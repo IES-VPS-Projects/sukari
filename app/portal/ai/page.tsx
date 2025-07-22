@@ -115,138 +115,138 @@ export default function AIInterfacePage() {
       <main className="flex-1 flex flex-col">
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-8">
-          {/* Greeting Header */}
-          <h1 className="text-3xl font-normal text-[#202020] mb-8">Dr. Wanjiku, it's great to see you</h1>
+          <div className="max-w-4xl mx-auto">
+            {/* Greeting Header */}
+            <h1 className="text-3xl font-normal text-[#202020] mb-8">Dr. Wanjiku, it's great to see you</h1>
 
-          {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            {/* KSB Copilot Daily - Large Featured Card */}
-            <div className="lg:col-span-2 xl:col-span-2">
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                      <Play className="h-6 w-6 text-white" />
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+              {/* KSB Copilot Daily - Large Featured Card */}
+              <div className="lg:col-span-2 xl:col-span-2">
+                <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
+                        <Play className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-xl">KSB Copilot Daily</h3>
+                        <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
+                      </div>
+                    </div>
+
+                    {/* Audio Waveform Visualization */}
+                    <div className="flex items-center justify-center mb-6 h-20">
+                      <div className="flex items-end gap-1">
+                        {Array.from({ length: 50 }, (_, i) => (
+                          <div
+                            key={i}
+                            className="bg-green-400 rounded-full animate-pulse"
+                            style={{
+                              width: "3px",
+                              height: `${Math.random() * 50 + 10}px`,
+                              animationDelay: `${i * 0.1}s`,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                      Sugar production up 8%, compliance review needed for 3 mills, favorable weather conditions expected
+                      for Western region
+                    </p>
+
+                    <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-full py-3">
+                      <Play className="h-4 w-4 mr-2" />
+                      Play now
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Weather Widget */}
+              <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                <CardContent className="p-6 relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-1">Nairobi</h3>
+                      <p className="text-4xl font-bold mb-1">24°</p>
+                      <p className="text-sm opacity-90 mb-1">Mostly cloudy</p>
+                      <p className="text-xs opacity-75">H 28° L 18°</p>
+                    </div>
+                    <div className="text-right">
+                      <Cloud className="h-16 w-16 opacity-80" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* KSB Insights Podcast Card */}
+              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                      <Headphones className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xl">KSB Copilot Daily</h3>
-                      <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
+                      <p className="text-xs text-[#6B6B6B] flex items-center gap-1">
+                        <Headphones className="h-3 w-3" />
+                        KSB Insights
+                      </p>
+                      <h3 className="font-medium text-[#202020]">Sugar Sector Transformation</h3>
                     </div>
                   </div>
+                  <div className="w-full h-24 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <AlarmClock className="h-8 w-8 text-purple-600" />
+                  </div>
+                </CardContent>
+              </Card>
 
-                  {/* Audio Waveform Visualization */}
-                  <div className="flex items-center justify-center mb-6 h-20">
-                    <div className="flex items-end gap-1">
-                      {Array.from({ length: 50 }, (_, i) => (
-                        <div
-                          key={i}
-                          className="bg-green-400 rounded-full animate-pulse"
-                          style={{
-                            width: "3px",
-                            height: `${Math.random() * 50 + 10}px`,
-                            animationDelay: `${i * 0.1}s`,
-                          }}
-                        />
-                      ))}
+              {/* Quick Analytics Card */}
+              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <h3 className="font-medium text-[#202020] mb-4">Quick Analytics</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#6B6B6B]">Production</span>
+                      <span className="font-semibold text-green-600">+8.2%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#6B6B6B]">Revenue</span>
+                      <span className="font-semibold text-green-600">+12.5%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-[#6B6B6B]">Compliance</span>
+                      <span className="font-semibold text-yellow-600">87%</span>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <p className="text-sm text-gray-300 mb-6 leading-relaxed">
-                    Sugar production up 8%, compliance review needed for 3 mills, favorable weather conditions expected
-                    for Western region
-                  </p>
-
-                  <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-full py-3">
-                    <Play className="h-4 w-4 mr-2" />
-                    Play now
-                  </Button>
+              {/* AI Suggestions Card */}
+              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <h3 className="font-medium text-[#202020] mb-4">AI Suggestions</h3>
+                  <div className="space-y-2">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                      Analyze Q4 trends
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                      Review compliance
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                      Generate report
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Weather Widget */}
-            <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative">
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Nairobi</h3>
-                    <p className="text-4xl font-bold mb-1">24°</p>
-                    <p className="text-sm opacity-90 mb-1">Mostly cloudy</p>
-                    <p className="text-xs opacity-75">H 28° L 18°</p>
-                  </div>
-                  <div className="text-right">
-                    <Cloud className="h-16 w-16 opacity-80" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* KSB Insights Podcast Card */}
-            <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Headphones className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#6B6B6B] flex items-center gap-1">
-                      <Headphones className="h-3 w-3" />
-                      KSB Insights
-                    </p>
-                    <h3 className="font-medium text-[#202020]">Sugar Sector Transformation</h3>
-                  </div>
-                </div>
-                <div className="w-full h-24 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <AlarmClock className="h-8 w-8 text-purple-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Analytics Card */}
-            <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <h3 className="font-medium text-[#202020] mb-4">Quick Analytics</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-[#6B6B6B]">Production</span>
-                    <span className="font-semibold text-green-600">+8.2%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-[#6B6B6B]">Revenue</span>
-                    <span className="font-semibold text-green-600">+12.5%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-[#6B6B6B]">Compliance</span>
-                    <span className="font-semibold text-yellow-600">87%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Suggestions Card */}
-            <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <h3 className="font-medium text-[#202020] mb-4">AI Suggestions</h3>
-                <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
-                    Analyze Q4 trends
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
-                    Review compliance
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
-                    Generate report
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Floating Message Input Bar */}
-          <div className="max-w-4xl mx-auto mt-8">
-            <form className="flex items-center gap-4 bg-white p-3 rounded-full shadow-lg">
-              <div className="flex-1 relative">
+            {/* Floating Message Input Bar */}
+            <form className="flex items-center gap-4 bg-[#F5F5DC] p-3 rounded-full shadow-lg">
+              <div className="flex-1 relative bg-white rounded-full">
                 <Input
                   placeholder="Message Sukari AI"
                   value={message}
@@ -255,12 +255,6 @@ export default function AIInterfacePage() {
                   className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
                 />
               </div>
-              <Button
-                variant="ghost"
-                className="rounded-full p-2 h-10 w-10"
-              >
-                <Image src="/sukari_ai_logo1.png" alt="Sukari AI" width={24} height={24} />
-              </Button>
               <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full">
                 <Plus className="h-5 w-5" />
               </Button>
