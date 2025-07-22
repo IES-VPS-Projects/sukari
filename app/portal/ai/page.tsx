@@ -117,7 +117,7 @@ export default function AIInterfacePage() {
         <div className="flex-1 overflow-y-auto p-8">
           <div className="max-w-4xl mx-auto">
             {/* Greeting Header */}
-            <h1 className="text-3xl font-normal text-[#202020] mb-8">Dr. Wanjiku, it's great to see you</h1>
+            <h1 className="text-3xl font-bold text-[#202020] mb-8 text-center">Dr. Wanjiku, it's great to see you</h1>
 
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
@@ -208,16 +208,16 @@ export default function AIInterfacePage() {
               <Card className="rounded-[24px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <h3 className="font-medium text-[#202020] mb-4">Quick Analytics</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
+                  <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
+                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Production</span>
                       <span className="font-semibold text-green-600">+8.2%</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Revenue</span>
                       <span className="font-semibold text-green-600">+12.5%</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Compliance</span>
                       <span className="font-semibold text-yellow-600">87%</span>
                     </div>
@@ -229,14 +229,14 @@ export default function AIInterfacePage() {
               <Card className="rounded-[24px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <h3 className="font-medium text-[#202020] mb-4">AI Suggestions</h3>
-                  <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                  <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
                       Analyze Q4 trends
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
                       Review compliance
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-2 text-sm">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
                       Generate report
                     </Button>
                   </div>
@@ -252,7 +252,7 @@ export default function AIInterfacePage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                  className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
+                  className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 outline-none text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
                 />
               </div>
               <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full">
