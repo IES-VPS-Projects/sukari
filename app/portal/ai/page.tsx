@@ -21,7 +21,13 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 
-const conversationHistory = [
+type ConversationGroup = {
+  date: string
+  conversations: string[]
+}
+
+// Make conversationHistory dynamic
+const initialHistory: ConversationGroup[] = [
   {
     date: "Friday, December 22",
     conversations: [
@@ -43,10 +49,11 @@ const conversationHistory = [
 export default function AIInterfacePage() {
   const [message, setMessage] = useState("")
   const [isListening, setIsListening] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [conversationHistory, setConversationHistory] = useState<ConversationGroup[]>(initialHistory)
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      // Handle sending message to AI
       setMessage("")
     }
   }
@@ -55,10 +62,22 @@ export default function AIInterfacePage() {
     setIsListening(!isListening)
   }
 
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed)
+  }
+
+  const handleNewChat = () => {
+    setMessage("")
+    setConversationHistory([
+      { date: new Date().toLocaleDateString(), conversations: [] },
+      ...conversationHistory
+    ])
+  }
+
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-[#F8F7F5]">
       {/* Left Sidebar */}
-      <aside className="w-80 bg-white border-r border-gray-200 flex flex-col">
+      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all ${isSidebarCollapsed ? 'w-0 overflow-hidden' : 'w-80'}`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
@@ -67,36 +86,25 @@ export default function AIInterfacePage() {
               <h2 className="text-xl font-semibold text-[#202020]">Sukari AI</h2>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={handleToggleSidebar}>
                 <LayoutPanelLeft className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={handleNewChat}>
                 <Pencil className="h-4 w-4" />
               </Button>
             </div>
           </div>
-
-          {/* Primary Navigation */}
-          <nav className="space-y-2">
-            <Button variant="ghost" className="w-full justify-start bg-blue-50 text-blue-700">
-              <Grid3X3 className="h-4 w-4 mr-3" />
-              Discover
-            </Button>
-            <Button variant="ghost" className="w-full justify-start text-[#6B6B6B]">
-              <Flask className="h-4 w-4 mr-3" />
-              Labs
-            </Button>
-          </nav>
         </div>
 
         {/* Conversation History */}
         <div className="flex-1 overflow-y-auto p-4">
+          <h3 className="text-lg font-medium text-[#202020] mb-4">Conversations</h3>
           <div className="space-y-6">
-            {conversationHistory.map((group, groupIndex) => (
+            {conversationHistory.map((group: ConversationGroup, groupIndex: number) => (
               <div key={groupIndex}>
-                <h3 className="text-sm font-medium text-[#6B6B6B] mb-3">{group.date}</h3>
+                <h4 className="text-sm font-medium text-[#6B6B6B] mb-3">{group.date}</h4>
                 <div className="space-y-2">
-                  {group.conversations.map((conversation, index) => (
+                  {group.conversations.map((conversation: string, index: number) => (
                     <button
                       key={index}
                       className="w-full text-left p-2 text-sm text-[#202020] hover:bg-gray-50 rounded-lg transition-colors"
@@ -121,16 +129,13 @@ export default function AIInterfacePage() {
 
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {/* KSB Copilot Daily - Large Featured Card */}
+              {/* Sukari AI Daily - Large Featured Card */}
               <div className="lg:col-span-2 xl:col-span-2">
                 <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
                   <CardContent className="p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                        <Play className="h-6 w-6 text-white" />
-                      </div>
                       <div>
-                        <h3 className="font-semibold text-xl">KSB Copilot Daily</h3>
+                        <h3 className="font-semibold text-xl">Sukari AI Daily</h3>
                         <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
                       </div>
                     </div>
@@ -208,16 +213,16 @@ export default function AIInterfacePage() {
               <Card className="rounded-[24px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <h3 className="font-medium text-[#202020] mb-4">Quick Analytics</h3>
-                  <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
-                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Production</span>
                       <span className="font-semibold text-green-600">+8.2%</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
+                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Revenue</span>
                       <span className="font-semibold text-green-600">+12.5%</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 hover:bg-[#F5F5DC]">
+                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       <span className="text-sm text-[#6B6B6B]">Compliance</span>
                       <span className="font-semibold text-yellow-600">87%</span>
                     </div>
@@ -229,14 +234,14 @@ export default function AIInterfacePage() {
               <Card className="rounded-[24px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <h3 className="font-medium text-[#202020] mb-4">AI Suggestions</h3>
-                  <div className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
+                  <div className="space-y-2">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       Analyze Q4 trends
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       Review compliance
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm hover:bg-[#F5F5DC] rounded-none">
+                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
                       Generate report
                     </Button>
                   </div>
