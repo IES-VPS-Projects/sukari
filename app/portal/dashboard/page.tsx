@@ -75,33 +75,31 @@ export default function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Production</CardTitle>
-            <Factory className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">18,247 MT</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 text-green-500" /> +12.5% from last quarter
-            </p>
-            <Progress value={85} className="mt-2" />
-            <p className="text-xs text-gray-600 mt-1">85% of annual target</p>
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-[#6B6B6B]">Production Pulse</h3>
+              <TrendingUp className="h-4 w-4 text-green-500" />
+            </div>
+            <div className="text-2xl font-bold text-[#202020] mb-1">24,580</div>
+            <p className="text-xs text-[#6B6B6B] mb-3">tonnes this month</p>
+            <p className="text-xs text-green-600 mb-2">+12% from last month</p>
+            <Progress value={78} className="h-2 mb-2" />
+            <p className="text-xs text-[#6B6B6B]">78% of monthly target</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue Generated</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">KSh 287M</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 text-green-500" /> +18.3% from last quarter
-            </p>
-            <Progress value={92} className="mt-2" />
-            <p className="text-xs text-gray-600 mt-1">92% of annual target</p>
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-[#6B6B6B]">Financial Health</h3>
+              <DollarSign className="h-4 w-4 text-green-500" />
+            </div>
+            <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
+            <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
+            <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
+            <div className="text-xs text-[#6B6B6B] mb-1">Levy Collection: 92%</div>
+            <Progress value={92} className="h-2" />
           </CardContent>
         </Card>
 
@@ -120,18 +118,23 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Rate</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">87%</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingDown className="inline h-3 w-3 text-red-500" /> -3% from last month
-            </p>
-            <Progress value={87} className="mt-2" />
-            <p className="text-xs text-gray-600 mt-1">3 mills need attention</p>
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            </div>
+            <div className="text-2xl font-bold text-[#202020] mb-1">94%</div>
+            <p className="text-xs text-[#6B6B6B] mb-3">overall compliance rate</p>
+            <p className="text-xs text-yellow-600 mb-2">3 pending violations</p>
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-[#6B6B6B]">Active Licenses</span>
+              <span className="font-medium">247</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-[#6B6B6B]">Renewals Due</span>
+              <span className="font-medium">12</span>
+            </div>
           </CardContent>
         </Card>
       </div>
