@@ -16,6 +16,8 @@ import {
   FileText,
   Award,
   Target,
+  Play,
+  Cloud,
 } from "lucide-react"
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 
@@ -60,34 +62,59 @@ export default function TodayPage() {
           </div>
 
           {/* AI Morning Briefing */}
-          <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white mb-8 rounded-[24px] shadow-lg border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <CheckCircle className="h-5 w-5" />
-                <h3 className="font-semibold text-lg">AI Morning Briefing</h3>
-              </div>
-              <p className="text-sm text-green-100 mb-6">Generated at 6:00 AM • Last updated 2 minutes ago</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="font-medium mb-3">Key Insights</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Sugar production up 12% this week vs last week</li>
-                    <li>• 3 mills reporting optimal capacity utilization</li>
-                    <li>• Weather conditions favorable for next 7 days</li>
-                  </ul>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2">
+              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div>
+                      <h3 className="font-semibold text-xl">Sukari AI Daily</h3>
+                      <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center mb-6 h-20">
+                    <div className="flex items-end gap-1">
+                      {Array.from({ length: 50 }, (_, i) => (
+                        <div
+                          key={i}
+                          className="bg-green-400 rounded-full animate-pulse"
+                          style={{
+                            width: "3px",
+                            height: `${Math.random() * 50 + 10}px`,
+                            animationDelay: `${i * 0.1}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                    Sugar production up 8%, compliance review needed for 3 mills, favorable weather conditions expected
+                    for Western region
+                  </p>
+                  <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-full py-3">
+                    <Play className="h-4 w-4 mr-2" />
+                    Play now
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+            <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative">
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+              <CardContent className="p-6 relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Nairobi</h3>
+                    <p className="text-4xl font-bold mb-1">24°</p>
+                    <p className="text-sm opacity-90 mb-1">Mostly cloudy</p>
+                    <p className="text-xs opacity-75">H 28° L 18°</p>
+                  </div>
+                  <div className="text-right">
+                    <Cloud className="h-16 w-16 opacity-80" />
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium mb-3">Action Required</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Review Mumias region compliance report</li>
-                    <li>• Approve 2 pending mill licenses</li>
-                    <li>• Schedule farmer meeting for next week</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* AI Recommendations and Stakeholder Sentiment */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

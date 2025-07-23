@@ -24,6 +24,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(true)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     let lastScroll = 0
@@ -47,20 +48,20 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={40} height={40} className="rounded-lg" />
+            <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={60} height={60} className="rounded-lg" />
             <div>
-              <h1 className="font-semibold text-green-800">KSB Executive Portal</h1>
-              <p className="text-xs text-gray-600">Kenya Sugar Board</p>
+              <h1 className="font-semibold text-green-800">Executive Portal</h1>
             </div>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
+          <DropdownMenu open={open} onOpenChange={setOpen}>
+            <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
+              <Button variant="ghost" className="flex items-center gap-2 border border-gray-300 rounded-md">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-green-100 text-green-800">
                     {user?.name
                       ?.split(" ")
+                      .slice(1)
                       .map((n) => n[0])
                       .join("") || "U"}
                   </AvatarFallback>
@@ -72,10 +73,13 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
+              <DropdownMenuItem>
+                Support
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Sign out
+                Log Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

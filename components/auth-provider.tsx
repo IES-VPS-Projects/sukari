@@ -28,7 +28,7 @@ const DEFAULT_CREDENTIALS = {
   user: {
     id: "1",
     email: "executive@ksb.go.ke",
-    name: "Dr. Sarah Wanjiku",
+    name: "Dr. Elvis Kazungu",
     role: "Chief Executive",
   },
 }
