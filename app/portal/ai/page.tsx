@@ -122,76 +122,13 @@ export default function AIInterfacePage() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-4xl mx-auto">
+        <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
+          <div className="max-w-4xl w-full">
             {/* Greeting Header */}
             <h1 className="text-3xl font-bold text-[#202020] mb-8 text-center">Dr. Kazungu, it's great to see you</h1>
 
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {/* KSB Insights Podcast Card */}
-              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Headphones className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#6B6B6B] flex items-center gap-1">
-                        <Headphones className="h-3 w-3" />
-                        KSB Insights
-                      </p>
-                      <h3 className="font-medium text-[#202020]">Sugar Sector Transformation</h3>
-                    </div>
-                  </div>
-                  <div className="w-full h-24 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-4">
-                    <AlarmClock className="h-8 w-8 text-purple-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Analytics Card */}
-              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <h3 className="font-medium text-[#202020] mb-4">Quick Analytics</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      <span className="text-sm text-[#6B6B6B]">Production</span>
-                      <span className="font-semibold text-green-600">+8.2%</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      <span className="text-sm text-[#6B6B6B]">Revenue</span>
-                      <span className="font-semibold text-green-600">+12.5%</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      <span className="text-sm text-[#6B6B6B]">Compliance</span>
-                      <span className="font-semibold text-yellow-600">87%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* AI Suggestions Card */}
-              <Card className="rounded-[24px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <h3 className="font-medium text-[#202020] mb-4">AI Suggestions</h3>
-                  <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      Analyze Q4 trends
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      Review compliance
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start text-left h-auto p-3 text-sm border border-gray-200 rounded-lg shadow-sm hover:bg-[#F5F5DC]">
-                      Generate report
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Floating Message Input Bar */}
-            <form className="flex items-center gap-4 bg-[#F5F5DC] p-3 rounded-full shadow-lg">
+            <form className="flex items-center gap-4 bg-[#F5F5DC] p-3 rounded-full shadow-lg mb-6">
               <div className="flex-1 relative bg-white rounded-full">
                 <Input
                   placeholder="Message Sukari AI"
@@ -213,6 +150,73 @@ export default function AIInterfacePage() {
                 <Mic className="h-5 w-5" />
               </Button>
             </form>
+
+            {/* AI Suggestions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("What's the drought risk for Western region?")}
+              >
+                What's the drought risk for Western region?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Predict next month's sugar production")}
+              >
+                Predict next month's sugar production
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("What are the top revenue-generating mills?")}
+              >
+                What are the top revenue-generating mills?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Compare revenue vs budget for Q1")}
+              >
+                Compare revenue vs budget for Q1
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Show me pending license renewals")}
+              >
+                Show me pending license renewals
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("List all compliance violations this month")}
+              >
+                List all compliance violations this month
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Which mills are underperforming this month?")}
+              >
+                Which mills are underperforming this month?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Compare this season's production with last year")}
+              >
+                Compare this season's production with last year
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Show me sugar production by county for the last quarter")}
+              >
+                Show me sugar production by county for the last quarter
+              </Button>
+            </div>
           </div>
         </div>
       </main>
