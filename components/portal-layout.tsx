@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -48,7 +48,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={60} height={60} className="rounded-lg" />
+            <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
             <div>
               <h1 className="font-semibold text-green-800">Executive Portal</h1>
             </div>
@@ -56,7 +56,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
 
           <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
-              <Button variant="ghost" className="flex items-center gap-2 border border-gray-300 rounded-md">
+              <Button variant="ghost" className="flex items-center gap-2 border-2 border-gray-300 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-green-100 text-green-800">
                     {user?.name
@@ -75,10 +75,15 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
               <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <HelpCircle className="mr-2 h-4 w-4" />
                 Support
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={logout}>
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4 text-red-600" />
                 Log Out
               </DropdownMenuItem>
             </DropdownMenuContent>

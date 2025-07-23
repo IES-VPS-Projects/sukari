@@ -18,8 +18,10 @@ import {
   Target,
   Play,
   Cloud,
+  TrendingDown,
 } from "lucide-react"
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
@@ -65,14 +67,14 @@ export default function TodayPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2">
               <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
                     <div>
-                      <h3 className="font-semibold text-xl">Sukari AI Daily</h3>
+                      <h3 className="font-semibold text-xl">Sukari AI Daily Brief</h3>
                       <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-center mb-6 h-20">
+                  <div className="flex items-center justify-center mb-4 h-15">
                     <div className="flex items-end gap-1">
                       {Array.from({ length: 50 }, (_, i) => (
                         <div
@@ -100,7 +102,7 @@ export default function TodayPage() {
             </div>
             <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative">
               <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-              <CardContent className="p-6 relative z-10">
+              <CardContent className="p-4 relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold mb-1">Nairobi</h3>
@@ -122,7 +124,7 @@ export default function TodayPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-[#202020]">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  AI Recommendations
+                  Action Items
                 </CardTitle>
                 <CardDescription className="text-[#6B6B6B]">
                   Intelligent insights based on current data patterns
@@ -236,21 +238,42 @@ export default function TodayPage() {
             {/* Quick Actions */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="text-[#202020]">Quick Actions</CardTitle>
+                <CardTitle className="text-[#202020]">Industry News</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="ghost" className="w-full justify-start h-auto p-3 bg-transparent">
-                  <Calendar className="h-4 w-4 mr-3" />
-                  Schedule Mill Visit
-                </Button>
-                <Button variant="ghost" className="w-full justify-start h-auto p-3 bg-transparent">
-                  <MessageSquare className="h-4 w-4 mr-3" />
-                  Message Stakeholders
-                </Button>
-                <Button variant="ghost" className="w-full justify-start h-auto p-3 bg-transparent">
-                  <FileText className="h-4 w-4 mr-3" />
-                  Generate Report
-                </Button>
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    <CarouselItem>
+                      <div className="p-1">
+                        <Card>
+                          <CardContent className="flex aspect-square items-center justify-center p-6">
+                            <span className="text-center">Sugar Prices Surge Amid Global Shortage</span>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                    <CarouselItem>
+                      <div className="p-1">
+                        <Card>
+                          <CardContent className="flex aspect-square items-center justify-center p-6">
+                            <span className="text-center">New Tech Boosts Cane Yields in Kenya</span>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                    <CarouselItem>
+                      <div className="p-1">
+                        <Card>
+                          <CardContent className="flex aspect-square items-center justify-center p-6">
+                            <span className="text-center">Government Subsidies for Sugar Farmers Announced</span>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
               </CardContent>
             </Card>
 
@@ -348,7 +371,7 @@ export default function TodayPage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-[#6B6B6B]">Sugar</h3>
-                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <TrendingDown className="h-4 w-4 text-red-500" />
                   </div>
                   <div className="text-2xl font-bold text-[#202020] mb-1">KSh 85</div>
                   <p className="text-xs text-[#6B6B6B] mb-3">per kg current price</p>
@@ -382,7 +405,7 @@ export default function TodayPage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-[#6B6B6B]">Fertilizer</h3>
-                    <TrendingUp className="h-4 w-4 text-green-500" />
+                    <TrendingDown className="h-4 w-4 text-red-500" />
                   </div>
                   <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2,500</div>
                   <p className="text-xs text-[#6B6B6B] mb-3">per 50 kg bag current price</p>
