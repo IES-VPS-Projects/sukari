@@ -139,6 +139,105 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* Dashboard Metrics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Performing Mills */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader>
+            <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#202020]">Mumias Sugar Mill</span>
+                <span className="text-sm font-medium text-green-600">85%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#202020]">Nzoia Sugar Mill</span>
+                <span className="text-sm font-medium text-green-600">80%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{width: '80%'}}></div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#202020]">West Kenya Sugar</span>
+                <span className="text-sm font-medium text-green-600">75%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Compliance Overview */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader>
+            <CardTitle className="text-[#202020]">Compliance Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#202020]">License Renewals</span>
+              <span className="text-sm font-medium text-green-600">98% Complete</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#202020]">Quality Standards</span>
+              <span className="text-sm font-medium text-orange-600">92% Compliant</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#202020]">Environmental Regulations</span>
+              <span className="text-sm font-medium text-green-600">96% Compliant</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#202020]">Safety Standards</span>
+              <span className="text-sm font-medium text-red-600">88% Compliant</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader>
+            <CardTitle className="text-[#202020]">Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#202020]">156</div>
+                <p className="text-xs text-[#6B6B6B]">New Farmers This Month</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">23</div>
+                <p className="text-xs text-[#6B6B6B]">Pending Licenses</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">7</div>
+                <p className="text-xs text-[#6B6B6B]">Mills Under Review</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">KES 2.4M</div>
+                <p className="text-xs text-[#6B6B6B]">Daily Revenue</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <ViewPlanModal open={viewPlanOpen} onOpenChange={setViewPlanOpen} />
     </div>
   )
