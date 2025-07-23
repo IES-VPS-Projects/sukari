@@ -74,6 +74,17 @@ export default function AIInterfacePage() {
     ])
   }
 
+  const SidebarActions = () => (
+    <div className="flex items-center gap-2">
+      <Button variant="ghost" size="sm" onClick={handleToggleSidebar}>
+        <LayoutPanelLeft className="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" size="sm" onClick={handleNewChat}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-[#F8F7F5]">
       {/* Left Sidebar */}
@@ -85,14 +96,7 @@ export default function AIInterfacePage() {
               <span className="text-2xl">✨</span>
               <h2 className="text-xl font-semibold text-[#202020]">Sukari AI</h2>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={handleToggleSidebar}>
-                <LayoutPanelLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleNewChat}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </div>
+            <SidebarActions />
           </div>
         </div>
 
@@ -220,6 +224,12 @@ export default function AIInterfacePage() {
           </div>
         </div>
       </main>
+
+      {isSidebarCollapsed && (
+        <div className="fixed top-[80px] left-0 z-10 p-2">
+          <SidebarActions />
+        </div>
+      )}
     </div>
   )
 }
