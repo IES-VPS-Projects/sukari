@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
 
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
@@ -48,7 +49,7 @@ export default function TodayPage() {
           {/* Header with User Info */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-normal text-[#202020]">Good morning, Dr. Wanjiku</h1>
+              <h1 className="text-3xl font-bold text-[#202020]">Good morning, Dr. Kazungu</h1>
               <p className="text-[#6B6B6B]">{currentTime}</p>
             </div>
             <div className="flex items-center gap-3">
@@ -237,52 +238,32 @@ export default function TodayPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Quick Actions */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-[#202020]">Industry News</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Carousel className="w-full">
+              <CardContent>
+                <Carousel className="w-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 })]}>
                   <CarouselContent>
-                    <CarouselItem>
-                      <div className="p-1">
-                        <Card>
-                          <CardContent className="flex aspect-square items-center justify-center p-6">
-                            <span className="text-center">Sugar Prices Surge Amid Global Shortage</span>
-                          </CardContent>
-                        </Card>
-                      </div>
+                    <CarouselItem className="bg-[url('/images/sugar_surge.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
+                      Sugar Prices Surge
                     </CarouselItem>
-                    <CarouselItem>
-                      <div className="p-1">
-                        <Card>
-                          <CardContent className="flex aspect-square items-center justify-center p-6">
-                            <span className="text-center">New Tech Boosts Cane Yields in Kenya</span>
-                          </CardContent>
-                        </Card>
-                      </div>
+                    <CarouselItem className="bg-[url('/images/cane_tech.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
+                      New Tech Boosts Yields
                     </CarouselItem>
-                    <CarouselItem>
-                      <div className="p-1">
-                        <Card>
-                          <CardContent className="flex aspect-square items-center justify-center p-6">
-                            <span className="text-center">Government Subsidies for Sugar Farmers Announced</span>
-                          </CardContent>
-                        </Card>
-                      </div>
+                    <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
+                      Government Subsidies
                     </CarouselItem>
                   </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
                 </Carousel>
               </CardContent>
             </Card>
 
             {/* Upcoming Meetings */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-[#202020]">Upcoming Meetings</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                   <div>
@@ -309,10 +290,10 @@ export default function TodayPage() {
 
             {/* Recent Activity */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
+              <CardHeader className="pb-2">
                 <CardTitle className="text-[#202020]">Recent Activity</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <CheckCircle className="h-4 w-4 text-green-600" />
