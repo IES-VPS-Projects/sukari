@@ -244,10 +244,10 @@ export default function TodayPage() {
               <CardContent>
                 <Carousel className="w-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 })]}>
                   <CarouselContent>
-                    <CarouselItem className="bg-[url('/images/sugar_surge.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
+                    <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
                       Sugar Prices Surge
                     </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/cane_tech.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
+                    <CarouselItem className="bg-[url('/images/cane_tech.jpeg')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
                       New Tech Boosts Yields
                     </CarouselItem>
                     <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">

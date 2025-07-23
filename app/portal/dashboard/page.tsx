@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   BarChart,
   Bar,
@@ -19,8 +20,31 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award } from "lucide-react"
+import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award, Filter } from "lucide-react"
 import { ViewPlanModal } from "@/components/modals/view-plan-modal"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js'
+import { Line as ChartLine, Doughnut } from 'react-chartjs-2'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  ArcElement
+)
 
 const productionData = [
   { month: "Jul", production: 2400, target: 2800 },
@@ -52,8 +76,84 @@ const stakeholders = [
   { type: "Molasses Dealers", count: 23, total: 30, location: "Industrial Areas", status: "compliant" },
 ]
 
+// Production Trends Chart Data
+const productionTrendsData = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  datasets: [
+    {
+      label: '2023',
+      data: [193000, 194500, 195000, 195500, 196000, 196500, 197000, 197500, 198000, 198500, 199000, 199500],
+      borderColor: '#f59e0b',
+      backgroundColor: '#f59e0b',
+      tension: 0.1,
+    },
+    {
+      label: '2024',
+      data: [258000, 258500, 259000, 260000, 261000, 262000, 263000, 264000, 265000, 266000, 267000, 268000],
+      borderColor: '#10b981',
+      backgroundColor: '#10b981',
+      tension: 0.1,
+    },
+  ],
+}
+
+// Regional Distribution Chart Data
+const regionalDistributionData = {
+  labels: ['Western', 'Nyanza', 'Rift Valley', 'Coast'],
+  datasets: [
+    {
+      data: [35, 26, 22, 17],
+      backgroundColor: ['#065f46', '#16a34a', '#fde047', '#a16207'],
+      borderWidth: 0,
+    },
+  ],
+}
+
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+    },
+    title: {
+      display: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: false,
+      grid: {
+        color: '#f3f4f6',
+      },
+    },
+    x: {
+      grid: {
+        color: '#f3f4f6',
+      },
+    },
+  },
+}
+
+const doughnutOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context: any) {
+          return `${context.label}: ${context.parsed}%`
+        }
+      }
+    },
+  },
+  cutout: '70%',
+}
+
 export default function DashboardPage() {
   const [viewPlanOpen, setViewPlanOpen] = useState(false)
+  const [selectedMetric, setSelectedMetric] = useState("Production")
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -232,6 +332,78 @@ export default function DashboardPage() {
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">KES 2.4M</div>
                 <p className="text-xs text-[#6B6B6B]">Daily Revenue</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Production Trends & Regional Distribution Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Production Trends Card */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-gray-600" />
+              <CardTitle className="text-[#202020]">Production Trends</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Filter className="h-4 w-4 text-gray-600" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ChartLine data={productionTrendsData} options={chartOptions} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Regional Distribution Card */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-gray-600" />
+              <CardTitle className="text-[#202020]">Regional Distribution</CardTitle>
+            </div>
+            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+              <SelectTrigger className="w-32 h-8">
+                <SelectValue placeholder="All Metrics" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Production">Production</SelectItem>
+                <SelectItem value="Farmers">Farmers</SelectItem>
+                <SelectItem value="Mills">Mills</SelectItem>
+                <SelectItem value="Compliance">Compliance</SelectItem>
+                <SelectItem value="Revenue">Revenue</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between h-80">
+              <div className="w-64 h-64 mx-auto">
+                <Doughnut data={regionalDistributionData} options={doughnutOptions} />
+              </div>
+              <div className="flex flex-col justify-center space-y-4 ml-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-green-800"></div>
+                  <span className="text-sm text-[#202020]">Western</span>
+                  <span className="text-sm font-medium text-[#202020]">35%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                  <span className="text-sm text-[#202020]">Nyanza</span>
+                  <span className="text-sm font-medium text-[#202020]">26%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
+                  <span className="text-sm text-[#202020]">Rift Valley</span>
+                  <span className="text-sm font-medium text-[#202020]">22%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-yellow-700"></div>
+                  <span className="text-sm text-[#202020]">Coast</span>
+                  <span className="text-sm font-medium text-[#202020]">17%</span>
+                </div>
               </div>
             </div>
           </CardContent>
