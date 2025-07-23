@@ -61,7 +61,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
                   <AvatarFallback className="bg-green-100 text-green-800">
                     {user?.name
                       ?.split(" ")
-                      .slice(1)
+                      .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
                       .map((n) => n[0])
                       .join("") || "U"}
                   </AvatarFallback>

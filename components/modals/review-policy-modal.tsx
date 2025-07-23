@@ -240,7 +240,7 @@ export function ReviewPolicyModal({ open, onOpenChange }: ReviewPolicyModalProps
                         {
                           version: "v2.1",
                           date: "2024-11-15",
-                          author: "Dr. Sarah Wanjiku",
+                          author: "Dr. Elvis Kazungu",
                           changes: "Updated quality control requirements",
                         },
                         {

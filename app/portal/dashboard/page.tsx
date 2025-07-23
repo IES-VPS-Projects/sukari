@@ -65,7 +65,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2">
           <Badge className="bg-green-100 text-green-800">Live Data</Badge>
           <Button variant="outline" size="sm">
-            Export Dashboard
+            Export Data
           </Button>
           <Button variant="outline" size="sm" onClick={() => setViewPlanOpen(true)}>
             View Plan

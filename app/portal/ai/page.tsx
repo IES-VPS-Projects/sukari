@@ -125,69 +125,10 @@ export default function AIInterfacePage() {
         <div className="flex-1 overflow-y-auto p-8">
           <div className="max-w-4xl mx-auto">
             {/* Greeting Header */}
-            <h1 className="text-3xl font-bold text-[#202020] mb-8 text-center">Dr. Wanjiku, it's great to see you</h1>
+            <h1 className="text-3xl font-bold text-[#202020] mb-8 text-center">Dr. Kazungu, it's great to see you</h1>
 
             {/* Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {/* Sukari AI Daily - Large Featured Card */}
-              <div className="lg:col-span-2 xl:col-span-2">
-                <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
-                  <CardContent className="p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div>
-                        <h3 className="font-semibold text-xl">Sukari AI Daily</h3>
-                        <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
-                      </div>
-                    </div>
-
-                    {/* Audio Waveform Visualization */}
-                    <div className="flex items-center justify-center mb-6 h-20">
-                      <div className="flex items-end gap-1">
-                        {Array.from({ length: 50 }, (_, i) => (
-                          <div
-                            key={i}
-                            className="bg-green-400 rounded-full animate-pulse"
-                            style={{
-                              width: "3px",
-                              height: `${Math.random() * 50 + 10}px`,
-                              animationDelay: `${i * 0.1}s`,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-gray-300 mb-6 leading-relaxed">
-                      Sugar production up 8%, compliance review needed for 3 mills, favorable weather conditions expected
-                      for Western region
-                    </p>
-
-                    <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-full py-3">
-                      <Play className="h-4 w-4 mr-2" />
-                      Play now
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Weather Widget */}
-              <Card className="bg-gradient-to-br from-blue-400 to-blue-600 text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative">
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                <CardContent className="p-6 relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Nairobi</h3>
-                      <p className="text-4xl font-bold mb-1">24°</p>
-                      <p className="text-sm opacity-90 mb-1">Mostly cloudy</p>
-                      <p className="text-xs opacity-75">H 28° L 18°</p>
-                    </div>
-                    <div className="text-right">
-                      <Cloud className="h-16 w-16 opacity-80" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* KSB Insights Podcast Card */}
               <Card className="rounded-[24px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
