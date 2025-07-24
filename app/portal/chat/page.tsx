@@ -85,9 +85,9 @@ export default function ChatPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto h-[calc(100vh-12rem)]">
-      <div className="flex h-full gap-6">
+      <div className="flex flex-col md:flex-row h-full gap-6">
         {/* Conversations List */}
-        <Card className="w-1/3 flex flex-col">
+        <Card className="w-full md:w-1/3 flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />

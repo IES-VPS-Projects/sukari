@@ -86,9 +86,9 @@ export default function AIInterfacePage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] bg-[#F8F7F5]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] bg-[#F8F7F5]">
       {/* Left Sidebar */}
-      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all ${isSidebarCollapsed ? 'w-0 overflow-hidden' : 'w-80'}`}>
+      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all lg:w-80 ${isSidebarCollapsed ? 'hidden lg:flex w-0' : 'w-full lg:w-80'}`}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
