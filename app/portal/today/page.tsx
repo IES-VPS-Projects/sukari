@@ -22,6 +22,7 @@ import {
   Sun,
   CloudRain,
   Wind,
+  ArrowRight,
 } from "lucide-react"
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
@@ -131,6 +132,113 @@ const weatherLocations: WeatherData[] = [
   }
 ]
 
+// Market Insights data schema
+interface ProductInsight {
+  productName: string
+  price: number
+  currency: string
+  priceUnit: string
+  weeklyChangePercent: number
+  weeklyChangeDirection: 'up' | 'down'
+  importVolume: number
+  exportVolume: number
+  volumeUnit: string
+}
+
+const marketData: ProductInsight[] = [
+  {
+    productName: "Sugarcane",
+    price: 4500,
+    currency: "KSh",
+    priceUnit: "per tonne",
+    weeklyChangePercent: 5,
+    weeklyChangeDirection: 'up',
+    importVolume: 1000,
+    exportVolume: 200,
+    volumeUnit: "tonnes"
+  },
+  {
+    productName: "Sugar",
+    price: 85,
+    currency: "KSh",
+    priceUnit: "per kg",
+    weeklyChangePercent: 2,
+    weeklyChangeDirection: 'down',
+    importVolume: 2450,
+    exportVolume: 890,
+    volumeUnit: "tonnes"
+  },
+  {
+    productName: "Molasses",
+    price: 15000,
+    currency: "KSh",
+    priceUnit: "per tonne",
+    weeklyChangePercent: 3,
+    weeklyChangeDirection: 'up',
+    importVolume: 500,
+    exportVolume: 300,
+    volumeUnit: "tonnes"
+  },
+  {
+    productName: "Fertilizer",
+    price: 2500,
+    currency: "KSh",
+    priceUnit: "per 50 kg bag",
+    weeklyChangePercent: 1,
+    weeklyChangeDirection: 'down',
+    importVolume: 1200,
+    exportVolume: 100,
+    volumeUnit: "tonnes"
+  }
+]
+
+// Market Insights Component
+const MarketInsightsCard = () => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % marketData.length)
+  }
+
+  const currentProduct = marketData[currentIndex]
+
+  return (
+    <Card 
+      className="rounded-[24px] shadow-lg border-0 bg-white relative overflow-hidden cursor-pointer"
+      onClick={handleNext}
+    >
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-[#202020]">Market Insights</CardTitle>
+        <Badge className="bg-gray-100 text-green-600 flex items-center gap-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          Live
+        </Badge>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-[#6B6B6B]">{currentProduct.productName}</h3>
+          {currentProduct.weeklyChangeDirection === 'up' ? (
+            <TrendingUp className="h-4 w-4 text-green-500" />
+          ) : (
+            <TrendingDown className="h-4 w-4 text-red-500" />
+          )}
+        </div>
+        <div className="text-2xl font-bold text-[#202020] mb-1">{currentProduct.currency} {currentProduct.price}</div>
+        <p className="text-xs text-[#6B6B6B] mb-3">{currentProduct.priceUnit}</p>
+        <p className="text-xs text-green-600 mb-2">{currentProduct.weeklyChangeDirection === 'up' ? '+' : '-'}{currentProduct.weeklyChangePercent}% from last week</p>
+        <div className="flex justify-between text-xs mb-1">
+          <span className="text-[#6B6B6B]">Import Volume</span>
+          <span className="font-medium">{currentProduct.importVolume} {currentProduct.volumeUnit}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className="text-[#6B6B6B]">Export Volume</span>
+          <span className="font-medium">{currentProduct.exportVolume} {currentProduct.volumeUnit}</span>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 // Weather Widget Component
 const WeatherCarouselWidget = () => {
   const [isActive, setIsActive] = useState(false)
@@ -194,20 +302,15 @@ const WeatherCarouselWidget = () => {
       <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
       <CardContent className="p-4 relative z-10 h-full flex flex-col">
         <div className="flex justify-between items-start">
-          {/* Location Name - Top Left */}
           <h3 className="text-lg font-semibold">{currentWeather.locationName}</h3>
-          {/* Weather Icon - Top Right */}
           <div>
             {getWeatherIcon(currentWeather.conditionCode)}
           </div>
         </div>
-        
         <div className="flex justify-between items-end mt-auto">
-          {/* Current Temperature - Bottom Left */}
           <div>
             <p className="text-4xl font-bold">{currentWeather.currentTemperature}°</p>
           </div>
-          {/* Weather Condition and High/Low - Bottom Right */}
           <div className="text-right">
             <p className="text-sm opacity-90 mb-1">{currentWeather.weatherCondition}</p>
             <p className="text-xs opacity-75">H {currentWeather.highTemperature}° L {currentWeather.lowTemperature}°</p>
@@ -259,13 +362,13 @@ export default function TodayPage() {
           </div>
 
           {/* AI Morning Briefing */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style={{ height: "50%" }}>
+            <div>
+              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0" style={{ height: "100%" }}>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div>
-                      <h3 className="font-semibold text-xl">Sukari AI Daily Brief</h3>
+                      <h3 className="font-semibold text-xl">Briefing</h3>
                       <p className="text-sm text-gray-300">Dec 22 • 3 min</p>
                     </div>
                   </div>
@@ -277,14 +380,14 @@ export default function TodayPage() {
                           className="bg-green-400 rounded-full animate-pulse"
                           style={{
                             width: "3px",
-                            height: `${Math.random() * 50 + 10}px`,
+                            height: `${Math.random() * 10 + 10}px`,
                             animationDelay: `${i * 0.1}s`,
                           }}
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                  <p className="text-xs text-gray-300 mb-6 leading-relaxed">
                     Sugar production up 8%, compliance review needed for 3 mills, favorable weather conditions expected
                     for Western region
                   </p>
@@ -295,6 +398,7 @@ export default function TodayPage() {
                 </CardContent>
               </Card>
             </div>
+            <MarketInsightsCard />
             <WeatherCarouselWidget />
           </div>
 
@@ -504,84 +608,6 @@ export default function TodayPage() {
             </Card>
           </div>
 
-          {/* Market Insights */}
-          <Card className="bg-white rounded-[24px] shadow-lg border-0 mb-8">
-            <CardHeader>
-              <CardTitle className="text-[#202020]">Market Insights</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Sugarcane</h3>
-                    <TrendingUp className="h-4 w-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 4,500</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">per tonne current price</p>
-                  <p className="text-xs text-green-600 mb-2">+5% from last week</p>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#6B6B6B]">Import Volume</span>
-                    <span className="font-medium">1,000 tonnes</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#6B6B6B]">Export Volume</span>
-                    <span className="font-medium">200 tonnes</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Sugar</h3>
-                    <TrendingDown className="h-4 w-4 text-red-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 85</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">per kg current price</p>
-                  <p className="text-xs text-red-600 mb-2">-2% from last week</p>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#6B6B6B]">Import Volume</span>
-                    <span className="font-medium">2,450 tonnes</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#6B6B6B]">Export Volume</span>
-                    <span className="font-medium">890 tonnes</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Molasses</h3>
-                    <TrendingUp className="h-4 w-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 15,000</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">per tonne current price</p>
-                  <p className="text-xs text-green-600 mb-2">+3% from last week</p>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#6B6B6B]">Import Volume</span>
-                    <span className="font-medium">500 tonnes</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#6B6B6B]">Export Volume</span>
-                    <span className="font-medium">300 tonnes</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Fertilizer</h3>
-                    <TrendingDown className="h-4 w-4 text-red-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2,500</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">per 50 kg bag current price</p>
-                  <p className="text-xs text-red-600 mb-2">-1% from last week</p>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#6B6B6B]">Import Volume</span>
-                    <span className="font-medium">1,200 tonnes</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-[#6B6B6B]">Export Volume</span>
-                    <span className="font-medium">100 tonnes</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
       <ScheduleVisitModal
