@@ -51,7 +51,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3">
               <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
               <div>
-                <h1 className="font-semibold text-green-800">Executive Portal</h1>
+                <h1 className="font-semibold text-green-800">Dashboard</h1>
               </div>
             </div>
 
