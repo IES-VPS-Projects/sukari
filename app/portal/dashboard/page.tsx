@@ -32,6 +32,7 @@ import {
   Tooltip as ChartTooltip,
   Legend,
   ArcElement,
+  Filler,
 } from 'chart.js'
 import { Line as ChartLine, Doughnut } from 'react-chartjs-2'
 import { useState as useStateReact, useEffect } from "react"
@@ -228,7 +229,8 @@ ChartJS.register(
   Title,
   ChartTooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  Filler
 )
 
 const productionData = [
@@ -269,15 +271,19 @@ const productionTrendsData = {
       label: '2023',
       data: [193000, 194500, 195000, 195500, 196000, 196500, 197000, 197500, 198000, 198500, 199000, 199500],
       borderColor: '#f59e0b',
-      backgroundColor: '#f59e0b',
+      backgroundColor: 'rgba(245, 158, 11, 0.3)',
+      fill: true,
       tension: 0.1,
+      stack: 'stack0',
     },
     {
       label: '2024',
       data: [258000, 258500, 259000, 260000, 261000, 262000, 263000, 264000, 265000, 266000, 267000, 268000],
       borderColor: '#10b981',
-      backgroundColor: '#10b981',
+      backgroundColor: 'rgba(16, 185, 129, 0.3)',
+      fill: true,
       tension: 0.1,
+      stack: 'stack0',
     },
   ],
 }
@@ -307,11 +313,13 @@ const chartOptions = {
   scales: {
     y: {
       beginAtZero: false,
+      stacked: true,
       grid: {
         color: '#f3f4f6',
       },
     },
     x: {
+      stacked: true,
       grid: {
         color: '#f3f4f6',
       },
