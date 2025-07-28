@@ -34,6 +34,191 @@ import {
   ArcElement,
 } from 'chart.js'
 import { Line as ChartLine, Doughnut } from 'react-chartjs-2'
+import { useState as useStateReact, useEffect } from "react"
+
+// Custom Gauge Meter Component
+const GaugeMeter = ({ value, size = 120 }: { value: number; size?: number }) => {
+  const [animatedValue, setAnimatedValue] = useStateReact(0)
+  
+  // Animation effect
+  useEffect(() => {
+    const duration = 2000 // 2 seconds
+    const steps = 60 // 60fps
+    const stepValue = value / steps
+    const stepDelay = duration / steps
+    
+    let currentStep = 0
+    const timer = setInterval(() => {
+      currentStep++
+      const newValue = Math.min(stepValue * currentStep, value)
+      setAnimatedValue(newValue)
+      
+      if (currentStep >= steps) {
+        clearInterval(timer)
+        setAnimatedValue(value) // Ensure final value is exact
+      }
+    }, stepDelay)
+    
+    return () => clearInterval(timer)
+  }, [value])
+  
+  const arcRadius = size * 0.28
+  const tickRadius = size * 0.38
+  const labelRadius = size * 0.45
+  const bezelRadius = size * 0.58
+  const startAngle = 180
+  const endAngle = 0
+  const angleRange = startAngle - endAngle
+  
+  // SVG dimensions to accommodate the full bezel
+  const svgWidth = (bezelRadius + 10) * 2
+  const svgHeight = size * 0.8
+  const centerX = svgWidth / 2
+  const centerY = size * 0.6
+  
+  // Calculate needle angle based on animated value (0-100%)
+  const needleAngle = startAngle - (animatedValue / 100) * angleRange
+  const needleLength = arcRadius * 0.9
+  const needleX = centerX + needleLength * Math.cos((needleAngle * Math.PI) / 180)
+  const needleY = centerY - needleLength * Math.sin((needleAngle * Math.PI) / 180)
+  
+  // Create multiple segments for smooth gradient transition
+  const segments = 50 // Number of segments for smooth transition
+  const segmentAngle = angleRange / segments
+  
+  return (
+    <div className="flex flex-col items-center">
+      <svg width={svgWidth} height={svgHeight} className="drop-shadow-sm">
+        <defs>
+          {/* Bezel gradient */}
+          <radialGradient id="bezelGradient">
+            <stop offset="0%" stopColor="#f0f0f0" />
+            <stop offset="60%" stopColor="#d0d0d0" />
+            <stop offset="85%" stopColor="#b0b0b0" />
+            <stop offset="100%" stopColor="#909090" />
+          </radialGradient>
+          
+          {/* Arc gradient for smooth color transition */}
+          <linearGradient id="arcGradient" gradientUnits="userSpaceOnUse" 
+            x1={centerX - arcRadius} y1={centerY} 
+            x2={centerX + arcRadius} y2={centerY}>
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="22.5%" stopColor="#f97316" />
+            <stop offset="45%" stopColor="#f59e0b" />
+            <stop offset="62.5%" stopColor="#eab308" />
+            <stop offset="75%" stopColor="#84cc16" />
+            <stop offset="87.5%" stopColor="#22c55e" />
+            <stop offset="100%" stopColor="#10b981" />
+          </linearGradient>
+        </defs>
+        
+        {/* Inner white face */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={arcRadius - 5}
+          fill="white"
+          stroke="#e5e5e5"
+          strokeWidth="1"
+        />
+        
+        {/* Single arc with gradient for smooth color transition */}
+        <path
+          d={`M ${centerX - arcRadius} ${centerY} A ${arcRadius} ${arcRadius} 0 0 1 ${centerX + arcRadius} ${centerY}`}
+          fill="none"
+          stroke="url(#arcGradient)"
+          strokeWidth="16"
+          strokeLinecap="round"
+        />
+        
+        {/* Scale tick marks and labels (outside the arcs) */}
+        {[0, 20, 40, 60, 80, 100].map((tick) => {
+          const tickAngle = startAngle - (tick / 100) * angleRange
+          const tickX1 = centerX + tickRadius * Math.cos((tickAngle * Math.PI) / 180)
+          const tickY1 = centerY - tickRadius * Math.sin((tickAngle * Math.PI) / 180)
+          const tickX2 = centerX + (tickRadius - 15) * Math.cos((tickAngle * Math.PI) / 180)
+          const tickY2 = centerY - (tickRadius - 15) * Math.sin((tickAngle * Math.PI) / 180)
+          const labelX = centerX + labelRadius * Math.cos((tickAngle * Math.PI) / 180)
+          const labelY = centerY - labelRadius * Math.sin((tickAngle * Math.PI) / 180)
+          
+          return (
+            <g key={tick}>
+              <line
+                x1={tickX1}
+                y1={tickY1}
+                x2={tickX2}
+                y2={tickY2}
+                stroke="#333"
+                strokeWidth="2"
+              />
+              <text
+                x={labelX}
+                y={labelY + 3}
+                textAnchor="middle"
+                fontSize="9"
+                fill="#333"
+                fontFamily="sans-serif"
+                fontWeight="500"
+              >
+                {tick}%
+              </text>
+            </g>
+          )
+        })}
+        
+        {/* Needle */}
+        <line
+          x1={centerX}
+          y1={centerY}
+          x2={needleX}
+          y2={needleY}
+          stroke="#000"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        
+        {/* Center dot */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r="4"
+          fill="#333"
+        />
+        
+        {/* Outer bezel (drawn last to appear on top) */}
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={bezelRadius}
+          fill="none"
+          stroke="url(#bezelGradient)"
+          strokeWidth="6"
+        />
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={bezelRadius - 3}
+          fill="none"
+          stroke="#a0a0a0"
+          strokeWidth="1"
+        />
+        <circle
+          cx={centerX}
+          cy={centerY}
+          r={bezelRadius + 3}
+          fill="none"
+          stroke="#e0e0e0"
+          strokeWidth="1"
+        />
+      </svg>
+      
+      {/* Digital display panel */}
+      <div className="mt-2 bg-gray-100 border border-gray-300 rounded-full px-4 py-1 shadow-inner">
+        <span className="text-lg font-bold text-black">{Math.round(animatedValue)}%</span>
+      </div>
+    </div>
+  )
+}
 
 ChartJS.register(
   CategoryScale,
@@ -223,16 +408,8 @@ export default function DashboardPage() {
               <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
               <AlertTriangle className="h-4 w-4 text-yellow-500" />
             </div>
-            <div className="text-2xl font-bold text-[#202020] mb-1">94%</div>
-            <p className="text-xs text-[#6B6B6B] mb-3">overall compliance rate</p>
-            <p className="text-xs text-yellow-600 mb-2">3 pending violations</p>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-[#6B6B6B]">Active Licenses</span>
-              <span className="font-medium">247</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-[#6B6B6B]">Renewals Due</span>
-              <span className="font-medium">12</span>
+            <div className="flex justify-center">
+              <GaugeMeter value={94} />
             </div>
           </CardContent>
         </Card>
