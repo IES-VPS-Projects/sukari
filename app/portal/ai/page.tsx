@@ -88,9 +88,9 @@ export default function AIInterfacePage() {
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] bg-[#F8F7F5]">
       {/* Left Sidebar */}
-      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all lg:w-80 ${isSidebarCollapsed ? 'hidden lg:flex w-0' : 'w-full lg:w-80'}`}>
+      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden' : 'w-full lg:w-80'}`}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-200">
+        <div className={`p-4 border-b border-gray-200 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-1">
               <span className="text-2xl">✨</span>
@@ -101,7 +101,7 @@ export default function AIInterfacePage() {
         </div>
 
         {/* Conversation History */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className={`flex-1 overflow-y-auto p-4 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
           <h3 className="text-lg font-medium text-[#202020] mb-4">Conversations</h3>
           <div className="space-y-6">
             {conversationHistory.map((group: ConversationGroup, groupIndex: number) => (

@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle, Settings } from "lucide-react"
+import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -18,7 +19,7 @@ const navigation = [
   { name: "Calendar", href: "/portal/calendar", icon: Calendar },
   { name: "Reports", href: "/portal/reports", icon: FileText },
   { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
-  { name: "AI Interface", href: "/portal/ai", icon: Bot },
+  { name: "AI", href: "/portal/ai", icon: HiSparkles },
 ]
 
 export function PortalLayout({ children }: { children: React.ReactNode }) {
