@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle, Settings } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -78,6 +78,10 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <HelpCircle className="mr-2 h-4 w-4" />
