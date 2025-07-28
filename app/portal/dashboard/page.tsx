@@ -159,7 +159,7 @@ export default function DashboardPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Executive Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Comprehensive overview of sugar sector performance</p>
         </div>
         <div className="flex items-center gap-2">
@@ -198,23 +198,22 @@ export default function DashboardPage() {
             <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
             <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
             <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
-            <div className="text-xs text-[#6B6B6B] mb-1">Levy Collection: 92%</div>
-            <Progress value={92} className="h-2" />
+            <Progress value={92} className="h-2 mb-2" />
+            <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Stakeholders</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3,038</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 text-green-500" /> +5.2% new registrations
-            </p>
-            <Progress value={78} className="mt-2" />
-            <p className="text-xs text-gray-600 mt-1">78% engagement rate</p>
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
+              <Users className="h-4 w-4 text-green-500" />
+            </div>
+            <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
+            <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
+            <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
+            <Progress value={78} className="h-2 mb-2" />
+            <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
           </CardContent>
         </Card>
 
