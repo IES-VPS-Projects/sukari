@@ -155,23 +155,23 @@ export default function ChatPage() {
             <div className="p-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold">Activity</h2>
               <div className="flex gap-4 mt-2">
-                <button className="text-sm text-blue-600 border-b-2 border-blue-600 pb-1">All</button>
-                <button className="text-sm text-gray-500 hover:text-gray-700">Mentions</button>
-                <button className="text-sm text-gray-500 hover:text-gray-700">Threads</button>
-                <button className="text-sm text-gray-500 hover:text-gray-700">Unreads <span className="bg-red-500 text-white text-xs rounded-full px-1 ml-1">3</span></button>
+                <button className="text-sm text-green-600 border-b-2 border-green-600 pb-1">All</button>
+                <button className="text-sm text-green-500 hover:text-green-700">Mentions</button>
+                <button className="text-sm text-green-500 hover:text-green-700">Threads</button>
+                <button className="text-sm text-green-500 hover:text-green-700">Unreads <span className="bg-red-500 text-white text-xs rounded-full px-1 ml-1">3</span></button>
               </div>
             </div>
             <div className="flex-1 overflow-hidden p-4">
               <div className="space-y-4">
-                <div className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm text-gray-600 mb-1">@channel mention in #field-officers</div>
-                  <div className="text-sm">Hey Track Leads, @channel (kindly read till the end)...</div>
-                  <div className="text-xs text-gray-500 mt-1">12:00 PM</div>
+                <div className="p-3 hover:bg-green-50 rounded-lg cursor-pointer">
+                  <div className="text-sm text-green-600 mb-1">@channel mention in #field-officers</div>
+                  <div className="text-sm text-green-700">Hey Track Leads, @channel (kindly read till the end)...</div>
+                  <div className="text-xs text-green-500 mt-1">12:00 PM</div>
                 </div>
-                <div className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-                  <div className="text-sm text-gray-600 mb-1">@channel mention in #compliance-reports</div>
-                  <div className="text-sm">@channel - anyone looking for a capstone project partner? 🤔</div>
-                  <div className="text-xs text-gray-500 mt-1">Friday</div>
+                <div className="p-3 hover:bg-green-50 rounded-lg cursor-pointer">
+                  <div className="text-sm text-green-600 mb-1">@channel mention in #compliance-reports</div>
+                  <div className="text-sm text-green-700">@channel - anyone looking for a capstone project partner? 🤔</div>
+                  <div className="text-xs text-green-500 mt-1">Friday</div>
                 </div>
               </div>
             </div>
@@ -435,31 +435,24 @@ export default function ChatPage() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-12 h-12 rounded-full bg-gray-600 hover:bg-gray-500 text-white border-0 shadow-lg"
+            className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 border-0 shadow-lg"
           >
             <Plus className="h-6 w-6" />
           </Button>
-        </div>
-
-        {/* User Profile Footer */}
-        <div className="border-t border-green-600 pt-3">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-green-600 text-white">EK</AvatarFallback>
-          </Avatar>
         </div>
       </div>
 
       {/* Column 2: Secondary Navigation / Conversation List */}
       {(currentView === "channel" || currentView === "dm") && (
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-green-50 border-r border-gray-200 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             {/* Header Row */}
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-lg font-bold">Home</h1>
+              <h1 className="text-lg font-bold text-green-700">Home</h1>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Unreads</span>
+                  <span className="text-sm text-green-600">Unreads</span>
                   <Switch 
                     checked={showUnreadsOnly}
                     onCheckedChange={setShowUnreadsOnly}
@@ -470,7 +463,7 @@ export default function ChatPage() {
                   variant="ghost" 
                   size="sm"
                   onClick={handleCreateNewMessage}
-                  className="p-1"
+                  className="p-1 text-green-600 hover:text-green-700 hover:bg-green-100"
                 >
                   <VscNewFile className="h-4 w-4" />
                 </Button>
@@ -479,26 +472,26 @@ export default function ChatPage() {
             
             {/* Search Bar */}
             <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Find a message"
-                className="pl-10"
+                className="pl-10 border-green-200 focus:border-green-400 focus:ring-green-200"
               />
             </div>
             
             {/* Action Buttons */}
             <div className="space-y-1">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-sm">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-sm text-green-700 hover:text-green-800 hover:bg-green-100">
                 <HiOutlineChatBubbleBottomCenterText className="h-4 w-4" />
                 Threads
               </Button>
-              <Button variant="ghost" className="w-full justify-start gap-3 text-sm">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-sm text-green-700 hover:text-green-800 hover:bg-green-100">
                 <MdOutlineSettingsVoice className="h-4 w-4" />
                 Meetings
               </Button>
-              <Button variant="ghost" className="w-full justify-start gap-3 text-sm">
+              <Button variant="ghost" className="w-full justify-start gap-3 text-sm text-green-700 hover:text-green-800 hover:bg-green-100">
                 <RiDraftLine className="h-4 w-4" />
                 Drafts
               </Button>
@@ -506,12 +499,12 @@ export default function ChatPage() {
           </div>
           
           {/* Conversation List */}
-          <div className="flex-1 overflow-hidden p-4">
+          <div className="flex-1 overflow-y-auto p-4 pb-28">
             {/* Channels Section */}
             <div className="mb-6">
               <button
                 onClick={() => setShowChannels(!showChannels)}
-                className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
+                className="w-full flex items-center justify-between px-3 py-2 text-sm text-green-700 hover:text-green-800"
               >
                 <span className="font-semibold">Channels</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${showChannels ? "" : "-rotate-90"}`} />
@@ -528,12 +521,12 @@ export default function ChatPage() {
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors ${
                         currentView === "channel" && selectedChannel.id === channel.id
-                          ? "bg-blue-50 border border-blue-200 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-50"
+                          ? "bg-green-100 border border-green-200 text-green-800"
+                          : "text-green-700 hover:bg-green-100"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Hash className="h-4 w-4 text-gray-500" />
+                        <Hash className="h-4 w-4 text-green-500" />
                         <span className={channel.unread > 0 ? "font-semibold" : ""}>{channel.name}</span>
                       </div>
                       {channel.unread > 0 && (
@@ -549,7 +542,7 @@ export default function ChatPage() {
             <div>
               <button
                 onClick={() => setShowDMs(!showDMs)}
-                className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
+                className="w-full flex items-center justify-between px-3 py-2 text-sm text-green-700 hover:text-green-800"
               >
                 <span className="font-semibold">Direct Messages</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${showDMs ? "" : "-rotate-90"}`} />
@@ -566,8 +559,8 @@ export default function ChatPage() {
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
                         currentView === "dm" && selectedDM?.id === dm.id
-                          ? "bg-blue-50 border border-blue-200 text-blue-700"
-                          : "text-gray-700 hover:bg-gray-50"
+                          ? "bg-green-100 border border-green-200 text-green-800"
+                          : "text-green-700 hover:bg-green-100"
                       }`}
                     >
                       <div className="relative">
@@ -583,10 +576,10 @@ export default function ChatPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className={`text-sm ${dm.unread > 0 ? "font-semibold" : ""}`}>{dm.name}</div>
-                        <div className="text-xs text-gray-500 truncate">{dm.lastMessage}</div>
+                        <div className="text-xs text-green-500 truncate">{dm.lastMessage}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-gray-500">{dm.time}</div>
+                        <div className="text-xs text-green-500">{dm.time}</div>
                         {dm.unread > 0 && (
                           <Badge className="bg-red-500 text-white text-xs mt-1">{dm.unread}</Badge>
                         )}

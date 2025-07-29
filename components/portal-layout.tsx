@@ -5,14 +5,13 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle, Settings, ArrowLeft, ArrowRight, Search, MoreHorizontal } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, ChevronDown, User, HelpCircle, Settings } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Input } from "@/components/ui/input"
 
 const navigation = [
   { name: "Today", href: "/portal/today", icon: Home },
@@ -52,20 +51,6 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
-              <div className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-700" />
-                <ArrowRight className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-700" />
-              </div>
-            </div>
-
-            <div className="flex-1 max-w-md mx-8">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input 
-                  placeholder="Search Kenya Sugar Board" 
-                  className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
-                />
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
