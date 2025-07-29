@@ -76,25 +76,25 @@ export default function AIInterfacePage() {
 
   const SidebarActions = () => (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="sm" onClick={handleToggleSidebar}>
+      <Button variant="ghost" size="sm" onClick={handleToggleSidebar} className="text-green-600 hover:text-green-700 hover:bg-green-100">
         <LayoutPanelLeft className="h-4 w-4" />
       </Button>
-      <Button variant="ghost" size="sm" onClick={handleNewChat}>
+      <Button variant="ghost" size="sm" onClick={handleNewChat} className="text-green-600 hover:text-green-700 hover:bg-green-100">
         <Pencil className="h-4 w-4" />
       </Button>
     </div>
   );
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] bg-[#F8F7F5]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] bg-white">
       {/* Left Sidebar */}
-      <aside className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden' : 'w-full lg:w-80'}`}>
+      <aside className={`bg-green-50 border-r border-gray-200 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden' : 'w-full lg:w-80'}`}>
         {/* Sidebar Header */}
         <div className={`p-4 border-b border-gray-200 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-1">
               <span className="text-2xl">✨</span>
-              <h2 className="text-xl font-semibold text-[#202020]">Sukari AI</h2>
+              <h2 className="text-xl font-semibold text-green-700">Sukari AI</h2>
             </div>
             <SidebarActions />
           </div>
@@ -102,16 +102,16 @@ export default function AIInterfacePage() {
 
         {/* Conversation History */}
         <div className={`flex-1 overflow-y-auto p-4 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
-          <h3 className="text-lg font-medium text-[#202020] mb-4">Conversations</h3>
+          <h3 className="text-lg font-medium text-green-700 mb-4">Conversations</h3>
           <div className="space-y-6">
             {conversationHistory.map((group: ConversationGroup, groupIndex: number) => (
               <div key={groupIndex}>
-                <h4 className="text-sm font-medium text-[#6B6B6B] mb-3">{group.date}</h4>
+                <h4 className="text-sm font-medium text-green-600 mb-3">{group.date}</h4>
                 <div className="space-y-2">
                   {group.conversations.map((conversation: string, index: number) => (
                     <button
                       key={index}
-                      className="w-full text-left p-2 text-sm text-[#202020] hover:bg-gray-50 rounded-lg transition-colors"
+                      className="w-full text-left p-2 text-sm text-green-700 hover:bg-green-100 rounded-lg transition-colors"
                     >
                       {conversation}
                     </button>
@@ -129,10 +129,10 @@ export default function AIInterfacePage() {
         <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
           <div className="max-w-4xl w-full">
             {/* Greeting Header */}
-            <h1 className="text-3xl font-bold text-[#202020] mb-8 text-center">Dr. Kazungu, it's great to see you</h1>
+            <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">Dr. Kazungu, it&apos;s great to see you</h1>
 
             {/* Floating Message Input Bar */}
-            <form className="flex items-center gap-4 bg-[#F5F5DC] p-3 rounded-full shadow-lg mb-6">
+            <form className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6">
               <div className="flex-1 relative bg-white rounded-full">
                 <Input
                   placeholder="Message Sukari AI"
@@ -142,14 +142,14 @@ export default function AIInterfacePage() {
                   className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 outline-none text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
                 />
               </div>
-              <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full">
+              <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full text-green-600 hover:text-green-700 hover:bg-green-100">
                 <Plus className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleVoiceInput}
-                className={`h-10 w-10 rounded-full ${isListening ? "bg-red-50 text-red-600" : ""}`}
+                className={`h-10 w-10 rounded-full ${isListening ? "bg-red-50 text-red-600" : "text-green-600 hover:text-green-700 hover:bg-green-100"}`}
               >
                 <Mic className="h-5 w-5" />
               </Button>
@@ -159,63 +159,63 @@ export default function AIInterfacePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("What's the drought risk for Western region?")}
               >
                 What's the drought risk for Western region?
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Predict next month's sugar production")}
               >
                 Predict next month's sugar production
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("What are the top revenue-generating mills?")}
               >
                 What are the top revenue-generating mills?
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Compare revenue vs budget for Q1")}
               >
                 Compare revenue vs budget for Q1
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Show me pending license renewals")}
               >
                 Show me pending license renewals
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("List all compliance violations this month")}
               >
                 List all compliance violations this month
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Which mills are underperforming this month?")}
               >
                 Which mills are underperforming this month?
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Compare this season's production with last year")}
               >
                 Compare this season's production with last year
               </Button>
               <Button 
                 variant="outline" 
-                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-[#F5F5DC] active:bg-[#F5F5DC] text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
                 onClick={() => setMessage("Show me sugar production by county for the last quarter")}
               >
                 Show me sugar production by county for the last quarter
