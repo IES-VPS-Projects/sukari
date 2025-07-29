@@ -5,13 +5,14 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle, Settings } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle, Settings, ArrowLeft, ArrowRight, Search, MoreHorizontal } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Input } from "@/components/ui/input"
 
 const navigation = [
   { name: "Today", href: "/portal/today", icon: Home },
@@ -49,48 +50,64 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
+              <div className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-700" />
+                <ArrowRight className="h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-700" />
+              </div>
             </div>
 
-            <DropdownMenu open={open} onOpenChange={setOpen}>
-              <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
-                <Button variant="ghost" className="flex items-center gap-2 border-2 border-gray-300 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-green-100 text-green-800">
-                      {user?.name
-                        ?.split(" ")
-                        .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
-                        .map((n) => n[0])
-                        .join("") || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{user?.name}</span>
-                    <span className="text-xs text-gray-500">{user?.role}</span>
-                  </div>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Support
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                  Log Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex-1 max-w-md mx-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input 
+                  placeholder="Search Kenya Sugar Board" 
+                  className="pl-10 bg-gray-50 border-gray-200 focus:bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <DropdownMenu open={open} onOpenChange={setOpen}>
+                <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
+                  <Button variant="ghost" className="flex items-center gap-2 border-2 border-gray-300 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-green-100 text-green-800">
+                        {user?.name
+                          ?.split(" ")
+                          .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
+                          .map((n) => n[0])
+                          .join("") || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-medium">{user?.name}</span>
+                      <span className="text-xs text-gray-500">{user?.role}</span>
+                    </div>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Support
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
         <main className="flex-1 pb-24 overflow-auto">{children}</main>
