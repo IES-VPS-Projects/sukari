@@ -44,7 +44,7 @@ const channels = [
 const directMessages: DirectMessage[] = [
   { id: 1, name: "Yusuf Menza", status: "online", unread: 2, lastMessage: "The mill inspection report for Nzoia is ready for your review", time: "5m" },
   { id: 2, name: "Joyce Jura", status: "away", unread: 0, lastMessage: "Budget allocation for Q2 has been approved by the board", time: "15m" },
-  { id: 3, name: "Elvis Kazungu", status: "online", unread: 1, lastMessage: "Emergency meeting scheduled for tomorrow regarding regulatory changes", time: "1h" },
+  { id: 3, name: "Jude Chesire", status: "online", unread: 1, lastMessage: "Emergency meeting scheduled for tomorrow regarding regulatory changes", time: "1h" },
   { id: 4, name: "Moses Mtengo", status: "offline", unread: 0, lastMessage: "Compliance audit findings submitted to your dashboard", time: "3h" },
 ]
 
@@ -52,14 +52,14 @@ const channelMessages = [
   {
     id: 1,
     type: "system",
-    content: "Elvis Kazungu, Darius Jabali and 163 others joined.",
+    content: "Jude Chesire, Darius Jabali and 163 others joined.",
     timestamp: "6:44 PM",
     date: "Friday, May 30th"
   },
   {
     id: 2,
     type: "message",
-    user: "Elvis Kazungu (Director General)",
+    user: "Jude Chesire (Director General)",
     avatar: "EK",
     content: "One more week until Success in Black - Customer Success network event. There's still some room to register",
     timestamp: "4:25 PM",
@@ -88,7 +88,7 @@ const dmMessages: { [key: number]: any[] } = {
       type: "message",
       user: "Yusuf Menza",
       avatar: "YM",
-      content: "Good morning Dr. Kazungu! The Nzoia Sugar Mill inspection has been completed.",
+      content: "Good morning Jude Chesire! The Nzoia Sugar Mill inspection has been completed.",
       timestamp: "9:15 AM",
       date: "Today"
     },
@@ -117,7 +117,7 @@ const dmMessages: { [key: number]: any[] } = {
       type: "message",
       user: "Joyce Jura",
       avatar: "JJ",
-      content: "Dr. Kazungu, I have great news about the Q2 budget proposal!",
+      content: "Jude Chesire, I have great news about the Q2 budget proposal!",
       timestamp: "8:30 AM",
       date: "Today"
     },
@@ -140,11 +140,11 @@ const dmMessages: { [key: number]: any[] } = {
       date: "Today"
     }
   ],
-  3: [ // Elvis Kazungu
+  3: [ // Jude Chesire
     {
       id: 1,
       type: "message",
-      user: "Elvis Kazungu",
+      user: "Jude Chesire",
       avatar: "EK",
       content: "Good morning! We need to discuss the new regulatory framework from the Ministry.",
       timestamp: "7:45 AM",
@@ -153,7 +153,7 @@ const dmMessages: { [key: number]: any[] } = {
     {
       id: 2,
       type: "message",
-      user: "Elvis Kazungu",
+      user: "Jude Chesire",
       avatar: "EK",
       content: "There are significant changes to sugar industry compliance requirements that affect all our mills.",
       timestamp: "7:47 AM",
@@ -162,7 +162,7 @@ const dmMessages: { [key: number]: any[] } = {
     {
       id: 3,
       type: "message",
-      user: "Elvis Kazungu",
+      user: "Jude Chesire",
       avatar: "EK",
       content: "Emergency meeting scheduled for tomorrow regarding regulatory changes",
       timestamp: "8:30 AM",
@@ -410,7 +410,7 @@ export default function ChatPage() {
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="font-semibold">Elvis Kazungu</span>
+                          <span className="font-semibold">Jude Chesire</span>
                           <span className="text-gray-500">Yesterday</span>
                         </div>
                         <p className="text-sm mt-1">@Director we need to discuss the new regulatory framework from the Ministry.</p>

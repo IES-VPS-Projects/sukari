@@ -129,7 +129,7 @@ export default function AIInterfacePage() {
         <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
           <div className="max-w-4xl w-full">
             {/* Greeting Header */}
-            <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">Dr. Kazungu, it&apos;s great to see you</h1>
+            <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">Jude Chesire, it&apos;s great to see you</h1>
 
             {/* Floating Message Input Bar */}
             <form className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6">

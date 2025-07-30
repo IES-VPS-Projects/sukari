@@ -346,7 +346,7 @@ export default function TodayPage() {
           {/* Header with User Info */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-[#202020]">Good morning, Dr. Kazungu</h1>
+              <h1 className="text-3xl font-bold text-[#202020]">Good morning, Jude Chesire</h1>
               <p className="text-[#6B6B6B]">{currentTime}</p>
             </div>
             <div className="flex items-center gap-3">
