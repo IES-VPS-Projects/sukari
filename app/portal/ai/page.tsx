@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,7 @@ import {
   Pencil,
 } from "lucide-react"
 import Image from "next/image"
+import { useAuth } from "@/components/auth-provider"
 
 type ConversationGroup = {
   date: string
@@ -51,6 +52,31 @@ export default function AIInterfacePage() {
   const [isListening, setIsListening] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [conversationHistory, setConversationHistory] = useState<ConversationGroup[]>(initialHistory)
+  const [dynamicGreeting, setDynamicGreeting] = useState("")
+  const { user } = useAuth()
+
+  // Array of dynamic greetings for AI impression
+  const dynamicGreetings = [
+    "Back at it, {name}?",
+    "Nice to see you {name}, What's new?",
+    "Hi {name}, what should we dive into today?",
+    "Hey {name}, what's on your mind today?"
+  ]
+
+  // Get the first name from the user's full name
+  const getFirstName = (fullName: string) => {
+    return fullName.split(' ')[0]
+  }
+
+  // Select a random greeting when the component mounts
+  useEffect(() => {
+    if (user) {
+      const firstName = getFirstName(user.name)
+      const randomIndex = Math.floor(Math.random() * dynamicGreetings.length)
+      const greeting = dynamicGreetings[randomIndex].replace('{name}', firstName)
+      setDynamicGreeting(greeting)
+    }
+  }, [user])
 
   const handleSendMessage = () => {
     if (message.trim()) {
@@ -129,7 +155,9 @@ export default function AIInterfacePage() {
         <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
           <div className="max-w-4xl w-full">
             {/* Greeting Header */}
-            <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">Jude Chesire, it&apos;s great to see you</h1>
+            <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">
+              {dynamicGreeting || "Great to see you"}
+            </h1>
 
             {/* Floating Message Input Bar */}
             <form className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6">

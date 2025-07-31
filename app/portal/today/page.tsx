@@ -27,6 +27,7 @@ import {
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
+import { useAuth } from "@/components/auth-provider"
 
 // Weather data schema
 interface WeatherData {
@@ -324,6 +325,32 @@ const WeatherCarouselWidget = () => {
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("")
+  const [greeting, setGreeting] = useState("")
+  const { user } = useAuth()
+  
+  // Get the first name from the user's full name
+  const getFirstName = (fullName: string) => {
+    return fullName.split(' ')[0]
+  }
+  
+  // Generate time-based greeting
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours()
+    const firstName = user ? getFirstName(user.name) : "there"
+    
+    if (hour < 12) {
+      return `Good Morning, ${firstName}`
+    } else if (hour < 17) {
+      return `Good Afternoon, ${firstName}`
+    } else {
+      return `Good Evening, ${firstName}`
+    }
+  }
+  
+  // Set time-based greeting when component mounts or user changes
+  useEffect(() => {
+    setGreeting(getTimeBasedGreeting())
+  }, [user])
 
   const currentTime = new Date().toLocaleString("en-US", {
     weekday: "long",
@@ -346,7 +373,7 @@ export default function TodayPage() {
           {/* Header with User Info */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-[#202020]">Good morning, Jude Chesire</h1>
+              <h1 className="text-3xl font-bold text-[#202020]">{greeting}</h1>
               <p className="text-[#6B6B6B]">{currentTime}</p>
             </div>
             <div className="flex items-center gap-3">
