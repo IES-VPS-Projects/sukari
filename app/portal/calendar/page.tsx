@@ -613,7 +613,9 @@ export default function CalendarPage() {
                             <span className="text-sm text-gray-700">•</span>
                             <span className="text-sm text-gray-700">{new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
                             {event.recurring && (
-                              <RefreshCw className="h-3 w-3 text-gray-500" title="Recurring event" />
+                              <span title="Recurring event">
+                                <RefreshCw className="h-3 w-3 text-gray-500" />
+                              </span>
                             )}
                           </div>
                         </div>

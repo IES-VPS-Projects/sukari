@@ -353,7 +353,6 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Comprehensive overview of sugar sector performance</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge className="bg-green-100 text-green-800">Live Data</Badge>

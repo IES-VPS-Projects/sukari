@@ -50,7 +50,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
+              <Image src="/images/AGRI-Logo.png" alt="AGRI Logo" width={75} height={75} className="rounded-lg" />
             </div>
 
             <div className="flex items-center gap-3">
