@@ -61,7 +61,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={80} height={80} className="rounded-lg" />
+            <Image src="/images/ISEAGRILOGO.png" alt="KSB Logo" width={80} height={80} className="rounded-lg" />
           </div>
           <CardTitle className="text-2xl font-bold text-green-800">Create Account</CardTitle>
           <CardDescription>Join the KSB Executive Portal</CardDescription>

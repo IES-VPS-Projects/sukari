@@ -22,7 +22,7 @@ const navigation = [
   { name: "AI", href: "/portal/ai", icon: HiSparkles },
 ]
 
-export function PortalLayout({ children }: { children: React.ReactNode }) {
+export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(true)
@@ -49,9 +49,19 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
+          <div className="flex items-center">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/images/ISEAGRILOGO.png" 
+                alt="AFA Logo" 
+                className="h-12 w-auto"
+              />
+              <div className="border-l border-gray-300 pl-3">
+                <h1 className="text-lg font-semibold text-gray-900">{pageTitle}</h1>
+                <p className="text-xs text-gray-500">KENYA SUGAR BOARD</p>
+              </div>
             </div>
+          </div>
 
             <div className="flex items-center gap-3">
               <DropdownMenu open={open} onOpenChange={setOpen}>

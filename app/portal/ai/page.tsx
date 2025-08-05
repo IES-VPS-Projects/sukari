@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import { useAuth } from "@/components/auth-provider"
+import { geminiService, ChatMessage } from "@/lib/gemini-service";
 
 type ConversationGroup = {
   date: string
@@ -53,6 +54,8 @@ export default function AIInterfacePage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [conversationHistory, setConversationHistory] = useState<ConversationGroup[]>(initialHistory)
   const [dynamicGreeting, setDynamicGreeting] = useState("")
+  const [conversation, setConversation] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth()
 
   // Array of dynamic greetings for AI impression
@@ -78,9 +81,19 @@ export default function AIInterfacePage() {
     }
   }, [user])
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim()) {
-      setMessage("")
+      const userMsg: ChatMessage = { role: 'user', content: message };
+      setConversation(prev => [...prev, userMsg]);
+      setMessage("");
+      setLoading(true);
+      try {
+        const aiReply = await geminiService.generateResponse([...conversation, userMsg]);
+        setConversation(prev => [...prev, { role: 'assistant', content: aiReply }]);
+      } catch (err) {
+        setConversation(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not get a response from the AI.' }]);
+      }
+      setLoading(false);
     }
   }
 
@@ -154,24 +167,47 @@ export default function AIInterfacePage() {
         {/* Content Area */}
         <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
           <div className="max-w-4xl w-full">
+            {/* Conversation History */}
+            <div className="mb-6 space-y-4">
+              {conversation.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`rounded-xl px-4 py-2 max-w-[80%] ${msg.role === 'user' ? 'bg-green-200 text-right' : 'bg-gray-100 text-left'}`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="rounded-xl px-4 py-2 bg-gray-100 text-left animate-pulse">Sukari AI is typing...</div>
+                </div>
+              )}
+            </div>
             {/* Greeting Header */}
             <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">
               {dynamicGreeting || "Great to see you"}
             </h1>
 
             {/* Floating Message Input Bar */}
-            <form className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6">
+            <form 
+              className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6"
+              onSubmit={e => { e.preventDefault(); handleSendMessage(); }}
+            >
               <div className="flex-1 relative bg-white rounded-full">
                 <Input
                   placeholder="Message Sukari AI"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                   className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 outline-none text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
                 />
               </div>
-              <Button variant="ghost" size="sm" className="h-10 w-10 rounded-full text-green-600 hover:text-green-700 hover:bg-green-100">
-                <Plus className="h-5 w-5" />
+              <Button 
+                type="submit"
+                variant="ghost" 
+                size="sm" 
+                className="h-10 w-10 rounded-full text-green-600 hover:text-green-700 hover:bg-green-100"
+                aria-label="Send message"
+              >
+                <Play className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
@@ -188,65 +224,72 @@ export default function AIInterfacePage() {
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("What's the drought risk for Western region?")}
+                onClick={() => setMessage("Show national sugar production for 2024")}
               >
-                What's the drought risk for Western region?
+                Show national sugar production for 2024
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Predict next month's sugar production")}
+                onClick={() => setMessage("Compare sugar production by region for last year")}
               >
-                Predict next month's sugar production
+                Compare sugar production by region for last year
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("What are the top revenue-generating mills?")}
+                onClick={() => setMessage("Which factory had the highest production this month?")}
               >
-                What are the top revenue-generating mills?
+                Which factory had the highest production this month?
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Compare revenue vs budget for Q1")}
+                onClick={() => setMessage("Show sugar production trends for the last 5 years")}
               >
-                Compare revenue vs budget for Q1
+                Show sugar production trends for the last 5 years
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Show me pending license renewals")}
+                onClick={() => setMessage("What is the average crop yield by region?")}
               >
-                Show me pending license renewals
+                What is the average crop yield by region?
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("List all compliance violations this month")}
+                onClick={() => setMessage("List all factories and their production for June")}
               >
-                List all compliance violations this month
+                List all factories and their production for June
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Which mills are underperforming this month?")}
+                onClick={() => setMessage("What was the total cane deliveries in Nzoia in March?")}
               >
-                Which mills are underperforming this month?
+                What was the total cane deliveries in Nzoia in March?
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Compare this season's production with last year")}
+                onClick={() => setMessage("Show production value by variety")}
               >
-                Compare this season's production with last year
+                Show production value by variety
               </Button>
               <Button 
                 variant="outline" 
                 className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
-                onClick={() => setMessage("Show me sugar production by county for the last quarter")}
+                onClick={() => setMessage("Which regions had the lowest production last quarter?")}
               >
-                Show me sugar production by county for the last quarter
+                Which regions had the lowest production last quarter?
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal"
+                onClick={() => setMessage("Give me a summary of sugar prices over the years")}
+              >
+                Give me a summary of sugar prices over the years
               </Button>
             </div>
           </div>
