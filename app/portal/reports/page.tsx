@@ -85,8 +85,7 @@ export default function ReportsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Page Title */}
         <div className="px-6 py-4">
-          <h1 className="text-3xl font-bold text-gray-900">Reports Center</h1>
-          <p className="text-gray-600 mt-1">Access and manage all KSB reports</p>
+          <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
         </div>
 
         {/* Search and Filter Bar - Extended across full width */}
@@ -214,74 +213,153 @@ export default function ReportsPage() {
                 <hr className="border-gray-200 mb-6" />
 
                 {/* Reports List */}
-                <div className={`space-y-4 ${viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-0" : ""}`}>
-                  {reportsData.map((report) => {
-                    const Icon = report.icon
-                    return (
-                      <div key={report.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <Icon className="h-5 w-5 text-blue-600" />
+                <div className={viewMode === "grid" ? "relative" : "space-y-4"}>
+                  {viewMode === "grid" ? (
+                    /* Horizontal Scrollable Grid View */
+                    <div className="overflow-x-auto pb-4">
+                      <div className="flex gap-6 min-w-max">
+                        {reportsData.map((report) => {
+                          const Icon = report.icon
+                          return (
+                            <div key={report.id} className="flex-shrink-0 w-80 border rounded-lg p-6 hover:shadow-lg transition-all bg-white">
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <Icon className="h-6 w-6 text-blue-600" />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-gray-900 mb-1 text-lg">{report.title}</h3>
+                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                                      <Badge variant="outline" className="text-xs">
+                                        {report.category}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <Badge 
+                                    variant={report.status === "Published" ? "default" : "secondary"}
+                                    className={report.status === "Published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
+                                  >
+                                    {report.status}
+                                  </Badge>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* Report Details */}
+                              <div className="space-y-3 mb-4">
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>{report.date}</span>
+                                  <span>•</span>
+                                  <span>{report.size}</span>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  Last modified {report.lastModified}
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex flex-col gap-2">
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 w-full">
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Report
+                                </Button>
+                                <div className="flex gap-2">
+                                  <Button variant="outline" size="sm" className="flex-1">
+                                    <Download className="h-4 w-4 mr-2" />
+                                    PDF
+                                  </Button>
+                                  <Button variant="outline" size="sm" className="flex-1">
+                                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                                    Excel
+                                  </Button>
+                                  <Button variant="outline" size="sm">
+                                    <Share className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-gray-900 mb-1">{report.title}</h3>
-                              <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <Badge variant="outline" className="text-xs">
-                                  {report.category}
+                          )
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    /* List View */
+                    <div className="space-y-4">
+                      {reportsData.map((report) => {
+                        const Icon = report.icon
+                        return (
+                          <div key={report.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                  <Icon className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-gray-900 mb-1">{report.title}</h3>
+                                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                                    <Badge variant="outline" className="text-xs">
+                                      {report.category}
+                                    </Badge>
+                                    <span>•</span>
+                                    <span>{report.date}</span>
+                                    <span>•</span>
+                                    <span>{report.size}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Badge 
+                                  variant={report.status === "Published" ? "default" : "secondary"}
+                                  className={report.status === "Published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
+                                >
+                                  {report.status}
                                 </Badge>
-                                <span>•</span>
-                                <span>{report.date}</span>
-                                <span>•</span>
-                                <span>{report.size}</span>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2 mb-4">
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Report
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Download className="h-4 w-4 mr-2" />
+                                Download PDF
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                                Export Excel
+                              </Button>
+                            </div>
+
+                            {/* Metadata */}
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                              <span>Last modified {report.lastModified}</span>
+                              <div className="flex items-center gap-2">
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Share className="h-3 w-3" />
+                                </Button>
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Download className="h-3 w-3" />
+                                </Button>
                               </div>
                             </div>
                           </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <Badge 
-                              variant={report.status === "Published" ? "default" : "secondary"}
-                              className={report.status === "Published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
-                            >
-                              {report.status}
-                            </Badge>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex items-center gap-2 mb-4">
-                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Report
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
-                            Download PDF
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <FileSpreadsheet className="h-4 w-4 mr-2" />
-                            Export Excel
-                          </Button>
-                        </div>
-
-                        {/* Metadata */}
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>Last modified {report.lastModified}</span>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                              <Share className="h-3 w-3" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                              <Download className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
