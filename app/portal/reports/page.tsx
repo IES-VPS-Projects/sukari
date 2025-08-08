@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Download, Search, TrendingUp, AlertTriangle, CheckCircle, DollarSign, Plus, Filter, MoreHorizontal, Share, Grid, List, Calendar, Eye, FileSpreadsheet, ChevronDown } from "lucide-react"
 import { ReviewPolicyModal } from "@/components/modals/review-policy-modal"
 import { CustomReportModal } from "@/components/modals/custom-report-modal"
+import { PortalLayout } from "@/components/portal-layout"
 
 // Sample reports data
 const reportsData = [
@@ -81,12 +82,13 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        {/* Page Title */}
-        <div className="px-6 py-4">
-          <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-        </div>
+    <PortalLayout pageTitle="Reports">
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Title */}
+          <div className="px-6 py-4">
+            <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
+          </div>
 
         {/* Search and Filter Bar - Extended across full width */}
         <div className="bg-white border-b px-6 py-4 mx-6 rounded-lg shadow-sm mb-6">
@@ -412,5 +414,6 @@ export default function ReportsPage() {
       <ReviewPolicyModal open={reviewPolicyOpen} onOpenChange={setReviewPolicyOpen} />
       <CustomReportModal open={customReportOpen} onOpenChange={setCustomReportOpen} />
     </div>
+    </PortalLayout>
   )
 }

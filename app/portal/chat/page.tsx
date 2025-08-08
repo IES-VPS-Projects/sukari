@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
+import { PortalLayout } from "@/components/portal-layout"
 import { 
   Search, 
   Hash, 
@@ -666,11 +667,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-5rem)] bg-gray-50">
-      {/* Column 1: Primary Navigation Sidebar */}
-      <div className="w-20 bg-green-700 text-white flex flex-col items-center py-6">
-        {/* Navigation */}
-        <nav className="flex-1 flex flex-col items-center space-y-6">
+    <PortalLayout pageTitle="Chat">
+      <div className="flex h-[calc(100vh-5rem)] bg-gray-50">
+        {/* Column 1: Primary Navigation Sidebar */}
+        <div className="w-20 bg-green-700 text-white flex flex-col items-center py-6">
+          {/* Navigation */}
+          <nav className="flex-1 flex flex-col items-center space-y-6">
           <button
             onClick={() => {
               setActiveNavigation("home")
@@ -1051,5 +1053,6 @@ export default function ChatPage() {
       {/* Column 3: Main Content / Chat View */}
       {renderMainContent()}
     </div>
+    </PortalLayout>
   )
 }

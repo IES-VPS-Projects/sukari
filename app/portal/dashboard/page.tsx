@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PortalLayout } from "@/components/portal-layout"
 import {
   BarChart,
   Bar,
@@ -349,12 +350,13 @@ export default function DashboardPage() {
   const [selectedMetric, setSelectedMetric] = useState("Production")
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        </div>
-        <div className="flex items-center gap-2">
+    <PortalLayout pageTitle="Dashboard">
+      <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          </div>
+          <div className="flex items-center gap-2">
           <Badge className="bg-green-100 text-green-800">Live Data</Badge>
           <Button variant="outline" size="sm">
             Export Data
@@ -595,5 +597,6 @@ export default function DashboardPage() {
 
       <ViewPlanModal open={viewPlanOpen} onOpenChange={setViewPlanOpen} />
     </div>
+    </PortalLayout>
   )
 }

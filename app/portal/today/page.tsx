@@ -14,126 +14,23 @@ import {
   Calendar,
   MessageSquare,
   FileText,
-  Award,
-  Target,
   Play,
   Pause,
-  Cloud,
   TrendingDown,
-  Sun,
-  CloudRain,
-  Wind,
   ArrowRight,
 } from "lucide-react"
+import { BsCheckAll, BsBoxArrowUpRight } from 'react-icons/bs'
+import { FiSettings, FiAlertTriangle } from 'react-icons/fi'
+import { HiEllipsisHorizontal } from 'react-icons/hi2'
+import { FaAngleDown } from 'react-icons/fa'
+import { LuForward } from 'react-icons/lu'
+import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
+import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
-
-// Weather data schema
-interface WeatherData {
-  locationName: string
-  currentTemperature: number
-  highTemperature: number
-  lowTemperature: number
-  temperatureUnit: 'celsius'
-  weatherCondition: string
-  conditionCode: 'SUNNY' | 'CLOUDY' | 'RAINY' | 'WINDY'
-}
-
-const weatherLocations: WeatherData[] = [
-  {
-    locationName: "Nzoia",
-    currentTemperature: 22,
-    highTemperature: 26,
-    lowTemperature: 16,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Mumias",
-    currentTemperature: 23,
-    highTemperature: 27,
-    lowTemperature: 17,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Partly cloudy",
-    conditionCode: 'CLOUDY'
-  },
-  {
-    locationName: "Chemelil",
-    currentTemperature: 25,
-    highTemperature: 29,
-    lowTemperature: 19,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Light rain",
-    conditionCode: 'RAINY'
-  },
-  {
-    locationName: "Muhoroni",
-    currentTemperature: 24,
-    highTemperature: 28,
-    lowTemperature: 18,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Windy",
-    conditionCode: 'WINDY'
-  },
-  {
-    locationName: "Thika",
-    currentTemperature: 26,
-    highTemperature: 30,
-    lowTemperature: 20,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Ganze",
-    currentTemperature: 28,
-    highTemperature: 32,
-    lowTemperature: 22,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Hot and sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Ramisi",
-    currentTemperature: 27,
-    highTemperature: 31,
-    lowTemperature: 21,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Partly cloudy",
-    conditionCode: 'CLOUDY'
-  },
-  {
-    locationName: "Butali",
-    currentTemperature: 21,
-    highTemperature: 25,
-    lowTemperature: 15,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Rainy",
-    conditionCode: 'RAINY'
-  },
-  {
-    locationName: "Webuye",
-    currentTemperature: 20,
-    highTemperature: 24,
-    lowTemperature: 14,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Cool and windy",
-    conditionCode: 'WINDY'
-  },
-  {
-    locationName: "Kibos",
-    currentTemperature: 23,
-    highTemperature: 27,
-    lowTemperature: 17,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  }
-]
 
 // Market Insights data schema
 interface ProductInsight {
@@ -211,6 +108,70 @@ const transcriptData = [
   { time: 110, text: "Thank you for listening. Stay tuned for more updates on the sugar sector." }  
 ];
 
+// Updates data for the Updates card
+const updatesData = {
+  alerts: [
+    {
+      id: '1',
+      title: 'Production Below Threshold',
+      label: 'HIGH',
+      description: 'Muhoroni sugar company production fell 25% below',
+      timestamp: '11:32 PM • Muhoroni',
+      labelColor: 'bg-red-500',
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600'
+    },
+    {
+      id: '2',
+      title: 'Compliance Issue Detected',
+      label: 'MEDIUM',
+      description: 'Nzoia Sugar Mill compliance violations reported',
+      timestamp: '10:15 AM • Nzoia',
+      labelColor: 'bg-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    {
+      id: '3',
+      title: 'Locust Infestation',
+      label: 'LOW',
+      description: 'Minor pest activity detected in western region',
+      timestamp: '9:30 AM • Butali',
+      labelColor: 'bg-yellow-500',
+      iconBg: 'bg-yellow-100',
+      iconColor: 'text-yellow-600'
+    }
+  ],
+  notifications: [
+    {
+      id: '4',
+      title: 'New Policy Update',
+      label: 'INFO',
+      description: 'Sugar Act 2024 implementation guidelines released',
+      timestamp: '2:45 PM • Kenya Sugar Board',
+      labelColor: 'bg-blue-500',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600'
+    },
+    {
+      id: '5',
+      title: 'Payment Processed',
+      label: 'SUCCESS',
+      description: 'Farmer payments disbursed successfully',
+      timestamp: '1:20 PM • Chemelil',
+      labelColor: 'bg-green-500',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600'
+    }
+  ]
+};
+
+// Scheduler suggestions data
+const schedulerSuggestions = [
+  'Quarterly board meeting',
+  'Reminder to read Farmer Daily Article'
+];
+
 // Market Insights Component
 const MarketInsightsCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -258,81 +219,252 @@ const MarketInsightsCard = () => {
   )
 }
 
-// Weather Widget Component
-const WeatherCarouselWidget = () => {
-  const [isActive, setIsActive] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null
-
-    if (isActive) {
-      interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % weatherLocations.length)
-      }, 3000)
-    }
-
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isActive])
-
-  const currentWeather = weatherLocations[currentIndex]
-
-  const getBackgroundGradient = (conditionCode: string) => {
-    switch (conditionCode) {
-      case 'SUNNY':
-        return 'from-orange-400 to-yellow-500'
-      case 'CLOUDY':
-        return 'from-blue-400 to-blue-600'
-      case 'RAINY':
-        return 'from-gray-500 to-blue-500'
-      case 'WINDY':
-        return 'from-gray-400 to-gray-600'
+// Updates Card Component
+const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemId }: {
+  activeTab: string,
+  setActiveTab: (tab: string) => void,
+  selectedItemId: string | null,
+  setSelectedItemId: (id: string | null) => void
+}) => {
+  const getTabData = () => {
+    switch (activeTab) {
+      case 'alerts':
+        return updatesData.alerts
+      case 'notifications':
+        return updatesData.notifications
       default:
-        return 'from-blue-400 to-blue-600'
+        return updatesData.alerts
     }
   }
 
-  const getWeatherIcon = (conditionCode: string) => {
-    switch (conditionCode) {
-      case 'SUNNY':
-        return <Sun className="h-16 w-16 opacity-80" />
-      case 'CLOUDY':
-        return <Cloud className="h-16 w-16 opacity-80" />
-      case 'RAINY':
-        return <CloudRain className="h-16 w-16 opacity-80" />
-      case 'WINDY':
-        return <Wind className="h-16 w-16 opacity-80" />
+  const getTabCount = (tab: string) => {
+    switch (tab) {
+      case 'alerts':
+        return updatesData.alerts.length
+      case 'notifications':
+        return updatesData.notifications.length
       default:
-        return <Cloud className="h-16 w-16 opacity-80" />
+        return 0
     }
+  }
+
+  const handleItemAction = (action: string, itemId: string) => {
+    console.log(`${action} action for item ${itemId}`)
+    setSelectedItemId(null)
   }
 
   return (
-    <Card 
-      className={`bg-gradient-to-br ${getBackgroundGradient(currentWeather.conditionCode)} text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative transition-all duration-500 cursor-pointer`}
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => {
-        setIsActive(false)
-        setCurrentIndex(0)
-      }}
-    >
-      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-      <CardContent className="p-4 relative z-10 h-full flex flex-col">
-        <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold">{currentWeather.locationName}</h3>
-          <div>
-            {getWeatherIcon(currentWeather.conditionCode)}
+    <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+      <CardHeader className="pb-1">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-[#202020]">Updates</CardTitle>
+          <div className="flex items-center gap-3">
+            <BsCheckAll className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+            <BsBoxArrowUpRight className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer" />
+            <FiSettings className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer" />
           </div>
         </div>
-        <div className="flex justify-between items-end mt-auto">
-          <div>
-            <p className="text-4xl font-bold">{currentWeather.currentTemperature}°</p>
+      </CardHeader>
+      <CardContent className="p-4">
+        {/* Tabs */}
+        <div className="flex gap-12 mb-4 border-b">
+          {['alerts', 'notifications'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-2 text-sm font-medium capitalize relative flex-1 text-center ${
+                activeTab === tab
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab}
+              {getTabCount(tab) > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs bg-red-500 text-white rounded-full flex items-center justify-center">
+                  {getTabCount(tab)}
+                </Badge>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="space-y-3">
+          {getTabData().map((item) => (
+            <div 
+              key={item.id} 
+              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                item.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
+                item.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
+                item.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
+                item.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
+                item.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
+                item.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
+                'hover:bg-gray-50'
+              } hover:shadow-md`}
+            >
+              {/* Icon */}
+              <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                <FiAlertTriangle className={`h-4 w-4 ${item.iconColor}`} />
+              </div>
+              
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-medium text-[#202020] truncate">{item.title}</h4>
+                      <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                        item.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
+                        item.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
+                        item.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                        item.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
+                        item.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                        item.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
+                        'bg-gray-50/80 text-gray-700 border-gray-300'
+                      }`}>
+                        {item.label}
+                      </div>
+                    </div>
+                    <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                    <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
+                  </div>
+                  
+                  {/* Options Menu */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
+                      className="p-1 hover:bg-gray-100 rounded"
+                    >
+                      <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {selectedItemId === item.id && (
+                      <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleItemAction('mark-read', item.id)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                          >
+                            <CheckCircle className="h-3 w-3" />
+                            Mark as read
+                          </button>
+                          <button
+                            onClick={() => handleItemAction('forward', item.id)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                          >
+                            <LuForward className="h-3 w-3" />
+                            Forward
+                          </button>
+                          <button
+                            onClick={() => handleItemAction('take-action', item.id)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                          >
+                            <Calendar className="h-3 w-3" />
+                            Take Action
+                          </button>
+                          <button
+                            onClick={() => handleItemAction('delete', item.id)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50 text-red-600"
+                          >
+                            ✕ Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// Scheduler Card Component
+const SchedulerCard = ({ schedulerInput, setSchedulerInput }: {
+  schedulerInput: string,
+  setSchedulerInput: (value: string) => void
+}) => {
+  const handleSubmit = () => {
+    if (schedulerInput.trim()) {
+      console.log('Scheduling:', schedulerInput)
+      setSchedulerInput('')
+    }
+  }
+
+  const handleAttachDocument = () => {
+    console.log('Attach document clicked')
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSchedulerInput(suggestion)
+  }
+
+  return (
+    <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+      <CardHeader className="pb-1">
+        <CardTitle className="text-[#202020]">Scheduler</CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        {/* Input Area */}
+        <div className="relative mb-4">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+            {/* Add/Plus Icon */}
+            <button
+              onClick={handleAttachDocument}
+              className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+            >
+              <BiPlus className="h-4 w-4 text-gray-600" />
+            </button>
+            
+            {/* Input Field */}
+            <input
+              type="text"
+              value={schedulerInput}
+              onChange={(e) => setSchedulerInput(e.target.value)}
+              placeholder="Add a new task or event..."
+              className="flex-1 bg-transparent text-sm text-[#202020] placeholder-gray-500 focus:outline-none"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSubmit()
+                }
+              }}
+            />
+            
+            {/* Voice/Send Icon */}
+            <button
+              onClick={handleSubmit}
+              className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+            >
+              {schedulerInput.trim() ? (
+                <BiSend className="h-4 w-4 text-white" />
+              ) : (
+                <BiMicrophone className="h-4 w-4 text-white" />
+              )}
+            </button>
           </div>
-          <div className="text-right">
-            <p className="text-sm opacity-90 mb-1">{currentWeather.weatherCondition}</p>
-            <p className="text-xs opacity-75">H {currentWeather.highTemperature}° L {currentWeather.lowTemperature}°</p>
+        </div>
+
+        {/* Suggestions Section */}
+        <div>
+          <h4 className="text-sm font-medium text-[#202020] mb-3">Suggestions</h4>
+          <div className="space-y-2">
+            {schedulerSuggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                onClick={() => handleSuggestionClick(suggestion)}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
+              >
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <HiSparkles className="h-4 w-4 text-blue-600" />
+                </div>
+                <p className="text-sm text-[#202020] flex-1">{suggestion}</p>
+              </div>
+            ))}
           </div>
         </div>
       </CardContent>
@@ -351,6 +483,13 @@ export default function TodayPage() {
   const [audio] = useState(typeof window !== 'undefined' ? new Audio('/sukari2.mp3') : null)
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
   const [audioTime, setAudioTime] = useState(0)
+
+  // Updates card state
+  const [activeTab, setActiveTab] = useState('alerts')
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+
+  // Scheduler state
+  const [schedulerInput, setSchedulerInput] = useState('')
 
   const handleAudioPlay = () => {
     if (audio) {
@@ -412,6 +551,14 @@ export default function TodayPage() {
     }
     return [{ text: "...", isActive: false, isComplete: false }]
   }
+
+  // Auto-scroll effect for transcript
+  useEffect(() => {
+    const transcriptContainer = document.getElementById('transcript-container')
+    if (transcriptContainer && isPlaying) {
+      transcriptContainer.scrollTop = transcriptContainer.scrollHeight
+    }
+  }, [currentTranscriptIndex, audioTime, isPlaying])
   
   // Get the first name from the user's full name
   const getFirstName = (fullName: string) => {
@@ -461,16 +608,6 @@ export default function TodayPage() {
               <h1 className="text-3xl font-bold text-[#202020]">{greeting}</h1>
               <p className="text-[#6B6B6B]">{currentTime}</p>
             </div>
-            <div className="flex items-center gap-3">
-              <Badge className="bg-green-100 text-green-800 border-green-200">
-                <Target className="h-3 w-3 mr-1" />
-                1,250 Points
-              </Badge>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                <Award className="h-3 w-3 mr-1" />
-                Level 5 Executive
-              </Badge>
-            </div>
           </div>
 
           {/* AI Morning Briefing */}
@@ -516,22 +653,24 @@ export default function TodayPage() {
                   )}
                   
                   {/* Transcript Display */}
-                  <div className="mb-6">
-                    {getCurrentTranscriptLines().map((line, index) => (
-                      <p 
-                        key={index} 
-                        className={`text-xs leading-relaxed transition-all duration-300 ${
-                          line.isActive 
-                            ? 'text-green-400' 
-                            : line.isComplete 
-                              ? 'text-gray-400' 
-                              : 'text-gray-300'
-                        }`}
-                      >
-                        {line.text}
-                        {line.isActive && <span className="animate-pulse">|</span>}
-                      </p>
-                    ))}
+                  <div id="transcript-container" className="mb-6 h-6 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
+                    <div className="transition-all duration-300">
+                      {getCurrentTranscriptLines().map((line, index) => (
+                        <p 
+                          key={index} 
+                          className={`text-xs leading-relaxed transition-all duration-300 ${
+                            line.isActive 
+                              ? 'text-green-400' 
+                              : line.isComplete 
+                                ? 'text-gray-400' 
+                                : 'text-gray-300'
+                          }`}
+                        >
+                          {line.text}
+                          {line.isActive && <span className="animate-pulse">|</span>}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                   
                   <Button 
@@ -554,16 +693,37 @@ export default function TodayPage() {
               </Card>
             </div>
             <MarketInsightsCard />
-            <WeatherCarouselWidget />
+            
+            {/* Industry News Card */}
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader className="pb-1">
+                <CardTitle className="text-[#202020]">Industry News</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <Carousel className="w-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 })]}>
+                  <CarouselContent>
+                    <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
+                      Sugar Prices Surge
+                    </CarouselItem>
+                    <CarouselItem className="bg-[url('/images/cane_tech.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
+                      New Tech Boosts Yields
+                    </CarouselItem>
+                    <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
+                      Government Subsidies
+                    </CarouselItem>
+                  </CarouselContent>
+                </Carousel>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* AI Recommendations and Stakeholder Sentiment */}
+          {/* AI Recommendations and Updates */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-[#202020]">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  Action Items
+                  AI Insights
                 </CardTitle>
                 <CardDescription className="text-[#6B6B6B]">
                   Intelligent insights based on current data patterns
@@ -607,116 +767,55 @@ export default function TodayPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#202020]">
-                  <Users className="h-5 w-5 text-purple-600" />
-                  Stakeholder Sentiment
-                </CardTitle>
-                <CardDescription className="text-[#6B6B6B]">
-                  AI-analyzed feedback from field reports and communications
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-[#202020]">Farmers</span>
-                    </div>
-                    <span className="text-sm font-medium text-green-600">78% Positive</span>
-                  </div>
-                  <Progress value={78} className="h-2" />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-[#202020]">Mill Operators</span>
-                    </div>
-                    <span className="text-sm font-medium text-blue-600">85% Positive</span>
-                  </div>
-                  <Progress value={85} className="h-2" />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      <span className="text-sm text-[#202020]">Dealers</span>
-                    </div>
-                    <span className="text-sm font-medium text-yellow-600">65% Neutral</span>
-                  </div>
-                  <Progress value={65} className="h-2" />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <span className="text-sm text-[#202020]">Field Officers</span>
-                    </div>
-                    <span className="text-sm font-medium text-purple-600">92% Positive</span>
-                  </div>
-                  <Progress value={92} className="h-2" />
-                </div>
-
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-[#6B6B6B]">
-                    <strong>Recent Feedback:</strong> "New digital reporting system has improved efficiency
-                    significantly" - Field Officer, Nyanza Region
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <UpdatesCard 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              selectedItemId={selectedItemId}
+              setSelectedItemId={setSelectedItemId}
+            />
           </div>
 
           {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Quick Actions */}
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-[#202020]">Industry News</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Carousel className="w-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 })]}>
-                  <CarouselContent>
-                    <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
-                      Sugar Prices Surge
-                    </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/cane_tech.jpeg')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
-                      New Tech Boosts Yields
-                    </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-40 flex items-center justify-center text-white font-bold text-lg">
-                      Government Subsidies
-                    </CarouselItem>
-                  </CarouselContent>
-                </Carousel>
-              </CardContent>
-            </Card>
-
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style={{ height: "10%" }}>
             {/* Upcoming Meetings */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-1">
                 <CardTitle className="text-[#202020]">Upcoming Meetings</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 p-6">
-                <div className="flex items-center gap-3">
+              <CardContent className="space-y-2 p-4">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to meeting details page
+                    console.log('Navigate to Board Meeting details')
+                  }}
+                >
                   <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                   <div>
                     <p className="text-sm font-medium text-[#202020]">Board Meeting</p>
                     <p className="text-xs text-[#6B6B6B]">Today, 2:00 PM</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to meeting details page
+                    console.log('Navigate to Farmer Representatives meeting details')
+                  }}
+                >
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <div>
                     <p className="text-sm font-medium text-[#202020]">Farmer Representatives</p>
                     <p className="text-xs text-[#6B6B6B]">Tomorrow, 10:00 AM</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to meeting details page
+                    console.log('Navigate to Mill Operators Review meeting details')
+                  }}
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <div>
                     <p className="text-sm font-medium text-[#202020]">Mill Operators Review</p>
@@ -726,41 +825,65 @@ export default function TodayPage() {
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Upcoming Activities */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-[#202020]">Recent Activity</CardTitle>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-[#202020]">Upcoming Activities</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+              <CardContent className="space-y-2 p-4">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to compliance review details page
+                    console.log('Navigate to Compliance Review details')
+                  }}
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#202020]">Approved mill license renewal</p>
-                    <p className="text-xs text-[#6B6B6B]">2 hours ago</p>
+                    <p className="text-sm font-medium text-[#202020]">Compliance Review Due</p>
+                    <p className="text-xs text-[#6B6B6B]">Mumias Mill - Tomorrow</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to site visit details page
+                    console.log('Navigate to Site Visit details')
+                  }}
+                >
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-blue-600" />
+                    <Calendar className="h-4 w-4 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#202020]">Reviewed compliance report</p>
-                    <p className="text-xs text-[#6B6B6B]">4 hours ago</p>
+                    <p className="text-sm font-medium text-[#202020]">Site Visit Scheduled</p>
+                    <p className="text-xs text-[#6B6B6B]">Chemelil Sugar Mill - Friday</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div 
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 hover:shadow-md cursor-pointer transition-all duration-200"
+                  onClick={() => {
+                    // TODO: Navigate to license renewal details page
+                    console.log('Navigate to License Renewal details')
+                  }}
+                >
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Calendar className="h-4 w-4 text-purple-600" />
+                    <CheckCircle className="h-4 w-4 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#202020]">Scheduled farmer meeting</p>
-                    <p className="text-xs text-[#6B6B6B]">Yesterday</p>
+                    <p className="text-sm font-medium text-[#202020]">License Renewal Reminder</p>
+                    <p className="text-xs text-[#6B6B6B]">Nzoia Sugar Co. - Next Week</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Scheduler Card */}
+            <SchedulerCard 
+              schedulerInput={schedulerInput}
+              setSchedulerInput={setSchedulerInput}
+            />
           </div>
 
         </div>
