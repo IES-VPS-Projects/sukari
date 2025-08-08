@@ -15,11 +15,11 @@ import { useIsMobile } from "@/hooks/use-mobile"
 
 const navigation = [
   { name: "Today", href: "/portal/today", icon: Home },
-  { name: "Chat", href: "/portal/chat", icon: MessageSquare },
-  { name: "Calendar", href: "/portal/calendar", icon: Calendar },
-  { name: "Reports", href: "/portal/reports", icon: FileText },
-  { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
   { name: "AI", href: "/portal/ai", icon: HiSparkles },
+  { name: "Calendar", href: "/portal/calendar", icon: Calendar },
+  { name: "Chat", href: "/portal/chat", icon: MessageSquare },
+  { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
+  { name: "Reports", href: "/portal/reports", icon: FileText },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
@@ -54,7 +54,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
               <img 
                 src="/images/ISEAGRILOGO.png" 
                 alt="AFA Logo" 
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
               <div className="border-l border-gray-300 pl-3">
                 <h1 className="text-lg font-semibold text-gray-900">{pageTitle}</h1>

@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Search, Send, Mic, Plus, Clock, X, MapPin, U
 import { GoFilter } from "react-icons/go"
 import { HiSparkles } from "react-icons/hi2"
 import { NewEventModal } from "@/components/modals/new-event-modal"
+import { PortalLayout } from "@/components/portal-layout"
 
 // Sample events data with enhanced properties for filtering
 const events = [
@@ -20,7 +21,7 @@ const events = [
     id: 1,
     title: "Mill Inspection - Chemelil",
     time: "10:00 AM",
-    date: "2025-07-31",
+    date: "2025-08-08",
     type: "Inspection",
     category: "inspection",
     mode: "physical",
@@ -31,7 +32,7 @@ const events = [
     id: 2,
     title: "Board Meeting - Q3 Strategy",
     time: "2:00 PM",
-    date: "2025-07-30",
+    date: "2025-08-09",
     type: "Meeting",
     category: "meeting",
     mode: "virtual",
@@ -42,7 +43,7 @@ const events = [
     id: 3,
     title: "Compliance Deadline - License Renewal",
     time: "11:59 PM",
-    date: "2025-08-01",
+    date: "2025-08-10",
     type: "Compliance Deadline",
     category: "compliance",
     mode: "administrative",
@@ -53,7 +54,7 @@ const events = [
     id: 4,
     title: "Stakeholder Appointment",
     time: "3:00 PM",
-    date: "2025-08-02",
+    date: "2025-08-12",
     type: "Appointment",
     category: "appointment",
     mode: "physical",
@@ -85,8 +86,8 @@ const quickActions = [
 ]
 
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 6, 30)) // July 30, 2025
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 6, 31)) // July 31, 2025
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 8)) // August 8, 2025 (current date)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null) // No date selected by default
   const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month")
   const [newEventOpen, setNewEventOpen] = useState(false)
   const [aiModalOpen, setAiModalOpen] = useState(false)
@@ -198,7 +199,7 @@ export default function CalendarPage() {
         day: date.getDate(),
         isCurrentMonth: date.getMonth() === month,
         isToday: date.toDateString() === today.toDateString(),
-        isSelected: date.toDateString() === selectedDate.toDateString(),
+        isSelected: selectedDate ? date.toDateString() === selectedDate.toDateString() : false,
         hasEvents: dayEvents.length > 0
       })
     }
@@ -249,7 +250,7 @@ export default function CalendarPage() {
         day: date.getDate(),
         dayName: dayNames[i],
         isToday: date.toDateString() === today.toDateString(),
-        isSelected: date.toDateString() === selectedDate.toDateString(),
+        isSelected: selectedDate ? date.toDateString() === selectedDate.toDateString() : false,
         events: dayEvents
       })
     }
@@ -369,21 +370,22 @@ export default function CalendarPage() {
   }, [filters])
 
   // Selected date information
-  const selectedDateStr = selectedDate.toLocaleDateString("en-US", {
+  const selectedDateStr = selectedDate ? selectedDate.toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric"
-  })
+  }) : "No date selected"
   
-  const selectedDateEvents = getEventsForDate(selectedDate)
+  const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : []
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Calendar</h1>
-        
-        <div className="flex items-center gap-3">
+    <PortalLayout pageTitle="Calendar">
+      <div className="p-6 max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Calendar</h1>
+          
+          <div className="flex items-center gap-3">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -498,7 +500,14 @@ export default function CalendarPage() {
                     {generateWeekView().map((day, index) => (
                       <div
                         key={index}
-                        onClick={() => setSelectedDate(day.date)}
+                        onClick={() => {
+                          // If clicking today's date, clear selection, otherwise set the selected date
+                          if (day.isToday) {
+                            setSelectedDate(null)
+                          } else {
+                            setSelectedDate(day.date)
+                          }
+                        }}
                         className={`
                           border-2 rounded-lg p-4 cursor-pointer transition-all hover:bg-green-50 hover:border-green-300
                           ${day.isSelected ? 'border-green-500 bg-green-50' : 'border-gray-200'}
@@ -541,7 +550,16 @@ export default function CalendarPage() {
                   {generateCalendarDays().map((day, index) => (
                     <div
                       key={index}
-                      onClick={() => day.isCurrentMonth && setSelectedDate(day.date)}
+                      onClick={() => {
+                        if (day.isCurrentMonth) {
+                          // If clicking today's date, clear selection, otherwise set the selected date
+                          if (day.isToday) {
+                            setSelectedDate(null)
+                          } else {
+                            setSelectedDate(day.date)
+                          }
+                        }
+                      }}
                       className={`
                         aspect-square flex flex-col items-center justify-center text-sm cursor-pointer transition-all relative
                         ${!day.isCurrentMonth ? 'text-gray-300' : 'border rounded-lg border-gray-200'}
@@ -571,12 +589,17 @@ export default function CalendarPage() {
             <CardHeader>
               <CardTitle className="text-lg">{selectedDateStr}</CardTitle>
               <p className="text-sm text-gray-600">
-                {selectedDateEvents.length} event{selectedDateEvents.length !== 1 ? 's' : ''} scheduled
+                {selectedDate ? (
+                  `${selectedDateEvents.length} event${selectedDateEvents.length !== 1 ? 's' : ''} scheduled`
+                ) : (
+                  "Select a date to view events"
+                )}
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
-              {selectedDateEvents.length > 0 ? (
-                selectedDateEvents.map((event) => (
+              {selectedDate ? (
+                selectedDateEvents.length > 0 ? (
+                  selectedDateEvents.map((event) => (
                   <div key={event.id} className="border rounded-lg overflow-hidden bg-white shadow-sm">
                     {/* Priority Color Bar */}
                     <div className={`h-1 w-full ${event.aiPrioritized ? 'bg-red-500' : 'bg-blue-500'}`}></div>
@@ -695,6 +718,11 @@ export default function CalendarPage() {
               ) : (
                 <p className="text-sm text-gray-500 text-center py-4">
                   No events scheduled for this day
+                </p>
+              )
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  Select a date to view events
                 </p>
               )}
             </CardContent>
@@ -929,5 +957,6 @@ export default function CalendarPage() {
 
       <NewEventModal open={newEventOpen} onOpenChange={setNewEventOpen} />
     </div>
+    </PortalLayout>
   )
 }

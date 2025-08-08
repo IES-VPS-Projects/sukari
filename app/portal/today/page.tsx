@@ -14,15 +14,9 @@ import {
   Calendar,
   MessageSquare,
   FileText,
-  Award,
-  Target,
   Play,
   Pause,
-  Cloud,
   TrendingDown,
-  Sun,
-  CloudRain,
-  Wind,
   ArrowRight,
 } from "lucide-react"
 import { BsCheckAll, BsBoxArrowUpRight } from 'react-icons/bs'
@@ -37,110 +31,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext
 import Autoplay from "embla-carousel-autoplay"
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
-
-// Weather data schema
-interface WeatherData {
-  locationName: string
-  currentTemperature: number
-  highTemperature: number
-  lowTemperature: number
-  temperatureUnit: 'celsius'
-  weatherCondition: string
-  conditionCode: 'SUNNY' | 'CLOUDY' | 'RAINY' | 'WINDY'
-}
-
-const weatherLocations: WeatherData[] = [
-  {
-    locationName: "Nzoia",
-    currentTemperature: 22,
-    highTemperature: 26,
-    lowTemperature: 16,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Mumias",
-    currentTemperature: 23,
-    highTemperature: 27,
-    lowTemperature: 17,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Partly cloudy",
-    conditionCode: 'CLOUDY'
-  },
-  {
-    locationName: "Chemelil",
-    currentTemperature: 25,
-    highTemperature: 29,
-    lowTemperature: 19,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Light rain",
-    conditionCode: 'RAINY'
-  },
-  {
-    locationName: "Muhoroni",
-    currentTemperature: 24,
-    highTemperature: 28,
-    lowTemperature: 18,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Windy",
-    conditionCode: 'WINDY'
-  },
-  {
-    locationName: "Thika",
-    currentTemperature: 26,
-    highTemperature: 30,
-    lowTemperature: 20,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Ganze",
-    currentTemperature: 28,
-    highTemperature: 32,
-    lowTemperature: 22,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Hot and sunny",
-    conditionCode: 'SUNNY'
-  },
-  {
-    locationName: "Ramisi",
-    currentTemperature: 27,
-    highTemperature: 31,
-    lowTemperature: 21,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Partly cloudy",
-    conditionCode: 'CLOUDY'
-  },
-  {
-    locationName: "Butali",
-    currentTemperature: 21,
-    highTemperature: 25,
-    lowTemperature: 15,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Rainy",
-    conditionCode: 'RAINY'
-  },
-  {
-    locationName: "Webuye",
-    currentTemperature: 20,
-    highTemperature: 24,
-    lowTemperature: 14,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Cool and windy",
-    conditionCode: 'WINDY'
-  },
-  {
-    locationName: "Kibos",
-    currentTemperature: 23,
-    highTemperature: 27,
-    lowTemperature: 17,
-    temperatureUnit: 'celsius',
-    weatherCondition: "Sunny",
-    conditionCode: 'SUNNY'
-  }
-]
 
 // Market Insights data schema
 interface ProductInsight {
@@ -273,18 +163,6 @@ const updatesData = {
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600'
     }
-  ],
-  texts: [
-    {
-      id: '6',
-      title: 'Field Report Received',
-      label: 'URGENT',
-      description: 'Weekly field assessment report from Mumias region',
-      timestamp: '8:45 AM • Field Officer',
-      labelColor: 'bg-purple-500',
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600'
-    }
   ]
 };
 
@@ -354,8 +232,6 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
         return updatesData.alerts
       case 'notifications':
         return updatesData.notifications
-      case 'texts':
-        return updatesData.texts
       default:
         return updatesData.alerts
     }
@@ -367,8 +243,6 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
         return updatesData.alerts.length
       case 'notifications':
         return updatesData.notifications.length
-      case 'texts':
-        return updatesData.texts.length
       default:
         return 0
     }
@@ -393,12 +267,12 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
       </CardHeader>
       <CardContent className="p-4">
         {/* Tabs */}
-        <div className="flex gap-6 mb-4 border-b">
-          {['alerts', 'notifications', 'texts'].map((tab) => (
+        <div className="flex gap-12 mb-4 border-b">
+          {['alerts', 'notifications'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm font-medium capitalize relative ${
+              className={`pb-2 text-sm font-medium capitalize relative flex-1 text-center ${
                 activeTab === tab
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -598,88 +472,6 @@ const SchedulerCard = ({ schedulerInput, setSchedulerInput }: {
   )
 }
 
-// Weather Widget Component
-const WeatherCarouselWidget = () => {
-  const [isActive, setIsActive] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null
-
-    if (isActive) {
-      interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % weatherLocations.length)
-      }, 3000)
-    }
-
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [isActive])
-
-  const currentWeather = weatherLocations[currentIndex]
-
-  const getBackgroundGradient = (conditionCode: string) => {
-    switch (conditionCode) {
-      case 'SUNNY':
-        return 'from-orange-400 to-yellow-500'
-      case 'CLOUDY':
-        return 'from-blue-400 to-blue-600'
-      case 'RAINY':
-        return 'from-gray-500 to-blue-500'
-      case 'WINDY':
-        return 'from-gray-400 to-gray-600'
-      default:
-        return 'from-blue-400 to-blue-600'
-    }
-  }
-
-  const getWeatherIcon = (conditionCode: string) => {
-    switch (conditionCode) {
-      case 'SUNNY':
-        return <Sun className="h-16 w-16 opacity-80" />
-      case 'CLOUDY':
-        return <Cloud className="h-16 w-16 opacity-80" />
-      case 'RAINY':
-        return <CloudRain className="h-16 w-16 opacity-80" />
-      case 'WINDY':
-        return <Wind className="h-16 w-16 opacity-80" />
-      default:
-        return <Cloud className="h-16 w-16 opacity-80" />
-    }
-  }
-
-  return (
-    <Card 
-      className={`bg-gradient-to-br ${getBackgroundGradient(currentWeather.conditionCode)} text-white overflow-hidden rounded-[24px] shadow-lg border-0 relative transition-all duration-500 cursor-pointer`}
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => {
-        setIsActive(false)
-        setCurrentIndex(0)
-      }}
-    >
-      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-      <CardContent className="p-4 relative z-10 h-full flex flex-col">
-        <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold">{currentWeather.locationName}</h3>
-          <div>
-            {getWeatherIcon(currentWeather.conditionCode)}
-          </div>
-        </div>
-        <div className="flex justify-between items-end mt-auto">
-          <div>
-            <p className="text-4xl font-bold">{currentWeather.currentTemperature}°</p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm opacity-90 mb-1">{currentWeather.weatherCondition}</p>
-            <p className="text-xs opacity-75">H {currentWeather.highTemperature}° L {currentWeather.lowTemperature}°</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("")
@@ -815,16 +607,6 @@ export default function TodayPage() {
             <div>
               <h1 className="text-3xl font-bold text-[#202020]">{greeting}</h1>
               <p className="text-[#6B6B6B]">{currentTime}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge className="bg-green-100 text-green-800 border-green-200">
-                <Target className="h-3 w-3 mr-1" />
-                1,250 Points
-              </Badge>
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                <Award className="h-3 w-3 mr-1" />
-                Level 5 Executive
-              </Badge>
             </div>
           </div>
 
