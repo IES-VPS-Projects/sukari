@@ -256,8 +256,7 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-[#202020]">Updates</CardTitle>
+        <div className="flex items-center justify-end">
           <div className="flex items-center gap-3">
             <BsCheckAll className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
             <BsBoxArrowUpRight className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer" />
@@ -266,27 +265,33 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Tabs */}
-        <div className="flex gap-12 mb-4 border-b">
+        {/* Redesigned Tabs - Bootstrap-style nav-pills */}
+        <ul className="flex gap-1 mb-4 p-0 list-none" role="tablist">
           {['alerts', 'notifications'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm font-medium capitalize relative flex-1 text-center ${
-                activeTab === tab
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab}
-              {getTabCount(tab) > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs bg-red-500 text-white rounded-full flex items-center justify-center">
-                  {getTabCount(tab)}
-                </Badge>
-              )}
-            </button>
+            <li key={tab} className="nav-item">
+              <button
+                onClick={() => setActiveTab(tab)}
+                className={`nav-link px-4 py-2 text-sm font-medium capitalize rounded transition-all duration-200 relative border-0 bg-transparent ${
+                  activeTab === tab
+                    ? 'text-blue-600 bg-blue-50 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                }`}
+                role="tab"
+              >
+                {tab}
+                {getTabCount(tab) > 0 && (
+                  <span className={`ml-2 px-2 py-0.5 text-xs rounded-full font-medium ${
+                    activeTab === tab 
+                      ? 'bg-blue-100 text-blue-700' 
+                      : 'bg-red-500 text-white'
+                  }`}>
+                    {getTabCount(tab)}
+                  </span>
+                )}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Content */}
         <div className="space-y-3">
@@ -730,7 +735,7 @@ export default function TodayPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Consider visiting Mumias region</p>
@@ -743,7 +748,7 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Recommend policy review</p>
@@ -754,7 +759,7 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Weather alert preparation</p>
@@ -780,7 +785,7 @@ export default function TodayPage() {
             {/* Upcoming Meetings */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Upcoming Meetings</CardTitle>
+                <CardTitle className="text-[#202020]">Meetings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 p-4">
                 <div 
@@ -828,7 +833,7 @@ export default function TodayPage() {
             {/* Upcoming Activities */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Upcoming Activities</CardTitle>
+                <CardTitle className="text-[#202020]">Activities</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 p-4">
                 <div 

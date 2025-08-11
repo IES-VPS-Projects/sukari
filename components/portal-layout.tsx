@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, ChevronDown, User, HelpCircle, Settings } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
@@ -57,8 +57,9 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                 className="h-16 w-auto"
               />
               <div className="border-l border-gray-300 pl-3">
-                <h1 className="text-lg font-semibold text-gray-900">{pageTitle}</h1>
-                <p className="text-xs text-gray-500">KENYA SUGAR BOARD</p>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {pageTitle === "Dashboard" ? "KENYA SUGAR BOARD" : pageTitle}
+                </h1>
               </div>
             </div>
           </div>
@@ -66,24 +67,23 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
             <div className="flex items-center gap-3">
               <DropdownMenu open={open} onOpenChange={setOpen}>
                 <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
-                  <Button variant="ghost" className="flex items-center gap-2 border-2 border-gray-300 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-green-100 text-green-800">
-                        {user?.name
-                          ?.split(" ")
-                          .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
-                          .map((n) => n[0])
-                          .join("") || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm font-medium">{user?.name}</span>
-                      <span className="text-xs text-gray-500">{user?.role}</span>
+                  <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
+                    <div className="relative">
+                      <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-green-300 transition-all border-2 border-gray-300">
+                        <AvatarFallback className="bg-green-100 text-green-800">
+                          {user?.name
+                            ?.split(" ")
+                            .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
+                            .map((n) => n[0])
+                            .join("") || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Green status indicator */}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
                     </div>
-                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
+                <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     Profile
