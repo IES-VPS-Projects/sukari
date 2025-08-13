@@ -19,10 +19,9 @@ import {
   Calendar,
   MessageSquare,
   FileText,
-  Play,
-  Pause,
   TrendingDown,
   ArrowRight,
+  ArrowLeft,
   Plus,
   ChevronDown
 } from "lucide-react"
@@ -33,11 +32,20 @@ import { FaAngleDown } from 'react-icons/fa'
 import { LuForward, LuSquarePen } from 'react-icons/lu'
 import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
 import { HiSparkles } from 'react-icons/hi2'
+import { GoInfo } from 'react-icons/go'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
+import { 
+  allActionsData, 
+  allMeetingsData, 
+  allActivitiesData, 
+  allAIInsightsData, 
+  allAlertsData 
+} from "@/lib/mockdata"
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
+import BriefingCard from "./BriefingCard"
 
 // Market Insights data schema
 interface ProductInsight {
@@ -184,7 +192,7 @@ const MarketInsightsCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % marketData.length)
+    setCurrentIndex((prev: number) => (prev + 1) % marketData.length)
   }
 
   const currentProduct = marketData[currentIndex]
@@ -227,19 +235,26 @@ const MarketInsightsCard = () => {
 }
 
 // Alerts Card Component (formerly Tasks Card)
-const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
+const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, setSelectedAlertForDetails }: {
   selectedItemId: string | null,
-  setSelectedItemId: (id: string | null) => void
+  setSelectedItemId: (id: string | null) => void,
+  setViewAllAlertsOpen: (open: boolean) => void,
+  setSelectedAlertForDetails: (id: string | null) => void
 }) => {
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
     setSelectedItemId(null)
+    
+    if (action === 'details') {
+      setSelectedAlertForDetails(itemId)
+      setViewAllAlertsOpen(true)
+    }
   }
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <CardTitle className="text-[#202020]">Alerts</CardTitle>
+        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllAlertsOpen(true)}>Alerts</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         {/* Alert Content - No tabs, just alerts */}
@@ -256,6 +271,13 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
                 item.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
                 'hover:bg-gray-50'
               } hover:shadow-md`}
+              onClick={(e: React.MouseEvent) => {
+                // Only trigger if not clicking on the ellipsis button
+                if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
+                  setSelectedAlertForDetails(item.id)
+                  setViewAllAlertsOpen(true)
+                }
+              }}
             >
               {/* Icon */}
               <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -288,7 +310,7 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
                   <div className="relative">
                     <button
                       onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
-                      className="p-1 hover:bg-gray-100 rounded"
+                      className="p-1 hover:bg-gray-100 rounded ellipsis-menu"
                     >
                       <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
                     </button>
@@ -297,6 +319,17 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
                     {selectedItemId === item.id && (
                       <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
                         <div className="py-1">
+                          <button
+                            onClick={() => {
+                              setSelectedAlertForDetails(item.id)
+                              setViewAllAlertsOpen(true)
+                              setSelectedItemId(null)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                          >
+                            <GoInfo className="h-3 w-3" />
+                            Details
+                          </button>
                           <button
                             onClick={() => handleItemAction('mark-read', item.id)}
                             className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
@@ -339,22 +372,29 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
 }
 
 // Actions Card Component (formerly Scheduler)
-const ActionsCard = ({ selectedItemId, setSelectedItemId }: {
+const ActionsCard = ({ selectedItemId, setSelectedItemId, setViewAllActionsOpen, setSelectedActionForDetails }: {
   selectedItemId: string | null,
-  setSelectedItemId: (id: string | null) => void
+  setSelectedItemId: (id: string | null) => void,
+  setViewAllActionsOpen: (open: boolean) => void,
+  setSelectedActionForDetails: (id: string | null) => void
 }) => {
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
     setSelectedItemId(null)
+    
+    if (action === 'details') {
+      setSelectedActionForDetails(itemId)
+      setViewAllActionsOpen(true)
+    }
   }
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-1">
+      <CardHeader className="pb-1 cursor-pointer" onClick={() => setViewAllActionsOpen(true)}>
         <CardTitle className="text-[#202020]">Actions</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Actions Content - List of actions requiring approval/votes */}
+        {/* Actions Content - List of actions requiring approval/votes (limited to 2) */}
         <div className="space-y-3">
           {[
             {
@@ -364,7 +404,8 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: {
               type: 'approval',
               timestamp: '2 hours ago',
               iconColor: 'text-blue-600',
-              iconBg: 'bg-blue-100'
+              iconBg: 'bg-blue-100',
+              hoverBg: 'hover:bg-blue-50'
             },
             {
               id: 'action-2', 
@@ -373,21 +414,20 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: {
               type: 'vote',
               timestamp: '4 hours ago',
               iconColor: 'text-green-600',
-              iconBg: 'bg-green-100'
-            },
-            {
-              id: 'action-3',
-              title: 'Mill Operations License Approval',
-              description: 'Approve renewal of operational license for Nzoia Sugar Factory',
-              type: 'approval', 
-              timestamp: '1 day ago',
-              iconColor: 'text-orange-600',
-              iconBg: 'bg-orange-100'
+              iconBg: 'bg-green-100',
+              hoverBg: 'hover:bg-green-50'
             }
           ].map((item) => (
             <div 
               key={item.id} 
-              className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${item.hoverBg} hover:shadow-md`}
+              onClick={(e: React.MouseEvent) => {
+                // Only trigger if not clicking on the ellipsis button
+                if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
+                  setSelectedActionForDetails(item.id)
+                  setViewAllActionsOpen(true)
+                }
+              }}
             >
               {/* Icon */}
               <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -408,9 +448,12 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: {
                   </div>
                   
                   {/* Options Menu */}
-                  <div className="relative">
+                  <div className="relative ellipsis-menu">
                     <button
-                      onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation() // Prevent triggering the card click
+                        setSelectedItemId(selectedItemId === item.id ? null : item.id)
+                      }}
                       className="p-1 hover:bg-gray-100 rounded"
                     >
                       <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
@@ -482,12 +525,6 @@ export default function TodayPage() {
   const [greeting, setGreeting] = useState("")
   const { user } = useAuth()
   
-  // Audio state and logic
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [audio] = useState(typeof window !== 'undefined' ? new Audio('/sukari2.mp3') : null)
-  const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
-  const [audioTime, setAudioTime] = useState(0)
-
   // Tasks card state (now only for alerts)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
@@ -498,6 +535,20 @@ export default function TodayPage() {
   // Dropdown states for templates
   const [meetingDropdownOpen, setMeetingDropdownOpen] = useState(false)
   const [activityDropdownOpen, setActivityDropdownOpen] = useState(false)
+  
+  // Modal states for viewing all items
+  const [viewAllActionsOpen, setViewAllActionsOpen] = useState(false)
+  const [viewAllMeetingsOpen, setViewAllMeetingsOpen] = useState(false)
+  const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
+  const [viewAllAlertsOpen, setViewAllAlertsOpen] = useState(false)
+  const [viewAllAIInsightsOpen, setViewAllAIInsightsOpen] = useState(false)
+  
+  // State for detail views
+  const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
+  const [selectedMeetingForDetails, setSelectedMeetingForDetails] = useState<string | null>(null)
+  const [selectedActivityForDetails, setSelectedActivityForDetails] = useState<string | null>(null)
+  const [selectedAlertForDetails, setSelectedAlertForDetails] = useState<string | null>(null)
+  const [selectedAIInsightForDetails, setSelectedAIInsightForDetails] = useState<string | null>(null)
 
   // Form states for new items
   const [meetingForm, setMeetingForm] = useState({
@@ -516,52 +567,6 @@ export default function TodayPage() {
     description: ''
   })
 
-  const handleAudioPlay = () => {
-    if (audio) {
-      if (isPlaying) {
-        audio.pause()
-        setIsPlaying(false)
-      } else {
-        audio.play()
-        setIsPlaying(true)
-      }
-    }
-  }
-
-  useEffect(() => {
-    if (audio) {
-      audio.addEventListener('ended', () => setIsPlaying(false))
-      return () => {
-        audio.removeEventListener('ended', () => setIsPlaying(false))
-      }
-    }
-  }, [audio])
-
-  useEffect(() => {
-    if (audio && isPlaying) {
-      const updateTranscript = () => {
-        const currentTime = audio.currentTime
-        setAudioTime(currentTime)
-
-        let currentSegment = -1
-        for (let i = 0; i < transcriptData.length; i++) {
-          const segment = transcriptData[i]
-          const nextSegment = transcriptData[i + 1]
-          if (currentTime >= segment.time && (!nextSegment || currentTime < nextSegment.time)) {
-            currentSegment = i
-            break
-          }
-        }
-        if (currentSegment !== -1 && currentSegment !== currentTranscriptIndex) {
-          setCurrentTranscriptIndex(currentSegment)
-        }
-      }
-
-      const interval = setInterval(updateTranscript, 100)
-      return () => clearInterval(interval)
-    }
-  }, [audio, isPlaying, currentTranscriptIndex])
-
   // Handle clicking outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -577,29 +582,6 @@ export default function TodayPage() {
     }
   }, [meetingDropdownOpen, activityDropdownOpen])
 
-  const getCurrentTranscriptLines = () => {
-    if (currentTranscriptIndex < transcriptData.length) {
-      const segment = transcriptData[currentTranscriptIndex]
-      const progress = Math.min((audioTime - segment.time) / 8, 1) // 8 seconds per segment
-      const textLength = Math.floor(segment.text.length * progress)
-
-      return [{
-        text: segment.text.substring(0, textLength),
-        isActive: true,
-        isComplete: progress >= 1
-      }]
-    }
-    return [{ text: "...", isActive: false, isComplete: false }]
-  }
-
-  // Auto-scroll effect for transcript
-  useEffect(() => {
-    const transcriptContainer = document.getElementById('transcript-container')
-    if (transcriptContainer && isPlaying) {
-      transcriptContainer.scrollTop = transcriptContainer.scrollHeight
-    }
-  }, [currentTranscriptIndex, audioTime, isPlaying])
-  
   // Get the first name from the user's full name
   const getFirstName = (fullName: string) => {
     return fullName.split(' ')[0]
@@ -652,86 +634,7 @@ export default function TodayPage() {
 
           {/* AI Morning Briefing */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style={{ height: "50%" }}>
-            <div>
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 text-white overflow-hidden rounded-[24px] shadow-lg border-0" style={{ height: "100%" }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div>
-                      <h3 className="font-semibold text-xl">Briefing</h3>
-                      <p className="text-sm text-gray-300">August 5th • 3 min</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center mb-4 h-15">
-                    <div className="flex items-end gap-1">
-                      {Array.from({ length: 50 }, (_, i) => (
-                        <div
-                          key={i}
-                          className={`rounded-full ${isPlaying ? 'animate-pulse' : ''}`}
-                          style={{
-                            width: "3px",
-                            height: `${Math.random() * 10 + 10}px`,
-                            backgroundColor: isPlaying ? '#10B981' : '#6B7280',
-                            animationDelay: `${i * 0.1}s`,
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Audio Progress */}
-                  {audio && (
-                    <div className="mb-4">
-                      <Progress 
-                        value={audio.duration ? (audio.currentTime / audio.duration) * 100 : 0} 
-                        className="h-1 bg-gray-700"
-                      />
-                      <div className="flex justify-between text-xs text-gray-400 mt-1">
-                        <span>{Math.floor(audio.currentTime || 0)}s</span>
-                        <span>{Math.floor(audio.duration || 0)}s</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Transcript Display */}
-                  <div id="transcript-container" className="mb-6 h-6 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
-                    <div className="transition-all duration-300">
-                      {getCurrentTranscriptLines().map((line, index) => (
-                        <p 
-                          key={index} 
-                          className={`text-xs leading-relaxed transition-all duration-300 ${
-                            line.isActive 
-                              ? 'text-green-400' 
-                              : line.isComplete 
-                                ? 'text-gray-400' 
-                                : 'text-gray-300'
-                          }`}
-                        >
-                          {line.text}
-                          {line.isActive && <span className="animate-pulse">|</span>}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={handleAudioPlay}
-                    className="w-full bg-white text-gray-900 hover:bg-gray-100 rounded-full py-3"
-                  >
-                    {isPlaying ? (
-                      <>
-                        <Pause className="h-4 w-4 mr-2" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4 mr-2" />
-                        Play now
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <BriefingCard />
             <MarketInsightsCard />
             
             {/* Industry News Card */}
@@ -761,7 +664,7 @@ export default function TodayPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#202020]">
+                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => setViewAllAIInsightsOpen(true)}>
                   <CheckCircle className="h-5 w-5 text-green-600" />
                   AI Insights
                 </CardTitle>
@@ -770,7 +673,15 @@ export default function TodayPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                <div 
+                  className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                  onClick={(e) => {
+                    if (!(e.target as HTMLElement).closest('button')) {
+                      setSelectedAIInsightForDetails('insight-1')
+                      setViewAllAIInsightsOpen(true)
+                    }
+                  }}
+                >
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Consider visiting Mumias region</p>
@@ -783,7 +694,15 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                <div 
+                  className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                  onClick={(e) => {
+                    if (!(e.target as HTMLElement).closest('button')) {
+                      setSelectedAIInsightForDetails('insight-2')
+                      setViewAllAIInsightsOpen(true)
+                    }
+                  }}
+                >
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Recommend policy review</p>
@@ -794,7 +713,15 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                <div 
+                  className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                  onClick={(e) => {
+                    if (!(e.target as HTMLElement).closest('button')) {
+                      setSelectedAIInsightForDetails('insight-3')
+                      setViewAllAIInsightsOpen(true)
+                    }
+                  }}
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Weather alert preparation</p>
@@ -810,6 +737,8 @@ export default function TodayPage() {
             <AlertsCard 
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
+              setViewAllAlertsOpen={setViewAllAlertsOpen}
+              setSelectedAlertForDetails={setSelectedAlertForDetails}
             />
           </div>
 
@@ -819,18 +748,25 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020]">Meetings</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllMeetingsOpen(true)}>Meetings</CardTitle>
                   <div className="relative">
-                    <Button 
-                      size="sm" 
-                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
-                      onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
-                    >
-                      <LuSquarePen className="h-4 w-4" />
-                      New
-                      <div className="w-px h-4 bg-gray-300 mx-1"></div>
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
+                    <div className="flex">
+                      <Button 
+                        size="sm" 
+                        className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                        onClick={() => setNewMeetingOpen(true)}
+                      >
+                        <LuSquarePen className="h-4 w-4" />
+                        New
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                        onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
+                      >
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </div>
                     
                     {/* Dropdown Menu */}
                     {meetingDropdownOpen && (
@@ -869,7 +805,7 @@ export default function TodayPage() {
                             }}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
                           >
-                            <Play className="h-4 w-4" />
+                            <Calendar className="h-4 w-4" />
                             Webinar
                           </button>
                           <button
@@ -919,8 +855,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to meeting details page
-                    console.log('Navigate to Board Meeting details')
+                    setSelectedMeetingForDetails('meeting-1')
+                    setViewAllMeetingsOpen(true)
                   }}
                 >
                   <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
@@ -932,8 +868,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to meeting details page
-                    console.log('Navigate to Farmer Representatives meeting details')
+                    setSelectedMeetingForDetails('meeting-2')
+                    setViewAllMeetingsOpen(true)
                   }}
                 >
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -945,8 +881,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to meeting details page
-                    console.log('Navigate to Mill Operators Review meeting details')
+                    setSelectedMeetingForDetails('meeting-3')
+                    setViewAllMeetingsOpen(true)
                   }}
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -962,18 +898,25 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020]">Activities</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllActivitiesOpen(true)}>Activities</CardTitle>
                   <div className="relative">
+                  <div className="flex">
                     <Button 
                       size="sm" 
-                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
-                      onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                      onClick={() => setNewActivityOpen(true)}
                     >
                       <LuSquarePen className="h-4 w-4" />
                       New
-                      <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                      onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
+                    >
                       <ChevronDown className="h-3 w-3" />
                     </Button>
+                    </div>
                     
                     {/* Dropdown Menu */}
                     {activityDropdownOpen && (
@@ -1058,8 +1001,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to compliance review details page
-                    console.log('Navigate to Compliance Review details')
+                    setSelectedActivityForDetails('activity-1')
+                    setViewAllActivitiesOpen(true)
                   }}
                 >
                   <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
@@ -1073,8 +1016,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to site visit details page
-                    console.log('Navigate to Site Visit details')
+                    setSelectedActivityForDetails('activity-2')
+                    setViewAllActivitiesOpen(true)
                   }}
                 >
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -1088,8 +1031,8 @@ export default function TodayPage() {
                 <div 
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 hover:shadow-md cursor-pointer transition-all duration-200"
                   onClick={() => {
-                    // TODO: Navigate to license renewal details page
-                    console.log('Navigate to License Renewal details')
+                    setSelectedActivityForDetails('activity-3')
+                    setViewAllActivitiesOpen(true)
                   }}
                 >
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -1107,6 +1050,8 @@ export default function TodayPage() {
             <ActionsCard 
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
+              setViewAllActionsOpen={setViewAllActionsOpen}
+              setSelectedActionForDetails={setSelectedActionForDetails}
             />
           </div>
 
@@ -1296,6 +1241,877 @@ export default function TodayPage() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View All Actions Modal */}
+      <Dialog open={viewAllActionsOpen} onOpenChange={() => {
+        setViewAllActionsOpen(false)
+        setSelectedActionForDetails(null)
+      }}>
+        <DialogContent className="sm:max-w-[750px] max-h-[85vh] [&>button]:hidden">
+          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <DialogTitle className="text-[#202020] text-lg font-medium">Actions</DialogTitle>
+            <div className="group relative">
+              <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+              <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                List of actions requiring approval or voting decisions
+              </div>
+            </div>
+          </DialogHeader>
+          
+          {!selectedActionForDetails ? (
+            <div className="space-y-3 max-h-[65vh] overflow-y-auto">
+              {allActionsData.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md border"
+                  onClick={() => setSelectedActionForDetails(item.id)}
+                >
+                  {/* Icon */}
+                  <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    {item.type === 'approval' ? (
+                      <CheckCircle className={`h-4 w-4 ${item.iconColor}`} />
+                    ) : (
+                      <Users className={`h-4 w-4 ${item.iconColor}`} />
+                    )}
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
+                        <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                        <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            // Action Details View
+            (() => {
+              const selectedAction = allActionsData.find(action => action.id === selectedActionForDetails)
+              if (!selectedAction) return null
+              
+              return (
+                <div className="space-y-4 max-h-[65vh] overflow-y-auto">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setSelectedActionForDetails(null)}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    <ArrowRight className="h-4 w-4 rotate-180" />
+                    Back to Actions
+                  </Button>
+                  
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`w-12 h-12 ${selectedAction.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        {selectedAction.type === 'approval' ? (
+                          <CheckCircle className={`h-6 w-6 ${selectedAction.iconColor}`} />
+                        ) : (
+                          <Users className={`h-6 w-6 ${selectedAction.iconColor}`} />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-[#202020] mb-2">{selectedAction.title}</h3>
+                        <p className="text-sm text-[#6B6B6B] mb-2">{selectedAction.description}</p>
+                        <p className="text-xs text-[#9CA3AF]">{selectedAction.timestamp}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Action Type:</label>
+                        <p className="text-sm text-gray-600 capitalize">{selectedAction.type}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Status:</label>
+                        <p className="text-sm text-yellow-600">Pending Review</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Priority:</label>
+                        <p className="text-sm text-gray-600">High</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700">Deadline:</label>
+                        <p className="text-sm text-gray-600">
+                          {selectedAction.id === 'action-1' ? 'August 15, 2025' :
+                           selectedAction.id === 'action-2' ? 'August 14, 2025' :
+                           selectedAction.id === 'action-3' ? 'August 16, 2025' :
+                           selectedAction.id === 'action-4' ? 'August 18, 2025' :
+                           'August 20, 2025'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+                      {selectedAction.type === 'approval' ? (
+                        <>
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700 text-white px-6"
+                            onClick={() => {
+                              console.log('Approve', selectedAction.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Approve
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            onClick={() => {
+                              console.log('Reject', selectedAction.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700 text-white px-6"
+                            onClick={() => {
+                              console.log('Vote Yes', selectedAction.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Vote Yes
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            onClick={() => {
+                              console.log('Vote No', selectedAction.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Vote No
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Alerts Modal */}
+      <Dialog open={viewAllAlertsOpen} onOpenChange={setViewAllAlertsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">
+            {selectedAlertForDetails ? 'Alert Details' : 'All Alerts'}
+          </DialogTitle>
+          {(() => {
+            if (selectedAlertForDetails) {
+              const alert = allAlertsData.find(a => a.id === selectedAlertForDetails)
+              if (alert) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedAlertForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center`}>
+                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{alert.title}</h2>
+                            <p className="text-sm text-gray-500">{alert.timestamp}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Alert Details</h3>
+                          <p className="text-gray-700">{alert.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            alert.labelColor === 'bg-red-500' ? 'bg-red-50 text-red-700' :
+                            alert.labelColor === 'bg-orange-500' ? 'bg-orange-50 text-orange-700' :
+                            alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50 text-yellow-700' :
+                            alert.labelColor === 'bg-blue-500' ? 'bg-blue-50 text-blue-700' :
+                            alert.labelColor === 'bg-green-500' ? 'bg-green-50 text-green-700' :
+                            alert.labelColor === 'bg-purple-500' ? 'bg-purple-50 text-purple-700' :
+                            'bg-gray-50 text-gray-700'
+                          }`}>
+                            {alert.label}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Affected Area</h3>
+                          <p className="text-gray-700">{alert.area || 'Field Operations'}</p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Recommended Actions</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review alert conditions and assess impact</li>
+                            <li>Coordinate with relevant teams for response</li>
+                            <li>Monitor situation for changes</li>
+                            <li>Update stakeholders on status</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          console.log('Mark as Read', alert.id)
+                          setSelectedAlertForDetails(null)
+                          setViewAllAlertsOpen(false)
+                        }}
+                      >
+                        Mark as Read
+                      </Button>
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => {
+                          console.log('Take Action', alert.id)
+                          setSelectedAlertForDetails(null)
+                          setViewAllAlertsOpen(false)
+                        }}
+                      >
+                        Take Action
+                      </Button>
+                    </div>
+                  </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold text-gray-900">All Alerts</h2>
+                  <p className="text-sm text-gray-500 mt-1">{allAlertsData.length} alerts requiring attention</p>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-4">
+                    {allAlertsData.map((alert) => (
+                      <div 
+                        key={alert.id}
+                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50 border-red-200' :
+                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50 border-orange-200' :
+                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50 border-yellow-200' :
+                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50 border-blue-200' :
+                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50 border-green-200' :
+                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50 border-purple-200' :
+                          'hover:bg-gray-50 border-gray-200'
+                        }`}
+                        onClick={() => setSelectedAlertForDetails(alert.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="text-sm font-medium text-gray-900">{alert.title}</h3>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                alert.labelColor === 'bg-red-500' ? 'bg-red-50 text-red-700' :
+                                alert.labelColor === 'bg-orange-500' ? 'bg-orange-50 text-orange-700' :
+                                alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50 text-yellow-700' :
+                                alert.labelColor === 'bg-blue-500' ? 'bg-blue-50 text-blue-700' :
+                                alert.labelColor === 'bg-green-500' ? 'bg-green-50 text-green-700' :
+                                alert.labelColor === 'bg-purple-500' ? 'bg-purple-50 text-purple-700' :
+                                'bg-gray-50 text-gray-700'
+                              }`}>
+                                {alert.label}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs text-gray-500">{alert.timestamp}</p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedAlertForDetails(alert.id)
+                                }}
+                              >
+                                <GoInfo className="h-4 w-4 mr-1" />
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Meetings Modal */}
+      <Dialog open={viewAllMeetingsOpen} onOpenChange={setViewAllMeetingsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">
+            {selectedMeetingForDetails ? 'Meeting Details' : 'All Meetings'}
+          </DialogTitle>
+          {(() => {
+            if (selectedMeetingForDetails) {
+              const meeting = allMeetingsData.find(m => m.id === selectedMeetingForDetails)
+              if (meeting) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedMeetingForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Calendar className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{meeting.title}</h2>
+                            <p className="text-sm text-gray-500">{meeting.date} • {meeting.time}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Meeting Details</h3>
+                          <p className="text-gray-700">{meeting.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Location</h3>
+                          <p className="text-gray-700">{meeting.location}</p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Type</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${meeting.typeColor}`}>
+                            {meeting.type}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Attendees ({meeting.attendees})</h3>
+                          <div className="flex -space-x-2">
+                            {Array.from({ length: Math.min(meeting.attendees, 6) }).map((_, i) => (
+                              <div key={i} className="w-8 h-8 bg-gray-200 rounded-full border-2 border-white flex items-center justify-center">
+                                <span className="text-xs font-medium text-gray-600">{String.fromCharCode(65 + i)}</span>
+                              </div>
+                            ))}
+                            {meeting.attendees > 6 && (
+                              <div className="w-8 h-8 bg-gray-100 rounded-full border-2 border-white flex items-center justify-center">
+                                <span className="text-xs font-medium text-gray-500">+{meeting.attendees - 6}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Agenda</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review previous meeting minutes</li>
+                            <li>Quarterly performance review</li>
+                            <li>Strategic planning discussion</li>
+                            <li>Next steps and action items</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          console.log('Join Meeting', meeting.id)
+                          setSelectedMeetingForDetails(null)
+                          setViewAllMeetingsOpen(false)
+                        }}
+                      >
+                        Join Meeting
+                      </Button>
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => {
+                          console.log('View Details', meeting.id)
+                          setSelectedMeetingForDetails(null)
+                          setViewAllMeetingsOpen(false)
+                        }}
+                      >
+                        View Full Details
+                      </Button>
+                    </div>
+                  </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold text-gray-900">All Meetings</h2>
+                  <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-4">
+                    {allMeetingsData.map((meeting) => (
+                      <div 
+                        key={meeting.id}
+                        className="p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:bg-blue-50 border-blue-200"
+                        onClick={() => setSelectedMeetingForDetails(meeting.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Calendar className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="text-sm font-medium text-gray-900">{meeting.title}</h3>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${meeting.typeColor}`}>
+                                {meeting.type}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{meeting.description}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <span>{meeting.date} • {meeting.time}</span>
+                                <span>{meeting.attendees} attendees</span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedMeetingForDetails(meeting.id)
+                                }}
+                              >
+                                <GoInfo className="h-4 w-4 mr-1" />
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Activities Modal */}
+      <Dialog open={viewAllActivitiesOpen} onOpenChange={setViewAllActivitiesOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">
+            {selectedActivityForDetails ? 'Activity Details' : 'All Activities'}
+          </DialogTitle>
+          {(() => {
+            if (selectedActivityForDetails) {
+              const activity = allActivitiesData.find(a => a.id === selectedActivityForDetails)
+              if (activity) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedActivityForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${activity.iconBg} rounded-lg flex items-center justify-center`}>
+                            <div className={`h-5 w-5 ${activity.iconColor}`}>
+                              {activity.type === 'compliance' && <AlertTriangle className="h-5 w-5" />}
+                              {activity.type === 'visit' && <Calendar className="h-5 w-5" />}
+                              {activity.type === 'renewal' && <CheckCircle className="h-5 w-5" />}
+                              {activity.type === 'maintenance' && <TrendingUp className="h-5 w-5" />}
+                            </div>
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{activity.title}</h2>
+                            <p className="text-sm text-gray-500">{activity.dueDate}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Activity Details</h3>
+                          <p className="text-gray-700">{activity.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Location</h3>
+                          <p className="text-gray-700">{activity.location}</p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Status</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${activity.statusColor}`}>
+                            {activity.status}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${activity.priorityColor}`}>
+                            {activity.priority}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Assigned To</h3>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-600">{activity.assignee?.charAt(0) || 'A'}</span>
+                            </div>
+                            <span className="text-gray-700">{activity.assignee || 'Unassigned'}</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Next Steps</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review activity requirements</li>
+                            <li>Coordinate with field teams</li>
+                            <li>Schedule necessary resources</li>
+                            <li>Update progress status</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          console.log('Mark Complete', activity.id)
+                          setSelectedActivityForDetails(null)
+                          setViewAllActivitiesOpen(false)
+                        }}
+                      >
+                        Mark Complete
+                      </Button>
+                      <Button 
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                        onClick={() => {
+                          console.log('Update Activity', activity.id)
+                          setSelectedActivityForDetails(null)
+                          setViewAllActivitiesOpen(false)
+                        }}
+                      >
+                        Update Activity
+                      </Button>
+                    </div>
+                  </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold text-gray-900">All Activities</h2>
+                  <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-4">
+                    {allActivitiesData.map((activity) => (
+                      <div 
+                        key={activity.id}
+                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          activity.type === 'compliance' ? 'hover:bg-orange-50 border-orange-200' :
+                          activity.type === 'visit' ? 'hover:bg-blue-50 border-blue-200' :
+                          activity.type === 'renewal' ? 'hover:bg-purple-50 border-purple-200' :
+                          activity.type === 'maintenance' ? 'hover:bg-green-50 border-green-200' :
+                          'hover:bg-gray-50 border-gray-200'
+                        }`}
+                        onClick={() => setSelectedActivityForDetails(activity.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                            <div className={`h-5 w-5 ${activity.iconColor}`}>
+                              {activity.type === 'compliance' && <AlertTriangle className="h-5 w-5" />}
+                              {activity.type === 'visit' && <Calendar className="h-5 w-5" />}
+                              {activity.type === 'renewal' && <CheckCircle className="h-5 w-5" />}
+                              {activity.type === 'maintenance' && <TrendingUp className="h-5 w-5" />}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="text-sm font-medium text-gray-900">{activity.title}</h3>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${activity.statusColor}`}>
+                                {activity.status}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{activity.description}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <span>{activity.dueDate}</span>
+                                <span className={`px-2 py-1 rounded-full ${activity.priorityColor}`}>
+                                  {activity.priority}
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedActivityForDetails(activity.id)
+                                }}
+                              >
+                                <GoInfo className="h-4 w-4 mr-1" />
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Insights Modal */}
+      <Dialog open={viewAllAIInsightsOpen} onOpenChange={setViewAllAIInsightsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">
+            {selectedAIInsightForDetails ? 'AI Insight Details' : 'All AI Insights'}
+          </DialogTitle>
+          {(() => {
+            if (selectedAIInsightForDetails) {
+              const insight = allAIInsightsData.find(i => i.id === selectedAIInsightForDetails)
+              if (insight) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedAIInsightForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{insight.title}</h2>
+                            <p className="text-sm text-gray-500">{insight.timestamp}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">AI Analysis</h3>
+                          <p className="text-gray-700">{insight.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Category</h3>
+                          <div className="capitalize text-gray-700">{insight.category}</div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Confidence Level</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            insight.confidence === 'high' ? 'bg-green-50 text-green-700' :
+                            insight.confidence === 'medium' ? 'bg-yellow-50 text-yellow-700' :
+                            'bg-red-50 text-red-700'
+                          }`}>
+                            {insight.confidence} confidence
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Impact Assessment</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            insight.impact === 'high' ? 'bg-red-50 text-red-700' :
+                            insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
+                            'bg-green-50 text-green-700'
+                          }`}>
+                            {insight.impact} impact
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Recommended Actions</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review detailed analytics and data patterns</li>
+                            <li>Validate AI recommendations with domain experts</li>
+                            <li>Implement suggested improvements where applicable</li>
+                            <li>Monitor outcomes and update models accordingly</li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Data Sources</h3>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Production Data</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Environmental Sensors</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Historical Patterns</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Market Analysis</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          console.log('Dismiss Insight', insight.id)
+                          setSelectedAIInsightForDetails(null)
+                          setViewAllAIInsightsOpen(false)
+                        }}
+                      >
+                        Dismiss
+                      </Button>
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          console.log('Implement Suggestion', insight.id)
+                          setSelectedAIInsightForDetails(null)
+                          setViewAllAIInsightsOpen(false)
+                        }}
+                      >
+                        Implement Suggestion
+                      </Button>
+                    </div>
+                  </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <h2 className="text-xl font-semibold text-gray-900">All AI Insights</h2>
+                  <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-4">
+                    {allAIInsightsData.map((insight) => (
+                      <div 
+                        key={insight.id}
+                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${insight.hoverBg}`}
+                        onClick={() => setSelectedAIInsightForDetails(insight.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                            <CheckCircle className={`h-5 w-5 ${insight.iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between mb-2">
+                              <h3 className="text-sm font-medium text-gray-900">{insight.title}</h3>
+                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                insight.confidence === 'high' ? 'bg-green-50 text-green-700' :
+                                insight.confidence === 'medium' ? 'bg-yellow-50 text-yellow-700' :
+                                'bg-red-50 text-red-700'
+                              }`}>
+                                {insight.confidence}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <span>{insight.timestamp}</span>
+                                <span className={`px-2 py-1 rounded-full ${
+                                  insight.impact === 'high' ? 'bg-red-50 text-red-700' :
+                                  insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
+                                  'bg-green-50 text-green-700'
+                                }`}>
+                                  {insight.impact} impact
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setSelectedAIInsightForDetails(insight.id)
+                                }}
+                              >
+                                <GoInfo className="h-4 w-4 mr-1" />
+                                Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
         </DialogContent>
       </Dialog>
     </PortalLayout>
