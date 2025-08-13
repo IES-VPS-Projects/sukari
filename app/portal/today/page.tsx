@@ -5,6 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import {
   TrendingUp,
   AlertTriangle,
@@ -18,12 +23,14 @@ import {
   Pause,
   TrendingDown,
   ArrowRight,
+  Plus,
+  ChevronDown
 } from "lucide-react"
 import { BsCheckAll, BsBoxArrowUpRight } from 'react-icons/bs'
 import { FiSettings, FiAlertTriangle } from 'react-icons/fi'
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
 import { FaAngleDown } from 'react-icons/fa'
-import { LuForward } from 'react-icons/lu'
+import { LuForward, LuSquarePen } from 'react-icons/lu'
 import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
 import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
@@ -108,7 +115,7 @@ const transcriptData = [
   { time: 110, text: "Thank you for listening. Stay tuned for more updates on the sugar sector." }  
 ];
 
-// Updates data for the Updates card
+// Updates data for the Tasks card
 const updatesData = {
   alerts: [
     {
@@ -219,35 +226,11 @@ const MarketInsightsCard = () => {
   )
 }
 
-// Updates Card Component
-const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemId }: {
-  activeTab: string,
-  setActiveTab: (tab: string) => void,
+// Alerts Card Component (formerly Tasks Card)
+const AlertsCard = ({ selectedItemId, setSelectedItemId }: {
   selectedItemId: string | null,
   setSelectedItemId: (id: string | null) => void
 }) => {
-  const getTabData = () => {
-    switch (activeTab) {
-      case 'alerts':
-        return updatesData.alerts
-      case 'notifications':
-        return updatesData.notifications
-      default:
-        return updatesData.alerts
-    }
-  }
-
-  const getTabCount = (tab: string) => {
-    switch (tab) {
-      case 'alerts':
-        return updatesData.alerts.length
-      case 'notifications':
-        return updatesData.notifications.length
-      default:
-        return 0
-    }
-  }
-
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
     setSelectedItemId(null)
@@ -256,41 +239,12 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-[#202020]">Updates</CardTitle>
-          <div className="flex items-center gap-3">
-            <BsCheckAll className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
-            <BsBoxArrowUpRight className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer" />
-            <FiSettings className="h-4 w-4 text-gray-400 hover:text-gray-600 cursor-pointer" />
-          </div>
-        </div>
+        <CardTitle className="text-[#202020]">Alerts</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Tabs */}
-        <div className="flex gap-12 mb-4 border-b">
-          {['alerts', 'notifications'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm font-medium capitalize relative flex-1 text-center ${
-                activeTab === tab
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {tab}
-              {getTabCount(tab) > 0 && (
-                <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs bg-red-500 text-white rounded-full flex items-center justify-center">
-                  {getTabCount(tab)}
-                </Badge>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
+        {/* Alert Content - No tabs, just alerts */}
         <div className="space-y-3">
-          {getTabData().map((item) => (
+          {updatesData.alerts.map((item) => (
             <div 
               key={item.id} 
               className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -384,88 +338,138 @@ const UpdatesCard = ({ activeTab, setActiveTab, selectedItemId, setSelectedItemI
   )
 }
 
-// Scheduler Card Component
-const SchedulerCard = ({ schedulerInput, setSchedulerInput }: {
-  schedulerInput: string,
-  setSchedulerInput: (value: string) => void
+// Actions Card Component (formerly Scheduler)
+const ActionsCard = ({ selectedItemId, setSelectedItemId }: {
+  selectedItemId: string | null,
+  setSelectedItemId: (id: string | null) => void
 }) => {
-  const handleSubmit = () => {
-    if (schedulerInput.trim()) {
-      console.log('Scheduling:', schedulerInput)
-      setSchedulerInput('')
-    }
-  }
-
-  const handleAttachDocument = () => {
-    console.log('Attach document clicked')
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setSchedulerInput(suggestion)
+  const handleItemAction = (action: string, itemId: string) => {
+    console.log(`${action} action for item ${itemId}`)
+    setSelectedItemId(null)
   }
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <CardTitle className="text-[#202020]">Scheduler</CardTitle>
+        <CardTitle className="text-[#202020]">Actions</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Input Area */}
-        <div className="relative mb-4">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
-            {/* Add/Plus Icon */}
-            <button
-              onClick={handleAttachDocument}
-              className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+        {/* Actions Content - List of actions requiring approval/votes */}
+        <div className="space-y-3">
+          {[
+            {
+              id: 'action-1',
+              title: 'Sugar Import Allocation Approval',
+              description: 'Approve allocation of 50,000 MT sugar imports to Mumias Sugar Company',
+              type: 'approval',
+              timestamp: '2 hours ago',
+              iconColor: 'text-blue-600',
+              iconBg: 'bg-blue-100'
+            },
+            {
+              id: 'action-2', 
+              title: 'Cane Pricing Committee Vote',
+              description: 'Vote on proposed cane pricing structure for 2024/25 season',
+              type: 'vote',
+              timestamp: '4 hours ago',
+              iconColor: 'text-green-600',
+              iconBg: 'bg-green-100'
+            },
+            {
+              id: 'action-3',
+              title: 'Mill Operations License Approval',
+              description: 'Approve renewal of operational license for Nzoia Sugar Factory',
+              type: 'approval', 
+              timestamp: '1 day ago',
+              iconColor: 'text-orange-600',
+              iconBg: 'bg-orange-100'
+            }
+          ].map((item) => (
+            <div 
+              key={item.id} 
+              className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
             >
-              <BiPlus className="h-4 w-4 text-gray-600" />
-            </button>
-            
-            {/* Input Field */}
-            <input
-              type="text"
-              value={schedulerInput}
-              onChange={(e) => setSchedulerInput(e.target.value)}
-              placeholder="Add a new task or event..."
-              className="flex-1 bg-transparent text-sm text-[#202020] placeholder-gray-500 focus:outline-none"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSubmit()
-                }
-              }}
-            />
-            
-            {/* Voice/Send Icon */}
-            <button
-              onClick={handleSubmit}
-              className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
-            >
-              {schedulerInput.trim() ? (
-                <BiSend className="h-4 w-4 text-white" />
-              ) : (
-                <BiMicrophone className="h-4 w-4 text-white" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Suggestions Section */}
-        <div>
-          <h4 className="text-sm font-medium text-[#202020] mb-3">Suggestions</h4>
-          <div className="space-y-2">
-            {schedulerSuggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
-              >
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <HiSparkles className="h-4 w-4 text-blue-600" />
-                </div>
-                <p className="text-sm text-[#202020] flex-1">{suggestion}</p>
+              {/* Icon */}
+              <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                {item.type === 'approval' ? (
+                  <CheckCircle className={`h-4 w-4 ${item.iconColor}`} />
+                ) : (
+                  <Users className={`h-4 w-4 ${item.iconColor}`} />
+                )}
               </div>
-            ))}
-          </div>
+              
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
+                    <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                    <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
+                  </div>
+                  
+                  {/* Options Menu */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
+                      className="p-1 hover:bg-gray-100 rounded"
+                    >
+                      <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {selectedItemId === item.id && (
+                      <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
+                        <div className="py-1">
+                          {item.type === 'approval' ? (
+                            <>
+                              <button
+                                onClick={() => handleItemAction('approve', item.id)}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-green-50 text-green-700"
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleItemAction('reject', item.id)}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
+                              >
+                                <AlertTriangle className="h-3 w-3" />
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleItemAction('vote-yes', item.id)}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-green-50 text-green-700"
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                                Vote Yes
+                              </button>
+                              <button
+                                onClick={() => handleItemAction('vote-no', item.id)}
+                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
+                              >
+                                <AlertTriangle className="h-3 w-3" />
+                                Vote No
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => handleItemAction('details', item.id)}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                          >
+                            <FileText className="h-3 w-3" />
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
@@ -484,12 +488,33 @@ export default function TodayPage() {
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
   const [audioTime, setAudioTime] = useState(0)
 
-  // Updates card state
-  const [activeTab, setActiveTab] = useState('alerts')
+  // Tasks card state (now only for alerts)
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
-  // Scheduler state
-  const [schedulerInput, setSchedulerInput] = useState('')
+  // Modal states for new meeting/activity
+  const [newMeetingOpen, setNewMeetingOpen] = useState(false)
+  const [newActivityOpen, setNewActivityOpen] = useState(false)
+  
+  // Dropdown states for templates
+  const [meetingDropdownOpen, setMeetingDropdownOpen] = useState(false)
+  const [activityDropdownOpen, setActivityDropdownOpen] = useState(false)
+
+  // Form states for new items
+  const [meetingForm, setMeetingForm] = useState({
+    title: '',
+    datetime: '',
+    location: '',
+    attendees: '',
+    description: ''
+  })
+  const [activityForm, setActivityForm] = useState({
+    title: '',
+    type: '',
+    datetime: '',
+    location: '',
+    assignedTo: '',
+    description: ''
+  })
 
   const handleAudioPlay = () => {
     if (audio) {
@@ -536,6 +561,21 @@ export default function TodayPage() {
       return () => clearInterval(interval)
     }
   }, [audio, isPlaying, currentTranscriptIndex])
+
+  // Handle clicking outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (meetingDropdownOpen || activityDropdownOpen) {
+        setMeetingDropdownOpen(false)
+        setActivityDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [meetingDropdownOpen, activityDropdownOpen])
 
   const getCurrentTranscriptLines = () => {
     if (currentTranscriptIndex < transcriptData.length) {
@@ -730,7 +770,7 @@ export default function TodayPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Consider visiting Mumias region</p>
@@ -743,7 +783,7 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Recommend policy review</p>
@@ -754,7 +794,7 @@ export default function TodayPage() {
                   </Button>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[#202020]">Weather alert preparation</p>
@@ -767,9 +807,7 @@ export default function TodayPage() {
               </CardContent>
             </Card>
 
-            <UpdatesCard 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
+            <AlertsCard 
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
             />
@@ -777,10 +815,105 @@ export default function TodayPage() {
 
           {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style={{ height: "10%" }}>
-            {/* Upcoming Meetings */}
+            {/*Meetings*/}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Upcoming Meetings</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-[#202020]">Meetings</CardTitle>
+                  <div className="relative">
+                    <Button 
+                      size="sm" 
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
+                      onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
+                    >
+                      <LuSquarePen className="h-4 w-4" />
+                      New
+                      <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                    
+                    {/* Dropdown Menu */}
+                    {meetingDropdownOpen && (
+                      <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                        <div className="py-1">
+                          <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Event</div>
+                          <button
+                            onClick={() => {
+                              setMeetingForm({...meetingForm, title: 'General Meeting'})
+                              setNewMeetingOpen(true)
+                              setMeetingDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <Calendar className="h-4 w-4" />
+                            Event
+                          </button>
+                          <button
+                            onClick={() => {
+                              setMeetingForm({...meetingForm, title: 'Channel Meeting'})
+                              setNewMeetingOpen(true)
+                              setMeetingDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                            Channel meeting
+                          </button>
+                          
+                          <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-t">Organisation templates</div>
+                          <button
+                            onClick={() => {
+                              setMeetingForm({...meetingForm, title: 'Webinar Session'})
+                              setNewMeetingOpen(true)
+                              setMeetingDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <Play className="h-4 w-4" />
+                            Webinar
+                          </button>
+                          <button
+                            onClick={() => {
+                              setMeetingForm({...meetingForm, title: 'Town Hall Meeting'})
+                              setNewMeetingOpen(true)
+                              setMeetingDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <Users className="h-4 w-4" />
+                            Town hall
+                          </button>
+                          
+                          <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-t">Class</div>
+                          <button
+                            onClick={() => {
+                              setMeetingForm({...meetingForm, title: 'Lecture Session'})
+                              setNewMeetingOpen(true)
+                              setMeetingDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <FileText className="h-4 w-4" />
+                            Lecture
+                          </button>
+                          
+                          <div className="border-t">
+                            <button
+                              onClick={() => {
+                                setNewMeetingOpen(true)
+                                setMeetingDropdownOpen(false)
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              <FileText className="h-4 w-4" />
+                              View all templates
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="space-y-2 p-4">
                 <div 
@@ -825,10 +958,101 @@ export default function TodayPage() {
               </CardContent>
             </Card>
 
-            {/* Upcoming Activities */}
+            {/*Activities */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Upcoming Activities</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-[#202020]">Activities</CardTitle>
+                  <div className="relative">
+                    <Button 
+                      size="sm" 
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
+                      onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
+                    >
+                      <LuSquarePen className="h-4 w-4" />
+                      New
+                      <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                    
+                    {/* Dropdown Menu */}
+                    {activityDropdownOpen && (
+                      <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                        <div className="py-1">
+                          <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Activity Types</div>
+                          <button
+                            onClick={() => {
+                              setActivityForm({...activityForm, title: 'Field Inspection', type: 'inspection'})
+                              setNewActivityOpen(true)
+                              setActivityDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            Field Inspection
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActivityForm({...activityForm, title: 'Compliance Review', type: 'compliance'})
+                              setNewActivityOpen(true)
+                              setActivityDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <AlertTriangle className="h-4 w-4" />
+                            Compliance Review
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActivityForm({...activityForm, title: 'Training Session', type: 'training'})
+                              setNewActivityOpen(true)
+                              setActivityDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <Users className="h-4 w-4" />
+                            Training Session
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActivityForm({...activityForm, title: 'Quality Audit', type: 'audit'})
+                              setNewActivityOpen(true)
+                              setActivityDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <FileText className="h-4 w-4" />
+                            Quality Audit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActivityForm({...activityForm, title: 'Equipment Maintenance', type: 'maintenance'})
+                              setNewActivityOpen(true)
+                              setActivityDropdownOpen(false)
+                            }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                          >
+                            <TrendingUp className="h-4 w-4" />
+                            Equipment Maintenance
+                          </button>
+                          
+                          <div className="border-t">
+                            <button
+                              onClick={() => {
+                                setNewActivityOpen(true)
+                                setActivityDropdownOpen(false)
+                              }}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              <FileText className="h-4 w-4" />
+                              View all templates
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="space-y-2 p-4">
                 <div 
@@ -879,10 +1103,10 @@ export default function TodayPage() {
               </CardContent>
             </Card>
 
-            {/* Scheduler Card */}
-            <SchedulerCard 
-              schedulerInput={schedulerInput}
-              setSchedulerInput={setSchedulerInput}
+            {/* Actions Card */}
+            <ActionsCard 
+              selectedItemId={selectedItemId}
+              setSelectedItemId={setSelectedItemId}
             />
           </div>
 
@@ -893,6 +1117,187 @@ export default function TodayPage() {
         onOpenChange={setScheduleVisitOpen}
         defaultLocation={selectedLocation}
       />
+
+      {/* New Meeting Modal */}
+      <Dialog open={newMeetingOpen} onOpenChange={setNewMeetingOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Schedule New Meeting</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="meeting-title">Meeting Title</Label>
+              <Input
+                id="meeting-title"
+                value={meetingForm.title}
+                onChange={(e) => setMeetingForm({ ...meetingForm, title: e.target.value })}
+                placeholder="Enter meeting title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="meeting-date">Date & Time</Label>
+              <Input
+                id="meeting-date"
+                type="datetime-local"
+                value={meetingForm.datetime}
+                onChange={(e) => setMeetingForm({ ...meetingForm, datetime: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="meeting-location">Location</Label>
+              <Select 
+                value={meetingForm.location} 
+                onValueChange={(value) => setMeetingForm({ ...meetingForm, location: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="headquarters">KSB Headquarters</SelectItem>
+                  <SelectItem value="mumias">Mumias Mill</SelectItem>
+                  <SelectItem value="nzoia">Nzoia Mill</SelectItem>
+                  <SelectItem value="online">Online Meeting</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="meeting-attendees">Attendees</Label>
+              <Input
+                id="meeting-attendees"
+                value={meetingForm.attendees}
+                onChange={(e) => setMeetingForm({ ...meetingForm, attendees: e.target.value })}
+                placeholder="Enter attendee emails (comma separated)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="meeting-description">Description</Label>
+              <Textarea
+                id="meeting-description"
+                value={meetingForm.description}
+                onChange={(e) => setMeetingForm({ ...meetingForm, description: e.target.value })}
+                placeholder="Meeting agenda and details"
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setNewMeetingOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  console.log('Schedule meeting:', meetingForm)
+                  setNewMeetingOpen(false)
+                  // Reset form
+                  setMeetingForm({ title: '', datetime: '', location: '', attendees: '', description: '' })
+                }}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Schedule Meeting
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* New Activity Modal */}
+      <Dialog open={newActivityOpen} onOpenChange={setNewActivityOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Schedule New Activity</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="activity-title">Activity Title</Label>
+              <Input
+                id="activity-title"
+                value={activityForm.title}
+                onChange={(e) => setActivityForm({ ...activityForm, title: e.target.value })}
+                placeholder="Enter activity title"
+              />
+            </div>
+            <div>
+              <Label htmlFor="activity-type">Activity Type</Label>
+              <Select 
+                value={activityForm.type} 
+                onValueChange={(value) => setActivityForm({ ...activityForm, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select activity type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inspection">Field Inspection</SelectItem>
+                  <SelectItem value="compliance">Compliance Review</SelectItem>
+                  <SelectItem value="training">Training Session</SelectItem>
+                  <SelectItem value="audit">Quality Audit</SelectItem>
+                  <SelectItem value="maintenance">Equipment Maintenance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="activity-date">Date & Time</Label>
+              <Input
+                id="activity-date"
+                type="datetime-local"
+                value={activityForm.datetime}
+                onChange={(e) => setActivityForm({ ...activityForm, datetime: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="activity-location">Location</Label>
+              <Select 
+                value={activityForm.location} 
+                onValueChange={(value) => setActivityForm({ ...activityForm, location: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mumias">Mumias Mill</SelectItem>
+                  <SelectItem value="nzoia">Nzoia Mill</SelectItem>
+                  <SelectItem value="chemelil">Chemelil Mill</SelectItem>
+                  <SelectItem value="sony">Sony Mill</SelectItem>
+                  <SelectItem value="field">Field Location</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="activity-assigned">Assigned To</Label>
+              <Input
+                id="activity-assigned"
+                value={activityForm.assignedTo}
+                onChange={(e) => setActivityForm({ ...activityForm, assignedTo: e.target.value })}
+                placeholder="Enter assignee email"
+              />
+            </div>
+            <div>
+              <Label htmlFor="activity-description">Description</Label>
+              <Textarea
+                id="activity-description"
+                value={activityForm.description}
+                onChange={(e) => setActivityForm({ ...activityForm, description: e.target.value })}
+                placeholder="Activity details and requirements"
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setNewActivityOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  console.log('Schedule activity:', activityForm)
+                  setNewActivityOpen(false)
+                  // Reset form
+                  setActivityForm({ title: '', type: '', datetime: '', location: '', assignedTo: '', description: '' })
+                }}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Schedule Activity
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PortalLayout>
   )
 }

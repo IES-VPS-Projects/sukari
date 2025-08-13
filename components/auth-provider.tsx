@@ -14,7 +14,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => Promise<boolean>
+  login: (identifier: string, password: string) => Promise<boolean>
   logout: () => void
   isLoading: boolean
 }
@@ -22,16 +22,30 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Default credentials for demo
-const DEFAULT_CREDENTIALS = {
-  email: "executive@ksb.go.ke",
-  password: "KSB2024!",
-  user: {
-    id: "1",
+const DEFAULT_CREDENTIALS = [
+  {
     email: "executive@ksb.go.ke",
-    name: "Jude Chesire",
-    role: "Chief Executive",
+    phone: "0700111123",
+    password: "KSB2024!",
+    user: {
+      id: "1",
+      email: "executive@ksb.go.ke",
+      name: "Jude Chesire",
+      role: "Chief Executive",
+    },
   },
-}
+  {
+    email: "admin@ksb.go.ke", 
+    phone: "0712345678",
+    password: "Admin123!",
+    user: {
+      id: "2",
+      email: "admin@ksb.go.ke",
+      name: "John Doe",
+      role: "Administrator",
+    },
+  },
+]
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -47,15 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (identifier: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    if (email === DEFAULT_CREDENTIALS.email && password === DEFAULT_CREDENTIALS.password) {
-      setUser(DEFAULT_CREDENTIALS.user)
-      localStorage.setItem("ksb_user", JSON.stringify(DEFAULT_CREDENTIALS.user))
+    // Check against default credentials - support both email and phone
+    const validCredential = DEFAULT_CREDENTIALS.find(cred => 
+      (cred.email === identifier || cred.phone === identifier) && cred.password === password
+    )
+
+    if (validCredential) {
+      setUser(validCredential.user)
+      localStorage.setItem("ksb_user", JSON.stringify(validCredential.user))
       setIsLoading(false)
       return true
     }
