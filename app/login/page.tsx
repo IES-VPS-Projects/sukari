@@ -3,18 +3,19 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth-provider"
 import Link from "next/link"
-import { User, Lock, Eye, EyeOff, CheckCircle } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react"
 import Image from "next/image"
+import { useAuth } from "@/components/auth-provider"
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    identifier: "",
-    password: "",
+    email: "",
+    pin: "",
     rememberMe: false,
   })
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPin, setShowPin] = useState(false)
   const [error, setError] = useState("")
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -36,39 +37,89 @@ export default function LoginPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
+    // For PIN field, only allow numeric input and limit to 4 digits
+    if (name === "pin") {
+      if (/^\d*$/.test(value) && value.length <= 4) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }))
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }))
+    }
+
+    // Clear error when user starts typing
+    if (error) {
+      setError("")
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
-    // For demo purposes, map phone number to email for existing auth system
-    const emailToUse = formData.identifier === "0700111123" 
-      ? "executive@ksb.go.ke" 
-      : formData.identifier
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address")
+      return
+    }
 
-    const success = await login(emailToUse, formData.password)
+    // Validate PIN format
+    if (formData.pin.length !== 4 || !/^\d{4}$/.test(formData.pin)) {
+      setError("PIN must be exactly 4 digits")
+      return
+    }
+
+    // Use the existing auth system
+    const success = await login(formData.email, formData.pin)
     if (success) {
+      toast.success('Login successful!')
       router.push("/portal/today")
     } else {
-      setError("Invalid credentials. Please check your phone number and password.")
+      setError("Invalid credentials. Please check your email and PIN.")
     }
   }
 
   const fillDemoCredentials = () => {
     setFormData(prev => ({
       ...prev,
-      identifier: "0700111123",
-      password: "KSB2024!"
+      email: "9davidmuia@gmail.com",
+      pin: "1234"
     }))
   }
 
   return (
     <div className="min-h-screen flex">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2">
@@ -107,65 +158,68 @@ export default function LoginPage() {
 
             {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">{error}</div>}
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Identifier Field */}
+              {/* Email Field */}
               <div>
-                <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
                 </label>
                 <div className="relative">
                   <div
                     className={`absolute left-1 top-1 bottom-1 w-10 flex items-center justify-center rounded-l-md ${
-                      focusedField === "identifier" ? "bg-gray-100" : "bg-gray-100"
+                      focusedField === "email" ? "bg-gray-100" : "bg-gray-100"
                     }`}
                   >
-                    <User className={`h-5 w-5 ${focusedField === "identifier" ? "text-green-600" : "text-gray-400"}`} />
+                    <Mail className={`h-5 w-5 ${focusedField === "email" ? "text-green-600" : "text-gray-400"}`} />
                   </div>
                   <input
-                    type="text"
-                    id="identifier"
-                    name="identifier"
-                    value={formData.identifier}
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleInputChange}
-                    onFocus={() => setFocusedField("identifier")}
+                    onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Enter your phone number"
+                    placeholder="Enter your email address"
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
                 </div>
               </div>
 
-              {/* Password Field */}
+              {/* PIN Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
+                <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-2">
+                  4-Digit PIN
                 </label>
                 <div className="relative">
                   <div
                     className={`absolute left-1 top-1 bottom-1 w-10 flex items-center justify-center rounded-l-md ${
-                      focusedField === "password" ? "bg-gray-100" : "bg-gray-100"
+                      focusedField === "pin" ? "bg-gray-100" : "bg-gray-100"
                     }`}
                   >
-                    <Lock className={`h-5 w-5 ${focusedField === "password" ? "text-green-600" : "text-gray-400"}`} />
+                    <Lock className={`h-5 w-5 ${focusedField === "pin" ? "text-green-600" : "text-gray-400"}`} />
                   </div>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    value={formData.password}
+                    type={showPin ? "text" : "password"}
+                    id="pin"
+                    name="pin"
+                    value={formData.pin}
                     onChange={handleInputChange}
-                    onFocus={() => setFocusedField("password")}
+                    onFocus={() => setFocusedField("pin")}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter your 4-digit PIN"
+                    maxLength={4}
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     required
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPin(!showPin)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPin ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
@@ -182,8 +236,8 @@ export default function LoginPage() {
                   />
                   <span className="ml-2 text-sm text-gray-700">Remember Me</span>
                 </label>
-                <Link href="/forgot-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
-                  Forgot Password?
+                <Link href="/forgot-pin" className="text-sm text-green-600 hover:text-green-700 font-medium">
+                  Forgot PIN?
                 </Link>
               </div>
 
