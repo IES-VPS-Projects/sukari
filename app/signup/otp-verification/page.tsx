@@ -1,28 +1,51 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Phone } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import { Mail, Phone, ArrowLeft, CheckCircle } from "lucide-react"
+import { useSignupData } from "@/hooks/use-signup-data"
+import { useSendOTP } from "@/hooks/use-send-otp"
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function OTPVerification() {
   const [selectedMethod, setSelectedMethod] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [signupData, setSignupData] = useState<any>({})
   const router = useRouter()
+  
+  const { 
+    getIPRSData, 
+    getVerificationData, 
+    getAuthenticationData, 
+    getUserCreationResponse,
+    isLoading 
+  } = useSignupData()
+  
+  const sendOTPMutation = useSendOTP()
+  
+  const iprsData = getIPRSData()
+  const verificationData = getVerificationData()
+  const authenticationData = getAuthenticationData()
+  const userCreationResponse = getUserCreationResponse()
 
   useEffect(() => {
-    // Get signup data
-    const data = localStorage.getItem("signupData")
-    if (!data) {
-      router.push("/signup/user-type")
+    // Wait for data to load before checking
+    if (isLoading) {
       return
     }
-    setSignupData(JSON.parse(data))
-  }, [router])
+
+    // Check if we have the required data from previous steps
+    if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
+      console.log('Missing required data, redirecting to authentication')
+      router.push("/signup/authentication")
+      return
+    }
+
+    console.log('OTP Verification - Data available:', {
+      iprsData: !!iprsData,
+      verificationData: !!verificationData,
+      authenticationData: !!authenticationData,
+      userCreationResponse: !!userCreationResponse
+    })
+  }, [iprsData, verificationData, authenticationData, userCreationResponse, router, isLoading])
 
   const handleMethodSelect = (method: string) => {
     setSelectedMethod(method)
@@ -32,28 +55,32 @@ export default function OTPVerification() {
     e.preventDefault()
 
     if (!selectedMethod) {
+      toast.error('Please select a verification method')
       return
     }
 
-    setLoading(true)
-
     try {
-      // Update signup data with selected OTP method
-      const updatedData = {
-        ...signupData,
-        otpMethod: selectedMethod,
+      const userId = userCreationResponse.data?.id || userCreationResponse?.userId;
+      if (!userId) {
+        toast.error('User ID not found. Please try again.');
+        return;
       }
-      localStorage.setItem("signupData", JSON.stringify(updatedData))
+      
+      const otpData = {
+        userId: userId,
+        type: selectedMethod.toUpperCase() as 'EMAIL' | 'SMS'
+      };
+      
+      console.log('Sending OTP via:', selectedMethod)
+      console.log('OTP data:', otpData)
 
-      // Simulate OTP sending
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await sendOTPMutation.mutateAsync(otpData)
 
       // Navigate to OTP submission
       router.push("/signup/otp-submission")
     } catch (error) {
-      console.error("Error:", error)
-    } finally {
-      setLoading(false)
+      console.error("Error sending OTP:", error)
+      // Error is already handled by the mutation hook
     }
   }
 
@@ -61,19 +88,68 @@ export default function OTPVerification() {
     router.push("/signup/authentication")
   }
 
+  // Show loading state while data is being loaded
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    )
+  }
+
+  // Show loading state if data is missing (will redirect after loading)
+  if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <SignupHeader />
-      <ProgressBar currentStep={4} totalSteps={5} />
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">OTP Verification</h2>
+          <p className="mt-2 text-gray-600">Choose how you'd like to receive your verification code</p>
+        </div>
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">OTP Verification</h2>
-            <p className="mt-2 text-gray-600">Choose how you'd like to receive your verification code</p>
+        {/* Display User Info Summary */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <span className="text-sm font-medium text-green-800">    {verificationData.fullName} 
+            </span>
           </div>
+           
+        </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Option */}
             <div
               onClick={() => handleMethodSelect("email")}
@@ -87,7 +163,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">Email</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {signupData.email}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {authenticationData.email}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
@@ -112,7 +188,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">SMS</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {signupData.phone}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {authenticationData.telephone}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
@@ -123,22 +199,24 @@ export default function OTPVerification() {
                 </div>
               </div>
             </div>
+             
 
             {/* Action Buttons */}
             <div className="flex space-x-4">
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                className="flex items-center space-x-2 flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
               >
-                Back
+                <ArrowLeft className="h-5 w-5" />
+                <span>Back</span>
               </button>
               <button
                 type="submit"
-                disabled={!selectedMethod || loading}
+                disabled={!selectedMethod || sendOTPMutation.isPending}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Sending..." : "Send OTP"}
+                {sendOTPMutation.isPending ? "Sending OTP..." : "Send OTP"}
               </button>
             </div>
           </form>

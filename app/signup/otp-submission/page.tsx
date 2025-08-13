@@ -5,27 +5,38 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import { useSignupData } from "@/hooks/use-signup-data"
+import { useVerifyOTP } from "@/hooks/use-verify-otp"
+import { useResendOTP } from "@/hooks/use-resend-otp"
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function OTPSubmission() {
-  const [otp, setOtp] = useState(["", "", "", ""])
-  const [loading, setLoading] = useState(false)
+  const [otp, setOtp] = useState(["", "", "", "","",""])
   const [error, setError] = useState("")
   const [resendTimer, setResendTimer] = useState(27)
-  const [signupData, setSignupData] = useState<any>({})
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const router = useRouter()
+  
+  const { getIPRSData, getVerificationData, getAuthenticationData, getUserCreationResponse, isLoading } = useSignupData()
+  const verifyOTPMutation = useVerifyOTP()
+  const resendOTPMutation = useResendOTP()
+  
+  const iprsData = getIPRSData()
+  const verificationData = getVerificationData()
+  const authenticationData = getAuthenticationData()
+  const userCreationResponse = getUserCreationResponse()
 
   useEffect(() => {
-    // Get signup data
-    const data = localStorage.getItem("signupData")
-    if (!data) {
-      router.push("/signup/user-type")
+    if (isLoading) {
       return
     }
-    setSignupData(JSON.parse(data))
+    
+    if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
+      console.log('Missing required data, redirecting to verification')
+      router.push("/signup/verification")
+      return
+    }
 
     // Focus first input on mount
     if (inputRefs.current[0]) {
@@ -44,7 +55,7 @@ export default function OTPSubmission() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [router])
+  }, [iprsData, verificationData, authenticationData, userCreationResponse, router, isLoading])
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return
@@ -54,7 +65,7 @@ export default function OTPSubmission() {
     setOtp(newOtp)
 
     // Auto-focus next input
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputRefs.current[index + 1]?.focus()
     }
 
@@ -74,17 +85,27 @@ export default function OTPSubmission() {
     e.preventDefault()
 
     const otpValue = otp.join("")
-    if (otpValue.length !== 4) {
+    if (otpValue.length !== 6) {
       setError("Please enter the complete OTP")
       return
     }
 
-    setLoading(true)
     setError("")
 
     try {
-      // Simulate OTP verification
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const userId = userCreationResponse?.data.id || userCreationResponse?.userId;
+      if (!userId) {
+        setError('User ID not found. Please try again.');
+        return;
+      }
+      
+      const verifyData = {
+        userId: userId,
+        code: otpValue,
+        type: 'EMAIL' as 'EMAIL' | 'SMS' // Default to EMAIL for now
+      };
+      
+      await verifyOTPMutation.mutateAsync(verifyData)
       
       // Show success message briefly
       setShowSuccessMessage(true)
@@ -93,9 +114,8 @@ export default function OTPSubmission() {
         router.push("/signup/create-password")
       }, 1500)
     } catch (error) {
-      setError("Invalid OTP. Please try again.")
-    } finally {
-      setLoading(false)
+      console.error("Error verifying OTP:", error)
+      // Error is already handled by the mutation hook
     }
   }
 
@@ -103,21 +123,40 @@ export default function OTPSubmission() {
     router.push("/signup/otp-verification")
   }
 
-  const handleResend = () => {
-    setResendTimer(27)
-    setOtp(["", "", "", ""])
-    setError("")
+  const handleResend = async () => {
+    try {
+      const userId = userCreationResponse?.data?.id || userCreationResponse?.userId;
+      if (!userId) {
+        toast.error('User ID not found. Please try again.');
+        return;
+      }
+      
+      const resendData = {
+        userId: userId,
+        type: 'EMAIL' as 'EMAIL' | 'SMS' // Default to EMAIL for now
+      };
+      
+      await resendOTPMutation.mutateAsync(resendData);
+      
+      // Reset OTP input and timer
+      setResendTimer(27)
+      setOtp(["", "", "", "", "", ""])
+      setError("")
 
-    // Restart timer
-    const timer = setInterval(() => {
-      setResendTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
+      // Restart timer
+      const timer = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } catch (error) {
+      console.error("Error resending OTP:", error)
+      // Error is already handled by the mutation hook
+    }
   }
 
   const formatTime = (seconds: number) => {
@@ -127,12 +166,15 @@ export default function OTPSubmission() {
   }
 
   const getContactInfo = () => {
-    if (signupData.otpMethod === "email") {
-      return signupData.email || "your email"
-    } else {
-      const phone = signupData.otpPhone || signupData.userVerificationData?.phoneNumber
-      if (!phone) return "your phone number"
-      
+    if (!authenticationData) return "your contact"
+    
+    // For now, we'll use email as default since we don't have otpMethod stored
+    const email = authenticationData.email;
+    const phone = authenticationData.telephone;
+    
+    if (email) {
+      return email;
+    } else if (phone) {
       // Format phone number to mask middle digits
       if (phone.startsWith("+254")) {
         return phone.replace(/(\+254)(\d{3})(\d{3})(\d{3})/, "$1$2***$4")
@@ -143,12 +185,36 @@ export default function OTPSubmission() {
       }
       return phone
     }
+    
+    return "your contact"
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SignupHeader />
-      <ProgressBar currentStep={4} totalSteps={5} />
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
 
       {/* Success Message */}
       {showSuccessMessage && (
@@ -158,7 +224,13 @@ export default function OTPSubmission() {
         </div>
       )}
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Show loading state while data is being loaded */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">OTP Submission</h2>
@@ -167,7 +239,7 @@ export default function OTPSubmission() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             {/* OTP Input */}
-            <div className="flex justify-center space-x-4">
+            <div className="flex justify-center space-x-2">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -179,7 +251,7 @@ export default function OTPSubmission() {
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className={`w-16 h-16 text-center text-2xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+                  className={`w-12 h-12 text-center text-xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
                     digit ? "border-green-500 bg-green-50" : "border-gray-300"
                   } ${error ? "border-red-500" : ""}`}
                   pattern="[0-9]*"
@@ -205,10 +277,10 @@ export default function OTPSubmission() {
               </button>
               <button
                 type="submit"
-                disabled={loading || otp.join("").length !== 4}
+                disabled={verifyOTPMutation.isPending || otp.join("").length !== 6}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Verifying..." : "Verify"}
+                {verifyOTPMutation.isPending ? "Verifying..." : "Verify"}
               </button>
             </div>
 
@@ -228,7 +300,8 @@ export default function OTPSubmission() {
             </div>
           </form>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -6,16 +6,29 @@ import { useRouter } from "next/navigation"
 import { Search, Building2, User, CheckCircle, AlertCircle, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react"
 import SignupHeader from "@/components/signup/SignupHeader"
 import ProgressBar from "@/components/signup/ProgressBar"
+import { useIPRSVerification, formatIPRSData } from "@/hooks/use-iprs"
+import { useVerificationContinue } from "@/hooks/use-verification-continue"
 
 export default function VerificationStep() {
   const [userType, setUserType] = useState("")
   const [searchValue, setSearchValue] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [shouldVerify, setShouldVerify] = useState(false)
   const [verificationResult, setVerificationResult] = useState<any>(null)
   const [error, setError] = useState("")
   const [companyFormData, setCompanyFormData] = useState<any>({})
   const [expandedDirectors, setExpandedDirectors] = useState<{ [key: number]: boolean }>({})
   const router = useRouter()
+
+  // React Query hook for IPRS verification
+  const {
+    data: iprsData,
+    isLoading: iprsLoading,
+    error: iprsError,
+    refetch: refetchIPRS
+  } = useIPRSVerification(searchValue, shouldVerify)
+
+  // React Query hook for continue submission
+  const continueMutation = useVerificationContinue()
 
   useEffect(() => {
     // Get user type from localStorage
@@ -29,117 +42,185 @@ export default function VerificationStep() {
     setUserType(parsedData.userType)
   }, [router])
 
-  const handleSearch = async () => {
+  // Handle IPRS verification results
+  useEffect(() => {
+    if (iprsData && userType === "individual") {
+      const formattedData = formatIPRSData(iprsData)
+      setVerificationResult({
+        verified: formattedData.verified,
+        data: formattedData
+      })
+      setError("")
+    }
+  }, [iprsData, userType])
+
+  // Handle IPRS errors
+  useEffect(() => {
+    if (iprsError && userType === "individual") {
+      setError(iprsError.message || "Verification failed. Please try again.")
+      setVerificationResult(null)
+    }
+  }, [iprsError, userType])
+
+  // Reset verification state when search value changes
+  useEffect(() => {
+    setShouldVerify(false)
+    setVerificationResult(null)
+    setError("")
+  }, [searchValue])
+
+  const handleSearch = () => {
     if (!searchValue.trim()) return
 
-    setLoading(true)
     setError("")
     setVerificationResult(null)
 
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      if (userType === "individual") {
-        // Simulate IPRS verification
-        if (searchValue.length >= 8) {
-          setVerificationResult({
-            verified: true,
-            data: {
-              idNumber: searchValue,
-              firstName: "Harry",
-              lastName: "Kiprop",
-              dateOfBirth: "1990-05-15",
-              gender: "Male"
-            }
-          })
-        } else {
-          setError("Please enter a valid National ID number")
-        }
-      } else {
-        // Simulate BRS company verification
-        if (searchValue.length >= 6) {
-          const companyData = {
-            registrationNumber: searchValue,
-            companyName: "ABC Sugar Company Ltd",
-            establishmentDate: "2015-03-20",
-            status: "Active",
-            businessType: "Private Limited Company",
-            taxId: "P051234567V",
-            companyEmail: "",
-            industry: "",
-            numberOfEmployees: "",
-            postalAddress: "P.O. Box 12345, Nairobi 00100",
-            buildingName: "Sugar Plaza",
-            streetName: "Industrial Area Road",
-            plotNumber: "LR No. 123/45",
-            county: "Nairobi",
-            subCounty: "Embakasi",
-            location: "Industrial Area",
-            ward: "Embakasi South",
-            directors: [
-              {
-                name: "Jane Khafweli",
-                idNumber: "12345678",
-                nationality: "Kenyan",
-                postalAddress: "P.O. Box 789, Nairobi",
-                phoneNumber: "",
-                email: ""
-              },
-              {
-                name: "Robert Matano", 
-                idNumber: "87654321",
-                nationality: "Kenyan",
-                postalAddress: "P.O. Box 456, Nakuru",
-                phoneNumber: "",
-                email: ""
-              }
-            ]
-          }
-          setVerificationResult({
-            verified: true,
-            data: companyData
-          })
-          setCompanyFormData(companyData)
-        } else {
-          setError("Please enter a valid Company Registration Number")
-        }
+    if (userType === "individual") {
+      // Validate National ID format (8 digits)
+      const idNumberRegex = /^\d{8}$/
+      if (!idNumberRegex.test(searchValue)) {
+        setError("Please enter a valid 8-digit National ID number")
+        return
       }
-    } catch (err) {
-      setError("Verification failed. Please try again.")
-    } finally {
-      setLoading(false)
+
+      // Trigger React Query to fetch IPRS data
+      setShouldVerify(true)
+    } else {
+      // Simulate BRS company verification (keeping existing logic)
+      if (searchValue.length >= 6) {
+        const companyData = {
+          registrationNumber: searchValue,
+          companyName: "ABC Sugar Company Ltd",
+          establishmentDate: "2015-03-20",
+          status: "Active",
+          businessType: "Private Limited Company",
+          taxId: "P051234567V",
+          companyEmail: "",
+          industry: "",
+          numberOfEmployees: "",
+          postalAddress: "P.O. Box 12345, Nairobi 00100",
+          buildingName: "Sugar Plaza",
+          streetName: "Industrial Area Road",
+          plotNumber: "LR No. 123/45",
+          county: "Nairobi",
+          subCounty: "Embakasi",
+          location: "Industrial Area",
+          ward: "Embakasi South",
+          directors: [
+            {
+              name: "Jane Khafweli",
+              idNumber: "12345678",
+              nationality: "Kenyan",
+              postalAddress: "P.O. Box 789, Nairobi",
+              phoneNumber: "",
+              email: ""
+            },
+            {
+              name: "Robert Matano", 
+              idNumber: "87654321",
+              nationality: "Kenyan",
+              postalAddress: "P.O. Box 456, Nakuru",
+              phoneNumber: "",
+              email: ""
+            }
+          ]
+        }
+        setVerificationResult({
+          verified: true,
+          data: companyData
+        })
+        setCompanyFormData(companyData)
+      } else {
+        setError("Please enter a valid Company Registration Number")
+      }
     }
   }
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (verificationResult?.verified) {
-      // Update signup data with verification results
-      const existingData = JSON.parse(localStorage.getItem("signupData") || "{}")
+      setError("")
       
-      let verificationData
-      if (userType === "company") {
-        verificationData = companyFormData
-      } else {
-        // For individuals, combine the IPRS data with the form data
-        verificationData = {
-          ...verificationResult.data,
-          designation: companyFormData.designation,
-          phoneNumber: companyFormData.phoneNumber
+      // Prepare the data to send
+      const continueData = {
+        userType: userType,
+        designation: companyFormData.designation,
+        phoneNumber: companyFormData.phoneNumber,
+        iprs_id: verificationResult.data.id // This is the IPRS record ID
+      }
+
+      console.log('Sending continue data:', continueData)
+
+      try {
+        // Use React Query mutation
+        const result = await continueMutation.mutateAsync(continueData)
+        console.log('Continue response:', result)
+
+        // Store comprehensive data for next page
+        const existingData = JSON.parse(localStorage.getItem("signupData") || "{}")
+        
+        // Store IPRS data for user updates
+        const iprsData = {
+          id: verificationResult.data.id,
+          id_no: verificationResult.data.id_no,
+          first_name: verificationResult.data.first_name,
+          middle_name: verificationResult.data.middle_name,
+          last_name: verificationResult.data.last_name,
+          nationality: verificationResult.data.nationality,
+          gender: verificationResult.data.gender,
+          county_of_birth: verificationResult.data.county_of_birth,
+          date_of_birth: verificationResult.data.date_of_birth,
+          email_address: verificationResult.data.email_address,
+          phone_no: verificationResult.data.phone_no,
+          current_county: verificationResult.data.current_county,
+          current_sub_county: verificationResult.data.current_sub_county,
+          mug_shot: verificationResult.data.mug_shot,
+          createdAt: verificationResult.data.createdAt,
+          updatedAt: verificationResult.data.updatedAt
         }
-      }
-      
-      const updatedData = {
-        ...existingData,
-        verificationData: verificationData
-      }
-      localStorage.setItem("signupData", JSON.stringify(updatedData))
-      
-      // Navigate to next step based on user type
-      if (userType === "company") {
-        router.push("/signup/user-verification")
-      } else {
-        router.push("/signup/authentication")
+        
+        // Store verification and entity data
+        const verificationData = {
+          userType: userType,
+          designation: companyFormData.designation,
+          phoneNumber: companyFormData.phoneNumber,
+          iprs_id: verificationResult.data.id,
+          // Include formatted data for display
+          fullName: verificationResult.data.fullName,
+          formattedDateOfBirth: verificationResult.data.dateOfBirth,
+          formattedGender: verificationResult.data.gender,
+          nationality: verificationResult.data.nationality,
+          countyOfBirth: verificationResult.data.countyOfBirth
+        }
+        
+        const updatedData = {
+          ...existingData,
+          iprsData: iprsData, // Complete IPRS data for user updates
+          verificationData: verificationData, // Form data and formatted display data
+          entityData: continueData, // Data sent to /api/entities
+          entityResponse: result // Response from /api/entities
+        }
+        
+        localStorage.setItem("signupData", JSON.stringify(updatedData))
+        console.log('Stored data for next page:', updatedData)
+        
+        // Show success message briefly before navigation
+        setError("")
+        setVerificationResult((prev: any) => ({
+          ...prev,
+          submitted: true
+        }))
+        
+        // Navigate to next step based on user type
+        setTimeout(() => {
+          if (userType === "company") {
+            router.push("/signup/user-verification")
+          } else {
+            router.push("/signup/authentication")
+          }
+        }, 1000) // Brief delay to show success state
+      } catch (error) {
+        console.error('Error submitting entity data:', error)
+        setError('Failed to submit entity data. Please try again.')
       }
     }
   }
@@ -216,16 +297,21 @@ export default function VerificationStep() {
                   <button
                     type="button"
                     onClick={handleSearch}
-                    disabled={loading || !searchValue.trim()}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={iprsLoading || !searchValue.trim()}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {loading ? (
+                    {iprsLoading ? (
                       <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                     ) : (
                       <Search className="h-5 w-5" />
                     )}
                   </button>
                 </div>
+                {userType === "individual" && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Enter your 8-digit National ID number to verify your identity through IPRS
+                  </p>
+                )}
               </div>
 
               {/* Error Message */}
@@ -233,6 +319,22 @@ export default function VerificationStep() {
                 <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
                   <AlertCircle className="h-5 w-5" />
                   <span>{error}</span>
+                </div>
+              )}
+
+              {/* Loading Message for IPRS */}
+              {iprsLoading && userType === "individual" && (
+                <div className="flex items-center space-x-2 text-blue-600 bg-blue-50 p-3 rounded-lg">
+                  <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                  <span>Verifying your identity through IPRS...</span>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {verificationResult?.submitted && (
+                <div className="flex items-center space-x-2 text-green-600 bg-green-50 p-3 rounded-lg">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>Data submitted successfully! Redirecting to next step...</span>
                 </div>
               )}
 
@@ -254,7 +356,7 @@ export default function VerificationStep() {
                           <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                           <input
                             type="text"
-                            value={`${verificationResult.data.firstName} ${verificationResult.data.lastName}`}
+                            value={verificationResult.data.fullName}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
                           />
@@ -282,6 +384,24 @@ export default function VerificationStep() {
                           <input
                             type="text"
                             value={verificationResult.data.gender}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                          <input
+                            type="text"
+                            value={verificationResult.data.nationality}
+                            readOnly
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">County of Birth</label>
+                          <input
+                            type="text"
+                            value={verificationResult.data.countyOfBirth || "Not specified"}
                             readOnly
                             className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
                           />
@@ -591,11 +711,25 @@ export default function VerificationStep() {
                 onClick={handleContinue}
                 disabled={
                   !verificationResult?.verified || 
-                  (userType === "individual" && (!companyFormData.designation || !companyFormData.phoneNumber))
+                  (userType === "individual" && (!companyFormData.designation || !companyFormData.phoneNumber)) ||
+                  continueMutation.isPending ||
+                  verificationResult?.submitted
                 }
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue
+                {continueMutation.isPending ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Submitting...
+                  </>
+                ) : verificationResult?.submitted ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Submitted
+                  </>
+                ) : (
+                  "Continue"
+                )}
               </button>
             </div>
           </div>

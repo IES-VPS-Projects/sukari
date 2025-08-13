@@ -1,105 +1,111 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Phone, Mail, ArrowLeft } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import { Phone, Mail, ArrowLeft, CheckCircle } from "lucide-react"
+import { useSignupData } from "@/hooks/use-signup-data"
+import { useCreateUser } from "@/hooks/use-create-user"
+import toast, { Toaster } from 'react-hot-toast'
 
-export default function SignupAuthentication() {
-  const [formData, setFormData] = useState({
-    phone: "",
-    email: "",
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(false)
+export default function AuthenticationPage() {
+  const [telephone, setTelephone] = useState("")
+  const [email, setEmail] = useState("")
+  const [error, setError] = useState("")
   const router = useRouter()
+  
+  const { getIPRSData, getVerificationData, getEntityResponse, updateSignupData, isLoading } = useSignupData()
+  
+  const iprsData = getIPRSData()
+  const verificationData = getVerificationData()
+  const entityResponse = getEntityResponse()
+
+  // React Query hook for creating user
+  const createUserMutation = useCreateUser()
 
   useEffect(() => {
-    // Check if user has completed verification step
-    const signupData = localStorage.getItem("signupData")
-    if (!signupData) {
-      router.push("/signup/user-type")
+    console.log('Authentication page useEffect - isLoading:', isLoading, 'iprsData:', !!iprsData, 'verificationData:', !!verificationData)
+    
+    // Wait for data to load before checking
+    if (isLoading) {
+      console.log('Still loading data from localStorage...')
       return
     }
-    
-    const parsedData = JSON.parse(signupData)
-    if (!parsedData.userType || !parsedData.verificationData) {
-      router.push("/signup/user-type")
-    }
-  }, [router])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }))
-    }
-  }
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    // Phone validation
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required"
-    } else {
-      const cleanedPhone = formData.phone.replace(/[^\d+]/g, "")
-      const isValid =
-        /^0[17]\d{8}$/.test(cleanedPhone) ||
-        /^254[17]\d{8}$/.test(cleanedPhone) ||
-        /^\+254[17]\d{8}$/.test(cleanedPhone)
-      const isValidLength = cleanedPhone.length >= 10 && cleanedPhone.length <= 13
-
-      if (!isValid || !isValidLength) {
-        newErrors.phone = "Please enter a valid Kenyan phone number (e.g. 0712345678, 254712345678 or +254712345678)"
-      }
+    // Check if we have the required data from previous step
+    if (!iprsData || !verificationData) {
+      console.log('Missing required data, redirecting to verification')
+      router.push("/signup/verification")
+      return
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
+    // Pre-fill telephone if available from IPRS
+    if (iprsData.phone_no) {
+      setTelephone(iprsData.phone_no)
+    } else if (verificationData.phoneNumber) {
+      setTelephone(verificationData.phoneNumber)
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    // Pre-fill email if available from IPRS
+    if (iprsData.email_address) {
+      setEmail(iprsData.email_address)
+    }
+
+    console.log('IPRS Data available:', iprsData)
+    console.log('Verification Data available:', verificationData)
+  }, [iprsData, verificationData, router, isLoading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
-    setLoading(true)
+    setError("")
 
     try {
-      // Update signup data with phone and email
-      const existingData = JSON.parse(localStorage.getItem("signupData") || "{}")
-      const updatedData = {
-        ...existingData,
-        phone: formData.phone,
-        email: formData.email
+      // Prepare data for user creation
+      const createUserData = {
+        iprsID: iprsData?.id || "",
+        phoneNumber: telephone,
+        email: email,
+        entityID: entityResponse?.data?.id || ""   // Get entity ID from previous API response
       }
-      localStorage.setItem("signupData", JSON.stringify(updatedData))
 
-      // Navigate to OTP verification
+      console.log('Creating user with data:', createUserData)
+
+      // Validate required fields
+      if (!createUserData.iprsID) {
+        throw new Error('IPRS ID is required')
+      }
+      if (!createUserData.phoneNumber) {
+        throw new Error('Phone number is required')
+      }
+      if (!createUserData.email) {
+        throw new Error('Valid email is required')
+      }
+      if (!createUserData.entityID) {
+        throw new Error('Entity ID is required')
+      }
+
+      // Call the API to create user
+      const result = await createUserMutation.mutateAsync(createUserData)
+      console.log('User creation response:', result)
+
+      // Update signup data with authentication info and user creation result
+      updateSignupData({
+        authenticationData: {
+          telephone,
+          email,
+          iprs_id: iprsData?.id || "",
+          userType: verificationData?.userType || ""
+        },
+        userCreationData: createUserData,
+        userCreationResponse: result
+      })
+
+      // Navigate to next step
       router.push("/signup/otp-verification")
     } catch (error) {
-      console.error("Error:", error)
-    } finally {
-      setLoading(false)
+      console.error('Error creating user:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create user. Please try again.'
+      setError(errorMessage)
+      toast.error(errorMessage)
     }
   }
 
@@ -107,44 +113,92 @@ export default function SignupAuthentication() {
     router.push("/signup/verification")
   }
 
+  // Show loading state while data is being loaded
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    )
+  }
+
+  // Show loading state if data is missing (will redirect after loading)
+  if (!iprsData || !verificationData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <SignupHeader />
-      <ProgressBar currentStep={3} totalSteps={5} />
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Authentication</h2>
+          <p className="mt-2 text-gray-600">
+            Enter your contact information for verification
+          </p>
+        </div>
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Authentication</h2>
-            <p className="mt-2 text-gray-600">Enter your contact information for verification</p>
+        {/* Display IPRS Data Summary */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <span className="text-sm font-medium text-green-800">Verified Identity</span>
           </div>
+          <p className="text-sm text-green-700">
+            {verificationData.fullName} • ID: {iprsData.id_no}
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {/* Phone Number */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-green-700 mb-2">
+              
+              <label htmlFor="telephone" className="block text-sm font-medium text-gray-700 mb-2">
                 Telephone
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-600" />
                 <input
                   type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
+                  id="telephone"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
                   placeholder="Enter your telephone no..."
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.phone ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
                 />
               </div>
-              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
 
-            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-green-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
               <div className="relative">
@@ -152,34 +206,43 @@ export default function SignupAuthentication() {
                 <input
                   type="email"
                   id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.email ? "border-red-500" : "border-gray-300"
-                  }`}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
                 />
               </div>
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
 
-            {/* Action Buttons */}
+            {error && (
+              <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+                {error}
+              </div>
+            )}
+
             <div className="flex space-x-4">
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-2"
+                className="flex items-center space-x-2 flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-5 w-5" />
                 <span>Back</span>
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={createUserMutation.isPending || !telephone || !email}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Processing..." : "Submit"}
+                {createUserMutation.isPending ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Creating User...
+                  </>
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           </form>
