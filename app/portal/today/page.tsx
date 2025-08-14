@@ -328,62 +328,6 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
                     <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
                     <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
                   </div>
-                  
-                  {/* Options Menu */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
-                      className="p-1 hover:bg-gray-100 rounded ellipsis-menu"
-                    >
-                      <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
-                    </button>
-                    
-                    {/* Dropdown Menu */}
-                    {selectedItemId === item.id && (
-                      <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
-                        <div className="py-1">
-                          <button
-                            onClick={() => {
-                              setSelectedAlertForDetails(item.id)
-                              setViewAllAlertsOpen(true)
-                              setSelectedItemId(null)
-                            }}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <GoInfo className="h-3 w-3" />
-                            Details
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('mark-read', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <CheckCircle className="h-3 w-3" />
-                            Mark as read
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('forward', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <LuForward className="h-3 w-3" />
-                            Forward
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('take-action', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <Calendar className="h-3 w-3" />
-                            Take Action
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('delete', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50 text-red-600"
-                          >
-                            ✕ Delete
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
@@ -1284,165 +1228,201 @@ export default function TodayPage() {
         setViewAllActionsOpen(false)
         setSelectedActionForDetails(null)
       }}>
-        <DialogContent className="sm:max-w-[750px] max-h-[85vh] [&>button]:hidden">
-          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <DialogTitle className="text-[#202020] text-lg font-medium">Actions</DialogTitle>
-              <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
-            </div>
-            <div className="group relative">
-              <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-              <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                List of actions requiring approval or voting decisions
-              </div>
-            </div>
-          </DialogHeader>
-          
-          {!selectedActionForDetails ? (
-            <div className="space-y-3 max-h-[65vh] overflow-y-auto">
-              {allActionsData.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md border"
-                  onClick={() => setSelectedActionForDetails(item.id)}
-                >
-                  {/* Icon */}
-                  <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                    {item.type === 'approval' ? (
-                      <CheckCircle className={`h-4 w-4 ${item.iconColor}`} />
-                    ) : (
-                      <Users className={`h-4 w-4 ${item.iconColor}`} />
-                    )}
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
-                        <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
-                        <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            // Action Details View
-            (() => {
-              const selectedAction = allActionsData.find(action => action.id === selectedActionForDetails)
-              if (!selectedAction) return null
-              
-              return (
-                <div className="space-y-4 max-h-[65vh] overflow-y-auto">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setSelectedActionForDetails(null)}
-                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    <ArrowRight className="h-4 w-4 rotate-180" />
-                    Back to Actions
-                  </Button>
-                  
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-12 h-12 ${selectedAction.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        {selectedAction.type === 'approval' ? (
-                          <CheckCircle className={`h-6 w-6 ${selectedAction.iconColor}`} />
-                        ) : (
-                          <Users className={`h-6 w-6 ${selectedAction.iconColor}`} />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-[#202020] mb-2">{selectedAction.title}</h3>
-                        <p className="text-sm text-[#6B6B6B] mb-2">{selectedAction.description}</p>
-                        <p className="text-xs text-[#9CA3AF]">{selectedAction.timestamp}</p>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+          <DialogTitle className="sr-only">
+            {selectedActionForDetails ? 'Action Details' : 'Actions'}
+          </DialogTitle>
+          {(() => {
+            if (selectedActionForDetails) {
+              const action = allActionsData.find(a => a.id === selectedActionForDetails)
+              if (action) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedActionForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                            {action.type === 'approval' ? (
+                              <CheckCircle className={`h-5 w-5 ${action.iconColor}`} />
+                            ) : (
+                              <Users className={`h-5 w-5 ${action.iconColor}`} />
+                            )}
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{action.title}</h2>
+                            <p className="text-sm text-gray-500">{action.timestamp}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Action Type:</label>
-                        <p className="text-sm text-gray-600 capitalize">{selectedAction.type}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Status:</label>
-                        <p className="text-sm text-yellow-600">Pending Review</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Priority:</label>
-                        <p className="text-sm text-gray-600">High</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Deadline:</label>
-                        <p className="text-sm text-gray-600">
-                          {selectedAction.id === 'action-1' ? 'August 15, 2025' :
-                           selectedAction.id === 'action-2' ? 'August 14, 2025' :
-                           selectedAction.id === 'action-3' ? 'August 16, 2025' :
-                           selectedAction.id === 'action-4' ? 'August 18, 2025' :
-                           'August 20, 2025'}
-                        </p>
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Details</h3>
+                          <p className="text-gray-700">{action.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Type</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            action.type === 'approval' ? 'bg-blue-50 text-blue-700' :
+                            'bg-green-50 text-green-700'
+                          }`}>
+                            {action.type === 'approval' ? 'Approval Required' : 'Voting Required'}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
+                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-orange-50 text-orange-700">
+                            High
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Status</h3>
+                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700">
+                            Pending Review
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Required Actions</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review the proposal details and supporting documents</li>
+                            <li>Assess the impact and feasibility of the proposed action</li>
+                            <li>Consider any potential risks or concerns</li>
+                            <li>Make an informed decision on approval or rejection</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-                      {selectedAction.type === 'approval' ? (
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      {action.type === 'approval' ? (
                         <>
                           <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white px-6"
-                            onClick={() => {
-                              console.log('Approve', selectedAction.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Approve
-                          </Button>
-                          <Button 
                             variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
                             onClick={() => {
-                              console.log('Reject', selectedAction.id)
+                              console.log('Reject', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
                             Reject
                           </Button>
-                        </>
-                      ) : (
-                        <>
                           <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white px-6"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                             onClick={() => {
-                              console.log('Vote Yes', selectedAction.id)
+                              console.log('Approve', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
-                            Vote Yes
+                            Approve
                           </Button>
+                        </>
+                      ) : (
+                        <>
                           <Button 
                             variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
                             onClick={() => {
-                              console.log('Vote No', selectedAction.id)
+                              console.log('Vote No', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
                             Vote No
                           </Button>
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => {
+                              console.log('Vote Yes', action.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Vote Yes
+                          </Button>
                         </>
                       )}
                     </div>
                   </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Actions</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        List of actions requiring approval or voting decisions
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )
-            })()
-          )}
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-3">
+                    {allActionsData.map((action) => (
+                      <div 
+                        key={action.id}
+                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                        onClick={() => setSelectedActionForDetails(action.id)}
+                      >
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          {action.type === 'approval' ? (
+                            <CheckCircle className={`h-4 w-4 ${action.iconColor}`} />
+                          ) : (
+                            <Users className={`h-4 w-4 ${action.iconColor}`} />
+                          )}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{action.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  action.type === 'approval' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
+                                  'bg-green-50/80 text-green-700 border-gray-300'
+                                }`}>
+                                  {action.type === 'approval' ? 'Approval' : 'Vote'}
+                                </div>
+                              </div>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
+                              <p className="text-xs text-[#9CA3AF]">{action.timestamp}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -1523,27 +1503,53 @@ export default function TodayPage() {
                       </div>
                     </div>
 
-                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          console.log('Mark as Read', alert.id)
-                          setSelectedAlertForDetails(null)
-                          setViewAllAlertsOpen(false)
-                        }}
-                      >
-                        Mark as Read
-                      </Button>
-                      <Button 
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={() => {
-                          console.log('Take Action', alert.id)
-                          setSelectedAlertForDetails(null)
-                          setViewAllAlertsOpen(false)
-                        }}
-                      >
-                        Take Action
-                      </Button>
+                    <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            console.log('Forward Alert', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          <LuForward className="h-4 w-4 mr-2" />
+                          Forward
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            console.log('Delete Alert', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          ✕ Delete
+                        </Button>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            console.log('Mark as Unread', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          Mark as Unread
+                        </Button>
+                        <Button 
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={() => {
+                            console.log('Take Action', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          Take Action
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )
