@@ -155,11 +155,31 @@ const updatesData = {
       labelColor: 'bg-yellow-500',
       iconBg: 'bg-yellow-100',
       iconColor: 'text-yellow-600'
+    },
+    {
+      id: '4',
+      title: 'Equipment Maintenance Required',
+      label: 'MEDIUM',
+      description: 'Routine maintenance scheduled for sugar mill equipment',
+      timestamp: '8:15 AM • Chemelil',
+      labelColor: 'bg-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    {
+      id: '5',
+      title: 'Weather Alert',
+      label: 'HIGH',
+      description: 'Heavy rainfall warning affects cane harvesting schedule',
+      timestamp: '7:45 AM • Kakamega Region',
+      labelColor: 'bg-red-500',
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600'
     }
   ],
   notifications: [
     {
-      id: '4',
+      id: '6',
       title: 'New Policy Update',
       label: 'INFO',
       description: 'Sugar Act 2024 implementation guidelines released',
@@ -169,7 +189,7 @@ const updatesData = {
       iconColor: 'text-blue-600'
     },
     {
-      id: '5',
+      id: '7',
       title: 'Payment Processed',
       label: 'SUCCESS',
       description: 'Farmer payments disbursed successfully',
@@ -254,12 +274,15 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllAlertsOpen(true)}>Alerts</CardTitle>
+        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+          setSelectedAlertForDetails(null)
+          setViewAllAlertsOpen(true)
+        }}>Alerts</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Alert Content - No tabs, just alerts */}
+        {/* Alert Content - No tabs, just alerts (limited to 3 most recent) */}
         <div className="space-y-3">
-          {updatesData.alerts.map((item) => (
+          {updatesData.alerts.slice(0, 3).map((item) => (
             <div 
               key={item.id} 
               className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -390,7 +413,10 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId, setViewAllActionsOpen,
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-1 cursor-pointer" onClick={() => setViewAllActionsOpen(true)}>
+      <CardHeader className="pb-1 cursor-pointer" onClick={() => {
+        setSelectedActionForDetails(null)
+        setViewAllActionsOpen(true)
+      }}>
         <CardTitle className="text-[#202020]">Actions</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -664,7 +690,10 @@ export default function TodayPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => setViewAllAIInsightsOpen(true)}>
+                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => {
+                  setSelectedAIInsightForDetails(null)
+                  setViewAllAIInsightsOpen(true)
+                }}>
                   <CheckCircle className="h-5 w-5 text-green-600" />
                   AI Insights
                 </CardTitle>
@@ -748,7 +777,10 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllMeetingsOpen(true)}>Meetings</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+                    setSelectedMeetingForDetails(null)
+                    setViewAllMeetingsOpen(true)
+                  }}>Meetings</CardTitle>
                   <div className="relative">
                     <div className="flex">
                       <Button 
@@ -898,7 +930,10 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllActivitiesOpen(true)}>Activities</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+                    setSelectedActivityForDetails(null)
+                    setViewAllActivitiesOpen(true)
+                  }}>Activities</CardTitle>
                   <div className="relative">
                   <div className="flex">
                     <Button 
@@ -1410,13 +1445,13 @@ export default function TodayPage() {
 
       {/* Alerts Modal */}
       <Dialog open={viewAllAlertsOpen} onOpenChange={setViewAllAlertsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedAlertForDetails ? 'Alert Details' : 'All Alerts'}
+            {selectedAlertForDetails ? 'Alert Details' : 'Alerts'}
           </DialogTitle>
           {(() => {
             if (selectedAlertForDetails) {
-              const alert = allAlertsData.find(a => a.id === selectedAlertForDetails)
+              const alert = updatesData.alerts.find(a => a.id === selectedAlertForDetails)
               if (alert) {
                 return (
                   <div className="flex flex-col h-full">
@@ -1466,7 +1501,11 @@ export default function TodayPage() {
 
                         <div>
                           <h3 className="text-sm font-medium text-gray-900 mb-2">Affected Area</h3>
-                          <p className="text-gray-700">{alert.area || 'Field Operations'}</p>
+                          <p className="text-gray-700">
+                            {alert.timestamp.includes('•') 
+                              ? alert.timestamp.split('•')[1].trim() 
+                              : 'Field Operations'}
+                          </p>
                         </div>
 
                         <div>
@@ -1512,60 +1551,61 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Alerts</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allAlertsData.length} alerts requiring attention</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
+                      <p className="text-sm text-gray-500 mt-1">{updatesData.alerts.length} alerts requiring attention</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        System alerts and notifications requiring attention
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
-                    {allAlertsData.map((alert) => (
+                  <div className="space-y-3">
+                    {updatesData.alerts.map((alert) => (
                       <div 
                         key={alert.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50 border-red-200' :
-                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50 border-orange-200' :
-                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50 border-yellow-200' :
-                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50 border-blue-200' :
-                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50 border-green-200' :
-                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50 border-purple-200' :
-                          'hover:bg-gray-50 border-gray-200'
-                        }`}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
+                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
+                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
+                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
+                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
+                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
+                          'hover:bg-gray-50'
+                        } hover:shadow-md`}
                         onClick={() => setSelectedAlertForDetails(alert.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{alert.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                alert.labelColor === 'bg-red-500' ? 'bg-red-50 text-red-700' :
-                                alert.labelColor === 'bg-orange-500' ? 'bg-orange-50 text-orange-700' :
-                                alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50 text-yellow-700' :
-                                alert.labelColor === 'bg-blue-500' ? 'bg-blue-50 text-blue-700' :
-                                alert.labelColor === 'bg-green-500' ? 'bg-green-50 text-green-700' :
-                                alert.labelColor === 'bg-purple-500' ? 'bg-purple-50 text-purple-700' :
-                                'bg-gray-50 text-gray-700'
-                              }`}>
-                                {alert.label}
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <FiAlertTriangle className={`h-4 w-4 ${alert.iconColor}`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{alert.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  alert.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
+                                  alert.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
+                                  alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                                  alert.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
+                                  alert.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                                  alert.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
+                                  'bg-gray-50/80 text-gray-700 border-gray-300'
+                                }`}>
+                                  {alert.label}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs text-gray-500">{alert.timestamp}</p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedAlertForDetails(alert.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{alert.description}</p>
+                              <p className="text-xs text-[#9CA3AF]">{alert.timestamp}</p>
                             </div>
                           </div>
                         </div>
@@ -1581,9 +1621,9 @@ export default function TodayPage() {
 
       {/* Meetings Modal */}
       <Dialog open={viewAllMeetingsOpen} onOpenChange={setViewAllMeetingsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedMeetingForDetails ? 'Meeting Details' : 'All Meetings'}
+            {selectedMeetingForDetails ? 'Meeting Details' : 'Meetings'}
           </DialogTitle>
           {(() => {
             if (selectedMeetingForDetails) {
@@ -1691,8 +1731,18 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Meetings</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        Scheduled meetings and appointments
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
@@ -1715,23 +1765,9 @@ export default function TodayPage() {
                               </div>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{meeting.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{meeting.date} • {meeting.time}</span>
-                                <span>{meeting.attendees} attendees</span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedMeetingForDetails(meeting.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>{meeting.date} • {meeting.time}</span>
+                              <span>{meeting.attendees} attendees</span>
                             </div>
                           </div>
                         </div>
@@ -1747,9 +1783,9 @@ export default function TodayPage() {
 
       {/* Activities Modal */}
       <Dialog open={viewAllActivitiesOpen} onOpenChange={setViewAllActivitiesOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedActivityForDetails ? 'Activity Details' : 'All Activities'}
+            {selectedActivityForDetails ? 'Activity Details' : 'Activities'}
           </DialogTitle>
           {(() => {
             if (selectedActivityForDetails) {
@@ -1863,8 +1899,18 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Activities</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        Tasks and activities needing completion
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
@@ -1898,25 +1944,11 @@ export default function TodayPage() {
                               </div>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{activity.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{activity.dueDate}</span>
-                                <span className={`px-2 py-1 rounded-full ${activity.priorityColor}`}>
-                                  {activity.priority}
-                                </span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedActivityForDetails(activity.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>{activity.dueDate}</span>
+                              <span className={`px-2 py-1 rounded-full ${activity.priorityColor}`}>
+                                {activity.priority}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -1932,9 +1964,9 @@ export default function TodayPage() {
 
       {/* AI Insights Modal */}
       <Dialog open={viewAllAIInsightsOpen} onOpenChange={setViewAllAIInsightsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedAIInsightForDetails ? 'AI Insight Details' : 'All AI Insights'}
+            {selectedAIInsightForDetails ? 'AI Insight Details' : 'AI Insights'}
           </DialogTitle>
           {(() => {
             if (selectedAIInsightForDetails) {
@@ -2051,8 +2083,18 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All AI Insights</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        AI-generated insights and recommendations
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
@@ -2079,29 +2121,15 @@ export default function TodayPage() {
                               </div>
                             </div>
                             <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{insight.timestamp}</span>
-                                <span className={`px-2 py-1 rounded-full ${
-                                  insight.impact === 'high' ? 'bg-red-50 text-red-700' :
-                                  insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
-                                  'bg-green-50 text-green-700'
-                                }`}>
-                                  {insight.impact} impact
-                                </span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedAIInsightForDetails(insight.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>{insight.timestamp}</span>
+                              <span className={`px-2 py-1 rounded-full ${
+                                insight.impact === 'high' ? 'bg-red-50 text-red-700' :
+                                insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
+                                'bg-green-50 text-green-700'
+                              }`}>
+                                {insight.impact} impact
+                              </span>
                             </div>
                           </div>
                         </div>
