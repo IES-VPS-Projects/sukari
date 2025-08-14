@@ -1286,7 +1286,10 @@ export default function TodayPage() {
       }}>
         <DialogContent className="sm:max-w-[750px] max-h-[85vh] [&>button]:hidden">
           <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <DialogTitle className="text-[#202020] text-lg font-medium">Actions</DialogTitle>
+            <div>
+              <DialogTitle className="text-[#202020] text-lg font-medium">Actions</DialogTitle>
+              <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+            </div>
             <div className="group relative">
               <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
               <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
@@ -1736,38 +1739,125 @@ export default function TodayPage() {
                       <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
                       <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
                     </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        Scheduled meetings and appointments
+                    <div className="flex items-center gap-3">
+                      {/* New and Dropdown buttons */}
+                      <div className="relative">
+                        <div className="flex">
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                            onClick={() => setNewMeetingOpen(true)}
+                          >
+                            <LuSquarePen className="h-4 w-4" />
+                            New
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                            onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Dropdown Menu */}
+                        {meetingDropdownOpen && (
+                          <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                            <div className="py-1">
+                              <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Event</div>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'General Meeting'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                General Meeting
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Project Review'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Project Review
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Strategic Planning'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Strategic Planning
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Team Standup'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Team Standup
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Client Presentation'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Client Presentation
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Scheduled meetings and appointments
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allMeetingsData.map((meeting) => (
                       <div 
                         key={meeting.id}
-                        className="p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:bg-blue-50 border-blue-200"
+                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:shadow-md"
                         onClick={() => setSelectedMeetingForDetails(meeting.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Calendar className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{meeting.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${meeting.typeColor}`}>
-                                {meeting.type}
+                        {/* Icon */}
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{meeting.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${meeting.typeColor} border-gray-300`}>
+                                  {meeting.type}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{meeting.description}</p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                              <span>{meeting.date} • {meeting.time}</span>
-                              <span>{meeting.attendees} attendees</span>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{meeting.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{meeting.date} • {meeting.time}</p>
+                                <p className="text-xs text-[#9CA3AF]">{meeting.attendees} attendees</p>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1904,51 +1994,138 @@ export default function TodayPage() {
                       <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
                       <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
                     </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        Tasks and activities needing completion
+                    <div className="flex items-center gap-3">
+                      {/* New and Dropdown buttons */}
+                      <div className="relative">
+                        <div className="flex">
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                            onClick={() => setNewActivityOpen(true)}
+                          >
+                            <LuSquarePen className="h-4 w-4" />
+                            New
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                            onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Dropdown Menu */}
+                        {activityDropdownOpen && (
+                          <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                            <div className="py-1">
+                              <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Activity Types</div>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Compliance Check'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Compliance Check
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Site Visit'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Site Visit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Policy Renewal'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Policy Renewal
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Equipment Maintenance'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Equipment Maintenance
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Training Session'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Training Session
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Tasks and activities needing completion
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allActivitiesData.map((activity) => (
                       <div 
                         key={activity.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          activity.type === 'compliance' ? 'hover:bg-orange-50 border-orange-200' :
-                          activity.type === 'visit' ? 'hover:bg-blue-50 border-blue-200' :
-                          activity.type === 'renewal' ? 'hover:bg-purple-50 border-purple-200' :
-                          activity.type === 'maintenance' ? 'hover:bg-green-50 border-green-200' :
-                          'hover:bg-gray-50 border-gray-200'
-                        }`}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          activity.type === 'compliance' ? 'hover:bg-orange-50' :
+                          activity.type === 'visit' ? 'hover:bg-blue-50' :
+                          activity.type === 'renewal' ? 'hover:bg-purple-50' :
+                          activity.type === 'maintenance' ? 'hover:bg-green-50' :
+                          'hover:bg-gray-50'
+                        } hover:shadow-md`}
                         onClick={() => setSelectedActivityForDetails(activity.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <div className={`h-5 w-5 ${activity.iconColor}`}>
-                              {activity.type === 'compliance' && <AlertTriangle className="h-5 w-5" />}
-                              {activity.type === 'visit' && <Calendar className="h-5 w-5" />}
-                              {activity.type === 'renewal' && <CheckCircle className="h-5 w-5" />}
-                              {activity.type === 'maintenance' && <TrendingUp className="h-5 w-5" />}
-                            </div>
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <div className={`h-4 w-4 ${activity.iconColor}`}>
+                            {activity.type === 'compliance' && <AlertTriangle className="h-4 w-4" />}
+                            {activity.type === 'visit' && <Calendar className="h-4 w-4" />}
+                            {activity.type === 'renewal' && <CheckCircle className="h-4 w-4" />}
+                            {activity.type === 'maintenance' && <TrendingUp className="h-4 w-4" />}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{activity.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${activity.statusColor}`}>
-                                {activity.status}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${activity.statusColor} border-gray-300`}>
+                                  {activity.status}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{activity.description}</p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                              <span>{activity.dueDate}</span>
-                              <span className={`px-2 py-1 rounded-full ${activity.priorityColor}`}>
-                                {activity.priority}
-                              </span>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{activity.dueDate}</p>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${activity.priorityColor} border-gray-300`}>
+                                  {activity.priority}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -2098,38 +2275,36 @@ export default function TodayPage() {
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allAIInsightsData.map((insight) => (
                       <div 
                         key={insight.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${insight.hoverBg}`}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${insight.hoverBg} hover:shadow-md`}
                         onClick={() => setSelectedAIInsightForDetails(insight.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <CheckCircle className={`h-5 w-5 ${insight.iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{insight.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                insight.confidence === 'high' ? 'bg-green-50 text-green-700' :
-                                insight.confidence === 'medium' ? 'bg-yellow-50 text-yellow-700' :
-                                'bg-red-50 text-red-700'
-                              }`}>
-                                {insight.confidence}
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <CheckCircle className={`h-4 w-4 ${insight.iconColor}`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{insight.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  insight.confidence === 'high' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                                  insight.confidence === 'medium' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                                  'bg-red-50/80 text-red-700 border-gray-300'
+                                }`}>
+                                  {insight.confidence}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                              <span>{insight.timestamp}</span>
-                              <span className={`px-2 py-1 rounded-full ${
-                                insight.impact === 'high' ? 'bg-red-50 text-red-700' :
-                                insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
-                                'bg-green-50 text-green-700'
-                              }`}>
-                                {insight.impact} impact
-                              </span>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
+                              </div>
                             </div>
                           </div>
                         </div>
