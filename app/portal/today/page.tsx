@@ -713,13 +713,13 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Consider visiting Mumias region</p>
+                    <p className="text-sm font-medium text-[#202020]">Regional Visit</p>
                     <p className="text-xs text-[#6B6B6B]">
-                      15% production drop detected - requires executive attention
+                      Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.
                     </p>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => handleScheduleVisit("Mumias Sugar Mill")}>
-                    Schedule
+                    Action
                   </Button>
                 </div>
 
@@ -734,11 +734,11 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Recommend policy review</p>
-                    <p className="text-xs text-[#6B6B6B]">23% increase in compliance violations this quarter</p>
+                    <p className="text-sm font-medium text-[#202020]">Policy Review Alert</p>
+                    <p className="text-xs text-[#6B6B6B]">Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.</p>
                   </div>
                   <Button size="sm" variant="outline">
-                    Review
+                    Action
                   </Button>
                 </div>
 
@@ -753,11 +753,11 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Weather alert preparation</p>
-                    <p className="text-xs text-[#6B6B6B]">Prepare drought mitigation for Western region</p>
+                    <p className="text-sm font-medium text-[#202020]">Weather Preparation Insight</p>
+                    <p className="text-xs text-[#6B6B6B]">Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.</p>
                   </div>
                   <Button size="sm" variant="outline">
-                    Prepare
+                    Action
                   </Button>
                 </div>
               </CardContent>
@@ -2280,7 +2280,11 @@ export default function TodayPage() {
                       <div 
                         key={insight.id}
                         className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${insight.hoverBg} hover:shadow-md`}
-                        onClick={() => setSelectedAIInsightForDetails(insight.id)}
+                        onClick={(e) => {
+                          if (!(e.target as HTMLElement).closest('button')) {
+                            setSelectedAIInsightForDetails(insight.id)
+                          }
+                        }}
                       >
                         {/* Icon */}
                         <div className={`w-8 h-8 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -2306,6 +2310,18 @@ export default function TodayPage() {
                                 <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
                               </div>
                             </div>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="ml-3 shrink-0"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                // Handle action scheduling logic here
+                                console.log('Schedule action for insight:', insight.id)
+                              }}
+                            >
+                              Action
+                            </Button>
                           </div>
                         </div>
                       </div>
