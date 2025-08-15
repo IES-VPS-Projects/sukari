@@ -155,11 +155,31 @@ const updatesData = {
       labelColor: 'bg-yellow-500',
       iconBg: 'bg-yellow-100',
       iconColor: 'text-yellow-600'
+    },
+    {
+      id: '4',
+      title: 'Equipment Maintenance Required',
+      label: 'MEDIUM',
+      description: 'Routine maintenance scheduled for sugar mill equipment',
+      timestamp: '8:15 AM • Chemelil',
+      labelColor: 'bg-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    {
+      id: '5',
+      title: 'Weather Alert',
+      label: 'HIGH',
+      description: 'Heavy rainfall warning affects cane harvesting schedule',
+      timestamp: '7:45 AM • Kakamega Region',
+      labelColor: 'bg-red-500',
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600'
     }
   ],
   notifications: [
     {
-      id: '4',
+      id: '6',
       title: 'New Policy Update',
       label: 'INFO',
       description: 'Sugar Act 2024 implementation guidelines released',
@@ -169,7 +189,7 @@ const updatesData = {
       iconColor: 'text-blue-600'
     },
     {
-      id: '5',
+      id: '7',
       title: 'Payment Processed',
       label: 'SUCCESS',
       description: 'Farmer payments disbursed successfully',
@@ -254,12 +274,15 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
       <CardHeader className="pb-1">
-        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllAlertsOpen(true)}>Alerts</CardTitle>
+        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+          setSelectedAlertForDetails(null)
+          setViewAllAlertsOpen(true)
+        }}>Alerts</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
-        {/* Alert Content - No tabs, just alerts */}
+        {/* Alert Content - No tabs, just alerts (limited to 3 most recent) */}
         <div className="space-y-3">
-          {updatesData.alerts.map((item) => (
+          {updatesData.alerts.slice(0, 3).map((item) => (
             <div 
               key={item.id} 
               className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -305,62 +328,6 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
                     <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
                     <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
                   </div>
-                  
-                  {/* Options Menu */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setSelectedItemId(selectedItemId === item.id ? null : item.id)}
-                      className="p-1 hover:bg-gray-100 rounded ellipsis-menu"
-                    >
-                      <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
-                    </button>
-                    
-                    {/* Dropdown Menu */}
-                    {selectedItemId === item.id && (
-                      <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
-                        <div className="py-1">
-                          <button
-                            onClick={() => {
-                              setSelectedAlertForDetails(item.id)
-                              setViewAllAlertsOpen(true)
-                              setSelectedItemId(null)
-                            }}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <GoInfo className="h-3 w-3" />
-                            Details
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('mark-read', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <CheckCircle className="h-3 w-3" />
-                            Mark as read
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('forward', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <LuForward className="h-3 w-3" />
-                            Forward
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('take-action', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <Calendar className="h-3 w-3" />
-                            Take Action
-                          </button>
-                          <button
-                            onClick={() => handleItemAction('delete', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50 text-red-600"
-                          >
-                            ✕ Delete
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
@@ -390,7 +357,10 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId, setViewAllActionsOpen,
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-1 cursor-pointer" onClick={() => setViewAllActionsOpen(true)}>
+      <CardHeader className="pb-1 cursor-pointer" onClick={() => {
+        setSelectedActionForDetails(null)
+        setViewAllActionsOpen(true)
+      }}>
         <CardTitle className="text-[#202020]">Actions</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -664,7 +634,10 @@ export default function TodayPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => setViewAllAIInsightsOpen(true)}>
+                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => {
+                  setSelectedAIInsightForDetails(null)
+                  setViewAllAIInsightsOpen(true)
+                }}>
                   <CheckCircle className="h-5 w-5 text-green-600" />
                   AI Insights
                 </CardTitle>
@@ -684,13 +657,13 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Consider visiting Mumias region</p>
+                    <p className="text-sm font-medium text-[#202020]">Regional Visit</p>
                     <p className="text-xs text-[#6B6B6B]">
-                      15% production drop detected - requires executive attention
+                      Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.
                     </p>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => handleScheduleVisit("Mumias Sugar Mill")}>
-                    Schedule
+                    Action
                   </Button>
                 </div>
 
@@ -705,11 +678,11 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Recommend policy review</p>
-                    <p className="text-xs text-[#6B6B6B]">23% increase in compliance violations this quarter</p>
+                    <p className="text-sm font-medium text-[#202020]">Policy Review Alert</p>
+                    <p className="text-xs text-[#6B6B6B]">Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.</p>
                   </div>
                   <Button size="sm" variant="outline">
-                    Review
+                    Action
                   </Button>
                 </div>
 
@@ -724,11 +697,11 @@ export default function TodayPage() {
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Weather alert preparation</p>
-                    <p className="text-xs text-[#6B6B6B]">Prepare drought mitigation for Western region</p>
+                    <p className="text-sm font-medium text-[#202020]">Weather Preparation Insight</p>
+                    <p className="text-xs text-[#6B6B6B]">Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.</p>
                   </div>
                   <Button size="sm" variant="outline">
-                    Prepare
+                    Action
                   </Button>
                 </div>
               </CardContent>
@@ -748,7 +721,10 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllMeetingsOpen(true)}>Meetings</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+                    setSelectedMeetingForDetails(null)
+                    setViewAllMeetingsOpen(true)
+                  }}>Meetings</CardTitle>
                   <div className="relative">
                     <div className="flex">
                       <Button 
@@ -898,7 +874,10 @@ export default function TodayPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => setViewAllActivitiesOpen(true)}>Activities</CardTitle>
+                  <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
+                    setSelectedActivityForDetails(null)
+                    setViewAllActivitiesOpen(true)
+                  }}>Activities</CardTitle>
                   <div className="relative">
                   <div className="flex">
                     <Button 
@@ -1249,174 +1228,213 @@ export default function TodayPage() {
         setViewAllActionsOpen(false)
         setSelectedActionForDetails(null)
       }}>
-        <DialogContent className="sm:max-w-[750px] max-h-[85vh] [&>button]:hidden">
-          <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <DialogTitle className="text-[#202020] text-lg font-medium">Actions</DialogTitle>
-            <div className="group relative">
-              <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-              <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                List of actions requiring approval or voting decisions
-              </div>
-            </div>
-          </DialogHeader>
-          
-          {!selectedActionForDetails ? (
-            <div className="space-y-3 max-h-[65vh] overflow-y-auto">
-              {allActionsData.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md border"
-                  onClick={() => setSelectedActionForDetails(item.id)}
-                >
-                  {/* Icon */}
-                  <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                    {item.type === 'approval' ? (
-                      <CheckCircle className={`h-4 w-4 ${item.iconColor}`} />
-                    ) : (
-                      <Users className={`h-4 w-4 ${item.iconColor}`} />
-                    )}
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
-                        <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
-                        <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            // Action Details View
-            (() => {
-              const selectedAction = allActionsData.find(action => action.id === selectedActionForDetails)
-              if (!selectedAction) return null
-              
-              return (
-                <div className="space-y-4 max-h-[65vh] overflow-y-auto">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setSelectedActionForDetails(null)}
-                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    <ArrowRight className="h-4 w-4 rotate-180" />
-                    Back to Actions
-                  </Button>
-                  
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-12 h-12 ${selectedAction.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        {selectedAction.type === 'approval' ? (
-                          <CheckCircle className={`h-6 w-6 ${selectedAction.iconColor}`} />
-                        ) : (
-                          <Users className={`h-6 w-6 ${selectedAction.iconColor}`} />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-[#202020] mb-2">{selectedAction.title}</h3>
-                        <p className="text-sm text-[#6B6B6B] mb-2">{selectedAction.description}</p>
-                        <p className="text-xs text-[#9CA3AF]">{selectedAction.timestamp}</p>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+          <DialogTitle className="sr-only">
+            {selectedActionForDetails ? 'Action Details' : 'Actions'}
+          </DialogTitle>
+          {(() => {
+            if (selectedActionForDetails) {
+              const action = allActionsData.find(a => a.id === selectedActionForDetails)
+              if (action) {
+                return (
+                  <div className="flex flex-col h-full">
+                    <div className="p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedActionForDetails(null)}
+                          className="shrink-0"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                            {action.type === 'approval' ? (
+                              <CheckCircle className={`h-5 w-5 ${action.iconColor}`} />
+                            ) : (
+                              <Users className={`h-5 w-5 ${action.iconColor}`} />
+                            )}
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-gray-900">{action.title}</h2>
+                            <p className="text-sm text-gray-500">{action.timestamp}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Action Type:</label>
-                        <p className="text-sm text-gray-600 capitalize">{selectedAction.type}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Status:</label>
-                        <p className="text-sm text-yellow-600">Pending Review</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Priority:</label>
-                        <p className="text-sm text-gray-600">High</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">Deadline:</label>
-                        <p className="text-sm text-gray-600">
-                          {selectedAction.id === 'action-1' ? 'August 15, 2025' :
-                           selectedAction.id === 'action-2' ? 'August 14, 2025' :
-                           selectedAction.id === 'action-3' ? 'August 16, 2025' :
-                           selectedAction.id === 'action-4' ? 'August 18, 2025' :
-                           'August 20, 2025'}
-                        </p>
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Details</h3>
+                          <p className="text-gray-700">{action.description}</p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Type</h3>
+                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            action.type === 'approval' ? 'bg-blue-50 text-blue-700' :
+                            'bg-green-50 text-green-700'
+                          }`}>
+                            {action.type === 'approval' ? 'Approval Required' : 'Voting Required'}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
+                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-orange-50 text-orange-700">
+                            High
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Status</h3>
+                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700">
+                            Pending Review
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">Required Actions</h3>
+                          <ul className="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Review the proposal details and supporting documents</li>
+                            <li>Assess the impact and feasibility of the proposed action</li>
+                            <li>Consider any potential risks or concerns</li>
+                            <li>Make an informed decision on approval or rejection</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-                      {selectedAction.type === 'approval' ? (
+
+                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                      {action.type === 'approval' ? (
                         <>
                           <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white px-6"
-                            onClick={() => {
-                              console.log('Approve', selectedAction.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Approve
-                          </Button>
-                          <Button 
                             variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
                             onClick={() => {
-                              console.log('Reject', selectedAction.id)
+                              console.log('Reject', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
                             Reject
                           </Button>
-                        </>
-                      ) : (
-                        <>
                           <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white px-6"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                             onClick={() => {
-                              console.log('Vote Yes', selectedAction.id)
+                              console.log('Approve', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
-                            Vote Yes
+                            Approve
                           </Button>
+                        </>
+                      ) : (
+                        <>
                           <Button 
                             variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50 px-6"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
                             onClick={() => {
-                              console.log('Vote No', selectedAction.id)
+                              console.log('Vote No', action.id)
                               setSelectedActionForDetails(null)
                               setViewAllActionsOpen(false)
                             }}
                           >
                             Vote No
                           </Button>
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => {
+                              console.log('Vote Yes', action.id)
+                              setSelectedActionForDetails(null)
+                              setViewAllActionsOpen(false)
+                            }}
+                          >
+                            Vote Yes
+                          </Button>
                         </>
                       )}
                     </div>
                   </div>
+                )
+              }
+            }
+
+            // List view
+            return (
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Actions</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        List of actions requiring approval or voting decisions
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )
-            })()
-          )}
+                
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-3">
+                    {allActionsData.map((action) => (
+                      <div 
+                        key={action.id}
+                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                        onClick={() => setSelectedActionForDetails(action.id)}
+                      >
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          {action.type === 'approval' ? (
+                            <CheckCircle className={`h-4 w-4 ${action.iconColor}`} />
+                          ) : (
+                            <Users className={`h-4 w-4 ${action.iconColor}`} />
+                          )}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{action.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  action.type === 'approval' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
+                                  'bg-green-50/80 text-green-700 border-gray-300'
+                                }`}>
+                                  {action.type === 'approval' ? 'Approval' : 'Vote'}
+                                </div>
+                              </div>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
+                              <p className="text-xs text-[#9CA3AF]">{action.timestamp}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
         </DialogContent>
       </Dialog>
 
       {/* Alerts Modal */}
       <Dialog open={viewAllAlertsOpen} onOpenChange={setViewAllAlertsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedAlertForDetails ? 'Alert Details' : 'All Alerts'}
+            {selectedAlertForDetails ? 'Alert Details' : 'Alerts'}
           </DialogTitle>
           {(() => {
             if (selectedAlertForDetails) {
-              const alert = allAlertsData.find(a => a.id === selectedAlertForDetails)
+              const alert = updatesData.alerts.find(a => a.id === selectedAlertForDetails)
               if (alert) {
                 return (
                   <div className="flex flex-col h-full">
@@ -1466,7 +1484,11 @@ export default function TodayPage() {
 
                         <div>
                           <h3 className="text-sm font-medium text-gray-900 mb-2">Affected Area</h3>
-                          <p className="text-gray-700">{alert.area || 'Field Operations'}</p>
+                          <p className="text-gray-700">
+                            {alert.timestamp.includes('•') 
+                              ? alert.timestamp.split('•')[1].trim() 
+                              : 'Field Operations'}
+                          </p>
                         </div>
 
                         <div>
@@ -1481,27 +1503,53 @@ export default function TodayPage() {
                       </div>
                     </div>
 
-                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          console.log('Mark as Read', alert.id)
-                          setSelectedAlertForDetails(null)
-                          setViewAllAlertsOpen(false)
-                        }}
-                      >
-                        Mark as Read
-                      </Button>
-                      <Button 
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={() => {
-                          console.log('Take Action', alert.id)
-                          setSelectedAlertForDetails(null)
-                          setViewAllAlertsOpen(false)
-                        }}
-                      >
-                        Take Action
-                      </Button>
+                    <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            console.log('Forward Alert', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          <LuForward className="h-4 w-4 mr-2" />
+                          Forward
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            console.log('Delete Alert', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          ✕ Delete
+                        </Button>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            console.log('Mark as Unread', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          Mark as Unread
+                        </Button>
+                        <Button 
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={() => {
+                            console.log('Take Action', alert.id)
+                            setSelectedAlertForDetails(null)
+                            setViewAllAlertsOpen(false)
+                          }}
+                        >
+                          Take Action
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )
@@ -1512,60 +1560,61 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Alerts</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allAlertsData.length} alerts requiring attention</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
+                      <p className="text-sm text-gray-500 mt-1">{updatesData.alerts.length} alerts requiring attention</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        System alerts and notifications requiring attention
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
-                    {allAlertsData.map((alert) => (
+                  <div className="space-y-3">
+                    {updatesData.alerts.map((alert) => (
                       <div 
                         key={alert.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50 border-red-200' :
-                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50 border-orange-200' :
-                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50 border-yellow-200' :
-                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50 border-blue-200' :
-                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50 border-green-200' :
-                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50 border-purple-200' :
-                          'hover:bg-gray-50 border-gray-200'
-                        }`}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
+                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
+                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
+                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
+                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
+                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
+                          'hover:bg-gray-50'
+                        } hover:shadow-md`}
                         onClick={() => setSelectedAlertForDetails(alert.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{alert.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                alert.labelColor === 'bg-red-500' ? 'bg-red-50 text-red-700' :
-                                alert.labelColor === 'bg-orange-500' ? 'bg-orange-50 text-orange-700' :
-                                alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50 text-yellow-700' :
-                                alert.labelColor === 'bg-blue-500' ? 'bg-blue-50 text-blue-700' :
-                                alert.labelColor === 'bg-green-500' ? 'bg-green-50 text-green-700' :
-                                alert.labelColor === 'bg-purple-500' ? 'bg-purple-50 text-purple-700' :
-                                'bg-gray-50 text-gray-700'
-                              }`}>
-                                {alert.label}
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <FiAlertTriangle className={`h-4 w-4 ${alert.iconColor}`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{alert.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  alert.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
+                                  alert.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
+                                  alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                                  alert.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
+                                  alert.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                                  alert.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
+                                  'bg-gray-50/80 text-gray-700 border-gray-300'
+                                }`}>
+                                  {alert.label}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs text-gray-500">{alert.timestamp}</p>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedAlertForDetails(alert.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{alert.description}</p>
+                              <p className="text-xs text-[#9CA3AF]">{alert.timestamp}</p>
                             </div>
                           </div>
                         </div>
@@ -1581,9 +1630,9 @@ export default function TodayPage() {
 
       {/* Meetings Modal */}
       <Dialog open={viewAllMeetingsOpen} onOpenChange={setViewAllMeetingsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedMeetingForDetails ? 'Meeting Details' : 'All Meetings'}
+            {selectedMeetingForDetails ? 'Meeting Details' : 'Meetings'}
           </DialogTitle>
           {(() => {
             if (selectedMeetingForDetails) {
@@ -1691,47 +1740,130 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Meetings</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* New and Dropdown buttons */}
+                      <div className="relative">
+                        <div className="flex">
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                            onClick={() => setNewMeetingOpen(true)}
+                          >
+                            <LuSquarePen className="h-4 w-4" />
+                            New
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                            onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Dropdown Menu */}
+                        {meetingDropdownOpen && (
+                          <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                            <div className="py-1">
+                              <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Event</div>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'General Meeting'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                General Meeting
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Project Review'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Project Review
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Strategic Planning'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Strategic Planning
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Team Standup'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Team Standup
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setMeetingForm({...meetingForm, title: 'Client Presentation'})
+                                  setNewMeetingOpen(true)
+                                  setMeetingDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Client Presentation
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Scheduled meetings and appointments
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allMeetingsData.map((meeting) => (
                       <div 
                         key={meeting.id}
-                        className="p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md hover:bg-blue-50 border-blue-200"
+                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-50 hover:shadow-md"
                         onClick={() => setSelectedMeetingForDetails(meeting.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Calendar className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{meeting.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${meeting.typeColor}`}>
-                                {meeting.type}
+                        {/* Icon */}
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{meeting.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${meeting.typeColor} border-gray-300`}>
+                                  {meeting.type}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{meeting.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{meeting.date} • {meeting.time}</span>
-                                <span>{meeting.attendees} attendees</span>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{meeting.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{meeting.date} • {meeting.time}</p>
+                                <p className="text-xs text-[#9CA3AF]">{meeting.attendees} attendees</p>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedMeetingForDetails(meeting.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
                             </div>
                           </div>
                         </div>
@@ -1747,9 +1879,9 @@ export default function TodayPage() {
 
       {/* Activities Modal */}
       <Dialog open={viewAllActivitiesOpen} onOpenChange={setViewAllActivitiesOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedActivityForDetails ? 'Activity Details' : 'All Activities'}
+            {selectedActivityForDetails ? 'Activity Details' : 'Activities'}
           </DialogTitle>
           {(() => {
             if (selectedActivityForDetails) {
@@ -1863,60 +1995,143 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All Activities</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* New and Dropdown buttons */}
+                      <div className="relative">
+                        <div className="flex">
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
+                            onClick={() => setNewActivityOpen(true)}
+                          >
+                            <LuSquarePen className="h-4 w-4" />
+                            New
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
+                            onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Dropdown Menu */}
+                        {activityDropdownOpen && (
+                          <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
+                            <div className="py-1">
+                              <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Activity Types</div>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Compliance Check'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Compliance Check
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Site Visit'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Site Visit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Policy Renewal'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Policy Renewal
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Equipment Maintenance'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Equipment Maintenance
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setActivityForm({...activityForm, title: 'Training Session'})
+                                  setNewActivityOpen(true)
+                                  setActivityDropdownOpen(false)
+                                }}
+                                className="w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                              >
+                                Training Session
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Tasks and activities needing completion
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allActivitiesData.map((activity) => (
                       <div 
                         key={activity.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          activity.type === 'compliance' ? 'hover:bg-orange-50 border-orange-200' :
-                          activity.type === 'visit' ? 'hover:bg-blue-50 border-blue-200' :
-                          activity.type === 'renewal' ? 'hover:bg-purple-50 border-purple-200' :
-                          activity.type === 'maintenance' ? 'hover:bg-green-50 border-green-200' :
-                          'hover:bg-gray-50 border-gray-200'
-                        }`}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          activity.type === 'compliance' ? 'hover:bg-orange-50' :
+                          activity.type === 'visit' ? 'hover:bg-blue-50' :
+                          activity.type === 'renewal' ? 'hover:bg-purple-50' :
+                          activity.type === 'maintenance' ? 'hover:bg-green-50' :
+                          'hover:bg-gray-50'
+                        } hover:shadow-md`}
                         onClick={() => setSelectedActivityForDetails(activity.id)}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <div className={`h-5 w-5 ${activity.iconColor}`}>
-                              {activity.type === 'compliance' && <AlertTriangle className="h-5 w-5" />}
-                              {activity.type === 'visit' && <Calendar className="h-5 w-5" />}
-                              {activity.type === 'renewal' && <CheckCircle className="h-5 w-5" />}
-                              {activity.type === 'maintenance' && <TrendingUp className="h-5 w-5" />}
-                            </div>
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <div className={`h-4 w-4 ${activity.iconColor}`}>
+                            {activity.type === 'compliance' && <AlertTriangle className="h-4 w-4" />}
+                            {activity.type === 'visit' && <Calendar className="h-4 w-4" />}
+                            {activity.type === 'renewal' && <CheckCircle className="h-4 w-4" />}
+                            {activity.type === 'maintenance' && <TrendingUp className="h-4 w-4" />}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{activity.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${activity.statusColor}`}>
-                                {activity.status}
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${activity.statusColor} border-gray-300`}>
+                                  {activity.status}
+                                </div>
                               </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{activity.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{activity.dueDate}</span>
-                                <span className={`px-2 py-1 rounded-full ${activity.priorityColor}`}>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{activity.dueDate}</p>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${activity.priorityColor} border-gray-300`}>
                                   {activity.priority}
-                                </span>
+                                </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedActivityForDetails(activity.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
                             </div>
                           </div>
                         </div>
@@ -1932,9 +2147,9 @@ export default function TodayPage() {
 
       {/* AI Insights Modal */}
       <Dialog open={viewAllAIInsightsOpen} onOpenChange={setViewAllAIInsightsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
           <DialogTitle className="sr-only">
-            {selectedAIInsightForDetails ? 'AI Insight Details' : 'All AI Insights'}
+            {selectedAIInsightForDetails ? 'AI Insight Details' : 'AI Insights'}
           </DialogTitle>
           {(() => {
             if (selectedAIInsightForDetails) {
@@ -2051,58 +2266,68 @@ export default function TodayPage() {
             return (
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b">
-                  <h2 className="text-xl font-semibold text-gray-900">All AI Insights</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
+                      <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                    </div>
+                    <div className="group relative">
+                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                        AI-generated insights and recommendations
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {allAIInsightsData.map((insight) => (
                       <div 
                         key={insight.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${insight.hoverBg}`}
-                        onClick={() => setSelectedAIInsightForDetails(insight.id)}
+                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${insight.hoverBg} hover:shadow-md`}
+                        onClick={(e) => {
+                          if (!(e.target as HTMLElement).closest('button')) {
+                            setSelectedAIInsightForDetails(insight.id)
+                          }
+                        }}
                       >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <CheckCircle className={`h-5 w-5 ${insight.iconColor}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="text-sm font-medium text-gray-900">{insight.title}</h3>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                insight.confidence === 'high' ? 'bg-green-50 text-green-700' :
-                                insight.confidence === 'medium' ? 'bg-yellow-50 text-yellow-700' :
-                                'bg-red-50 text-red-700'
-                              }`}>
-                                {insight.confidence}
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span>{insight.timestamp}</span>
-                                <span className={`px-2 py-1 rounded-full ${
-                                  insight.impact === 'high' ? 'bg-red-50 text-red-700' :
-                                  insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
-                                  'bg-green-50 text-green-700'
+                        {/* Icon */}
+                        <div className={`w-8 h-8 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <CheckCircle className={`h-4 w-4 ${insight.iconColor}`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{insight.title}</h4>
+                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                                  insight.confidence === 'high' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                                  insight.confidence === 'medium' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                                  'bg-red-50/80 text-red-700 border-gray-300'
                                 }`}>
-                                  {insight.impact} impact
-                                </span>
+                                  {insight.confidence}
+                                </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  setSelectedAIInsightForDetails(insight.id)
-                                }}
-                              >
-                                <GoInfo className="h-4 w-4 mr-1" />
-                                Details
-                              </Button>
+                              <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>
+                              <div className="flex items-center gap-4">
+                                <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
+                              </div>
                             </div>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="ml-3 shrink-0"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                // Handle action scheduling logic here
+                                console.log('Schedule action for insight:', insight.id)
+                              }}
+                            >
+                              Action
+                            </Button>
                           </div>
                         </div>
                       </div>
