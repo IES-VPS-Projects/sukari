@@ -46,6 +46,7 @@ import {
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
 import BriefingCard from "./BriefingCard"
+import ActionsCard from "./ActionsCard"
 
 // Market Insights data schema
 interface ProductInsight {
@@ -338,157 +339,6 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
   )
 }
 
-// Actions Card Component (formerly Scheduler)
-const ActionsCard = ({ selectedItemId, setSelectedItemId, setViewAllActionsOpen, setSelectedActionForDetails }: {
-  selectedItemId: string | null,
-  setSelectedItemId: (id: string | null) => void,
-  setViewAllActionsOpen: (open: boolean) => void,
-  setSelectedActionForDetails: (id: string | null) => void
-}) => {
-  const handleItemAction = (action: string, itemId: string) => {
-    console.log(`${action} action for item ${itemId}`)
-    setSelectedItemId(null)
-    
-    if (action === 'details') {
-      setSelectedActionForDetails(itemId)
-      setViewAllActionsOpen(true)
-    }
-  }
-
-  return (
-    <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-1 cursor-pointer" onClick={() => {
-        setSelectedActionForDetails(null)
-        setViewAllActionsOpen(true)
-      }}>
-        <CardTitle className="text-[#202020]">Actions</CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        {/* Actions Content - List of actions requiring approval/votes (limited to 2) */}
-        <div className="space-y-3">
-          {[
-            {
-              id: 'action-1',
-              title: 'Sugar Import Allocation Approval',
-              description: 'Approve allocation of 50,000 MT sugar imports to Mumias Sugar Company',
-              type: 'approval',
-              timestamp: '2 hours ago',
-              iconColor: 'text-blue-600',
-              iconBg: 'bg-blue-100',
-              hoverBg: 'hover:bg-blue-50'
-            },
-            {
-              id: 'action-2', 
-              title: 'Cane Pricing Committee Vote',
-              description: 'Vote on proposed cane pricing structure for 2024/25 season',
-              type: 'vote',
-              timestamp: '4 hours ago',
-              iconColor: 'text-green-600',
-              iconBg: 'bg-green-100',
-              hoverBg: 'hover:bg-green-50'
-            }
-          ].map((item) => (
-            <div 
-              key={item.id} 
-              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${item.hoverBg} hover:shadow-md`}
-              onClick={(e: React.MouseEvent) => {
-                // Only trigger if not clicking on the ellipsis button
-                if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
-                  setSelectedActionForDetails(item.id)
-                  setViewAllActionsOpen(true)
-                }
-              }}
-            >
-              {/* Icon */}
-              <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                {item.type === 'approval' ? (
-                  <CheckCircle className={`h-4 w-4 ${item.iconColor}`} />
-                ) : (
-                  <Users className={`h-4 w-4 ${item.iconColor}`} />
-                )}
-              </div>
-              
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
-                    <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
-                    <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
-                  </div>
-                  
-                  {/* Options Menu */}
-                  <div className="relative ellipsis-menu">
-                    <button
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation() // Prevent triggering the card click
-                        setSelectedItemId(selectedItemId === item.id ? null : item.id)
-                      }}
-                      className="p-1 hover:bg-gray-100 rounded"
-                    >
-                      <HiEllipsisHorizontal className="h-4 w-4 text-gray-400" />
-                    </button>
-                    
-                    {/* Dropdown Menu */}
-                    {selectedItemId === item.id && (
-                      <div className="absolute right-0 top-8 bg-white border rounded-lg shadow-lg z-10 w-40">
-                        <div className="py-1">
-                          {item.type === 'approval' ? (
-                            <>
-                              <button
-                                onClick={() => handleItemAction('approve', item.id)}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-green-50 text-green-700"
-                              >
-                                <CheckCircle className="h-3 w-3" />
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleItemAction('reject', item.id)}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
-                              >
-                                <AlertTriangle className="h-3 w-3" />
-                                Reject
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => handleItemAction('vote-yes', item.id)}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-green-50 text-green-700"
-                              >
-                                <CheckCircle className="h-3 w-3" />
-                                Vote Yes
-                              </button>
-                              <button
-                                onClick={() => handleItemAction('vote-no', item.id)}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
-                              >
-                                <AlertTriangle className="h-3 w-3" />
-                                Vote No
-                              </button>
-                            </>
-                          )}
-                          <button
-                            onClick={() => handleItemAction('details', item.id)}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
-                          >
-                            <FileText className="h-3 w-3" />
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("")
@@ -507,14 +357,12 @@ export default function TodayPage() {
   const [activityDropdownOpen, setActivityDropdownOpen] = useState(false)
   
   // Modal states for viewing all items
-  const [viewAllActionsOpen, setViewAllActionsOpen] = useState(false)
   const [viewAllMeetingsOpen, setViewAllMeetingsOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
   const [viewAllAlertsOpen, setViewAllAlertsOpen] = useState(false)
   const [viewAllAIInsightsOpen, setViewAllAIInsightsOpen] = useState(false)
   
   // State for detail views
-  const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
   const [selectedMeetingForDetails, setSelectedMeetingForDetails] = useState<string | null>(null)
   const [selectedActivityForDetails, setSelectedActivityForDetails] = useState<string | null>(null)
   const [selectedAlertForDetails, setSelectedAlertForDetails] = useState<string | null>(null)
@@ -1029,8 +877,6 @@ export default function TodayPage() {
             <ActionsCard 
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
-              setViewAllActionsOpen={setViewAllActionsOpen}
-              setSelectedActionForDetails={setSelectedActionForDetails}
             />
           </div>
 
@@ -1220,209 +1066,6 @@ export default function TodayPage() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* View All Actions Modal */}
-      <Dialog open={viewAllActionsOpen} onOpenChange={() => {
-        setViewAllActionsOpen(false)
-        setSelectedActionForDetails(null)
-      }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
-          <DialogTitle className="sr-only">
-            {selectedActionForDetails ? 'Action Details' : 'Actions'}
-          </DialogTitle>
-          {(() => {
-            if (selectedActionForDetails) {
-              const action = allActionsData.find(a => a.id === selectedActionForDetails)
-              if (action) {
-                return (
-                  <div className="flex flex-col h-full">
-                    <div className="p-6 border-b">
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedActionForDetails(null)}
-                          className="shrink-0"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 ${action.iconBg} rounded-lg flex items-center justify-center`}>
-                            {action.type === 'approval' ? (
-                              <CheckCircle className={`h-5 w-5 ${action.iconColor}`} />
-                            ) : (
-                              <Users className={`h-5 w-5 ${action.iconColor}`} />
-                            )}
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-semibold text-gray-900">{action.title}</h2>
-                            <p className="text-sm text-gray-500">{action.timestamp}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Details</h3>
-                          <p className="text-gray-700">{action.description}</p>
-                        </div>
-                        
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Action Type</h3>
-                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                            action.type === 'approval' ? 'bg-blue-50 text-blue-700' :
-                            'bg-green-50 text-green-700'
-                          }`}>
-                            {action.type === 'approval' ? 'Approval Required' : 'Voting Required'}
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
-                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-orange-50 text-orange-700">
-                            High
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Status</h3>
-                          <div className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700">
-                            Pending Review
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Required Actions</h3>
-                          <ul className="list-disc list-inside space-y-1 text-gray-700">
-                            <li>Review the proposal details and supporting documents</li>
-                            <li>Assess the impact and feasibility of the proposed action</li>
-                            <li>Consider any potential risks or concerns</li>
-                            <li>Make an informed decision on approval or rejection</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-                      {action.type === 'approval' ? (
-                        <>
-                          <Button 
-                            variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                            onClick={() => {
-                              console.log('Reject', action.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Reject
-                          </Button>
-                          <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => {
-                              console.log('Approve', action.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Approve
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button 
-                            variant="outline"
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                            onClick={() => {
-                              console.log('Vote No', action.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Vote No
-                          </Button>
-                          <Button 
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => {
-                              console.log('Vote Yes', action.id)
-                              setSelectedActionForDetails(null)
-                              setViewAllActionsOpen(false)
-                            }}
-                          >
-                            Vote Yes
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )
-              }
-            }
-
-            // List view
-            return (
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Actions</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
-                    </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        List of actions requiring approval or voting decisions
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-3">
-                    {allActionsData.map((action) => (
-                      <div 
-                        key={action.id}
-                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                        onClick={() => setSelectedActionForDetails(action.id)}
-                      >
-                        {/* Icon */}
-                        <div className={`w-8 h-8 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                          {action.type === 'approval' ? (
-                            <CheckCircle className={`h-4 w-4 ${action.iconColor}`} />
-                          ) : (
-                            <Users className={`h-4 w-4 ${action.iconColor}`} />
-                          )}
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-sm font-medium text-[#202020] truncate">{action.title}</h4>
-                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
-                                  action.type === 'approval' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
-                                  'bg-green-50/80 text-green-700 border-gray-300'
-                                }`}>
-                                  {action.type === 'approval' ? 'Approval' : 'Vote'}
-                                </div>
-                              </div>
-                              <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
-                              <p className="text-xs text-[#9CA3AF]">{action.timestamp}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
         </DialogContent>
       </Dialog>
 
