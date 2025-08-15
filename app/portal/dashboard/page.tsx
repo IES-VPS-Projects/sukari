@@ -22,7 +22,7 @@ import {
   Cell,
 } from "recharts"
 import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award, Filter } from "lucide-react"
-import { ViewPlanModal } from "@/components/modals/view-plan-modal"
+import ViewPlanCard from "./ViewPlanCard"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -346,7 +346,6 @@ const doughnutOptions = {
 }
 
 export default function DashboardPage() {
-  const [viewPlanOpen, setViewPlanOpen] = useState(false)
   const [selectedMetric, setSelectedMetric] = useState("Production")
 
   return (
@@ -360,9 +359,6 @@ export default function DashboardPage() {
           <Badge className="bg-green-100 text-green-800">Live Data</Badge>
           <Button variant="outline" size="sm">
             Export Data
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setViewPlanOpen(true)}>
-            View Plan
           </Button>
         </div>
       </div>
@@ -464,33 +460,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Compliance Overview */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="text-[#202020]">Compliance Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#202020]">License Renewals</span>
-              <span className="text-sm font-medium text-green-600">98% Complete</span>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#202020]">Quality Standards</span>
-              <span className="text-sm font-medium text-orange-600">92% Compliant</span>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#202020]">Environmental Regulations</span>
-              <span className="text-sm font-medium text-green-600">96% Compliant</span>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#202020]">Safety Standards</span>
-              <span className="text-sm font-medium text-red-600">88% Compliant</span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* View Strategic Plan */}
+        <ViewPlanCard />
 
         {/* Quick Stats */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
@@ -594,8 +565,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      <ViewPlanModal open={viewPlanOpen} onOpenChange={setViewPlanOpen} />
     </div>
     </PortalLayout>
   )
