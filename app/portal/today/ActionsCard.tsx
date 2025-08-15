@@ -73,7 +73,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
               {
                 id: 'action-1',
                 title: 'Sugar Import Allocation Approval',
-                description: 'Approve allocation of 50,000 MT sugar imports to Mumias Sugar Company',
+                description: 'Approve allocation of 50,000 MT sugar imports to Tropical Confectioners Limited',
                 type: 'approval',
                 timestamp: '2 hours ago',
                 iconColor: 'text-blue-600',

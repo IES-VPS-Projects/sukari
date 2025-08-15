@@ -15,19 +15,20 @@ interface ViewPlanCardProps {
 const ViewPlanCard = ({ className }: ViewPlanCardProps) => {
   const [viewPlanOpen, setViewPlanOpen] = useState(false)
 
-  // Sample plan overview data
+  // Sample plan overview data based on KSB Strategic Plan 2024-2029 (Production & Productivity KRA)
   const planOverview = {
-    title: "Strategic Plan 2024-2025",
-    progress: 72,
-    totalObjectives: 5,
-    completedObjectives: 2,
-    onTrackObjectives: 2,
-    atRiskObjectives: 1,
+    title: "Strategic Plan 2024-2029",
+    progress: 58,
+    totalObjectives: 4,
+    completedObjectives: 0,
+    onTrackObjectives: 4,
+    atRiskObjectives: 0,
+    inProgressObjectives: 4,
     keyMetrics: [
-      { label: "Overall Progress", value: "72%", status: "on_track" },
-      { label: "Budget Utilization", value: "68%", status: "on_track" },
-      { label: "Timeline Adherence", value: "85%", status: "ahead" },
-      { label: "Risk Level", value: "Medium", status: "caution" }
+      { label: "Overall Progress", value: "58%", status: "on_track" },
+      { label: "Current Phase", value: "Y2", status: "on_track" },
+      { label: "Timeline Adherence", value: "Y2 of 5", status: "on_track" },
+      { label: "Risk Level", value: "Low", status: "on_track" }
     ]
   }
 
