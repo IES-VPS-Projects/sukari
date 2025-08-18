@@ -1,0 +1,172 @@
+2025-08-08 08:05:55 +00:00:  ⨯ Failed to start server
+2025-08-08 08:05:55 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:05:55 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:05:55 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:05:55 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:05:55 +00:00:   errno: -98,
+2025-08-08 08:05:55 +00:00:   syscall: 'listen',
+2025-08-08 08:05:55 +00:00:   address: '::',
+2025-08-08 08:05:55 +00:00:   port: 3000
+2025-08-08 08:05:55 +00:00: }
+2025-08-08 08:05:56 +00:00:  ⨯ Failed to start server
+2025-08-08 08:05:56 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:05:56 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:05:56 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:05:56 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:05:56 +00:00:   errno: -98,
+2025-08-08 08:05:56 +00:00:   syscall: 'listen',
+2025-08-08 08:05:56 +00:00:   address: '::',
+2025-08-08 08:05:56 +00:00:   port: 3000
+2025-08-08 08:05:56 +00:00: }
+2025-08-08 08:05:57 +00:00:  ⨯ Failed to start server
+2025-08-08 08:05:57 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:05:57 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:05:57 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:05:57 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:05:57 +00:00:   errno: -98,
+2025-08-08 08:05:57 +00:00:   syscall: 'listen',
+2025-08-08 08:05:57 +00:00:   address: '::',
+2025-08-08 08:05:57 +00:00:   port: 3000
+2025-08-08 08:05:57 +00:00: }
+2025-08-08 08:05:58 +00:00:  ⨯ Failed to start server
+2025-08-08 08:05:58 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:05:58 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:05:58 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:05:58 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:05:58 +00:00:   errno: -98,
+2025-08-08 08:05:58 +00:00:   syscall: 'listen',
+2025-08-08 08:05:58 +00:00:   address: '::',
+2025-08-08 08:05:58 +00:00:   port: 3000
+2025-08-08 08:05:58 +00:00: }
+2025-08-08 08:05:59 +00:00:  ⨯ Failed to start server
+2025-08-08 08:05:59 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:05:59 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:05:59 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:05:59 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:05:59 +00:00:   errno: -98,
+2025-08-08 08:05:59 +00:00:   syscall: 'listen',
+2025-08-08 08:05:59 +00:00:   address: '::',
+2025-08-08 08:05:59 +00:00:   port: 3000
+2025-08-08 08:05:59 +00:00: }
+2025-08-08 08:06:00 +00:00:  ⨯ Failed to start server
+2025-08-08 08:06:00 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:06:00 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:06:00 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:06:00 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:06:00 +00:00:   errno: -98,
+2025-08-08 08:06:00 +00:00:   syscall: 'listen',
+2025-08-08 08:06:00 +00:00:   address: '::',
+2025-08-08 08:06:00 +00:00:   port: 3000
+2025-08-08 08:06:00 +00:00: }
+2025-08-08 08:06:01 +00:00:  ⨯ Failed to start server
+2025-08-08 08:06:01 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:06:01 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:06:01 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:06:01 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:06:01 +00:00:   errno: -98,
+2025-08-08 08:06:01 +00:00:   syscall: 'listen',
+2025-08-08 08:06:01 +00:00:   address: '::',
+2025-08-08 08:06:01 +00:00:   port: 3000
+2025-08-08 08:06:01 +00:00: }
+2025-08-08 08:06:02 +00:00:  ⨯ Failed to start server
+2025-08-08 08:06:02 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:06:02 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:06:02 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:06:02 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:06:02 +00:00:   errno: -98,
+2025-08-08 08:06:02 +00:00:   syscall: 'listen',
+2025-08-08 08:06:02 +00:00:   address: '::',
+2025-08-08 08:06:02 +00:00:   port: 3000
+2025-08-08 08:06:02 +00:00: }
+2025-08-08 08:06:03 +00:00:  ⨯ Failed to start server
+2025-08-08 08:06:03 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:06:03 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:06:03 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:06:03 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:06:03 +00:00:   errno: -98,
+2025-08-08 08:06:03 +00:00:   syscall: 'listen',
+2025-08-08 08:06:03 +00:00:   address: '::',
+2025-08-08 08:06:03 +00:00:   port: 3000
+2025-08-08 08:06:03 +00:00: }
+2025-08-08 08:06:04 +00:00:  ⨯ Failed to start server
+2025-08-08 08:06:04 +00:00: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-08 08:06:04 +00:00:     at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+2025-08-08 08:06:04 +00:00:     at new Promise (<anonymous>) {
+2025-08-08 08:06:04 +00:00:   code: 'EADDRINUSE',
+2025-08-08 08:06:04 +00:00:   errno: -98,
+2025-08-08 08:06:04 +00:00:   syscall: 'listen',
+2025-08-08 08:06:04 +00:00:   address: '::',
+2025-08-08 08:06:04 +00:00:   port: 3000
+2025-08-08 08:06:04 +00:00: }
+2025-08-08 08:18:41 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:18:41 +00:00: Require stack:
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:18:41 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:18:41 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:18:41 +00:00:   requireStack: [Array]
+2025-08-08 08:18:41 +00:00: }
+2025-08-08 08:18:44 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:18:44 +00:00: Require stack:
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:18:44 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:18:44 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:18:44 +00:00:   requireStack: [Array]
+2025-08-08 08:18:44 +00:00: }
+2025-08-08 08:18:45 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:18:45 +00:00: Require stack:
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:18:45 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:18:45 +00:00:   requireStack: [Array]
+2025-08-08 08:18:45 +00:00: }
+2025-08-08 08:18:45 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:18:45 +00:00: Require stack:
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:18:45 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:18:45 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:18:45 +00:00:   requireStack: [Array]
+2025-08-08 08:18:45 +00:00: }
+2025-08-08 08:19:33 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:19:33 +00:00: Require stack:
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:19:33 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:19:33 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:19:33 +00:00:   requireStack: [Array]
+2025-08-08 08:19:33 +00:00: }
+2025-08-08 08:19:34 +00:00:  ⨯ [Error: Cannot find module './vendor-chunks/tailwind-merge.js'
+2025-08-08 08:19:34 +00:00: Require stack:
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/.next/server/webpack-runtime.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/.next/server/pages/_document.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/require.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next-server.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/next.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/node_modules/next/dist/server/lib/start-server.js
+2025-08-08 08:19:34 +00:00: - /home/quinto/sukari/node_modules/next/dist/cli/next-start.js] {
+2025-08-08 08:19:34 +00:00:   code: 'MODULE_NOT_FOUND',
+2025-08-08 08:19:34 +00:00:   requireStack: [Array]
+2025-08-08 08:19:34 +00:00: }
