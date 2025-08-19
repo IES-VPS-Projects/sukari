@@ -8,255 +8,842 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Target, TrendingUp, Calendar, Users, CheckCircle, AlertTriangle, Clock, Award } from "lucide-react"
+import { Target, TrendingUp, Calendar, Users, CheckCircle, AlertTriangle, Clock, Award, Factory, Shield, Leaf, ChevronDown, ChevronRight } from "lucide-react"
 
 interface ViewPlanModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const kraData = {
-  id: 1,
-  title: "Production & Productivity",
-  description: "Enhance sugarcane production efficiency and productivity through improved practices, cost reduction, variety adoption, and quality control systems",
-  progress: 58,
-  status: "on_track",
-  targetDate: "End of plan (Y5 - 2029)",
-  objectives: [
-    {
-      id: 1,
-      title: "Improve average sugarcane yield from 61 TCH to 80 TCH",
-      description: "Enhance sugarcane productivity through modern agronomic practices, farmer training, and improved inputs",
-      progress: 68,
-      status: "on_track",
-      targetDate: "Y5 (2029)",
-      activities: [
-        {
-          id: 1,
-          name: "Promote modern agronomic practices",
-          description: "Implementation of best practices for sugarcane cultivation",
-          status: "in_progress",
-          completion: 70,
-          kpi: {
-            name: "Average cane yield (TCH)",
-            baseline: "61 TCH",
-            target: "80 TCH",
-            current: "69 TCH",
-            progress: 42,
-            yearlyTargets: { Y1: "65", Y2: "69", Y3: "73", Y4: "77", Y5: "80" }
-          }
-        },
-        {
-          id: 2,
-          name: "Train farmers on soil health & fertility",
-          description: "Comprehensive training programs on soil management and fertility improvement",
-          status: "in_progress",
-          completion: 50,
-          kpi: {
-            name: "% farmers trained",
-            baseline: "0%",
-            target: "80%",
-            current: "40%",
-            progress: 50,
-            yearlyTargets: { Y1: "20%", Y2: "40%", Y3: "60%", Y4: "70%", Y5: "80%" }
-          }
-        },
-        {
-          id: 3,
-          name: "Distribute improved farm inputs",
-          description: "Provision of quality inputs and soil testing services to farmers",
-          status: "in_progress",
-          completion: 43,
-          kpi: {
-            name: "% farms with soil test reports",
-            baseline: "0%",
-            target: "70%",
-            current: "30%",
-            progress: 43,
-            yearlyTargets: { Y1: "10%", Y2: "30%", Y3: "50%", Y4: "60%", Y5: "70%" }
-          }
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: "Reduce Cost of Production per Hectare by 20%",
-      description: "Optimize production costs through bulk procurement, mechanization, and irrigation improvements",
-      progress: 50,
-      status: "on_track",
-      targetDate: "Y5 (2029)",
-      activities: [
-        {
-          id: 4,
-          name: "Bulk procurement of inputs",
-          description: "Collective purchasing strategies to reduce input costs for farmers",
-          status: "in_progress",
-          completion: 50,
-          kpi: {
-            name: "Average cost per hectare (% reduction)",
-            baseline: "0%",
-            target: "20% reduction",
-            current: "10%",
-            progress: 50,
-            yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "18%", Y5: "20%" }
-          }
-        },
-        {
-          id: 5,
-          name: "Introduce mechanized planting & harvesting",
-          description: "Modernization of farming equipment and mechanized practices",
-          status: "in_progress",
-          completion: 40,
-          kpi: {
-            name: "% farms mechanized",
-            baseline: "TBD",
-            target: "+25pp",
-            current: "+10pp",
-            progress: 40,
-            yearlyTargets: { Y1: "+5pp", Y2: "+10pp", Y3: "+15pp", Y4: "+20pp", Y5: "+25pp" }
-          }
-        },
-        {
-          id: 6,
-          name: "Optimize irrigation systems",
-          description: "Efficient water management and irrigation infrastructure development",
-          status: "in_progress",
-          completion: 33,
-          kpi: {
-            name: "% irrigated farms",
-            baseline: "TBD",
-            target: "30%",
-            current: "10%",
-            progress: 33,
-            yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "20%", Y5: "30%" }
-          }
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: "Increase adoption of improved sugarcane varieties from 10% to 25%",
-      description: "Promote adoption of high-yielding and disease-resistant sugarcane varieties",
-      progress: 33,
-      status: "on_track",
-      targetDate: "Y5 (2029)",
-      activities: [
-        {
-          id: 7,
-          name: "Distribute certified improved seed cane",
-          description: "Provision of quality planting materials to farmers",
-          status: "in_progress",
-          completion: 33,
-          kpi: {
-            name: "% area under improved varieties",
-            baseline: "10%",
-            target: "25%",
-            current: "15%",
-            progress: 33,
-            yearlyTargets: { Y1: "12%", Y2: "15%", Y3: "18%", Y4: "21%", Y5: "25%" }
-          }
-        },
-        {
-          id: 8,
-          name: "Partner with research institutions",
-          description: "Collaboration for variety development and testing",
-          status: "in_progress",
-          completion: 67,
-          kpi: {
-            name: "No. of new varieties introduced",
-            baseline: "0",
-            target: "3",
-            current: "2",
-            progress: 67,
-            yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "0", Y5: "0" }
-          }
-        },
-        {
-          id: 9,
-          name: "Conduct field demonstrations",
-          description: "Demonstration plots to showcase improved varieties",
-          status: "in_progress",
-          completion: 40,
-          kpi: {
-            name: "No. of demo plots",
-            baseline: "0",
-            target: "20",
-            current: "8",
-            progress: 40,
-            yearlyTargets: { Y1: "4", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
-          }
-        }
-      ]
-    },
-    {
-      id: 4,
-      title: "Operationalize Cane Testing Units (CTUs) by Dec 2027",
-      description: "Establish and operationalize cane testing facilities for improved quality control",
-      progress: 60,
-      status: "on_track",
-      targetDate: "Dec 2027 (Y3)",
-      activities: [
-        {
-          id: 10,
-          name: "Procure and install CTU equipment",
-          description: "Acquisition and installation of specialized testing equipment",
-          status: "in_progress",
-          completion: 60,
-          kpi: {
-            name: "% CTUs operational",
-            baseline: "0%",
-            target: "100%",
-            current: "60%",
-            progress: 60,
-            yearlyTargets: { Y1: "20%", Y2: "60%", Y3: "100%", Y4: "100%", Y5: "100%" }
-          }
-        },
-        {
-          id: 11,
-          name: "Train CTU staff",
-          description: "Capacity building for testing unit personnel",
-          status: "in_progress",
-          completion: 70,
-          kpi: {
-            name: "No. staff trained",
-            baseline: "0",
-            target: "50",
-            current: "35",
-            progress: 70,
-            yearlyTargets: { Y1: "15", Y2: "20", Y3: "15", Y4: "0", Y5: "0" }
-          }
-        },
-        {
-          id: 12,
-          name: "Develop CTU SOPs",
-          description: "Standard operating procedures for quality testing operations",
-          status: "completed",
-          completion: 100,
-          kpi: {
-            name: "Approved SOPs (Yes/No)",
-            baseline: "No",
-            target: "Yes",
-            current: "Yes",
-            progress: 100,
-            yearlyTargets: { Y1: "No", Y2: "Yes", Y3: "Yes", Y4: "Yes", Y5: "Yes" }
-          }
-        }
-      ]
-    }
-  ]
+interface ViewPlanModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
+const kraData = [
+  {
+    id: 1,
+    title: "Production & Productivity",
+    description: "Enhance sugarcane production efficiency and productivity through improved practices, cost reduction, variety adoption, and quality control systems",
+    icon: Factory,
+    color: "green",
+    progress: 58,
+    status: "on_track",
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Improve average sugarcane yield from 61 TCH to 80 TCH",
+        description: "Enhance sugarcane productivity through modern agronomic practices, farmer training, and improved inputs",
+        progress: 68,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 1,
+            name: "Promote modern agronomic practices",
+            description: "Implementation of best practices for sugarcane cultivation",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "Average cane yield (TCH)",
+              baseline: "61 TCH",
+              target: "80 TCH",
+              current: "69 TCH",
+              progress: 42,
+              yearlyTargets: { Y1: "65", Y2: "69", Y3: "73", Y4: "77", Y5: "80" }
+            }
+          },
+          {
+            id: 2,
+            name: "Train farmers on soil health & fertility",
+            description: "Comprehensive training programs on soil management and fertility improvement",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "% farmers trained",
+              baseline: "0%",
+              target: "80%",
+              current: "40%",
+              progress: 50,
+              yearlyTargets: { Y1: "20%", Y2: "40%", Y3: "60%", Y4: "70%", Y5: "80%" }
+            }
+          },
+          {
+            id: 3,
+            name: "Distribute improved farm inputs",
+            description: "Provision of quality inputs and soil testing services to farmers",
+            status: "in_progress",
+            completion: 43,
+            kpi: {
+              name: "% farms with soil test reports",
+              baseline: "0%",
+              target: "70%",
+              current: "30%",
+              progress: 43,
+              yearlyTargets: { Y1: "10%", Y2: "30%", Y3: "50%", Y4: "60%", Y5: "70%" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Reduce Cost of Production per Hectare by 20%",
+        description: "Optimize production costs through bulk procurement, mechanization, and irrigation improvements",
+        progress: 50,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 4,
+            name: "Bulk procurement of inputs",
+            description: "Collective purchasing strategies to reduce input costs for farmers",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "Average cost per hectare (% reduction)",
+              baseline: "0%",
+              target: "20% reduction",
+              current: "10%",
+              progress: 50,
+              yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "18%", Y5: "20%" }
+            }
+          },
+          {
+            id: 5,
+            name: "Introduce mechanized planting & harvesting",
+            description: "Modernization of farming equipment and mechanized practices",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "% farms mechanized",
+              baseline: "TBD",
+              target: "+25pp",
+              current: "+10pp",
+              progress: 40,
+              yearlyTargets: { Y1: "+5pp", Y2: "+10pp", Y3: "+15pp", Y4: "+20pp", Y5: "+25pp" }
+            }
+          },
+          {
+            id: 6,
+            name: "Optimize irrigation systems",
+            description: "Efficient water management and irrigation infrastructure development",
+            status: "in_progress",
+            completion: 33,
+            kpi: {
+              name: "% irrigated farms",
+              baseline: "TBD",
+              target: "30%",
+              current: "10%",
+              progress: 33,
+              yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "20%", Y5: "30%" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Increase adoption of improved sugarcane varieties from 10% to 25%",
+        description: "Promote adoption of high-yielding and disease-resistant sugarcane varieties",
+        progress: 33,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 7,
+            name: "Distribute certified improved seed cane",
+            description: "Provision of quality planting materials to farmers",
+            status: "in_progress",
+            completion: 33,
+            kpi: {
+              name: "% area under improved varieties",
+              baseline: "10%",
+              target: "25%",
+              current: "15%",
+              progress: 33,
+              yearlyTargets: { Y1: "12%", Y2: "15%", Y3: "18%", Y4: "21%", Y5: "25%" }
+            }
+          },
+          {
+            id: 8,
+            name: "Partner with research institutions",
+            description: "Collaboration for variety development and testing",
+            status: "in_progress",
+            completion: 67,
+            kpi: {
+              name: "No. of new varieties introduced",
+              baseline: "0",
+              target: "3",
+              current: "2",
+              progress: 67,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "0", Y5: "0" }
+            }
+          },
+          {
+            id: 9,
+            name: "Conduct field demonstrations",
+            description: "Demonstration plots to showcase improved varieties",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of demo plots",
+              baseline: "0",
+              target: "20",
+              current: "8",
+              progress: 40,
+              yearlyTargets: { Y1: "4", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Operationalize Cane Testing Units (CTUs) by Dec 2027",
+        description: "Establish and operationalize cane testing facilities for improved quality control",
+        progress: 60,
+        status: "on_track",
+        targetDate: "Dec 2027 (Y3)",
+        activities: [
+          {
+            id: 10,
+            name: "Procure and install CTU equipment",
+            description: "Acquisition and installation of specialized testing equipment",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "% CTUs operational",
+              baseline: "0%",
+              target: "100%",
+              current: "60%",
+              progress: 60,
+              yearlyTargets: { Y1: "20%", Y2: "60%", Y3: "100%", Y4: "100%", Y5: "100%" }
+            }
+          },
+          {
+            id: 11,
+            name: "Train CTU staff",
+            description: "Capacity building for testing unit personnel",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "No. staff trained",
+              baseline: "0",
+              target: "50",
+              current: "35",
+              progress: 70,
+              yearlyTargets: { Y1: "15", Y2: "20", Y3: "15", Y4: "0", Y5: "0" }
+            }
+          },
+          {
+            id: 12,
+            name: "Develop CTU SOPs",
+            description: "Standard operating procedures for quality testing operations",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Approved SOPs (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "No", Y2: "Yes", Y3: "Yes", Y4: "Yes", Y5: "Yes" }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Effective Regulation",
+    description: "Create enabling legal frameworks, establish robust compliance systems, and strengthen quality assurance across the sugar industry",
+    icon: Shield,
+    color: "blue",
+    progress: 72,
+    status: "on_track",
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Create an enabling legal & regulatory framework",
+        description: "Review and update regulations, digitize licensing systems, and conduct stakeholder consultations",
+        progress: 75,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 1,
+            name: "Review & update sugar regulations",
+            description: "Comprehensive review of pricing, quality, licensing, and traceability regulations",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "No. of regulations reviewed & updated",
+              baseline: "0",
+              target: "8",
+              current: "4",
+              progress: 50,
+              yearlyTargets: { Y1: "2", Y2: "2", Y3: "2", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 2,
+            name: "Draft & submit amendments to Sugar Act 2024",
+            description: "Preparation and submission of legislative amendments",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Amendment proposals submitted (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "Yes", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 3,
+            name: "Conduct stakeholder consultations on reforms",
+            description: "Engagement sessions with industry stakeholders on regulatory reforms",
+            status: "in_progress",
+            completion: 48,
+            kpi: {
+              name: "No. of consultations held",
+              baseline: "0",
+              target: "50",
+              current: "24",
+              progress: 48,
+              yearlyTargets: { Y1: "12", Y2: "12", Y3: "10", Y4: "8", Y5: "8" }
+            }
+          },
+          {
+            id: 4,
+            name: "Digitize licensing & regulatory framework",
+            description: "Implementation of digital systems for licensing and regulatory processes",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "Digital licensing system operational (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Development",
+              progress: 60,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "Yes", Y4: "", Y5: "" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Establish robust compliance & enforcement",
+        description: "Implement comprehensive compliance monitoring and enforcement mechanisms",
+        progress: 70,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 5,
+            name: "Conduct annual compliance inspections",
+            description: "Regular inspections of all licensed entities to ensure compliance",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "% coverage of licensed entities",
+              baseline: "0%",
+              target: "100%",
+              current: "75%",
+              progress: 75,
+              yearlyTargets: { Y1: "60%", Y2: "75%", Y3: "85%", Y4: "95%", Y5: "100%" }
+            }
+          },
+          {
+            id: 6,
+            name: "Enforce corrective action follow-up",
+            description: "Monitor and ensure timely resolution of compliance issues",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "% of non-compliance resolved within 90 days",
+              baseline: "0%",
+              target: "90%",
+              current: "70%",
+              progress: 78,
+              yearlyTargets: { Y1: "60%", Y2: "70%", Y3: "80%", Y4: "85%", Y5: "90%" }
+            }
+          },
+          {
+            id: 7,
+            name: "Reduce licensing turnaround time",
+            description: "Streamline processes to reduce license approval timeframes",
+            status: "in_progress",
+            completion: 62,
+            kpi: {
+              name: "Avg. license approval (days)",
+              baseline: "30",
+              target: "≤14",
+              current: "25",
+              progress: 31,
+              yearlyTargets: { Y1: "30", Y2: "25", Y3: "20", Y4: "16", Y5: "14" }
+            }
+          },
+          {
+            id: 8,
+            name: "Market surveillance inspections",
+            description: "Regular market surveillance to ensure product quality and compliance",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of operations per year",
+              baseline: "0",
+              target: "60",
+              current: "22",
+              progress: 37,
+              yearlyTargets: { Y1: "10", Y2: "12", Y3: "12", Y4: "12", Y5: "14" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Strengthen sugar quality assurance",
+        description: "Implement comprehensive quality testing and traceability systems",
+        progress: 68,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 9,
+            name: "Conduct random market product testing",
+            description: "Regular testing of sugar products in the market for quality compliance",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "% of samples passing tests",
+              baseline: "88%",
+              target: "≥95%",
+              current: "90%",
+              progress: 29,
+              yearlyTargets: { Y1: "88%", Y2: "90%", Y3: "92%", Y4: "94%", Y5: "95%" }
+            }
+          },
+          {
+            id: 10,
+            name: "Roll out industry traceability system",
+            description: "Implementation of comprehensive traceability system across the industry",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "Traceability system functional (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Testing",
+              progress: 75,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "Yes", Y4: "Yes", Y5: "Yes" }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "Industry Sustainability",
+    description: "Mainstream ESG compliance, integrate gender & youth participation, strengthen labor rights, and implement sustainable practices with climate resilience",
+    icon: Leaf,
+    color: "emerald",
+    progress: 45,
+    status: "on_track",
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Mainstream ESG compliance & sustainability",
+        description: "Develop and implement comprehensive ESG frameworks and auditing systems",
+        progress: 60,
+        status: "on_track",
+        targetDate: "Y2 (2025)",
+        activities: [
+          {
+            id: 1,
+            name: "Develop ESG compliance framework",
+            description: "Creation of comprehensive ESG scorecard and compliance framework",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "ESG scorecard developed (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "Yes", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 2,
+            name: "Conduct ESG audits",
+            description: "Regular auditing of ESG compliance across industry entities",
+            status: "in_progress",
+            completion: 25,
+            kpi: {
+              name: "No. of annual ESG audit reports",
+              baseline: "0",
+              target: "4",
+              current: "1",
+              progress: 25,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 3,
+            name: "Conduct ESG sensitization",
+            description: "Awareness and training programs on ESG compliance for stakeholders",
+            status: "in_progress",
+            completion: 56,
+            kpi: {
+              name: "No. of sensitization forums",
+              baseline: "0",
+              target: "36",
+              current: "20",
+              progress: 56,
+              yearlyTargets: { Y1: "20", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Integrate gender & youth in farming & agro-processing",
+        description: "Promote inclusive participation of women and youth in the sugar value chain",
+        progress: 40,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 4,
+            name: "Conduct training programs for youth & women",
+            description: "Capacity building programs targeting youth and women in sugar farming and processing",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of capacity-building programs",
+              baseline: "0",
+              target: "25",
+              current: "10",
+              progress: 40,
+              yearlyTargets: { Y1: "5", Y2: "5", Y3: "5", Y4: "5", Y5: "5" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Strengthen labour rights, OHS & community engagement",
+        description: "Implement industry codes of conduct and strengthen community engagement",
+        progress: 50,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 5,
+            name: "Adopt industry code of conduct",
+            description: "Development and adoption of comprehensive industry code of conduct",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "Code of conduct adopted (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Review",
+              progress: 75,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 6,
+            name: "Conduct code compliance audits",
+            description: "Regular auditing of code of conduct compliance",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of annual reports",
+              baseline: "0",
+              target: "4",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 7,
+            name: "Roll out anti-child labour campaigns",
+            description: "Awareness campaigns against child labor in sugar mill zones",
+            status: "in_progress",
+            completion: 77,
+            kpi: {
+              name: "No. of awareness campaigns in mill zones",
+              baseline: "0",
+              target: "26",
+              current: "20",
+              progress: 77,
+              yearlyTargets: { Y1: "10", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Integrate sustainable practices & climate resilience",
+        description: "Implement sustainability projects and establish climate change adaptation measures",
+        progress: 30,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 8,
+            name: "Implement sustainability projects",
+            description: "Implementation of targeted sustainability initiatives across the industry",
+            status: "in_progress",
+            completion: 20,
+            kpi: {
+              name: "No. of projects implemented",
+              baseline: "0",
+              target: "5",
+              current: "1",
+              progress: 20,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 9,
+            name: "Conduct sustainability campaigns",
+            description: "Awareness campaigns on sustainable practices across the industry",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of awareness campaigns",
+              baseline: "0",
+              target: "100",
+              current: "40",
+              progress: 40,
+              yearlyTargets: { Y1: "20", Y2: "20", Y3: "20", Y4: "20", Y5: "20" }
+            }
+          },
+          {
+            id: 10,
+            name: "Establish Climate Change Hub",
+            description: "Creation of dedicated climate change coordination and response hub",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "Climate hub operational (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "NO",
+              progress: 0,
+              yearlyTargets: { Y1: "", Y2: "", Y3: "", Y4: "", Y5: "" }
+            }
+          },
+          {
+            id: 11,
+            name: "Publish climate advisories",
+            description: "Regular publication of climate-related advisories for the industry",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of reports published",
+              baseline: "0",
+              target: "4",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Sector-wide planning & value-chain financing",
+        description: "Develop comprehensive industry planning and financing mechanisms",
+        progress: 35,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 12,
+            name: "Develop industry strategic plan",
+            description: "Creation of comprehensive industry strategic development plan",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Strategic plan developed (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "YES",
+              progress: 100,
+              yearlyTargets: { Y1: "YES", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 13,
+            name: "Conduct performance reviews",
+            description: "Regular biannual performance reviews of industry progress",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of biannual reviews",
+              baseline: "0",
+              target: "8",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "2", Y3: "2", Y4: "2", Y5: "2" }
+            }
+          },
+          {
+            id: 14,
+            name: "Establish Stabilization Fund",
+            description: "Creation and capitalization of industry stabilization fund",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "Fund capitalization (KES mn)",
+              baseline: "0",
+              target: "2000",
+              current: "1000",
+              progress: 50,
+              yearlyTargets: { Y1: "500", Y2: "500", Y3: "500", Y4: "500", Y5: "500" }
+            }
+          },
+          {
+            id: 15,
+            name: "Enroll smallholders in scheme",
+            description: "Registration of smallholder farmers in stabilization scheme",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "% enrolled",
+              baseline: "0%",
+              target: "100%",
+              current: "0%",
+              progress: 0,
+              yearlyTargets: { Y1: "0%", Y2: "20%", Y3: "40%", Y4: "40%", Y5: "100%" }
+            }
+          },
+          {
+            id: 16,
+            name: "Develop bonus payment system",
+            description: "Creation of performance-based bonus payment framework",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Approved framework (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "YES",
+              progress: 100,
+              yearlyTargets: { Y1: "YES", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 17,
+            name: "Conduct lease compliance audits",
+            description: "Regular auditing of land lease compliance",
+            status: "in_progress",
+            completion: 20,
+            kpi: {
+              name: "No. of annual audits",
+              baseline: "0",
+              target: "5",
+              current: "1",
+              progress: 20,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 18,
+            name: "Hold financial literacy forums",
+            description: "Financial education programs for industry stakeholders",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of forums",
+              baseline: "0",
+              target: "20",
+              current: "8",
+              progress: 40,
+              yearlyTargets: { Y1: "4", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          },
+          {
+            id: 19,
+            name: "Roll out crop insurance",
+            description: "Development and implementation of crop insurance products",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of insurance products",
+              baseline: "0",
+              target: "3",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "-" }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
+
 export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
+  const [selectedKra, setSelectedKra] = useState(() => {
+    if (kraData && kraData.length > 0) {
+      return kraData[0]
+    }
+    return null
+  })
+  const [expandedKra, setExpandedKra] = useState(() => {
+    if (kraData && kraData.length > 0) {
+      return kraData[0].id
+    }
+    return null
+  })
   const [selectedObjective, setSelectedObjective] = useState(() => {
-    if (kraData?.objectives && kraData.objectives.length > 0) {
-      return kraData.objectives[0]
+    if (kraData?.[0]?.objectives && kraData[0].objectives.length > 0) {
+      return kraData[0].objectives[0]
     }
     return null
   })
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
 
-  // Early return if no objective is selected
-  if (!selectedObjective) {
+  // Update selected objective when KRA changes
+  const handleKraChange = (kra: any) => {
+    setSelectedKra(kra)
+    setExpandedKra(kra.id)
+    if (kra?.objectives && kra.objectives.length > 0) {
+      setSelectedObjective(kra.objectives[0])
+    } else {
+      setSelectedObjective(null)
+    }
+  }
+
+  // Toggle KRA expansion
+  const toggleKraExpansion = (kraId: number) => {
+    if (expandedKra === kraId) {
+      setExpandedKra(null)
+    } else {
+      const kra = kraData.find(k => k.id === kraId)
+      if (kra) {
+        setExpandedKra(kraId)
+        setSelectedKra(kra)
+        if (kra.objectives && kra.objectives.length > 0) {
+          setSelectedObjective(kra.objectives[0])
+        }
+      }
+    }
+  }
+
+  // Early return if no KRA or objective is selected
+  if (!selectedKra || !selectedObjective) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[90vh]">
@@ -314,56 +901,151 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
     }
   }
 
+  const getKraColorClasses = (color: string) => {
+    switch (color) {
+      case "green":
+        return {
+          bg: "bg-green-50",
+          border: "border-green-200",
+          text: "text-green-800",
+          icon: "text-green-600"
+        }
+      case "blue":
+        return {
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          text: "text-blue-800",
+          icon: "text-blue-600"
+        }
+      case "emerald":
+        return {
+          bg: "bg-emerald-50",
+          border: "border-emerald-200",
+          text: "text-emerald-800",
+          icon: "text-emerald-600"
+        }
+      default:
+        return {
+          bg: "bg-gray-50",
+          border: "border-gray-200",
+          text: "text-gray-800",
+          icon: "text-gray-600"
+        }
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-green-600" />
-            KRA 1: {kraData.title}
+            <selectedKra.icon className={`h-5 w-5 ${getKraColorClasses(selectedKra.color).icon}`} />
+            KRA {selectedKra.id}: {selectedKra.title}
           </DialogTitle>
-          <DialogDescription>Strategic Objectives and Activities for {kraData.description}</DialogDescription>
+          <DialogDescription>Strategic Objectives and Activities for {selectedKra.description}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-[70vh] gap-4">
-          {/* Objectives List */}
+        <div className="flex h-[75vh] gap-4">
+          {/* Collapsible KRA Sidebar & Objectives List */}
           <div className="w-1/3 border-r pr-4">
-            <h3 className="font-medium mb-4">Strategic Objectives</h3>
+            <h3 className="font-medium mb-4">Strategic Plan Overview</h3>
             <ScrollArea className="h-full">
-              <div className="space-y-3">
-                {kraData.objectives.map((objective) => (
-                  <Card
-                    key={objective.id}
-                    className={`cursor-pointer transition-colors ${
-                      selectedObjective.id === objective.id ? "border-green-200 bg-green-50" : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => setSelectedObjective(objective)}
-                  >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-sm">{objective.title}</CardTitle>
-                        <Badge className={`text-xs ${getStatusColor(objective.status)}`}>
-                          {getStatusIcon(objective.status)}
-                          <span className="ml-1">{objective.status.replace("_", " ")}</span>
-                        </Badge>
-                      </div>
-                      <CardDescription className="text-xs">{objective.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <span>Progress</span>
-                          <span>{objective.progress}%</span>
+              <div className="space-y-2">
+                {kraData.map((kra) => {
+                  const colors = getKraColorClasses(kra.color)
+                  const IconComponent = kra.icon
+                  const isExpanded = expandedKra === kra.id
+                  const isSelected = selectedKra?.id === kra.id
+                  
+                  return (
+                    <div key={kra.id} className="space-y-2">
+                      {/* KRA Header - Collapsible */}
+                      <Card
+                        className={`cursor-pointer transition-all duration-200 ${
+                          isSelected 
+                            ? `${colors.border} ${colors.bg} shadow-md` 
+                            : "hover:bg-gray-50 hover:shadow-sm"
+                        }`}
+                        onClick={() => toggleKraExpansion(kra.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center">
+                              {isExpanded ? (
+                                <ChevronDown className="h-4 w-4 text-gray-500 transition-transform" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-gray-500 transition-transform" />
+                              )}
+                            </div>
+                            <IconComponent className={`h-5 w-5 ${colors.icon}`} />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-sm font-semibold">KRA {kra.id}: {kra.title}</h4>
+                                <Badge className={`text-xs ${getStatusColor(kra.status)}`}>
+                                  {kra.progress}%
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{kra.description}</p>
+                              <div className="mt-2">
+                                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                  <span>Progress</span>
+                                  <span>{kra.progress}%</span>
+                                </div>
+                                <Progress value={kra.progress} className="h-1.5" />
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Strategic Objectives - Collapsible Content */}
+                      {isExpanded && (
+                        <div className="ml-6 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                          <h4 className="text-xs font-medium text-gray-700 mb-2">Strategic Objectives</h4>
+                          {kra.objectives.map((objective: any) => (
+                            <Card
+                              key={objective.id}
+                              className={`cursor-pointer transition-all duration-150 ${
+                                selectedObjective?.id === objective.id 
+                                  ? `${colors.border} ${colors.bg} shadow-sm` 
+                                  : "hover:bg-gray-50 border-gray-200"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedObjective(objective)
+                                setSelectedKra(kra)
+                              }}
+                            >
+                              <CardContent className="p-3">
+                                <div className="space-y-2">
+                                  <div className="flex items-start justify-between">
+                                    <h5 className="text-xs font-medium leading-tight">{objective.title}</h5>
+                                    <Badge className={`text-xs ${getStatusColor(objective.status)} ml-2 flex-shrink-0`}>
+                                      {getStatusIcon(objective.status)}
+                                      <span className="ml-1">{objective.status.replace("_", " ")}</span>
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xs text-gray-600 line-clamp-2">{objective.description}</p>
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs">
+                                      <span className="text-gray-500">Progress</span>
+                                      <span className="font-medium">{objective.progress}%</span>
+                                    </div>
+                                    <Progress value={objective.progress} className="h-1.5" />
+                                    <div className="flex justify-between text-xs text-gray-500">
+                                      <span>Target: {objective.targetDate}</span>
+                                      <span>{objective.activities.length} activities</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
-                        <Progress value={objective.progress} className="h-2" />
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>Target: {objective.targetDate}</span>
-                          <span>{objective.activities.length} activities</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </ScrollArea>
           </div>
@@ -1056,7 +1738,14 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button className="bg-green-600 hover:bg-green-700">Export Plan</Button>
+          <Button className={`${
+            selectedKra.color === 'green' ? 'bg-green-600 hover:bg-green-700' :
+            selectedKra.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
+            selectedKra.color === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' :
+            'bg-gray-600 hover:bg-gray-700'
+          }`}>
+            Export Plan
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
