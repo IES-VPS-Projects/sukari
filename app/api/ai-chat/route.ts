@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user_input: body.user_input
+        query: body.user_input
       }),
     });
 
@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     
-    return NextResponse.json(data);
+    // Transform the response to match expected format
+    return NextResponse.json({
+      response: data.answer || data.structured_answer?.summary || "No response available"
+    });
   } catch (error) {
     console.error('Error in AI chat proxy:', error);
     return NextResponse.json(
