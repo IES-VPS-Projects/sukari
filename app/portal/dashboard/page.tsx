@@ -23,8 +23,6 @@ import {
 } from "recharts"
 import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award, Filter } from "lucide-react"
 import ViewPlanCard from "./ViewPlanCard"
-import AverageSucroseCard from "./AverageSucroseCard"
-import ProductionPulseCard from "./ProductionPulseCard"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -341,9 +339,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <ProductionPulseCard />
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -459,11 +455,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Average Sucrose Content & Regional Distribution Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Average Sucrose Content Card */}
-        <AverageSucroseCard />
-
+      {/* Regional Distribution Row */}
+      <div className="grid grid-cols-1 gap-6">
         {/* Regional Distribution Card */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardHeader className="flex flex-row items-center justify-between">
