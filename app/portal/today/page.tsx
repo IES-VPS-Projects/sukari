@@ -128,16 +128,6 @@ const transcriptData = [
 const updatesData = {
   alerts: [
     {
-      id: '1',
-      title: 'Production Below Threshold',
-      label: 'HIGH',
-      description: 'Muhoroni sugar company production fell 25% below',
-      timestamp: '11:32 PM • Muhoroni',
-      labelColor: 'bg-red-500',
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600'
-    },
-    {
       id: '2',
       title: 'Compliance Issue Detected',
       label: 'MEDIUM',
@@ -256,11 +246,12 @@ const MarketInsightsCard = () => {
 }
 
 // Alerts Card Component (formerly Tasks Card)
-const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, setSelectedAlertForDetails }: {
+const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, setSelectedAlertForDetails, alertsData }: {
   selectedItemId: string | null,
   setSelectedItemId: (id: string | null) => void,
   setViewAllAlertsOpen: (open: boolean) => void,
-  setSelectedAlertForDetails: (id: string | null) => void
+  setSelectedAlertForDetails: (id: string | null) => void,
+  alertsData: any
 }) => {
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
@@ -283,7 +274,7 @@ const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, s
       <CardContent className="p-4">
         {/* Alert Content - No tabs, just alerts (limited to 3 most recent) */}
         <div className="space-y-3">
-          {updatesData.alerts.slice(0, 3).map((item) => (
+          {alertsData.alerts.slice(0, 3).map((item: any) => (
             <div 
               key={item.id} 
               className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -343,6 +334,7 @@ export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("")
   const [greeting, setGreeting] = useState("")
+  const [dynamicAlerts, setDynamicAlerts] = useState<any[]>([])
   const { user } = useAuth()
   
   // Tasks card state (now only for alerts)
@@ -380,6 +372,28 @@ export default function TodayPage() {
     setGreeting(getTimeBasedGreeting())
   }, [user])
 
+  // Load and listen for production alerts
+  useEffect(() => {
+    const loadProductionAlerts = () => {
+      const productionAlerts = JSON.parse(localStorage.getItem('productionAlerts') || '[]')
+      setDynamicAlerts(productionAlerts)
+    }
+
+    // Load initial alerts
+    loadProductionAlerts()
+
+    // Listen for production alert updates
+    const handleProductionAlertUpdate = () => {
+      loadProductionAlerts()
+    }
+
+    window.addEventListener('productionAlertUpdate', handleProductionAlertUpdate)
+
+    return () => {
+      window.removeEventListener('productionAlertUpdate', handleProductionAlertUpdate)
+    }
+  }, [])
+
   const currentTime = new Date().toLocaleString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -392,6 +406,12 @@ export default function TodayPage() {
   const handleScheduleVisit = (location?: string) => {
     setSelectedLocation(location || "")
     setScheduleVisitOpen(true)
+  }
+
+  // Combine static alerts with dynamic production alerts
+  const combinedAlertsData = {
+    ...updatesData,
+    alerts: [...dynamicAlerts, ...updatesData.alerts]
   }
 
   return (
@@ -516,6 +536,7 @@ export default function TodayPage() {
               setSelectedItemId={setSelectedItemId}
               setViewAllAlertsOpen={setViewAllAlertsOpen}
               setSelectedAlertForDetails={setSelectedAlertForDetails}
+              alertsData={combinedAlertsData}
             />
           </div>
 
@@ -548,7 +569,7 @@ export default function TodayPage() {
           </DialogTitle>
           {(() => {
             if (selectedAlertForDetails) {
-              const alert = updatesData.alerts.find(a => a.id === selectedAlertForDetails)
+              const alert = combinedAlertsData.alerts.find((a: any) => a.id === selectedAlertForDetails)
               if (alert) {
                 return (
                   <div className="flex flex-col h-full">
@@ -677,7 +698,7 @@ export default function TodayPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
-                      <p className="text-sm text-gray-500 mt-1">{updatesData.alerts.length} alerts requiring attention</p>
+                      <p className="text-sm text-gray-500 mt-1">{combinedAlertsData.alerts.length} alerts requiring attention</p>
                     </div>
                     <div className="group relative">
                       <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
@@ -690,7 +711,7 @@ export default function TodayPage() {
                 
                 <div className="flex-1 overflow-y-auto p-6">
                   <div className="space-y-3">
-                    {updatesData.alerts.map((alert) => (
+                    {combinedAlertsData.alerts.map((alert: any) => (
                       <div 
                         key={alert.id}
                         className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${

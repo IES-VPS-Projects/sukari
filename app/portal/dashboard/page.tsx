@@ -23,6 +23,8 @@ import {
 } from "recharts"
 import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award, Filter } from "lucide-react"
 import ViewPlanCard from "./ViewPlanCard"
+import AverageSucroseCard from "./AverageSucroseCard"
+import ProductionPulseCard from "./ProductionPulseCard"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -264,31 +266,6 @@ const stakeholders = [
   { type: "Molasses Dealers", count: 23, total: 30, location: "Industrial Areas", status: "compliant" },
 ]
 
-// Production Trends Chart Data
-const productionTrendsData = {
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-  datasets: [
-    {
-      label: '2023',
-      data: [193000, 194500, 195000, 195500, 196000, 196500, 197000, 197500, 198000, 198500, 199000, 199500],
-      borderColor: '#f59e0b',
-      backgroundColor: 'rgba(245, 158, 11, 0.3)',
-      fill: true,
-      tension: 0.1,
-      stack: 'stack0',
-    },
-    {
-      label: '2024',
-      data: [258000, 258500, 259000, 260000, 261000, 262000, 263000, 264000, 265000, 266000, 267000, 268000],
-      borderColor: '#10b981',
-      backgroundColor: 'rgba(16, 185, 129, 0.3)',
-      fill: true,
-      tension: 0.1,
-      stack: 'stack0',
-    },
-  ],
-}
-
 // Regional Distribution Chart Data
 const regionalDistributionData = {
   labels: ['Western', 'Nyanza', 'Rift Valley', 'Coast'],
@@ -365,19 +342,7 @@ export default function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-[#6B6B6B]">Production Pulse</h3>
-              <TrendingUp className="h-4 w-4 text-green-500" />
-            </div>
-            <div className="text-2xl font-bold text-[#202020] mb-1">24,580</div>
-            <p className="text-xs text-[#6B6B6B] mb-3">tonnes this month</p>
-            <p className="text-xs text-green-600 mb-2">+12% from last month</p>
-            <Progress value={78} className="h-2 mb-2" />
-            <p className="text-xs text-[#6B6B6B]">78% of monthly target</p>
-          </CardContent>
-        </Card>
+        <ProductionPulseCard />
 
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardContent className="p-6">
@@ -422,7 +387,40 @@ export default function DashboardPage() {
 
       {/* Dashboard Metrics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Performing Mills */}
+        {/* Quick Stats - moved to first position */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader>
+            <CardTitle className="text-[#202020]">Quick Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#202020]">156</div>
+                <p className="text-xs text-[#6B6B6B]">New Farmers This Month</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">23</div>
+                <p className="text-xs text-[#6B6B6B]">Pending Licenses</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">7</div>
+                <p className="text-xs text-[#6B6B6B]">Mills Under Review</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">KES 2.4M</div>
+                <p className="text-xs text-[#6B6B6B]">Daily Revenue</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* View Strategic Plan */}
+        <ViewPlanCard />
+
+        {/* Top Performing Mills - moved to last position */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardHeader>
             <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
@@ -459,60 +457,12 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* View Strategic Plan */}
-        <ViewPlanCard />
-
-        {/* Quick Stats */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="text-[#202020]">Quick Stats</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#202020]">156</div>
-                <p className="text-xs text-[#6B6B6B]">New Farmers This Month</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">23</div>
-                <p className="text-xs text-[#6B6B6B]">Pending Licenses</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">7</div>
-                <p className="text-xs text-[#6B6B6B]">Mills Under Review</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">KES 2.4M</div>
-                <p className="text-xs text-[#6B6B6B]">Daily Revenue</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Production Trends & Regional Distribution Row */}
+      {/* Average Sucrose Content & Regional Distribution Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Production Trends Card */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-gray-600" />
-              <CardTitle className="text-[#202020]">Production Trends</CardTitle>
-            </div>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Filter className="h-4 w-4 text-gray-600" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ChartLine data={productionTrendsData} options={chartOptions} />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Average Sucrose Content Card */}
+        <AverageSucroseCard />
 
         {/* Regional Distribution Card */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
@@ -565,6 +515,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
     </div>
     </PortalLayout>
   )
