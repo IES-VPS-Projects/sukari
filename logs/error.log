@@ -170,3 +170,9 @@
 2025-08-08 08:19:34 +00:00:   code: 'MODULE_NOT_FOUND',
 2025-08-08 08:19:34 +00:00:   requireStack: [Array]
 2025-08-08 08:19:34 +00:00: }
+2025-08-18 10:45:59 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"Which factory had the highest production this month?"}}]}
+2025-08-18 10:46:19 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"Give me a summary of sugar prices over the years"}}]}
+2025-08-18 10:46:51 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"why can't I get a response?"}}]}
+2025-08-18 10:47:50 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"Show national sugar production for 2024"}}]}
+2025-08-18 10:49:29 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"Show national sugar production for 2024"}}]}
+2025-08-18 10:51:15 +00:00: AI Backend Error Response: {"detail":[{"type":"missing","loc":["body","query"],"msg":"Field required","input":{"user_input":"Compare sugar production by region for last year"}}]}
