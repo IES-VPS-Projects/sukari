@@ -27,9 +27,11 @@ import { allActivitiesData } from "@/lib/mockdata"
 
 interface ActivitiesCardProps {
   className?: string
+  triggerNewActivity?: boolean
+  setTriggerNewActivity?: (value: boolean) => void
 }
 
-const ActivitiesCard = ({ className }: ActivitiesCardProps) => {
+const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }: ActivitiesCardProps) => {
   // Modal states
   const [newActivityOpen, setNewActivityOpen] = useState(false)
   const [activityDropdownOpen, setActivityDropdownOpen] = useState(false)
@@ -59,6 +61,14 @@ const ActivitiesCard = ({ className }: ActivitiesCardProps) => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [activityDropdownOpen])
+
+  // Handle trigger from parent component (AI Insights/Alerts)
+  useEffect(() => {
+    if (triggerNewActivity && setTriggerNewActivity) {
+      setNewActivityOpen(true)
+      setTriggerNewActivity(false)
+    }
+  }, [triggerNewActivity, setTriggerNewActivity])
 
   const handleCreateActivity = () => {
     console.log('Creating activity:', activityForm)

@@ -794,26 +794,109 @@ const kraData = [
   }
 ]
 
+// Helper functions to calculate dynamic percentages
+const calculateObjectiveProgress = (objective: any): number => {
+  if (!objective.activities || objective.activities.length === 0) return 0
+  const totalCompletion = objective.activities.reduce((sum: number, activity: any) => sum + activity.completion, 0)
+  return Math.round(totalCompletion / objective.activities.length)
+}
+
+const calculateKraProgress = (kra: any): number => {
+  if (!kra.objectives || kra.objectives.length === 0) return 0
+  const totalProgress = kra.objectives.reduce((sum: number, objective: any) => {
+    return sum + calculateObjectiveProgress(objective)
+  }, 0)
+  return Math.round(totalProgress / kra.objectives.length)
+}
+
+const getUpdatedKraData = () => {
+  return kraData.map(kra => {
+    const updatedObjectives = kra.objectives.map(objective => {
+      // Update activities to sync KPI progress with activity completion
+      const updatedActivities = objective.activities.map(activity => ({
+        ...activity,
+        kpi: {
+          ...activity.kpi,
+          progress: activity.completion // Sync KPI progress with activity completion
+        }
+      }))
+      
+      return {
+        ...objective,
+        activities: updatedActivities,
+        progress: calculateObjectiveProgress({ ...objective, activities: updatedActivities })
+      }
+    })
+    
+    return {
+      ...kra,
+      objectives: updatedObjectives,
+      progress: calculateKraProgress({ ...kra, objectives: updatedObjectives })
+    }
+  })
+}
+
 export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
+  // Use dynamically calculated data
+  const dynamicKraData = getUpdatedKraData()
+  
   const [selectedKra, setSelectedKra] = useState(() => {
-    if (kraData && kraData.length > 0) {
-      return kraData[0]
+    if (dynamicKraData && dynamicKraData.length > 0) {
+      return dynamicKraData[0]
     }
     return null
   })
   const [expandedKra, setExpandedKra] = useState(() => {
-    if (kraData && kraData.length > 0) {
-      return kraData[0].id
+    if (dynamicKraData && dynamicKraData.length > 0) {
+      return dynamicKraData[0].id
     }
     return null
   })
   const [selectedObjective, setSelectedObjective] = useState(() => {
-    if (kraData?.[0]?.objectives && kraData[0].objectives.length > 0) {
-      return kraData[0].objectives[0]
+    if (dynamicKraData?.[0]?.objectives && dynamicKraData[0].objectives.length > 0) {
+      return dynamicKraData[0].objectives[0]
     }
     return null
   })
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
+  const [expandedTimelineYears, setExpandedTimelineYears] = useState<string[]>(['Y1']) // Track expanded years in timeline
+
+  // Toggle year expansion in timeline
+  const toggleTimelineYear = (year: string) => {
+    setExpandedTimelineYears(prev => 
+      prev.includes(year) 
+        ? prev.filter(y => y !== year)
+        : [...prev, year]
+    )
+  }
+
+  // Group activities by years based on their completion and timeline
+  const getActivitiesByYear = () => {
+    if (!selectedObjective?.activities) return {}
+    
+    const years = ['Y1', 'Y2', 'Y3', 'Y4', 'Y5']
+    const activitiesByYear: { [key: string]: any[] } = {}
+    
+    years.forEach(year => {
+      activitiesByYear[year] = []
+    })
+    
+    selectedObjective.activities.forEach(activity => {
+      // Determine which year this activity belongs to based on completion status
+      if (activity.completion >= 80) {
+        activitiesByYear['Y1'].push({ ...activity, achievedInYear: 'Y1' })
+      } else if (activity.completion >= 40) {
+        activitiesByYear['Y2'].push({ ...activity, achievedInYear: 'Y2' })
+      } else {
+        // Future activities go to Y3-Y5 based on priority or randomly distribute
+        const futureYears = ['Y3', 'Y4', 'Y5']
+        const randomYear = futureYears[Math.floor(Math.random() * futureYears.length)]
+        activitiesByYear[randomYear].push({ ...activity, achievedInYear: randomYear })
+      }
+    })
+    
+    return activitiesByYear
+  }
 
   // Update selected objective when KRA changes
   const handleKraChange = (kra: any) => {
@@ -831,7 +914,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
     if (expandedKra === kraId) {
       setExpandedKra(null)
     } else {
-      const kra = kraData.find(k => k.id === kraId)
+      const kra = dynamicKraData.find(k => k.id === kraId)
       if (kra) {
         setExpandedKra(kraId)
         setSelectedKra(kra)
@@ -950,7 +1033,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
             <h3 className="font-medium mb-4">Strategic Plan Overview</h3>
             <ScrollArea className="h-full">
               <div className="space-y-2">
-                {kraData.map((kra) => {
+                {dynamicKraData.map((kra) => {
                   const colors = getKraColorClasses(kra.color)
                   const IconComponent = kra.icon
                   const isExpanded = expandedKra === kra.id
@@ -1183,41 +1266,30 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                   </div>
                                   
                                   <div className="grid grid-cols-2 gap-3 mb-3">
-                                    <div className={`text-center p-2 rounded ${
-                                      currentYearProgress >= 90 ? 'bg-green-100' :
-                                      currentYearProgress >= 70 ? 'bg-amber-100' :
-                                      'bg-red-100'
-                                    }`}>
+                                    <div className="text-center p-3 rounded bg-white border">
                                       <p className="text-xs text-gray-600">Year 2 Progress</p>
                                       <p className={`text-lg font-bold ${
                                         currentYearProgress >= 90 ? 'text-green-600' :
                                         currentYearProgress >= 70 ? 'text-amber-600' :
                                         'text-red-600'
                                       }`}>{currentYearProgress}%</p>
-                                      <div className="mt-1">
+                                      <p className="text-xs text-gray-500 mt-1">Current: {kpi?.current || 'N/A'}</p>
+                                      <div className="mt-2">
                                         <Progress value={currentYearProgress} className="h-1" />
                                       </div>
                                     </div>
-                                    <div className={`text-center p-2 rounded ${
-                                      fiveYearProgress >= 90 ? 'bg-green-100' :
-                                      fiveYearProgress >= 70 ? 'bg-amber-100' :
-                                      'bg-red-100'
-                                    }`}>
+                                    <div className="text-center p-3 rounded bg-white border">
                                       <p className="text-xs text-gray-600">5-Year Progress</p>
                                       <p className={`text-lg font-bold ${
                                         fiveYearProgress >= 90 ? 'text-green-600' :
                                         fiveYearProgress >= 70 ? 'text-amber-600' :
                                         'text-red-600'
                                       }`}>{fiveYearProgress}%</p>
-                                      <div className="mt-1">
+                                      <p className="text-xs text-gray-500 mt-1">Target: {kpi?.target || 'N/A'}</p>
+                                      <div className="mt-2">
                                         <Progress value={fiveYearProgress} className="h-1" />
                                       </div>
                                     </div>
-                                  </div>
-                                  
-                                  <div className="flex justify-between text-sm text-gray-600">
-                                    <span>Current: {kpi?.current || 'N/A'}</span>
-                                    <span>Target: {kpi?.target || 'N/A'}</span>
                                   </div>
                                 </div>
                               );
@@ -1332,18 +1404,14 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                               <CardContent>
                                 <div className="space-y-4">
                                   {/* Year on Year and 5-Year Progress Summary */}
-                                  <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                                  <div className="grid grid-cols-2 gap-4 p-2 bg-gray-50 rounded-lg">
                                     <div className="text-center">
-                                      <p className="text-sm text-gray-600 mb-1">Year 2 (Current) Progress</p>
+                                      <p className="text-sm text-gray-600 mb-1">Current Progress</p>
                                       <p className={`text-3xl font-bold ${
                                         currentYearProgress >= 90 ? 'text-green-600' :
                                         currentYearProgress >= 70 ? 'text-amber-600' :
                                         'text-red-600'
                                       }`}>{currentYearProgress}%</p>
-                                      <p className="text-xs text-gray-500">Target: {kpi.yearlyTargets.Y2}</p>
-                                      <div className="mt-2">
-                                        <Progress value={currentYearProgress} className="h-2" />
-                                      </div>
                                     </div>
                                     <div className="text-center">
                                       <p className="text-sm text-gray-600 mb-1">5-Year Plan Progress</p>
@@ -1352,10 +1420,6 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                         fiveYearProgress >= 70 ? 'text-amber-600' :
                                         'text-red-600'
                                       }`}>{fiveYearProgress}%</p>
-                                      <p className="text-xs text-gray-500">Final Target: {kpi.target}</p>
-                                      <div className="mt-2">
-                                        <Progress value={fiveYearProgress} className="h-2" />
-                                      </div>
                                     </div>
                                   </div>
                                   <div>
@@ -1367,7 +1431,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                   </div>
                                   {kpi.yearlyTargets && (
                                     <div>
-                                      <p className="text-sm font-medium text-gray-700 mb-3">Year-on-Year Targets & Completion</p>
+                                      <p className="text-sm font-medium text-gray-700 mb-3">Year-on-Year Targets</p>
                                       <div className="grid grid-cols-5 gap-3">
                                         {(['Y1', 'Y2', 'Y3', 'Y4', 'Y5'] as const).map((year, yearIndex) => {
                                           const isCurrentYear = year === 'Y2';
@@ -1381,7 +1445,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                                                  milestoneProgress;
                                           
                                           return (
-                                            <div key={year} className={`p-3 rounded-lg border-2 text-center ${
+                                            <div key={year} className={`p-2 rounded-lg border-2 text-center ${
                                               isCompleted ? 'bg-green-100 border-green-300' :
                                               isCurrentYear ? 'bg-blue-100 border-blue-300' : 
                                               isFutureYear ? 'bg-gray-50 border-gray-200' :
@@ -1397,24 +1461,11 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                                   isCurrentYear ? 'text-blue-700' :
                                                   'text-gray-600'
                                                 }`}>
-                                                  {isCompleted ? '✓ Achieved' : 
-                                                   isCurrentYear ? `${displayProgress}% of Y2 Target` : 
+                                                  {isCompleted ? '✓ Completed' : 
+                                                   isCurrentYear ? `In Progress` : 
                                                    isFutureYear ? 'Planned' : 'Milestone'}
                                                 </p>
                                                 
-                                                {/* Progress bar for completed and current years */}
-                                                {(isCompleted || isCurrentYear) && (
-                                                  <div className="w-full bg-white rounded-full h-2 mt-1">
-                                                    <div 
-                                                      className={`h-2 rounded-full ${
-                                                        isCompleted ? 'bg-green-500' : 'bg-blue-500'
-                                                      }`}
-                                                      style={{ 
-                                                        width: `${displayProgress}%` 
-                                                      }}
-                                                    />
-                                                  </div>
-                                                )}
                                               </div>
                                               
                                               {/* Status indicator */}
@@ -1427,33 +1478,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                           );
                                         })}
                                       </div>
-                                      
-                                      {/* Year-on-Year Performance Summary */}
-                                      <div className="mt-4 p-3 bg-white rounded-lg border">
-                                        <h6 className="font-medium text-gray-700 mb-3">Performance Tracking Summary</h6>
-                                        <div className="grid grid-cols-2 gap-4 text-sm">
-                                          <div>
-                                            <div className="flex justify-between mb-1">
-                                              <span className="text-gray-600">Y1 Achievement:</span>
-                                              <span className="font-medium text-green-600">✓ 100%</span>
-                                            </div>
-                                            <div className="flex justify-between mb-1">
-                                              <span className="text-gray-600">Y2 Progress vs Target:</span>
-                                              <span className="font-medium text-blue-600">{currentYearProgress}%</span>
-                                            </div>
-                                          </div>
-                                          <div>
-                                            <div className="flex justify-between mb-1">
-                                              <span className="text-gray-600">5-Year Progress:</span>
-                                              <span className="font-medium text-purple-600">{fiveYearProgress}%</span>
-                                            </div>
-                                            <div className="flex justify-between mb-1">
-                                              <span className="text-gray-600">Remaining to Final:</span>
-                                              <span className="font-medium text-gray-600">{100 - fiveYearProgress}%</span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
+
                                     </div>
                                   )}
                                 </div>
@@ -1470,30 +1495,38 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
               <TabsContent value="activities" className="h-[calc(100%-4rem)] overflow-hidden">
                 <Card className="h-full flex flex-col">
                   <CardHeader className="flex-shrink-0">
-                    <CardTitle>Activities & KPIs</CardTitle>
+                    <CardTitle>Activities</CardTitle>
                     <CardDescription>Activities and their corresponding KPIs for {selectedObjective.title}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 overflow-hidden">
                     <ScrollArea className="h-full">
                       <div className="space-y-4">
                         {selectedObjective?.activities?.map((activity, index) => (
-                          <Card key={index} className="border-l-4 border-l-blue-500">
+                          <Card key={index} className={`border-l-4 ${
+                            activity.completion >= 80 ? 'border-l-green-500' :
+                            activity.completion >= 51 ? 'border-l-amber-500' :
+                            'border-l-red-500'
+                          }`}>
                             <CardContent className="pt-4">
                               <div className="space-y-4">
                                 {/* Activity Header */}
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
-                                    <h4 className="font-medium text-lg">{activity.name}</h4>
-                                    <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                                    <div className="flex items-center gap-3 mt-2">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-medium text-lg">{activity.name}</h4>
                                       <Badge className={`${getInitiativeStatusColor(activity.status)}`}>
                                         {activity.status.replace("_", " ")}
                                       </Badge>
                                     </div>
+                                    <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
                                   </div>
                                   <div className="text-right ml-4">
                                     <p className="text-sm text-gray-600">Completion</p>
-                                    <p className="text-2xl font-bold text-blue-600">{activity.completion}%</p>
+                                    <p className={`text-2xl font-bold ${
+                                      activity.completion >= 80 ? 'text-green-600' :
+                                      activity.completion >= 51 ? 'text-amber-600' :
+                                      'text-red-600'
+                                    }`}>{activity.completion}%</p>
                                   </div>
                                 </div>
                                 
@@ -1501,12 +1534,8 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                 <Progress value={activity.completion} className="h-2" />
                                 
                                 {/* Associated KPI */}
-                                <div className="bg-gray-50 p-4 rounded-lg border">
-                                  <div className="flex items-center justify-between mb-3">
-                                    <h5 className="font-medium text-gray-700">Key Performance Indicator</h5>
-                                  </div>
-                                  
-                                  <h6 className="font-medium mb-2">{activity.kpi.name}</h6>
+                                <div className="bg-gray-50 p-3 rounded-lg border">
+                                  <h5 className="font-medium text-gray-700 mb-2">KPI - {activity.kpi.name}</h5>
                                   
                                   <div className="mb-3">
                                     <div className="flex justify-between text-sm mb-1">
@@ -1557,101 +1586,167 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                 <Card className="h-full flex flex-col">
                   <CardHeader className="flex-shrink-0">
                     <CardTitle>Implementation Timeline</CardTitle>
-                    <CardDescription>Activity milestones and KPI targets for {selectedObjective.title}</CardDescription>
+                    <CardDescription>Year-by-year progress and achieved activities for {selectedObjective.title}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 overflow-hidden">
                     <ScrollArea className="h-full">
-                      <div className="space-y-6">
-                        {selectedObjective?.activities?.map((activity, activityIndex) => (
-                          <div key={activityIndex} className="relative">
-                            {/* Activity Timeline Header */}
-                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-l-4 border-l-blue-500">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-lg text-blue-800">{activity.name}</h4>
-                                <Badge className={`${getInitiativeStatusColor(activity.status)}`}>
-                                  {activity.status.replace("_", " ")}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">{activity.description}</p>
-                              
-                              {/* Activity Progress */}
-                              <div className="flex items-center gap-4 mb-3">
-                                <div className="flex-1">
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Activity Progress</span>
-                                    <span>{activity.completion}%</span>
+                      <div className="space-y-3">
+                        {Object.entries(getActivitiesByYear()).map(([year, activities]) => {
+                          const isExpanded = expandedTimelineYears.includes(year)
+                          const isCurrentYear = year === 'Y2'
+                          const isCompletedYear = year === 'Y1'
+                          const isFutureYear = ['Y3', 'Y4', 'Y5'].includes(year)
+                          
+                          // Calculate year progress based on activities
+                          const yearProgress = activities.length > 0 
+                            ? Math.round(activities.reduce((sum, act) => sum + act.completion, 0) / activities.length)
+                            : 0
+                          
+                          return (
+                            <div key={year} className="border rounded-lg">
+                              {/* Year Header - Clickable to expand/collapse */}
+                              <div 
+                                className={`p-4 cursor-pointer transition-all duration-200 ${
+                                  isCompletedYear ? 'bg-green-50 hover:bg-green-100 border-green-200' :
+                                  isCurrentYear ? 'bg-blue-50 hover:bg-blue-100 border-blue-200' :
+                                  isFutureYear ? 'bg-gray-50 hover:bg-gray-100 border-gray-200' :
+                                  'bg-gray-50 hover:bg-gray-100'
+                                } ${isExpanded ? 'rounded-t-lg' : 'rounded-lg'}`}
+                                onClick={() => toggleTimelineYear(year)}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    {/* Expand/Collapse Icon */}
+                                    {isExpanded ? (
+                                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                                    ) : (
+                                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                                    )}
+                                    
+                                    {/* Year Title and Status */}
+                                    <div>
+                                      <h3 className={`text-lg font-semibold ${
+                                        isCompletedYear ? 'text-green-800' :
+                                        isCurrentYear ? 'text-blue-800' :
+                                        'text-gray-800'
+                                      }`}>
+                                        Year {year.slice(1)} ({year})
+                                      </h3>
+                                      <p className="text-sm text-gray-600">
+                                        {isCompletedYear ? 'Completed Year' :
+                                         isCurrentYear ? 'Current Year' :
+                                         'Planned Year'}
+                                      </p>
+                                    </div>
                                   </div>
-                                  <Progress value={activity.completion} className="h-2" />
+                                  
+                                  <div className="flex items-center gap-4">
+                                    {/* Activities Count */}
+                                    <div className="text-center">
+                                      <p className="text-lg font-bold text-gray-800">{activities.length}</p>
+                                      <p className="text-xs text-gray-600">Activities</p>
+                                    </div>
+                                    
+                                    {/* Year Progress */}
+                                    <div className="text-center min-w-[80px]">
+                                      <p className={`text-2xl font-bold ${
+                                        yearProgress >= 80 ? 'text-green-600' :
+                                        yearProgress >= 50 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>
+                                        {yearProgress}%
+                                      </p>
+                                      <p className="text-xs text-gray-600">Progress</p>
+                                    </div>
+                                    
+                                    {/* Status Badge */}
+                                    <Badge className={`${
+                                      isCompletedYear ? 'bg-green-100 text-green-800' :
+                                      isCurrentYear ? 'bg-blue-100 text-blue-800' :
+                                      'bg-gray-100 text-gray-800'
+                                    }`}>
+                                      {isCompletedYear ? 'Completed' :
+                                       isCurrentYear ? 'In Progress' :
+                                       'Planned'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                
+                                {/* Progress Bar for the year */}
+                                <div className="mt-3">
+                                  <Progress 
+                                    value={yearProgress} 
+                                    className={`h-2 ${
+                                      isCompletedYear ? '[&>div]:bg-green-500' :
+                                      isCurrentYear ? '[&>div]:bg-blue-500' :
+                                      '[&>div]:bg-gray-400'
+                                    }`} 
+                                  />
                                 </div>
                               </div>
-                            </div>
-                            
-                            {/* KPI Timeline */}
-                            <div className="ml-6 mt-4 space-y-3">
-                              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                                <h5 className="font-medium text-green-800 mb-3">
-                                  KPI: {activity.kpi.name}
-                                </h5>
-                                
-                                {/* KPI 5-Year Timeline */}
-                                <div className="grid grid-cols-5 gap-3">
-                                  {(['Y1', 'Y2', 'Y3', 'Y4', 'Y5'] as const).map((year, yearIndex) => {
-                                    const isCurrentYear = year === 'Y2';
-                                    const isFinalYear = year === 'Y5';
-                                    const isCompleted = yearIndex === 0; // Y1 is completed
-                                    const target = activity.kpi.yearlyTargets[year];
-                                    
-                                    return (
-                                      <div key={year} className="relative">
-                                        {/* Timeline connector */}
-                                        {yearIndex < 4 && (
-                                          <div className="absolute top-6 left-1/2 w-full h-0.5 bg-gray-300 z-0" />
-                                        )}
-                                        
-                                        <div className={`relative z-10 p-3 rounded-lg border-2 text-center ${
-                                          isCompleted ? 'bg-green-100 border-green-400' :
-                                          isCurrentYear ? 'bg-blue-100 border-blue-400' : 
-                                          isFinalYear ? 'bg-amber-100 border-amber-400' :
-                                          'bg-gray-50 border-gray-300'
-                                        }`}>
-                                          {/* Timeline dot */}
-                                          <div className={`w-3 h-3 rounded-full mx-auto mb-2 ${
-                                            isCompleted ? 'bg-green-500' :
-                                            isCurrentYear ? 'bg-blue-500' :
-                                            isFinalYear ? 'bg-amber-500' :
-                                            'bg-gray-400'
-                                          }`} />
-                                          
-                                          <p className="font-medium text-sm">{year}</p>
-                                          <p className="text-lg font-bold mt-1">{target}</p>
-                                          <p className="text-xs text-gray-600 mt-1">
-                                            {isCompleted ? 'Achieved' : 
-                                             isCurrentYear ? 'Current Target' : 
-                                             isFinalYear ? 'Final Goal' : 'Milestone'}
-                                          </p>
-                                          
-                                          {isCurrentYear && (
-                                            <div className="mt-2">
-                                              <div className="text-xs text-blue-700">
-                                                Progress: {activity.kpi.progress}%
+                              
+                              {/* Expandable Activities List */}
+                              {isExpanded && (
+                                <div className="border-t bg-white p-4 rounded-b-lg space-y-3 animate-in slide-in-from-top-2 duration-200">
+                                  {activities.length > 0 ? (
+                                    activities.map((activity, index) => (
+                                      <div key={index} className={`p-4 rounded-lg border-l-4 ${
+                                        activity.completion >= 80 ? 'border-l-green-500 bg-green-50' :
+                                        activity.completion >= 50 ? 'border-l-amber-500 bg-amber-50' :
+                                        'border-l-red-500 bg-red-50'
+                                      }`}>
+                                        <div className="flex justify-between items-start">
+                                          <div className="flex-1">
+                                            <h4 className="font-medium text-gray-900">{activity.name}</h4>
+                                            <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                                            
+                                            {/* Activity KPI */}
+                                            <div className="mt-3 p-3 bg-white rounded border">
+                                              <div className="flex justify-between items-center mb-2">
+                                                <span className="text-sm font-medium text-gray-700">
+                                                  KPI: {activity.kpi.name}
+                                                </span>
+                                                <span className="text-sm text-gray-600">
+                                                  Target: {activity.kpi.yearlyTargets[year] || activity.kpi.target}
+                                                </span>
                                               </div>
-                                              <div className="w-full bg-white rounded-full h-1.5 mt-1">
-                                                <div 
-                                                  className="bg-blue-500 h-1.5 rounded-full" 
-                                                  style={{ width: `${activity.kpi.progress}%` }}
-                                                />
+                                              <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                                <span>Progress</span>
+                                                <span>{activity.kpi.progress}%</span>
                                               </div>
+                                              <Progress value={activity.kpi.progress} className="h-1.5" />
                                             </div>
-                                          )}
+                                          </div>
+                                          
+                                          <div className="text-right ml-4">
+                                            <Badge className={`${getInitiativeStatusColor(activity.status)} mb-2`}>
+                                              {activity.status.replace("_", " ")}
+                                            </Badge>
+                                            <div className="text-center">
+                                              <p className={`text-lg font-bold ${
+                                                activity.completion >= 80 ? 'text-green-600' :
+                                                activity.completion >= 50 ? 'text-amber-600' :
+                                                'text-red-600'
+                                              }`}>
+                                                {activity.completion}%
+                                              </p>
+                                              <p className="text-xs text-gray-600">Complete</p>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
-                                    );
-                                  })}
+                                    ))
+                                  ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                      <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                      <p className="text-sm">No activities planned for this year</p>
+                                    </div>
+                                  )}
                                 </div>
-                              </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </ScrollArea>
                   </CardContent>

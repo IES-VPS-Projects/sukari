@@ -52,7 +52,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
               <img 
-                src="/images/ISEAGRILOGO.png" 
+                src="/images/ISEAGRILOGO3.png" 
                 alt="AFA Logo" 
                 className="h-16 w-auto"
               />

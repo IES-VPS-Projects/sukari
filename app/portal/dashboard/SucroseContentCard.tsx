@@ -69,30 +69,61 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
     const currentMonth = "Aug" // Current month
     const currentMonthItem = filteredData.find(d => d.month === currentMonth)
     
-    const dataKey = selectedMiller as keyof Pick<SucroseData, 'butali' | 'chemelil' | 'combined'>
-    const yearlyValues = filteredData.map(d => d[dataKey])
-    const yearlyAverage = yearlyValues.reduce((a, b) => a + b, 0) / yearlyValues.length
+    if (selectedMiller === "combined") {
+      // For combined view, calculate average of both mills
+      const butaliValues = filteredData.map(d => d.butali)
+      const chemelilValues = filteredData.map(d => d.chemelil)
+      const combinedValues = filteredData.map(d => (d.butali + d.chemelil) / 2)
+      
+      const yearlyAverage = combinedValues.reduce((a, b) => a + b, 0) / combinedValues.length
+      
+      // Find highest and lowest from combined values
+      let highest = { value: 0, month: "" }
+      let lowest = { value: 100, month: "" }
+      
+      filteredData.forEach(d => {
+        const value = (d.butali + d.chemelil) / 2
+        if (value > highest.value) {
+          highest = { value: Math.round(value * 100) / 100, month: d.month }
+        }
+        if (value < lowest.value) {
+          lowest = { value: Math.round(value * 100) / 100, month: d.month }
+        }
+      })
 
-    // Find highest and lowest
-    let highest = { value: 0, month: "" }
-    let lowest = { value: 100, month: "" }
-    
-    filteredData.forEach(d => {
-      const value = d[dataKey]
-      if (value > highest.value) {
-        highest = { value, month: d.month }
-      }
-      if (value < lowest.value) {
-        lowest = { value, month: d.month }
-      }
-    })
+      setCurrentMonthData({
+        average: currentMonthItem ? Math.round(((currentMonthItem.butali + currentMonthItem.chemelil) / 2) * 100) / 100 : 0,
+        yearlyAverage: Math.round(yearlyAverage * 100) / 100,
+        highest,
+        lowest
+      })
+    } else {
+      // For individual miller view
+      const dataKey = selectedMiller as keyof Pick<SucroseData, 'butali' | 'chemelil'>
+      const yearlyValues = filteredData.map(d => d[dataKey])
+      const yearlyAverage = yearlyValues.reduce((a, b) => a + b, 0) / yearlyValues.length
 
-    setCurrentMonthData({
-      average: currentMonthItem ? currentMonthItem[dataKey] : 0,
-      yearlyAverage: Math.round(yearlyAverage * 100) / 100,
-      highest,
-      lowest
-    })
+      // Find highest and lowest
+      let highest = { value: 0, month: "" }
+      let lowest = { value: 100, month: "" }
+      
+      filteredData.forEach(d => {
+        const value = d[dataKey]
+        if (value > highest.value) {
+          highest = { value, month: d.month }
+        }
+        if (value < lowest.value) {
+          lowest = { value, month: d.month }
+        }
+      })
+
+      setCurrentMonthData({
+        average: currentMonthItem ? currentMonthItem[dataKey] : 0,
+        yearlyAverage: Math.round(yearlyAverage * 100) / 100,
+        highest,
+        lowest
+      })
+    }
   }, [sucroseData, selectedMiller, selectedYear])
 
   const chartData = sucroseData.filter(d => d.year === parseInt(selectedYear))
@@ -114,7 +145,7 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
         <CardHeader className="pb-2 px-4 pt-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-bold text-[#202020]">
-              Sucrose Content
+              CTU Sucrose Content
             </CardTitle>
             <div className="flex gap-2">
               <Select value={selectedMiller} onValueChange={setSelectedMiller}>
@@ -169,47 +200,107 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
           {/* Enhanced Chart */}
           <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="sucroseGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: '#64748b' }}
-                  height={20}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 9, fill: '#64748b' }}
-                  width={25}
-                />
-                <Tooltip 
-                  formatter={(value: number) => [`${value}%`, selectedMiller === "combined" ? "Combined" : selectedMiller === "butali" ? "Butali" : "Chemelil"]}
-                  labelFormatter={(label) => `Month: ${label}`}
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey={selectedMiller === "butali" ? "butali" : selectedMiller === "chemelil" ? "chemelil" : "combined"}
-                  stroke="#10b981" 
-                  strokeWidth={2}
-                  fill="url(#sucroseGradient)"
-                  dot={{ fill: "#10b981", strokeWidth: 2, r: 2 }}
-                  activeDot={{ r: 4, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                />
-              </AreaChart>
+              {selectedMiller === "combined" ? (
+                // Stacked Area Chart for Combined view
+                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="butaliGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                    </linearGradient>
+                    <linearGradient id="chemelilGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.6}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    height={20}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    width={25}
+                  />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [
+                      `${value}%`, 
+                      name === "butali" ? "Butali" : "Chemelil"
+                    ]}
+                    labelFormatter={(label) => `Month: ${label}`}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="butali"
+                    stackId="1"
+                    stroke="#3b82f6" 
+                    strokeWidth={2}
+                    fill="url(#butaliGradient)"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="chemelil"
+                    stackId="1"
+                    stroke="#10b981" 
+                    strokeWidth={2}
+                    fill="url(#chemelilGradient)"
+                  />
+                </AreaChart>
+              ) : (
+                // Regular Area Chart for individual millers
+                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="singleSucroseGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.05}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    height={20}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    width={25}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value}%`, selectedMiller === "butali" ? "Butali" : "Chemelil"]}
+                    labelFormatter={(label) => `Month: ${label}`}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey={selectedMiller === "butali" ? "butali" : "chemelil"}
+                    stroke={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} 
+                    strokeWidth={2}
+                    fill="url(#singleSucroseGradient)"
+                    dot={{ fill: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, r: 2 }}
+                    activeDot={{ r: 4, stroke: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, fill: "white" }}
+                  />
+                </AreaChart>
+              )}
             </ResponsiveContainer>
           </div>
         </CardContent>
@@ -279,46 +370,117 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
             {/* Main Chart */}
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="sucroseModalGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.05}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis 
-                    dataKey="month" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                  />
-                  <YAxis 
-                    label={{ value: 'Sucrose Content (%)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#64748b' }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`${value}%`, selectedMiller === "combined" ? "Combined" : selectedMiller === "butali" ? "Butali" : "Chemelil"]}
-                    labelFormatter={(label) => `Month: ${label}`}
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey={getDataValue}
-                    stroke="#10b981" 
-                    strokeWidth={3}
-                    fill="url(#sucroseModalGradient)"
-                    dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2, fill: "white" }}
-                  />
-                </AreaChart>
+                {selectedMiller === "combined" ? (
+                  // Stacked Area Chart for Combined view
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="butaliModalGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                      </linearGradient>
+                      <linearGradient id="chemelilModalGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      label={{ 
+                        value: "Sucrose Content (%)", 
+                        angle: -90, 
+                        position: 'insideLeft',
+                        style: { textAnchor: 'middle' }
+                      }}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [
+                        `${value}%`, 
+                        name === "butali" ? "Butali" : "Chemelil"
+                      ]}
+                      labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="butali"
+                      stackId="1"
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      fill="url(#butaliModalGradient)"
+                      name="butali"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="chemelil"
+                      stackId="1"
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      fill="url(#chemelilModalGradient)"
+                      name="chemelil"
+                    />
+                  </AreaChart>
+                ) : (
+                  // Regular Area Chart for individual millers
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="singleSucroseModalGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.05}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      label={{ 
+                        value: 'Sucrose Content (%)', 
+                        angle: -90, 
+                        position: 'insideLeft', 
+                        style: { textAnchor: 'middle' } 
+                      }}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`${value}%`, selectedMiller === "butali" ? "Butali" : "Chemelil"]}
+                      labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey={selectedMiller === "butali" ? "butali" : "chemelil"}
+                      stroke={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} 
+                      strokeWidth={3}
+                      fill="url(#singleSucroseModalGradient)"
+                      dot={{ fill: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, fill: "white" }}
+                    />
+                  </AreaChart>
+                )}
               </ResponsiveContainer>
             </div>
           </div>

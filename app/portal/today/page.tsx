@@ -343,6 +343,7 @@ export default function TodayPage() {
   // Modal states for viewing all items
   const [viewAllAlertsOpen, setViewAllAlertsOpen] = useState(false)
   const [viewAllAIInsightsOpen, setViewAllAIInsightsOpen] = useState(false)
+  const [triggerNewActivity, setTriggerNewActivity] = useState(false)
   
   // State for detail views
   const [selectedAlertForDetails, setSelectedAlertForDetails] = useState<string | null>(null)
@@ -486,9 +487,6 @@ export default function TodayPage() {
                       Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.
                     </p>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => handleScheduleVisit("Mumias Sugar Mill")}>
-                    Action
-                  </Button>
                 </div>
 
                 <div 
@@ -505,9 +503,6 @@ export default function TodayPage() {
                     <p className="text-sm font-medium text-[#202020]">Policy Review Alert</p>
                     <p className="text-xs text-[#6B6B6B]">Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.</p>
                   </div>
-                  <Button size="sm" variant="outline">
-                    Action
-                  </Button>
                 </div>
 
                 <div 
@@ -524,9 +519,6 @@ export default function TodayPage() {
                     <p className="text-sm font-medium text-[#202020]">Weather Preparation Insight</p>
                     <p className="text-xs text-[#6B6B6B]">Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.</p>
                   </div>
-                  <Button size="sm" variant="outline">
-                    Action
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -546,7 +538,10 @@ export default function TodayPage() {
             <MeetingsCard />
 
             {/* Activities */}
-            <ActivitiesCard />
+            <ActivitiesCard 
+              triggerNewActivity={triggerNewActivity}
+              setTriggerNewActivity={setTriggerNewActivity}
+            />
 
             {/* Actions Card */}
             <ActionsCard 
@@ -680,6 +675,7 @@ export default function TodayPage() {
                             console.log('Take Action', alert.id)
                             setSelectedAlertForDetails(null)
                             setViewAllAlertsOpen(false)
+                            setTriggerNewActivity(true)
                           }}
                         >
                           Take Action
@@ -867,12 +863,13 @@ export default function TodayPage() {
                       <Button 
                         className="bg-green-600 hover:bg-green-700 text-white"
                         onClick={() => {
-                          console.log('Implement Suggestion', insight.id)
+                          console.log('Take Action', insight.id)
                           setSelectedAIInsightForDetails(null)
                           setViewAllAIInsightsOpen(false)
+                          setTriggerNewActivity(true)
                         }}
                       >
-                        Implement Suggestion
+                        Take Action
                       </Button>
                     </div>
                   </div>
@@ -934,18 +931,6 @@ export default function TodayPage() {
                                 <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
                               </div>
                             </div>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="ml-3 shrink-0"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                // Handle action scheduling logic here
-                                console.log('Schedule action for insight:', insight.id)
-                              }}
-                            >
-                              Action
-                            </Button>
                           </div>
                         </div>
                       </div>
