@@ -258,7 +258,7 @@ const kraData = [
     title: "Effective Regulation",
     description: "Create enabling legal frameworks, establish robust compliance systems, and strengthen quality assurance across the sugar industry",
     icon: Shield,
-    color: "blue",
+    color: "green",
     progress: 72,
     status: "on_track",
     targetDate: "End of plan (Y5 - 2029)",
@@ -1021,10 +1021,6 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                       <span className="font-medium">{objective.progress}%</span>
                                     </div>
                                     <Progress value={objective.progress} className="h-1.5" />
-                                    <div className="flex justify-between text-xs text-gray-500">
-                                      <span>Target: {objective.targetDate}</span>
-                                      <span>{objective.activities.length} activities</span>
-                                    </div>
                                   </div>
                                 </div>
                               </CardContent>
@@ -1054,15 +1050,17 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
               <TabsContent value="overview" className="h-[calc(100%-4rem)] overflow-hidden">
                 <Card className="h-full flex flex-col">
                   <CardHeader className="flex-shrink-0">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{selectedObjective.title}</CardTitle>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <CardTitle>{selectedObjective.title}</CardTitle>
+                          <Badge className={getStatusColor(selectedObjective.status)}>
+                            {getStatusIcon(selectedObjective.status)}
+                            <span className="ml-1">{selectedObjective.status.replace("_", " ")}</span>
+                          </Badge>
+                        </div>
                         <CardDescription className="mt-2">{selectedObjective.description}</CardDescription>
                       </div>
-                      <Badge className={getStatusColor(selectedObjective.status)}>
-                        {getStatusIcon(selectedObjective.status)}
-                        <span className="ml-1">{selectedObjective.status.replace("_", " ")}</span>
-                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 overflow-hidden">
@@ -1072,7 +1070,7 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                         <div className="p-4 bg-gray-50 rounded-lg border">
                           <h4 className="font-medium text-gray-800 mb-3">Strategic Progress Overview</h4>
                           <div className="grid grid-cols-3 gap-4">
-                            <div className="text-center p-3 bg-white rounded-lg border">
+                            <div className="text-center p-2 bg-white rounded-lg border">
                               <div className="flex items-center justify-center gap-2 mb-2">
                                 <Calendar className="h-4 w-4 text-gray-600" />
                                 <span className="text-sm font-medium text-gray-800">Year 2 (Current)</span>
@@ -1085,10 +1083,9 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                     return acc + Math.min(100, (currentVal / yearTargetVal) * 100);
                                   }, 0) / selectedObjective.activities.length) : 0}%
                               </p>
-                              <p className="text-xs text-gray-600">Average Y2 Target Achievement</p>
                             </div>
                             
-                            <div className="text-center p-3 bg-white rounded-lg border">
+                            <div className="text-center p-2 bg-white rounded-lg border">
                               <div className="flex items-center justify-center gap-2 mb-2">
                                 <TrendingUp className="h-4 w-4 text-gray-600" />
                                 <span className="text-sm font-medium text-gray-800">5-Year Plan</span>
@@ -1102,10 +1099,9 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                     return acc + ((currentVal - baselineVal) / (finalTargetVal - baselineVal)) * 100;
                                   }, 0) / selectedObjective.activities.length) : 0}%
                               </p>
-                              <p className="text-xs text-gray-600">5-Year Plan Progress</p>
                             </div>
                             
-                            <div className="text-center p-3 bg-white rounded-lg border">
+                            <div className="text-center p-2 bg-white rounded-lg border">
                               <div className="flex items-center justify-center gap-2 mb-2">
                                 <Target className="h-4 w-4 text-gray-600" />
                                 <span className="text-sm font-medium text-gray-800">Completion Rate</span>
@@ -1120,40 +1116,31 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                                     return fiveYearProgress >= 90;
                                   }).length}/${selectedObjective.activities.length}` : '0/0'}
                               </p>
-                              <p className="text-xs text-gray-600">KPIs On Track</p>
                             </div>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className={`p-4 rounded-lg border ${
-                            selectedObjective.progress >= 90 ? 'bg-green-50 border-green-200' :
-                            selectedObjective.progress >= 70 ? 'bg-amber-50 border-amber-200' :
-                            'bg-red-50 border-red-200'
-                          }`}>
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
-                              <TrendingUp className={`h-5 w-5 ${
-                                selectedObjective.progress >= 90 ? 'text-green-600' :
-                                selectedObjective.progress >= 70 ? 'text-amber-600' :
-                                'text-red-600'
-                              }`} />
+                              <TrendingUp className="h-5 w-5 text-black" />
                               <span className="font-medium">Overall Progress</span>
                             </div>
                             <p className={`text-2xl font-bold ${
-                              selectedObjective.progress >= 90 ? 'text-green-600' :
-                              selectedObjective.progress >= 70 ? 'text-amber-600' :
+                              selectedObjective.progress >= 80 ? 'text-green-600' :
+                              selectedObjective.progress >= 51 ? 'text-amber-600' :
                               'text-red-600'
                             }`}>{selectedObjective.progress}%</p>
                             <Progress value={selectedObjective.progress} className="mt-2" />
                           </div>
-                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
                               <Calendar className="h-5 w-5 text-gray-600" />
                               <span className="font-medium">Target Date</span>
                             </div>
                             <p className="text-lg font-bold text-gray-800">{selectedObjective.targetDate}</p>
                           </div>
-                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
                               <Users className="h-5 w-5 text-gray-600" />
                               <span className="font-medium">Activities</span>
