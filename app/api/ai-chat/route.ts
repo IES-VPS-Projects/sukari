@@ -4,14 +4,21 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
+    const requestBody: any = {
+      query: body.user_input || body.query
+    };
+
+    // Add session_id if provided
+    if (body.session_id) {
+      requestBody.session_id = body.session_id;
+    }
+    
     const response = await fetch('http://35.222.235.13:7402/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        query: body.user_input
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

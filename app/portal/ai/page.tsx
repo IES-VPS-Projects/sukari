@@ -1,66 +1,35 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { PortalLayout } from "@/components/portal-layout"
-import { AiOutlinePaperClip } from 'react-icons/ai'
-import { BiSend } from 'react-icons/bi'
-import {
-  Mic,
-  Plus,
-  Grid3X3,
-  FlaskRoundIcon as Flask,
-  ChevronDown,
-  MoreHorizontal,
-  Maximize2,
-  Cloud,
-  Headphones,
-  AlarmClock,
+import { useAuth } from "@/components/auth-provider"
+import { customAIService, ChatMessage, ChatSession } from "@/lib/custom-ai-service"
+import ReactMarkdown from 'react-markdown'
+import { 
+  PlusIcon, 
+  SearchIcon, 
+  MessageSquareIcon, 
+  BookOpenIcon,
+  MenuIcon,
+  ShareIcon,
+  MoreHorizontalIcon,
+  MicIcon,
+  PaperclipIcon,
+  ArrowUpIcon,
+  SparklesIcon,
   LayoutPanelLeft,
   Pencil,
-} from "lucide-react"
-import Image from "next/image"
-import { useAuth } from "@/components/auth-provider"
-import { customAIService, ChatMessage } from "@/lib/custom-ai-service";
-import ReactMarkdown from 'react-markdown';
-
-type ConversationGroup = {
-  date: string
-  conversations: string[]
-}
-
-// Make conversationHistory dynamic
-const initialHistory: ConversationGroup[] = [
-  {
-    date: "Friday, December 22",
-    conversations: [
-      "Sugar production analysis for Q4",
-      "Weather impact on cane harvest",
-      "Mill efficiency optimization",
-    ],
-  },
-  {
-    date: "Wednesday, December 20",
-    conversations: ["Compliance report generation", "Stakeholder satisfaction metrics", "Revenue performance review"],
-  },
-  {
-    date: "Monday, December 18",
-    conversations: ["Strategic planning discussion", "Regional mill performance", "Policy framework updates"],
-  },
-]
+  Trash2Icon,
+} from 'lucide-react'
 
 export default function AIInterfacePage() {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [message, setMessage] = useState("")
-  const [isListening, setIsListening] = useState(false)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [conversationHistory, setConversationHistory] = useState<ConversationGroup[]>(initialHistory)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isTyping, setIsTyping] = useState(false)
+  const [sessions, setSessions] = useState<ChatSession[]>([])
+  const [currentSession, setCurrentSession] = useState<ChatSession | null>(null)
   const [dynamicGreeting, setDynamicGreeting] = useState("")
-  const [conversation, setConversation] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showChatMode, setShowChatMode] = useState(false);
-  const [streamingText, setStreamingText] = useState("");
   const { user } = useAuth()
 
   // Array of dynamic greetings for AI impression
@@ -76,6 +45,12 @@ export default function AIInterfacePage() {
     return fullName.split(' ')[0]
   }
 
+  // Get user ID consistently
+  const getUserId = () => {
+    if (!user) return null;
+    return user.id || user.email || user.name;
+  }
+
   // Select a random greeting when the component mounts
   useEffect(() => {
     if (user) {
@@ -86,360 +61,410 @@ export default function AIInterfacePage() {
     }
   }, [user])
 
-  const handleSendMessage = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     if (message.trim()) {
-      setShowChatMode(true);
-      const userMsg: ChatMessage = { role: 'user', content: message };
-      setConversation(prev => [...prev, userMsg]);
-      setMessage("");
-      setLoading(true);
-      setStreamingText("");
-      
-      try {
-        const aiReply = await customAIService.generateResponse([...conversation, userMsg]);
-        setLoading(false);
+      // Create new session if none exists
+      if (!currentSession) {
+        const userId = getUserId();
+        if (!userId) return;
         
-        // Simulate streaming effect
-        let currentText = "";
-        const words = aiReply.split(" ");
-        for (let i = 0; i < words.length; i++) {
-          await new Promise(resolve => setTimeout(resolve, 50)); // Delay between words
-          currentText += (i > 0 ? " " : "") + words[i];
-          setStreamingText(currentText);
+        const newSession = customAIService.createNewSession(userId);
+        setCurrentSession(newSession);
+        customAIService.saveSession(newSession);
+        setSessions(customAIService.getSessions(userId));
+      }
+
+      const userMessage: ChatMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date()
+      }
+      
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages)
+      setMessage('')
+      setIsTyping(true)
+
+      try {
+        const aiReply = await customAIService.generateResponse(updatedMessages, currentSession?.id)
+        setIsTyping(false)
+        
+        const aiMessage: ChatMessage = {
+          role: 'assistant',
+          content: aiReply,
+          timestamp: new Date()
         }
         
-        // Add complete message to conversation
-        setConversation(prev => [...prev, { role: 'assistant', content: aiReply }]);
-        setStreamingText("");
+        const finalMessages = [...updatedMessages, aiMessage];
+        setMessages(finalMessages)
+        
+        // Update session with new messages
+        if (currentSession) {
+          const updatedSession = {
+            ...currentSession,
+            messages: finalMessages,
+            updatedAt: new Date()
+          };
+          
+          // Update session title based on first message
+          if (finalMessages.length === 2) {
+            customAIService.updateSessionTitle(updatedSession, userMessage.content);
+          }
+          
+          setCurrentSession(updatedSession);
+          customAIService.saveSession(updatedSession);
+          const userId = getUserId();
+          if (userId) {
+            setSessions(customAIService.getSessions(userId));
+          }
+        }
       } catch (err) {
-        setLoading(false);
-        setConversation(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not get a response from the AI.' }]);
+        setIsTyping(false)
+        const errorMessage: ChatMessage = {
+          role: 'assistant',
+          content: 'Sorry, I could not get a response from the AI.',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
       }
     }
   }
 
-  const handleAttachment = () => {
-    // TODO: Implement attachment functionality
-    console.log('Attachment functionality to be implemented');
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value)
+    
+    // Auto-resize textarea
+    const textarea = e.target
+    textarea.style.height = 'auto'
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`
   }
 
-  const handleVoiceOrSend = () => {
-    if (message.trim()) {
-      handleSendMessage();
-    } else {
-      handleVoiceInput();
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e as any)
     }
   }
 
-  const handleVoiceInput = () => {
-    setIsListening(!isListening)
-  }
-
-  const handleToggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed)
-  }
+  // Load sessions on component mount and when user changes
+  useEffect(() => {
+    const userId = getUserId();
+    if (userId) {
+      const savedSessions = customAIService.getSessions(userId);
+      setSessions(savedSessions);
+      setCurrentSession(null); // Reset current session when user changes
+      setMessages([]);
+    } else {
+      setSessions([]);
+      setCurrentSession(null);
+      setMessages([]);
+    }
+  }, [user]);
 
   const handleNewChat = () => {
-    setMessage("")
-    setShowChatMode(false)
-    setConversation([])
-    setStreamingText("")
-    setLoading(false)
-    setConversationHistory([
-      { date: new Date().toLocaleDateString(), conversations: [] },
-      ...conversationHistory
-    ])
+    const userId = getUserId();
+    if (!userId) return;
+    
+    const newSession = customAIService.createNewSession(userId);
+    setCurrentSession(newSession);
+    setMessages([]);
+    setMessage("");
+    setIsTyping(false);
+    
+    // Save the new session
+    customAIService.saveSession(newSession);
+    setSessions(customAIService.getSessions(userId));
+  }
+
+  const handleLoadSession = (sessionId: string) => {
+    const userId = getUserId();
+    if (!userId) return;
+    
+    const session = customAIService.getSession(sessionId, userId);
+    if (session) {
+      setCurrentSession(session);
+      setMessages(session.messages);
+      setMessage("");
+      setIsTyping(false);
+    }
+  }
+
+  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const userId = getUserId();
+    if (!userId) return;
+    
+    customAIService.deleteSession(sessionId, userId);
+    setSessions(customAIService.getSessions(userId));
+    
+    // If we're deleting the current session, start a new one
+    if (currentSession?.id === sessionId) {
+      handleNewChat();
+    }
   }
 
   const SidebarActions = () => (
-    <div className="flex items-center gap-2">
-      <Button variant="ghost" size="sm" onClick={handleToggleSidebar} className="text-green-600 hover:text-green-700 hover:bg-white hover:shadow-md hover:scale-105 transition-all duration-200">
-        <LayoutPanelLeft className="h-4 w-4" />
-      </Button>
-      <Button variant="ghost" size="sm" onClick={handleNewChat} className="text-green-600 hover:text-green-700 hover:bg-white hover:shadow-md hover:scale-105 transition-all duration-200">
-        <Pencil className="h-4 w-4" />
-      </Button>
+    <div className="flex flex-col gap-2">
+      {/* Toggle Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="flex items-center gap-3 w-full p-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+      >
+        <MenuIcon className="w-4 h-4" />
+        {sidebarOpen && "Menu"}
+      </button>
+      
+      {/* New Chat */}
+      <button
+        onClick={handleNewChat}
+        className="flex items-center gap-3 w-full p-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+      >
+        <PlusIcon className="w-4 h-4" />
+        {sidebarOpen && "New chat"}
+      </button>
     </div>
-  );
+  )
 
   return (
     <PortalLayout pageTitle="AI">
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-8rem)] bg-white">
-        {/* Left Sidebar */}
-        <aside className={`bg-green-50 border-r border-gray-200 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'lg:w-0 lg:overflow-hidden' : 'w-full lg:w-80'}`}>
+      <div className="flex h-[calc(100vh-8rem)] bg-white text-gray-800">
+        {/* Sidebar */}
+        <div className={`${sidebarOpen ? 'w-64' : 'w-12'} transition-all duration-300 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden`}>
           {/* Sidebar Header */}
-          <div className={`p-4 border-b border-gray-200 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-1">
-                <span className="text-2xl">✨</span>
-                <h2 className="text-xl font-semibold text-green-700">AI</h2>
-              </div>
-              <SidebarActions />
+          <div className="p-3 flex flex-col gap-2">
+            <SidebarActions />
+          </div>
+
+          {/* Search */}
+          <div className="px-3 pb-3">
+            <div className="flex items-center gap-3 w-full p-2 text-sm text-gray-700">
+              <SearchIcon className="w-4 h-4" />
+              {sidebarOpen && "Search chats"}
             </div>
+          </div>
+
+          {/* Library */}
+          <div className="px-3 pb-3">
+            <div className="flex items-center gap-3 w-full p-2 text-sm text-gray-700">
+              <BookOpenIcon className="w-4 h-4" />
+              {sidebarOpen && "Library"}
+            </div>
+          </div>
+
+          {/* Chats Section */}
+          {sidebarOpen && (
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-3">
+                <div className="text-xs font-medium text-gray-500 mb-2 px-2">Chats</div>
+                {sessions.map((session) => (
+                  <div key={session.id} className="mb-2">
+                    <button
+                      onClick={() => handleLoadSession(session.id)}
+                      className={`w-full text-left p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors mb-1 flex items-center justify-between group ${
+                        currentSession?.id === session.id ? 'bg-gray-200' : ''
+                      }`}
+                    >
+                      <div className="truncate flex-1">{session.title}</div>
+                      <button
+                        onClick={(e) => handleDeleteSession(session.id, e)}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all"
+                      >
+                        <Trash2Icon className="w-3 h-3 text-gray-500" />
+                      </button>
+                    </button>
+                    <div className="text-xs text-gray-400 px-2 mb-1">
+                      {session.updatedAt.toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+                {sessions.length === 0 && (
+                  <div className="text-xs text-gray-400 px-2 py-4 text-center">
+                    No previous chats
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+
         </div>
 
-        {/* Conversation History */}
-        <div className={`flex-1 overflow-y-auto scrollbar-hide p-4 transition-opacity duration-300 ${isSidebarCollapsed ? 'lg:opacity-0' : 'opacity-100'}`}>
-          <h3 className="text-lg font-medium text-green-700 mb-4">Conversations</h3>
-          <div className="space-y-6">
-            {conversationHistory.map((group: ConversationGroup, groupIndex: number) => (
-              <div key={groupIndex}>
-                <h4 className="text-sm font-medium text-green-600 mb-3">{group.date}</h4>
-                <div className="space-y-2">
-                  {group.conversations.map((conversation: string, index: number) => (
-                    <button
-                      key={index}
-                      className="w-full text-left p-2 text-sm text-gray-500 hover:bg-white hover:shadow-md hover:scale-105 transition-all duration-200"
-                    >
-                      {conversation}
-                    </button>
-                  ))}
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          {/* Chat Area */}
+          <div className="flex-1 overflow-y-auto">
+            {messages.length === 0 ? (
+              // Initial State
+              <div className="flex flex-col items-center justify-center h-full px-4">
+                <div className="text-center mb-8">
+                  <h1 className="text-2xl font-medium text-gray-800 mb-8">
+                    {dynamicGreeting || "Hey, ready to dive in?"}
+                  </h1>
+                </div>
+                
+                {/* Centered Input Box */}
+                <div className="w-full max-w-2xl">
+                  <form onSubmit={handleSubmit} className="relative">
+                    <div className="flex items-end gap-2 bg-white border border-gray-300 rounded-2xl p-3 focus-within:border-gray-400 transition-colors shadow-sm">
+                      <button 
+                        type="button"
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <PlusIcon className="w-5 h-5" />
+                      </button>
+                      
+                      <textarea
+                        value={message}
+                        onChange={handleTextareaChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Ask anything about sugar production, mills, or agriculture..."
+                        className="flex-1 resize-none border-0 bg-transparent focus:outline-none min-h-[24px] max-h-32 py-1 text-gray-900 placeholder-gray-500"
+                        rows={1}
+                      />
+                      
+                      <div className="flex items-center gap-2">
+                        <button 
+                          type="button"
+                          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <MicIcon className="w-5 h-5" />
+                        </button>
+                        
+                        <button 
+                          type="button"
+                          className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                  
+                  <div className="text-center mt-2">
+                    <p className="text-xs text-gray-500">
+                      AI can make mistakes. Check important info.
+                    </p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col">
-        {showChatMode ? (
-          // Chat Mode Layout
-          <>
-            {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {conversation.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`rounded-2xl px-4 py-3 max-w-[80%] ${
-                    msg.role === 'user' 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-gray-100 text-gray-900'
-                  }`}>
+            ) : (
+              // Chat Messages
+              <div className="max-w-3xl mx-auto px-4 py-8">
+                {messages.map((msg, index) => (
+                  <div key={index} className="mb-8">
                     {msg.role === 'user' ? (
-                      msg.content
+                      // User Message - Right aligned without avatar
+                      <div className="flex justify-end">
+                        <div className="bg-gray-100 rounded-2xl p-4 ml-12">
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            {msg.content}
+                          </p>
+                        </div>
+                      </div>
                     ) : (
-                      <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown 
-                          components={{
-                            p: ({children}) => <p className="mb-2 last:mb-0">{children}</p>,
-                            h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                            h2: ({children}) => <h2 className="text-base font-bold mb-2">{children}</h2>,
-                            h3: ({children}) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
-                            ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                            ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                            li: ({children}) => <li className="text-sm">{children}</li>,
-                            strong: ({children}) => <strong className="font-semibold">{children}</strong>,
-                            em: ({children}) => <em className="italic">{children}</em>,
-                            code: ({children}) => <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                            pre: ({children}) => <pre className="bg-gray-200 p-2 rounded text-xs font-mono overflow-x-auto mb-2">{children}</pre>,
-                            blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2">{children}</blockquote>,
-                          }}
-                        >
-                          {msg.content}
-                        </ReactMarkdown>
+                      // AI Response - Left aligned, no avatar
+                      <div className="flex-1">
+                        <div className="prose prose-sm max-w-none">
+                          <ReactMarkdown 
+                            components={{
+                              p: ({children}) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                              h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                              h2: ({children}) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                              h3: ({children}) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                              ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                              ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                              li: ({children}) => <li className="text-sm leading-relaxed">{children}</li>,
+                              strong: ({children}) => <strong className="font-semibold">{children}</strong>,
+                              em: ({children}) => <em className="italic">{children}</em>,
+                              code: ({children}) => <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                              pre: ({children}) => <pre className="bg-gray-200 p-2 rounded text-xs font-mono overflow-x-auto mb-2">{children}</pre>,
+                              blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2">{children}</blockquote>,
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
-              ))}
-              
-              {/* Loading or Streaming Indicator */}
-              {(loading || streamingText) && (
-                <div className="flex justify-start">
-                  <div className="rounded-2xl px-4 py-3 bg-gray-100 text-gray-900 max-w-[80%]">
-                    {loading && !streamingText && (
-                      <div className="flex items-center space-x-2">
+                ))}
+                
+                {/* Typing Indicator */}
+                {isTyping && (
+                  <div className="mb-8">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1">
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                        <span className="text-sm text-gray-500">AI is typing...</span>
                       </div>
-                    )}
-                    {streamingText && (
-                      <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown 
-                          components={{
-                            p: ({children}) => <p className="mb-2 last:mb-0">{children}</p>,
-                            h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                            h2: ({children}) => <h2 className="text-base font-bold mb-2">{children}</h2>,
-                            h3: ({children}) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
-                            ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                            ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                            li: ({children}) => <li className="text-sm">{children}</li>,
-                            strong: ({children}) => <strong className="font-semibold">{children}</strong>,
-                            em: ({children}) => <em className="italic">{children}</em>,
-                            code: ({children}) => <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                            pre: ({children}) => <pre className="bg-gray-200 p-2 rounded text-xs font-mono overflow-x-auto mb-2">{children}</pre>,
-                            blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-2">{children}</blockquote>,
-                          }}
-                        >
-                          {streamingText}
-                        </ReactMarkdown>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Fixed Bottom Message Input */}
-            <div className="border-t bg-white p-4">
-              <form 
-                className="flex items-center gap-3 max-w-4xl mx-auto"
-                onSubmit={e => { e.preventDefault(); handleSendMessage(); }}
-              >
-                <div className="flex-1 relative">
-                  <Input
-                    placeholder="Message AI"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="w-full h-12 px-4 rounded-full border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none text-[#202020] placeholder:text-[#6B6B6B]"
-                  />
-                </div>
-                <Button 
-                  type="button"
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleAttachment}
-                  className="h-10 w-10 rounded-full text-green-600 hover:text-green-700 hover:bg-white hover:shadow-md hover:scale-105 transition-all duration-200"
-                  aria-label="Attach file"
-                >
-                  <AiOutlinePaperClip className="h-5 w-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleVoiceOrSend}
-                  className={`h-10 w-10 rounded-full hover:shadow-md hover:scale-105 transition-all duration-200 ${isListening ? "bg-red-50 text-red-600 hover:bg-white" : "text-green-600 hover:text-green-700 hover:bg-white"}`}
-                >
-                  {message.trim() ? <BiSend className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                </Button>
-              </form>
-            </div>
-          </>
-        ) : (
-          // Initial Welcome Mode Layout
-          <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto p-8">
-            <div className="max-w-4xl w-full">
-              {/* Greeting Header */}
-              <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">
-                {dynamicGreeting || "Great to see you"}
-              </h1>
+                )}
+              </div>
+            )}
+          </div>
 
-              {/* Floating Message Input Bar */}
-              <form 
-                className="flex items-center gap-4 bg-green-100 p-3 rounded-full shadow-lg mb-6"
-                onSubmit={e => { e.preventDefault(); handleSendMessage(); }}
-              >
-                <div className="flex-1 relative bg-white rounded-full">
-                  <Input
-                    placeholder="Message AI"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="w-full h-12 px-4 rounded-full border-none focus:border-none focus:ring-0 focus:outline-none outline-none text-[#202020] placeholder:text-[#6B6B6B] bg-transparent"
-                  />
+          {/* Input Area - Only show when there are messages */}
+          {messages.length > 0 && (
+            <div className="border-t border-gray-200 p-4">
+              <div className="max-w-3xl mx-auto">
+                <form onSubmit={handleSubmit} className="relative">
+                  <div className="flex items-end gap-2 bg-white border border-gray-300 rounded-2xl p-3 focus-within:border-gray-400 transition-colors">
+                    <button 
+                      type="button"
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <PaperclipIcon className="w-5 h-5" />
+                    </button>
+                    
+                    <textarea
+                      value={message}
+                      onChange={handleTextareaChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Ask anything about sugar production, mills, or agriculture..."
+                      className="flex-1 resize-none border-0 bg-transparent focus:outline-none min-h-[24px] max-h-32 py-1 text-gray-900 placeholder-gray-500"
+                      rows={1}
+                    />
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        type="button"
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <MicIcon className="w-5 h-5" />
+                      </button>
+                      
+                      <button 
+                        type="submit"
+                        className={`p-2 rounded-lg transition-colors ${
+                          message.trim() 
+                            ? 'bg-black text-white hover:bg-gray-800' 
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                        disabled={!message.trim()}
+                      >
+                        <ArrowUpIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                
+                <div className="text-center mt-2">
+                  <p className="text-xs text-gray-500">
+                    AI can make mistakes. Check important info.
+                  </p>
                 </div>
-                <Button 
-                  type="button"
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleAttachment}
-                  className="h-10 w-10 rounded-full text-green-600 hover:text-green-700 hover:bg-white hover:shadow-md hover:scale-105 transition-all duration-200"
-                  aria-label="Attach file"
-                >
-                  <AiOutlinePaperClip className="h-5 w-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleVoiceOrSend}
-                  className={`h-10 w-10 rounded-full hover:shadow-md hover:scale-105 transition-all duration-200 ${isListening ? "bg-red-50 text-red-600 hover:bg-white" : "text-green-600 hover:text-green-700 hover:bg-white"}`}
-                >
-                  {message.trim() ? <BiSend className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                </Button>
-              </form>
-
-              {/* AI Suggestions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Show national sugar production for 2024"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Show national sugar production for 2024
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Compare sugar production by region for last year"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Compare sugar production by region for last year
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Which factory had the highest production this month?"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Which factory had the highest production this month?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("What is the average crop yield by region?"); setTimeout(handleSendMessage, 100); }}
-                >
-                  What is the average crop yield by region?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("List all factories and their production for June"); setTimeout(handleSendMessage, 100); }}
-                >
-                  List all factories and their production for June
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("What was the total cane deliveries in Nzoia in March?"); setTimeout(handleSendMessage, 100); }}
-                >
-                  What was the total cane deliveries in Nzoia in March?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Show production value by variety"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Show production value by variety
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Which regions had the lowest production last quarter?"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Which regions had the lowest production last quarter?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 text-left justify-start rounded-xl border-gray-200 hover:bg-green-100 active:bg-green-100 text-[#6B6B6B] hover:text-[#202020] whitespace-normal hover:shadow-md hover:scale-105 transition-all duration-200"
-                  onClick={() => { setMessage("Give me a summary of sugar prices over the years"); setTimeout(handleSendMessage, 100); }}
-                >
-                  Give me a summary of sugar prices over the years
-                </Button>
               </div>
             </div>
-          </div>
-        )}
-      </main>
-
-      {isSidebarCollapsed && (
-        <div className="fixed top-[80px] left-0 z-10 p-2">
-          <SidebarActions />
+          )}
         </div>
-      )}
-    </div>
+      </div>
     </PortalLayout>
   )
 }
