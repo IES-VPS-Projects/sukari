@@ -25,6 +25,7 @@ import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Ma
 import ViewPlanCard from "./ViewPlanCard"
 import SucroseContentCard from "./SucroseContentCard"
 import ProductionPulseCard from "./ProductionPulseCard"
+import { loadChartData, SucroseDataPoint, ProductionDataPoint } from "@/lib/csv-data-service"
 
 // Custom Gauge Meter Component
 const GaugeMeter = ({ value, size = 120 }: { value: number; size?: number }) => {
@@ -242,6 +243,27 @@ const stakeholders = [
 
 export default function DashboardPage() {
   const [selectedMetric, setSelectedMetric] = useState("Production")
+  const [sucroseData, setSucroseData] = useState<SucroseDataPoint[]>([])
+  const [productionData, setProductionData] = useState<ProductionDataPoint[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load CSV data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true)
+        const { sucroseData, productionData } = await loadChartData()
+        setSucroseData(sucroseData)
+        setProductionData(productionData)
+      } catch (error) {
+        console.error('Error loading chart data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadData()
+  }, [])
 
   return (
     <PortalLayout pageTitle="Dashboard">
@@ -378,10 +400,28 @@ export default function DashboardPage() {
       {/* Production Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 my-8">
         {/* Sucrose Content Card */}
-        <SucroseContentCard />
+        {isLoading ? (
+          <Card className="rounded-[20px] shadow-lg border-0 bg-white h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-gray-600">Loading sucrose content data...</p>
+            </div>
+          </Card>
+        ) : (
+          <SucroseContentCard sucroseData={sucroseData} />
+        )}
 
         {/* Production Pulse Card */}
-        <ProductionPulseCard />
+        {isLoading ? (
+          <Card className="rounded-[20px] shadow-lg border-0 bg-white h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              <p className="text-gray-600">Loading production data...</p>
+            </div>
+          </Card>
+        ) : (
+          <ProductionPulseCard productionData={productionData} />
+        )}
       </div>
 
     </div>

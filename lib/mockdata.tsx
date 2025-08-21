@@ -95,6 +95,7 @@ export interface AIInsightItem {
   category: string;
   confidence: string;
   impact: string;
+  priority: string;
   iconColor: string;
   iconBg: string;
   hoverBg: string;
@@ -422,37 +423,40 @@ export const todayPageData = {
   allAIInsightsData: [
     {
       id: 'insight-1',
-      title: 'Regional Visit',
+      title: 'Productivity',
       description: 'Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.',
       timestamp: '2 hours ago',
       category: 'travel',
       confidence: 'high',
       impact: 'high',
+      priority: 'high',
       iconColor: 'text-blue-600',
       iconBg: 'bg-blue-100',
       hoverBg: 'hover:bg-blue-50'
     },
     {
       id: 'insight-2',
-      title: 'Policy Review Alert',
+      title: 'Compliance',
       description: 'Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.',
       timestamp: '4 hours ago',
       category: 'governance',
       confidence: 'high',
       impact: 'high',
+      priority: 'high',
       iconColor: 'text-yellow-600',
       iconBg: 'bg-yellow-100',
       hoverBg: 'hover:bg-yellow-50'
     },
     {
       id: 'insight-3',
-      title: 'Weather Preparation Insight',
+      title: 'Weather',
       description: 'Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.',
       timestamp: '6 hours ago',
       category: 'environmental',
-      confidence: 'medium',
+      confidence: 'high',
       impact: 'medium',
-      iconColor: 'text-green-600',
+      priority: 'medium',
+      iconColor: 'text-green-400',
       iconBg: 'bg-green-100',
       hoverBg: 'hover:bg-green-50'
     },
@@ -464,6 +468,7 @@ export const todayPageData = {
       category: 'forecast',
       confidence: 'medium',
       impact: 'high',
+      priority: 'high',
       iconColor: 'text-purple-600',
       iconBg: 'bg-purple-100',
       hoverBg: 'hover:bg-purple-50'
@@ -476,6 +481,7 @@ export const todayPageData = {
       category: 'growth',
       confidence: 'high',
       impact: 'high',
+      priority: 'medium',
       iconColor: 'text-blue-800',
       iconBg: 'bg-blue-200',
       hoverBg: 'hover:bg-blue-100'
@@ -488,6 +494,7 @@ export const todayPageData = {
       category: 'fiscal',
       confidence: 'high',
       impact: 'high',
+      priority: 'high',
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
       hoverBg: 'hover:bg-orange-50'
@@ -500,9 +507,49 @@ export const todayPageData = {
       category: 'compliance',
       confidence: 'high',
       impact: 'high',
+      priority: 'high',
       iconColor: 'text-red-600',
       iconBg: 'bg-red-100',
       hoverBg: 'hover:bg-red-50'
+    },
+    {
+      id: 'insight-8',
+      title: 'Stakeholder Engagement Update',
+      description: 'Community Relations: 85% satisfaction rate in Western Kenya – Maintain outreach programs and expand to Nyanza region.',
+      timestamp: '2 days ago',
+      category: 'inclusivity',
+      confidence: 'high',
+      impact: 'medium',
+      priority: 'low',
+      iconColor: 'text-teal-600',
+      iconBg: 'bg-teal-100',
+      hoverBg: 'hover:bg-teal-50'
+    },
+    {
+      id: 'insight-9',
+      title: 'Sustainability Metric',
+      description: 'Carbon Footprint: 22% reduction achieved this quarter – On track for 2025 sustainability goals. Continue current initiatives.',
+      timestamp: '2 days ago',
+      category: 'sustainability',
+      confidence: 'high',
+      impact: 'medium',
+      priority: 'low',
+      iconColor: 'text-green-800',
+      iconBg: 'bg-green-200',
+      hoverBg: 'hover:bg-green-100'
+    },
+    {
+      id: 'insight-10',
+      title: 'Market Trend Analysis',
+      description: 'Global Sugar Prices: 18% increase expected in Q4 – Strategic positioning for export markets recommended.',
+      timestamp: '3 days ago',
+      category: 'market intelligence',
+      confidence: 'medium',
+      impact: 'high',
+      priority: 'medium',
+      iconColor: 'text-indigo-600',
+      iconBg: 'bg-indigo-100',
+      hoverBg: 'hover:bg-indigo-50'
     }
   ] as AIInsightItem[],
 

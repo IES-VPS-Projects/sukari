@@ -12,54 +12,29 @@ interface SucroseData {
   year: number
   butali: number
   chemelil: number
+  muhoroni: number
+  kibos: number
+  westKenya: number
+  nzoia: number
+  kwale: number
   combined: number
 }
 
 interface SucroseContentCardProps {
   className?: string
+  sucroseData: SucroseData[]
 }
 
-const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
+const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedMiller, setSelectedMiller] = useState("combined")
   const [selectedYear, setSelectedYear] = useState("2024")
-  const [sucroseData, setSucroseData] = useState<SucroseData[]>([])
   const [currentMonthData, setCurrentMonthData] = useState({
     average: 0,
     yearlyAverage: 0,
     highest: { value: 0, month: "" },
     lowest: { value: 0, month: "" }
   })
-
-  // Mock data generation based on CSV structure
-  useEffect(() => {
-    const generateMockData = () => {
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      const years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
-      const data: SucroseData[] = []
-
-      years.forEach(year => {
-        months.forEach(month => {
-          // Generate realistic sucrose content based on typical sugar mill data
-          const butaliSucrose = 12 + Math.random() * 6 // 12-18% range
-          const chemelilSucrose = 11 + Math.random() * 7 // 11-18% range
-          const combined = (butaliSucrose + chemelilSucrose) / 2
-
-          data.push({
-            month,
-            year,
-            butali: Math.round(butaliSucrose * 100) / 100,
-            chemelil: Math.round(chemelilSucrose * 100) / 100,
-            combined: Math.round(combined * 100) / 100
-          })
-        })
-      })
-
-      setSucroseData(data)
-    }
-
-    generateMockData()
-  }, [])
 
   // Calculate current month stats
   useEffect(() => {
@@ -70,11 +45,8 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
     const currentMonthItem = filteredData.find(d => d.month === currentMonth)
     
     if (selectedMiller === "combined") {
-      // For combined view, calculate average of both mills
-      const butaliValues = filteredData.map(d => d.butali)
-      const chemelilValues = filteredData.map(d => d.chemelil)
-      const combinedValues = filteredData.map(d => (d.butali + d.chemelil) / 2)
-      
+      // For combined view, use the combined field
+      const combinedValues = filteredData.map(d => d.combined)
       const yearlyAverage = combinedValues.reduce((a, b) => a + b, 0) / combinedValues.length
       
       // Find highest and lowest from combined values
@@ -82,24 +54,23 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
       let lowest = { value: 100, month: "" }
       
       filteredData.forEach(d => {
-        const value = (d.butali + d.chemelil) / 2
-        if (value > highest.value) {
-          highest = { value: Math.round(value * 100) / 100, month: d.month }
+        if (d.combined > highest.value) {
+          highest = { value: Math.round(d.combined * 100) / 100, month: d.month }
         }
-        if (value < lowest.value) {
-          lowest = { value: Math.round(value * 100) / 100, month: d.month }
+        if (d.combined < lowest.value) {
+          lowest = { value: Math.round(d.combined * 100) / 100, month: d.month }
         }
       })
 
       setCurrentMonthData({
-        average: currentMonthItem ? Math.round(((currentMonthItem.butali + currentMonthItem.chemelil) / 2) * 100) / 100 : 0,
+        average: currentMonthItem ? Math.round(currentMonthItem.combined * 100) / 100 : 0,
         yearlyAverage: Math.round(yearlyAverage * 100) / 100,
         highest,
         lowest
       })
     } else {
-      // For individual miller view
-      const dataKey = selectedMiller as keyof Pick<SucroseData, 'butali' | 'chemelil'>
+      // For individual factory view
+      const dataKey = selectedMiller as keyof Pick<SucroseData, 'butali' | 'chemelil' | 'muhoroni' | 'kibos' | 'westKenya' | 'nzoia' | 'kwale'>
       const yearlyValues = filteredData.map(d => d[dataKey])
       const yearlyAverage = yearlyValues.reduce((a, b) => a + b, 0) / yearlyValues.length
 
@@ -132,6 +103,11 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
     switch (selectedMiller) {
       case "butali": return item.butali
       case "chemelil": return item.chemelil
+      case "muhoroni": return item.muhoroni
+      case "kibos": return item.kibos
+      case "westKenya": return item.westKenya
+      case "nzoia": return item.nzoia
+      case "kwale": return item.kwale
       default: return item.combined
     }
   }
@@ -144,7 +120,7 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
       >
         <CardHeader className="pb-2 px-4 pt-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-[#202020]">
+            <CardTitle className="text-2xl font-bold text-[#202020]">
               CTU Sucrose Content
             </CardTitle>
             <div className="flex gap-2">
@@ -156,6 +132,11 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
                   <SelectItem value="combined">Combined</SelectItem>
                   <SelectItem value="butali">Butali</SelectItem>
                   <SelectItem value="chemelil">Chemelil</SelectItem>
+                  <SelectItem value="muhoroni">Muhoroni</SelectItem>
+                  <SelectItem value="kibos">Kibos</SelectItem>
+                  <SelectItem value="westKenya">West Kenya</SelectItem>
+                  <SelectItem value="nzoia">Nzoia</SelectItem>
+                  <SelectItem value="kwale">Kwale</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -180,19 +161,19 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
           {/* Stats moved above chart */}
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-blue-600">{currentMonthData.average}%</div>
+              <div className="text-lg font-bold text-blue-600">{(Math.round(currentMonthData.average * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Current Month</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-green-600">{currentMonthData.yearlyAverage}%</div>
+              <div className="text-lg font-bold text-green-600">{(Math.round(currentMonthData.yearlyAverage * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Yearly Average</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-orange-600">{currentMonthData.highest.value}%</div>
+              <div className="text-lg font-bold text-orange-600">{(Math.round(currentMonthData.highest.value * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Highest ({currentMonthData.highest.month})</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-red-600">{currentMonthData.lowest.value}%</div>
+              <div className="text-lg font-bold text-red-600">{(Math.round(currentMonthData.lowest.value * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Lowest ({currentMonthData.lowest.month})</p>
             </div>
           </div>
@@ -350,19 +331,19 @@ const SucroseContentCard = ({ className }: SucroseContentCardProps) => {
             {/* Stats moved above chart */}
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-blue-600">{currentMonthData.average}%</div>
+                <div className="text-2xl font-bold text-blue-600">{(Math.round(currentMonthData.average * 100) / 100)}%</div>
                 <p className="text-sm text-[#6B6B6B]">Current Month</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-green-600">{currentMonthData.yearlyAverage}%</div>
+                <div className="text-2xl font-bold text-green-600">{(Math.round(currentMonthData.yearlyAverage * 100) / 100)}%</div>
                 <p className="text-sm text-[#6B6B6B]">Yearly Average</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-orange-600">{currentMonthData.highest.value}%</div>
+                <div className="text-2xl font-bold text-orange-600">{(Math.round(currentMonthData.highest.value * 100) / 100)}%</div>
                 <p className="text-sm text-[#6B6B6B]">Highest ({currentMonthData.highest.month})</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-red-600">{currentMonthData.lowest.value}%</div>
+                <div className="text-2xl font-bold text-red-600">{(Math.round(currentMonthData.lowest.value * 100) / 100)}%</div>
                 <p className="text-sm text-[#6B6B6B]">Lowest ({currentMonthData.lowest.month})</p>
               </div>
             </div>

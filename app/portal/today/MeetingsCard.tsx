@@ -4,15 +4,11 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Calendar,
   MessageSquare,
   FileText,
   Users,
-  ChevronDown,
   ArrowLeft,
   Clock,
   MapPin,
@@ -21,6 +17,7 @@ import {
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
 import { allMeetingsData } from "@/lib/mockdata"
+import { ScheduleMeetingModal } from "@/components/modals/schedule-meeting-modal"
 
 interface MeetingsCardProps {
   className?: string
@@ -29,44 +26,8 @@ interface MeetingsCardProps {
 const MeetingsCard = ({ className }: MeetingsCardProps) => {
   // Modal states
   const [newMeetingOpen, setNewMeetingOpen] = useState(false)
-  const [meetingDropdownOpen, setMeetingDropdownOpen] = useState(false)
   const [viewAllMeetingsOpen, setViewAllMeetingsOpen] = useState(false)
   const [selectedMeetingForDetails, setSelectedMeetingForDetails] = useState<string | null>(null)
-
-  // Form state
-  const [meetingForm, setMeetingForm] = useState({
-    title: '',
-    datetime: '',
-    location: '',
-    attendees: '',
-    description: ''
-  })
-
-  // Handle clicking outside to close dropdowns
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (meetingDropdownOpen) {
-        setMeetingDropdownOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [meetingDropdownOpen])
-
-  const handleCreateMeeting = () => {
-    console.log('Creating meeting:', meetingForm)
-    setMeetingForm({
-      title: '',
-      datetime: '',
-      location: '',
-      attendees: '',
-      description: ''
-    })
-    setNewMeetingOpen(false)
-  }
 
   return (
     <>
@@ -77,106 +38,14 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
               setSelectedMeetingForDetails(null)
               setViewAllMeetingsOpen(true)
             }}>Meetings</CardTitle>
-            <div className="relative">
-              <div className="flex">
-                <Button 
-                  size="sm" 
-                  className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
-                  onClick={() => setNewMeetingOpen(true)}
-                >
-                  <LuSquarePen className="h-4 w-4" />
-                  New
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
-                  onClick={() => setMeetingDropdownOpen(!meetingDropdownOpen)}
-                >
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </div>
-              
-              {/* Dropdown Menu */}
-              {meetingDropdownOpen && (
-                <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
-                  <div className="py-1">
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Event</div>
-                    <button
-                      onClick={() => {
-                        setMeetingForm({...meetingForm, title: 'General Meeting'})
-                        setNewMeetingOpen(true)
-                        setMeetingDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Event
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMeetingForm({...meetingForm, title: 'Channel Meeting'})
-                        setNewMeetingOpen(true)
-                        setMeetingDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      Channel meeting
-                    </button>
-                    
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-t">Organisation templates</div>
-                    <button
-                      onClick={() => {
-                        setMeetingForm({...meetingForm, title: 'Webinar Session'})
-                        setNewMeetingOpen(true)
-                        setMeetingDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Webinar
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMeetingForm({...meetingForm, title: 'Town Hall Meeting'})
-                        setNewMeetingOpen(true)
-                        setMeetingDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <Users className="h-4 w-4" />
-                      Town hall
-                    </button>
-                    
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b border-t">Class</div>
-                    <button
-                      onClick={() => {
-                        setMeetingForm({...meetingForm, title: 'Lecture Session'})
-                        setNewMeetingOpen(true)
-                        setMeetingDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <FileText className="h-4 w-4" />
-                      Lecture
-                    </button>
-                    
-                    <div className="border-t">
-                      <button
-                        onClick={() => {
-                          setNewMeetingOpen(true)
-                          setMeetingDropdownOpen(false)
-                        }}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                      >
-                        <FileText className="h-4 w-4" />
-                        View all templates
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Button 
+              size="sm" 
+              className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
+              onClick={() => setNewMeetingOpen(true)}
+            >
+              <LuSquarePen className="h-4 w-4" />
+              New
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-2 p-4">
@@ -223,69 +92,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
       </Card>
 
       {/* New Meeting Modal */}
-      <Dialog open={newMeetingOpen} onOpenChange={setNewMeetingOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Schedule New Meeting</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="meeting-title">Meeting Title</Label>
-              <Input
-                id="meeting-title"
-                value={meetingForm.title}
-                onChange={(e) => setMeetingForm({...meetingForm, title: e.target.value})}
-                placeholder="Enter meeting title"
-              />
-            </div>
-            <div>
-              <Label htmlFor="meeting-datetime">Date & Time</Label>
-              <Input
-                id="meeting-datetime"
-                type="datetime-local"
-                value={meetingForm.datetime}
-                onChange={(e) => setMeetingForm({...meetingForm, datetime: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="meeting-location">Location</Label>
-              <Input
-                id="meeting-location"
-                value={meetingForm.location}
-                onChange={(e) => setMeetingForm({...meetingForm, location: e.target.value})}
-                placeholder="Enter location or meeting link"
-              />
-            </div>
-            <div>
-              <Label htmlFor="meeting-attendees">Attendees</Label>
-              <Input
-                id="meeting-attendees"
-                value={meetingForm.attendees}
-                onChange={(e) => setMeetingForm({...meetingForm, attendees: e.target.value})}
-                placeholder="Enter attendee emails (comma separated)"
-              />
-            </div>
-            <div>
-              <Label htmlFor="meeting-description">Description</Label>
-              <Textarea
-                id="meeting-description"
-                value={meetingForm.description}
-                onChange={(e) => setMeetingForm({...meetingForm, description: e.target.value})}
-                placeholder="Enter meeting description or agenda"
-                rows={3}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setNewMeetingOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreateMeeting}>
-                Schedule Meeting
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ScheduleMeetingModal open={newMeetingOpen} onOpenChange={setNewMeetingOpen} />
 
       {/* Meetings Modal */}
       <Dialog open={viewAllMeetingsOpen} onOpenChange={setViewAllMeetingsOpen}>

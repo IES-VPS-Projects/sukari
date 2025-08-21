@@ -47,6 +47,7 @@ import BriefingCard from "./BriefingCard"
 import ActionsCard from "./ActionsCard"
 import MeetingsCard from "./MeetingsCard"
 import ActivitiesCard from "./ActivitiesCard"
+import AIInsightsCard from "./AIInsightsCard"
 
 // Market Insights data schema
 interface ProductInsight {
@@ -342,12 +343,10 @@ export default function TodayPage() {
   
   // Modal states for viewing all items
   const [viewAllAlertsOpen, setViewAllAlertsOpen] = useState(false)
-  const [viewAllAIInsightsOpen, setViewAllAIInsightsOpen] = useState(false)
   const [triggerNewActivity, setTriggerNewActivity] = useState(false)
   
   // State for detail views
   const [selectedAlertForDetails, setSelectedAlertForDetails] = useState<string | null>(null)
-  const [selectedAIInsightForDetails, setSelectedAIInsightForDetails] = useState<string | null>(null)
 
   // Get the first name from the user's full name
   const getFirstName = (fullName: string) => {
@@ -457,71 +456,10 @@ export default function TodayPage() {
 
           {/* AI Recommendations and Updates */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => {
-                  setSelectedAIInsightForDetails(null)
-                  setViewAllAIInsightsOpen(true)
-                }}>
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  AI Insights
-                </CardTitle>
-                <CardDescription className="text-[#6B6B6B]">
-                  Intelligent insights based on current data patterns
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div 
-                  className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                  onClick={(e) => {
-                    if (!(e.target as HTMLElement).closest('button')) {
-                      setSelectedAIInsightForDetails('insight-1')
-                      setViewAllAIInsightsOpen(true)
-                    }
-                  }}
-                >
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Regional Visit</p>
-                    <p className="text-xs text-[#6B6B6B]">
-                      Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.
-                    </p>
-                  </div>
-                </div>
-
-                <div 
-                  className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                  onClick={(e) => {
-                    if (!(e.target as HTMLElement).closest('button')) {
-                      setSelectedAIInsightForDetails('insight-2')
-                      setViewAllAIInsightsOpen(true)
-                    }
-                  }}
-                >
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Policy Review Alert</p>
-                    <p className="text-xs text-[#6B6B6B]">Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.</p>
-                  </div>
-                </div>
-
-                <div 
-                  className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                  onClick={(e) => {
-                    if (!(e.target as HTMLElement).closest('button')) {
-                      setSelectedAIInsightForDetails('insight-3')
-                      setViewAllAIInsightsOpen(true)
-                    }
-                  }}
-                >
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#202020]">Weather Preparation Insight</p>
-                    <p className="text-xs text-[#6B6B6B]">Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AIInsightsCard 
+              triggerNewActivity={triggerNewActivity}
+              setTriggerNewActivity={setTriggerNewActivity}
+            />
 
             <AlertsCard 
               selectedItemId={selectedItemId}
@@ -746,190 +684,6 @@ export default function TodayPage() {
                               </div>
                               <p className="text-xs text-[#6B6B6B] mb-1">{alert.description}</p>
                               <p className="text-xs text-[#9CA3AF]">{alert.timestamp}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
-        </DialogContent>
-      </Dialog>
-
-      {/* AI Insights Modal */}
-      <Dialog open={viewAllAIInsightsOpen} onOpenChange={setViewAllAIInsightsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
-          <DialogTitle className="sr-only">
-            {selectedAIInsightForDetails ? 'AI Insight Details' : 'AI Insights'}
-          </DialogTitle>
-          {(() => {
-            if (selectedAIInsightForDetails) {
-              const insight = allAIInsightsData.find(i => i.id === selectedAIInsightForDetails)
-              if (insight) {
-                return (
-                  <div className="flex flex-col h-full">
-                    <div className="p-6 border-b">
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedAIInsightForDetails(null)}
-                          className="shrink-0"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-semibold text-gray-900">{insight.title}</h2>
-                            <p className="text-sm text-gray-500">{insight.timestamp}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">AI Analysis</h3>
-                          <p className="text-gray-700">{insight.description}</p>
-                        </div>
-                        
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Category</h3>
-                          <div className="capitalize text-gray-700">{insight.category}</div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Confidence Level</h3>
-                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                            insight.confidence === 'high' ? 'bg-green-50 text-green-700' :
-                            insight.confidence === 'medium' ? 'bg-yellow-50 text-yellow-700' :
-                            'bg-red-50 text-red-700'
-                          }`}>
-                            {insight.confidence} confidence
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Impact Assessment</h3>
-                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                            insight.impact === 'high' ? 'bg-red-50 text-red-700' :
-                            insight.impact === 'medium' ? 'bg-orange-50 text-orange-700' :
-                            'bg-green-50 text-green-700'
-                          }`}>
-                            {insight.impact} impact
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Recommended Actions</h3>
-                          <ul className="list-disc list-inside space-y-1 text-gray-700">
-                            <li>Review detailed analytics and data patterns</li>
-                            <li>Validate AI recommendations with domain experts</li>
-                            <li>Implement suggested improvements where applicable</li>
-                            <li>Monitor outcomes and update models accordingly</li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Data Sources</h3>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Production Data</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Environmental Sensors</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Historical Patterns</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Market Analysis</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-                      <Button 
-                        variant="outline"
-                        onClick={() => {
-                          console.log('Dismiss Insight', insight.id)
-                          setSelectedAIInsightForDetails(null)
-                          setViewAllAIInsightsOpen(false)
-                        }}
-                      >
-                        Dismiss
-                      </Button>
-                      <Button 
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => {
-                          console.log('Take Action', insight.id)
-                          setSelectedAIInsightForDetails(null)
-                          setViewAllAIInsightsOpen(false)
-                          setTriggerNewActivity(true)
-                        }}
-                      >
-                        Take Action
-                      </Button>
-                    </div>
-                  </div>
-                )
-              }
-            }
-
-            // List view
-            return (
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
-                    </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        AI-generated insights and recommendations
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-3">
-                    {allAIInsightsData.map((insight) => (
-                      <div 
-                        key={insight.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${insight.hoverBg} hover:shadow-md`}
-                        onClick={(e) => {
-                          if (!(e.target as HTMLElement).closest('button')) {
-                            setSelectedAIInsightForDetails(insight.id)
-                          }
-                        }}
-                      >
-                        {/* Icon */}
-                        <div className={`w-8 h-8 ${insight.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                          <CheckCircle className={`h-4 w-4 ${insight.iconColor}`} />
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-sm font-medium text-[#202020] truncate">{insight.title}</h4>
-                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
-                                  insight.confidence === 'high' ? 'bg-green-50/80 text-green-700 border-gray-300' :
-                                  insight.confidence === 'medium' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
-                                  'bg-red-50/80 text-red-700 border-gray-300'
-                                }`}>
-                                  {insight.confidence}
-                                </div>
-                              </div>
-                              <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>
-                              <div className="flex items-center gap-4">
-                                <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
-                              </div>
                             </div>
                           </div>
                         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog"
@@ -14,6 +14,7 @@ import { Factory, TrendingUp, AlertTriangle, Target, Settings } from "lucide-rea
 interface ProductionData {
   month: string
   year: number
+  factory: string // Factory name
   ksbReturns: number // in millions KSh
   kraReturns: number // in millions KSh
   target: number
@@ -21,96 +22,92 @@ interface ProductionData {
 
 interface ProductionPulseCardProps {
   className?: string
+  productionData: ProductionData[]
 }
 
-const ProductionPulseCard = ({ className }: ProductionPulseCardProps) => {
+const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedMetric, setSelectedMetric] = useState("ksbReturns")
+  const [selectedFactory, setSelectedFactory] = useState("all")
   const [selectedYear, setSelectedYear] = useState("2024")
-  const [productionData, setProductionData] = useState<ProductionData[]>([])
   const [monthlyTarget, setMonthlyTarget] = useState(50) // in millions KSh
   const [alertThreshold, setAlertThreshold] = useState(80) // percentage
   const [currentMonthData, setCurrentMonthData] = useState({
-    current: 0,
-    target: 50,
-    yearlyAverage: 0,
-    highest: { value: 0, month: "" },
-    lowest: { value: 0, month: "" }
+    totalSupply: 0,        // Total Supply (Tonnes)
+    totalProduction: 0,    // Total Production (Tonnes)
+    conversionRate: 0,     // Conversion Rate (%)
+    peakMonth: { value: 0, month: "" } // Peak Month
   })
 
-  // Mock data generation based on CSV structure
-  useEffect(() => {
-    const generateMockData = () => {
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      const years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
-      const data: ProductionData[] = []
-
-      years.forEach(year => {
-        months.forEach((month, index) => {
-          // Generate realistic returns data
-          // KSB Returns vary seasonally - higher values similar to original sugarcane supply
-          const seasonalFactor = Math.sin((index / 12) * 2 * Math.PI) * 0.3 + 1
-          const baseKsbReturns = 40 + Math.random() * 20 // 40-60 million KSh base
-          const ksbReturns = Math.round(baseKsbReturns * seasonalFactor * 100) / 100
-          
-          // KRA Returns are lower and derived from KSB returns with different patterns
-          const kraBaseFactor = 0.3 + Math.random() * 0.2 // 30-50% of KSB returns
-          const kraReturns = Math.round(ksbReturns * kraBaseFactor * 100) / 100
-          
-          const target = monthlyTarget
-
-          data.push({
-            month,
-            year,
-            ksbReturns,
-            kraReturns,
-            target
-          })
-        })
+  // Single data processing function for both stats and chart
+  const getProcessedData = useCallback(() => {
+    if (!productionData || productionData.length === 0) return []
+    
+    let filteredData = productionData.filter(d => d.year === parseInt(selectedYear))
+    
+    if (selectedFactory !== "all") {
+      return filteredData.filter(d => d.factory.toLowerCase() === selectedFactory.toLowerCase())
+    } else {
+      // For "all", aggregate all factories by month
+      const monthlyAggregated: { [key: string]: ProductionData } = {}
+      
+      filteredData.forEach(item => {
+        const key = item.month
+        if (!monthlyAggregated[key]) {
+          monthlyAggregated[key] = {
+            month: item.month,
+            year: item.year,
+            factory: "all",
+            ksbReturns: 0,
+            kraReturns: 0,
+            target: item.target
+          }
+        }
+        monthlyAggregated[key].ksbReturns += item.ksbReturns
+        monthlyAggregated[key].kraReturns += item.kraReturns
       })
-
-      setProductionData(data)
+      
+      return Object.values(monthlyAggregated).sort((a, b) => {
+        const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        return monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month)
+      })
     }
+  }, [productionData, selectedYear, selectedFactory])
 
-    generateMockData()
-  }, [monthlyTarget])
-
-  // Calculate current month stats
+  // Calculate stats using the same processed data
   useEffect(() => {
-    if (productionData.length === 0) return
-
-    const filteredData = productionData.filter(d => d.year === parseInt(selectedYear))
-    const currentMonth = "Aug" // Current month
-    const currentMonthItem = filteredData.find(d => d.month === currentMonth)
+    const processedData = getProcessedData()
+    if (processedData.length === 0) return
     
+    // Calculate the new stats based on the entire year's processed data
+    const totalSupply = processedData.reduce((sum: number, d: ProductionData) => sum + d.ksbReturns + d.kraReturns, 0) * 1000 / 12 // Convert to tonnes, approximate
+    const totalProduction = processedData.reduce((sum: number, d: ProductionData) => sum + d.ksbReturns, 0) * 1000 / 12 // Convert to tonnes, approximate
+    const conversionRate = totalSupply > 0 ? (totalProduction / totalSupply) * 100 : 0
+    
+    // Find peak month
     const dataKey = selectedMetric as keyof Pick<ProductionData, 'ksbReturns' | 'kraReturns'>
-    const yearlyValues = filteredData.map(d => d[dataKey])
-    const yearlyAverage = yearlyValues.reduce((a, b) => a + b, 0) / yearlyValues.length
-
-    // Find highest and lowest
-    let highest = { value: 0, month: "" }
-    let lowest = { value: 100000, month: "" }
+    let peakMonth = { value: 0, month: "" }
     
-    filteredData.forEach(d => {
+    processedData.forEach((d: ProductionData) => {
       const value = d[dataKey]
-      if (value > highest.value) {
-        highest = { value, month: d.month }
-      }
-      if (value < lowest.value) {
-        lowest = { value, month: d.month }
+      if (value > peakMonth.value) {
+        peakMonth = { 
+          value: Math.round(value * 100) / 100, 
+          month: d.month 
+        }
       }
     })
 
     setCurrentMonthData({
-      current: currentMonthItem ? currentMonthItem[dataKey] : 0,
-      target: monthlyTarget,
-      yearlyAverage: Math.round(yearlyAverage * 100) / 100,
-      highest,
-      lowest
+      totalSupply: Math.round(totalSupply * 100) / 100,
+      totalProduction: Math.round(totalProduction * 100) / 100,
+      conversionRate: Math.round(conversionRate * 100) / 100,
+      peakMonth
     })
-  }, [productionData, selectedMetric, selectedYear, monthlyTarget])
+  }, [getProcessedData, selectedMetric, monthlyTarget])
 
-  const chartData = productionData.filter(d => d.year === parseInt(selectedYear))
+  // Use the same processed data for chart
+  const chartData = getProcessedData()
 
   const getDataValue = (item: ProductionData) => {
     return selectedMetric === "ksbReturns" ? item.ksbReturns : 
@@ -137,10 +134,25 @@ const ProductionPulseCard = ({ className }: ProductionPulseCardProps) => {
       >
         <CardHeader className="pb-2 px-4 pt-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-[#202020]">
+            <CardTitle className="text-2xl font-bold text-[#202020]">
               Production
             </CardTitle>
             <div className="flex gap-2">
+              <Select value={selectedFactory} onValueChange={setSelectedFactory}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Factories</SelectItem>
+                  <SelectItem value="butali">Butali</SelectItem>
+                  <SelectItem value="chemelil">Chemelil</SelectItem>
+                  <SelectItem value="muhoroni">Muhoroni</SelectItem>
+                  <SelectItem value="kibos">Kibos</SelectItem>
+                  <SelectItem value="westKenya">West Kenya</SelectItem>
+                  <SelectItem value="nzoia">Nzoia</SelectItem>
+                  <SelectItem value="kwale">Kwale</SelectItem>
+                </SelectContent>
+              </Select>
               <Select value={selectedMetric} onValueChange={setSelectedMetric}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -173,20 +185,20 @@ const ProductionPulseCard = ({ className }: ProductionPulseCardProps) => {
           {/* Stats moved above chart */}
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-blue-600">{currentMonthData.current}M</div>
-              <p className="text-xs text-[#6B6B6B]">Current Month</p>
+              <div className="text-lg font-bold text-gray-900">{currentMonthData.totalSupply.toLocaleString()}</div>
+              <p className="text-xs text-[#6B6B6B]">Total Supply</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-green-600">{currentMonthData.target}M</div>
-              <p className="text-xs text-[#6B6B6B]">Monthly Target</p>
+              <div className="text-lg font-bold text-green-600">{currentMonthData.totalProduction.toLocaleString()}</div>
+              <p className="text-xs text-[#6B6B6B]">Total Production</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-orange-600">{currentMonthData.yearlyAverage}M</div>
-              <p className="text-xs text-[#6B6B6B]">Yearly Average</p>
+              <div className="text-lg font-bold text-blue-600">{currentMonthData.conversionRate}%</div>
+              <p className="text-xs text-[#6B6B6B]">Conversion Rate</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-red-600">{currentMonthData.highest.value}M</div>
-              <p className="text-xs text-[#6B6B6B]">Peak Month ({currentMonthData.highest.month})</p>
+              <div className="text-lg font-bold text-orange-600">{currentMonthData.peakMonth.value}M</div>
+              <p className="text-xs text-[#6B6B6B]">Peak Month ({currentMonthData.peakMonth.month})</p>
             </div>
           </div>
 
@@ -346,20 +358,20 @@ const ProductionPulseCard = ({ className }: ProductionPulseCardProps) => {
             {/* Stats moved above chart */}
             <div className="grid grid-cols-4 gap-4">
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-blue-600">{currentMonthData.current}M</div>
-                <p className="text-sm text-[#6B6B6B]">Current Month</p>
+                <div className="text-2xl font-bold text-gray-900">{currentMonthData.totalSupply.toLocaleString()}</div>
+                <p className="text-sm text-[#6B6B6B]">Total Supply (Tonnes)</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-green-600">{currentMonthData.yearlyAverage}M</div>
-                <p className="text-sm text-[#6B6B6B]">Yearly Average</p>
+                <div className="text-2xl font-bold text-green-600">{currentMonthData.totalProduction.toLocaleString()}</div>
+                <p className="text-sm text-[#6B6B6B]">Total Production (Tonnes)</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-orange-600">{currentMonthData.highest.value}M</div>
-                <p className="text-sm text-[#6B6B6B]">Highest ({currentMonthData.highest.month})</p>
+                <div className="text-2xl font-bold text-blue-600">{currentMonthData.conversionRate}%</div>
+                <p className="text-sm text-[#6B6B6B]">Conversion Rate</p>
               </div>
               <div className="text-center p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <div className="text-2xl font-bold text-red-600">{currentMonthData.lowest.value}M</div>
-                <p className="text-sm text-[#6B6B6B]">Lowest ({currentMonthData.lowest.month})</p>
+                <div className="text-2xl font-bold text-orange-600">{currentMonthData.peakMonth.value}M</div>
+                <p className="text-sm text-[#6B6B6B]">Peak Month ({currentMonthData.peakMonth.month})</p>
               </div>
             </div>
 

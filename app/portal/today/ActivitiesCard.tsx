@@ -15,7 +15,6 @@ import {
   FileText,
   Users,
   TrendingUp,
-  ChevronDown,
   ArrowLeft,
   Clock,
   MapPin,
@@ -34,7 +33,6 @@ interface ActivitiesCardProps {
 const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }: ActivitiesCardProps) => {
   // Modal states
   const [newActivityOpen, setNewActivityOpen] = useState(false)
-  const [activityDropdownOpen, setActivityDropdownOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
   const [selectedActivityForDetails, setSelectedActivityForDetails] = useState<string | null>(null)
 
@@ -42,25 +40,13 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [activityForm, setActivityForm] = useState({
     title: '',
     type: '',
-    datetime: '',
+    priority: 'medium',
+    startDate: '',
+    endDate: '',
     location: '',
     assignedTo: '',
     description: ''
   })
-
-  // Handle clicking outside to close dropdowns
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (activityDropdownOpen) {
-        setActivityDropdownOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [activityDropdownOpen])
 
   // Handle trigger from parent component (AI Insights/Alerts)
   useEffect(() => {
@@ -75,7 +61,9 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
     setActivityForm({
       title: '',
       type: '',
-      datetime: '',
+      priority: 'medium',
+      startDate: '',
+      endDate: '',
       location: '',
       assignedTo: '',
       description: ''
@@ -92,102 +80,14 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
               setSelectedActivityForDetails(null)
               setViewAllActivitiesOpen(true)
             }}>Activities</CardTitle>
-            <div className="relative">
-              <div className="flex">
-                <Button 
-                  size="sm" 
-                  className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-l-lg flex items-center gap-2 shadow-sm border-r-0"
-                  onClick={() => setNewActivityOpen(true)}
-                >
-                  <LuSquarePen className="h-4 w-4" />
-                  New
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-2 py-1 rounded-r-lg flex items-center shadow-sm"
-                  onClick={() => setActivityDropdownOpen(!activityDropdownOpen)}
-                >
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </div>
-              
-              {/* Dropdown Menu */}
-              {activityDropdownOpen && (
-                <div className="absolute right-0 top-10 bg-white border rounded-lg shadow-lg z-20 w-48">
-                  <div className="py-1">
-                    <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">Activity Types</div>
-                    <button
-                      onClick={() => {
-                        setActivityForm({...activityForm, title: 'Field Inspection', type: 'inspection'})
-                        setNewActivityOpen(true)
-                        setActivityDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      Field Inspection
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActivityForm({...activityForm, title: 'Compliance Review', type: 'compliance'})
-                        setNewActivityOpen(true)
-                        setActivityDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      Compliance Review
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActivityForm({...activityForm, title: 'Training Session', type: 'training'})
-                        setNewActivityOpen(true)
-                        setActivityDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <Users className="h-4 w-4" />
-                      Training Session
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActivityForm({...activityForm, title: 'Quality Audit', type: 'audit'})
-                        setNewActivityOpen(true)
-                        setActivityDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <FileText className="h-4 w-4" />
-                      Quality Audit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActivityForm({...activityForm, title: 'Equipment Maintenance', type: 'maintenance'})
-                        setNewActivityOpen(true)
-                        setActivityDropdownOpen(false)
-                      }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                    >
-                      <TrendingUp className="h-4 w-4" />
-                      Equipment Maintenance
-                    </button>
-                    
-                    <div className="border-t">
-                      <button
-                        onClick={() => {
-                          setNewActivityOpen(true)
-                          setActivityDropdownOpen(false)
-                        }}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                      >
-                        <FileText className="h-4 w-4" />
-                        View all templates
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Button 
+              size="sm" 
+              className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 shadow-sm"
+              onClick={() => setNewActivityOpen(true)}
+            >
+              <LuSquarePen className="h-4 w-4" />
+              New
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-2 p-4">
@@ -241,7 +141,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
 
       {/* New Activity Modal */}
       <Dialog open={newActivityOpen} onOpenChange={setNewActivityOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Create New Activity</DialogTitle>
           </DialogHeader>
@@ -255,30 +155,80 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                 placeholder="Enter activity title"
               />
             </div>
-            <div>
-              <Label htmlFor="activity-type">Activity Type</Label>
-              <Select value={activityForm.type} onValueChange={(value) => setActivityForm({...activityForm, type: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select activity type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="inspection">Field Inspection</SelectItem>
-                  <SelectItem value="compliance">Compliance Review</SelectItem>
-                  <SelectItem value="training">Training Session</SelectItem>
-                  <SelectItem value="audit">Quality Audit</SelectItem>
-                  <SelectItem value="maintenance">Equipment Maintenance</SelectItem>
-                </SelectContent>
-              </Select>
+            
+            {/* Activity Type and Priority Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="activity-type">Activity Type</Label>
+                <Select 
+                  value={activityForm.type} 
+                  onValueChange={(value) => {
+                    // Auto-populate title when a template type is selected
+                    let title = activityForm.title;
+                    if (value === 'inspection') title = 'Field Inspection';
+                    else if (value === 'compliance') title = 'Compliance Review';
+                    else if (value === 'training') title = 'Training Session';
+                    else if (value === 'audit') title = 'Quality Audit';
+                    else if (value === 'maintenance') title = 'Equipment Maintenance';
+                    
+                    setActivityForm({...activityForm, type: value, title});
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select activity type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inspection">Field Inspection</SelectItem>
+                    <SelectItem value="compliance">Compliance Review</SelectItem>
+                    <SelectItem value="training">Training Session</SelectItem>
+                    <SelectItem value="audit">Quality Audit</SelectItem>
+                    <SelectItem value="maintenance">Equipment Maintenance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="activity-priority">Priority</Label>
+                <Select
+                  value={activityForm.priority}
+                  onValueChange={(value) => setActivityForm({...activityForm, priority: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="activity-datetime">Date & Time</Label>
-              <Input
-                id="activity-datetime"
-                type="datetime-local"
-                value={activityForm.datetime}
-                onChange={(e) => setActivityForm({...activityForm, datetime: e.target.value})}
-              />
+
+            {/* Start Date and End Date Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="activity-start-date">Start Date</Label>
+                <Input
+                  id="activity-start-date"
+                  type="datetime-local"
+                  value={activityForm.startDate}
+                  onChange={(e) => setActivityForm({...activityForm, startDate: e.target.value})}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="activity-end-date">End Date</Label>
+                <Input
+                  id="activity-end-date"
+                  type="datetime-local"
+                  value={activityForm.endDate}
+                  onChange={(e) => setActivityForm({...activityForm, endDate: e.target.value})}
+                />
+              </div>
             </div>
+
             <div>
               <Label htmlFor="activity-location">Location</Label>
               <Input
@@ -311,7 +261,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
               <Button variant="outline" onClick={() => setNewActivityOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleCreateActivity}>
+              <Button onClick={handleCreateActivity} className="bg-green-600 hover:bg-green-700">
                 Create Activity
               </Button>
             </div>
