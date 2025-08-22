@@ -112,20 +112,56 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
     }
   }
 
+  const getMillerColor = (miller: string) => {
+    const colors = {
+      combined: "#6b7280",
+      butali: "#3b82f6",
+      chemelil: "#10b981",
+      muhoroni: "#f59e0b",
+      kibos: "#ef4444",
+      westKenya: "#8b5cf6",
+      nzoia: "#06b6d4",
+      kwale: "#f97316"
+    }
+    return colors[miller as keyof typeof colors] || "#6b7280"
+  }
+
+  const getMillerDisplayName = (miller: string) => {
+    const names = {
+      combined: "Combined",
+      butali: "Butali",
+      chemelil: "Chemelil", 
+      muhoroni: "Muhoroni",
+      kibos: "Kibos",
+      westKenya: "West Kenya",
+      nzoia: "Nzoia",
+      kwale: "Kwale"
+    }
+    return names[miller as keyof typeof names] || miller
+  }
+
   return (
     <>
       <Card 
         className={`rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200 h-[400px] ${className}`}
-        onClick={() => setModalOpen(true)}
       >
-        <CardHeader className="pb-2 px-4 pt-4">
+        <CardHeader className="pb-2 px-4 pt-4" onClick={() => setModalOpen(true)}>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-[#202020]">
               CTU Sucrose Content
             </CardTitle>
-            <div className="flex gap-2">
+            <div 
+              className="flex gap-2"
+              onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+            >
               <Select value={selectedMiller} onValueChange={setSelectedMiller}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger 
+                  className="w-32 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  onClick={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -140,7 +176,11 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                 </SelectContent>
               </Select>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-20">
+                <SelectTrigger 
+                  className="w-20 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  onClick={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,7 +197,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3 p-4">
+        <CardContent className="space-y-3 p-4 cursor-pointer" onClick={() => setModalOpen(true)}>
           {/* Stats moved above chart */}
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -243,8 +283,8 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                 <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                   <defs>
                     <linearGradient id="singleSucroseGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.05}/>
+                      <stop offset="5%" stopColor={getMillerColor(selectedMiller)} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={getMillerColor(selectedMiller)} stopOpacity={0.05}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -262,7 +302,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                     width={25}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [`${value}%`, selectedMiller === "butali" ? "Butali" : "Chemelil"]}
+                    formatter={(value: number) => [`${value}%`, getMillerDisplayName(selectedMiller)]}
                     labelFormatter={(label) => `Month: ${label}`}
                     contentStyle={{
                       backgroundColor: 'white',
@@ -273,12 +313,12 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                   />
                   <Area 
                     type="monotone" 
-                    dataKey={selectedMiller === "butali" ? "butali" : "chemelil"}
-                    stroke={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} 
+                    dataKey={selectedMiller}
+                    stroke={getMillerColor(selectedMiller)} 
                     strokeWidth={2}
                     fill="url(#singleSucroseGradient)"
-                    dot={{ fill: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, r: 2 }}
-                    activeDot={{ r: 4, stroke: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, fill: "white" }}
+                    dot={{ fill: getMillerColor(selectedMiller), strokeWidth: 2, r: 2 }}
+                    activeDot={{ r: 4, stroke: getMillerColor(selectedMiller), strokeWidth: 2, fill: "white" }}
                   />
                 </AreaChart>
               )}
@@ -291,28 +331,33 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogPortal>
           <DialogOverlay className="z-[55]" />
-          <DialogContent className="max-w-4xl z-[60] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl z-[60] max-h-[90vh] overflow-y-auto [&>button]:hidden">
           <DialogHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <DialogTitle className="text-xl font-bold">
-                Sucrose Content
+                CTU Sucrose Content
               </DialogTitle>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={selectedMiller} onValueChange={setSelectedMiller}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-full sm:w-32">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[70]">
                     <SelectItem value="combined">Combined</SelectItem>
                     <SelectItem value="butali">Butali</SelectItem>
                     <SelectItem value="chemelil">Chemelil</SelectItem>
+                    <SelectItem value="muhoroni">Muhoroni</SelectItem>
+                    <SelectItem value="kibos">Kibos</SelectItem>
+                    <SelectItem value="westKenya">West Kenya</SelectItem>
+                    <SelectItem value="nzoia">Nzoia</SelectItem>
+                    <SelectItem value="kwale">Kwale</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="w-20">
+                  <SelectTrigger className="w-full sm:w-20">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[70]">
                     <SelectItem value="2017">2017</SelectItem>
                     <SelectItem value="2018">2018</SelectItem>
                     <SelectItem value="2019">2019</SelectItem>
@@ -419,8 +464,8 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="singleSucroseModalGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} stopOpacity={0.05}/>
+                        <stop offset="5%" stopColor={getMillerColor(selectedMiller)} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={getMillerColor(selectedMiller)} stopOpacity={0.05}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -442,7 +487,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                       tick={{ fontSize: 12, fill: '#64748b' }}
                     />
                     <Tooltip 
-                      formatter={(value: number) => [`${value}%`, selectedMiller === "butali" ? "Butali" : "Chemelil"]}
+                      formatter={(value: number) => [`${value}%`, getMillerDisplayName(selectedMiller)]}
                       labelFormatter={(label) => `Month: ${label}`}
                       contentStyle={{
                         backgroundColor: 'white',
@@ -453,12 +498,12 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                     />
                     <Area 
                       type="monotone" 
-                      dataKey={selectedMiller === "butali" ? "butali" : "chemelil"}
-                      stroke={selectedMiller === "butali" ? "#3b82f6" : "#10b981"} 
+                      dataKey={selectedMiller}
+                      stroke={getMillerColor(selectedMiller)} 
                       strokeWidth={3}
                       fill="url(#singleSucroseModalGradient)"
-                      dot={{ fill: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: selectedMiller === "butali" ? "#3b82f6" : "#10b981", strokeWidth: 2, fill: "white" }}
+                      dot={{ fill: getMillerColor(selectedMiller), strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: getMillerColor(selectedMiller), strokeWidth: 2, fill: "white" }}
                     />
                   </AreaChart>
                 )}
