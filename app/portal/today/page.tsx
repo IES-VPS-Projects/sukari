@@ -21,19 +21,17 @@ import {
   FileText,
   TrendingDown,
   ArrowRight,
-  ArrowLeft,
-  Plus,
   ChevronDown
 } from "lucide-react"
 import { BsCheckAll, BsBoxArrowUpRight } from 'react-icons/bs'
-import { FiSettings, FiAlertTriangle } from 'react-icons/fi'
+import { FiSettings } from 'react-icons/fi'
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
 import { FaAngleDown } from 'react-icons/fa'
-import { LuForward, LuSquarePen } from 'react-icons/lu'
 import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
 import { HiSparkles } from 'react-icons/hi2'
-import { GoInfo } from 'react-icons/go'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
+import { AlertsModal } from "@/components/modals/alerts-modal"
+import AlertsCard from "./AlertsCard"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 import { 
@@ -246,91 +244,6 @@ const MarketInsightsCard = () => {
   )
 }
 
-// Alerts Card Component (formerly Tasks Card)
-const AlertsCard = ({ selectedItemId, setSelectedItemId, setViewAllAlertsOpen, setSelectedAlertForDetails, alertsData }: {
-  selectedItemId: string | null,
-  setSelectedItemId: (id: string | null) => void,
-  setViewAllAlertsOpen: (open: boolean) => void,
-  setSelectedAlertForDetails: (id: string | null) => void,
-  alertsData: any
-}) => {
-  const handleItemAction = (action: string, itemId: string) => {
-    console.log(`${action} action for item ${itemId}`)
-    setSelectedItemId(null)
-    
-    if (action === 'details') {
-      setSelectedAlertForDetails(itemId)
-      setViewAllAlertsOpen(true)
-    }
-  }
-
-  return (
-    <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-1">
-        <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
-          setSelectedAlertForDetails(null)
-          setViewAllAlertsOpen(true)
-        }}>Alerts</CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        {/* Alert Content - No tabs, just alerts (limited to 3 most recent) */}
-        <div className="space-y-3">
-          {alertsData.alerts.slice(0, 3).map((item: any) => (
-            <div 
-              key={item.id} 
-              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                item.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
-                item.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
-                item.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
-                item.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
-                item.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
-                item.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
-                'hover:bg-gray-50'
-              } hover:shadow-md`}
-              onClick={(e: React.MouseEvent) => {
-                // Only trigger if not clicking on the ellipsis button
-                if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
-                  setSelectedAlertForDetails(item.id)
-                  setViewAllAlertsOpen(true)
-                }
-              }}
-            >
-              {/* Icon */}
-              <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                <FiAlertTriangle className={`h-4 w-4 ${item.iconColor}`} />
-              </div>
-              
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-medium text-[#202020] truncate">{item.title}</h4>
-                      <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
-                        item.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
-                        item.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
-                        item.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
-                        item.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
-                        item.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
-                        item.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
-                        'bg-gray-50/80 text-gray-700 border-gray-300'
-                      }`}>
-                        {item.label}
-                      </div>
-                    </div>
-                    <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
-                    <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState("")
@@ -494,208 +407,14 @@ export default function TodayPage() {
         defaultLocation={selectedLocation}
       />
 
-      {/* Alerts Modal */}
-      <Dialog open={viewAllAlertsOpen} onOpenChange={setViewAllAlertsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
-          <DialogTitle className="sr-only">
-            {selectedAlertForDetails ? 'Alert Details' : 'Alerts'}
-          </DialogTitle>
-          {(() => {
-            if (selectedAlertForDetails) {
-              const alert = combinedAlertsData.alerts.find((a: any) => a.id === selectedAlertForDetails)
-              if (alert) {
-                return (
-                  <div className="flex flex-col h-full">
-                    <div className="p-6 border-b">
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedAlertForDetails(null)}
-                          className="shrink-0"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center`}>
-                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-semibold text-gray-900">{alert.title}</h2>
-                            <p className="text-sm text-gray-500">{alert.timestamp}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Alert Details</h3>
-                          <p className="text-gray-700">{alert.description}</p>
-                        </div>
-                        
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Priority</h3>
-                          <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                            alert.labelColor === 'bg-red-500' ? 'bg-red-50 text-red-700' :
-                            alert.labelColor === 'bg-orange-500' ? 'bg-orange-50 text-orange-700' :
-                            alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50 text-yellow-700' :
-                            alert.labelColor === 'bg-blue-500' ? 'bg-blue-50 text-blue-700' :
-                            alert.labelColor === 'bg-green-500' ? 'bg-green-50 text-green-700' :
-                            alert.labelColor === 'bg-purple-500' ? 'bg-purple-50 text-purple-700' :
-                            'bg-gray-50 text-gray-700'
-                          }`}>
-                            {alert.label}
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Affected Area</h3>
-                          <p className="text-gray-700">
-                            {alert.timestamp.includes('•') 
-                              ? alert.timestamp.split('•')[1].trim() 
-                              : 'Field Operations'}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-2">Recommended Actions</h3>
-                          <ul className="list-disc list-inside space-y-1 text-gray-700">
-                            <li>Review alert conditions and assess impact</li>
-                            <li>Coordinate with relevant teams for response</li>
-                            <li>Monitor situation for changes</li>
-                            <li>Update stakeholders on status</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
-                      <div className="flex gap-3">
-                        <Button 
-                          variant="outline"
-                          onClick={() => {
-                            console.log('Forward Alert', alert.id)
-                            setSelectedAlertForDetails(null)
-                            setViewAllAlertsOpen(false)
-                          }}
-                        >
-                          <LuForward className="h-4 w-4 mr-2" />
-                          Forward
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => {
-                            console.log('Delete Alert', alert.id)
-                            setSelectedAlertForDetails(null)
-                            setViewAllAlertsOpen(false)
-                          }}
-                        >
-                          ✕ Delete
-                        </Button>
-                      </div>
-                      <div className="flex gap-3">
-                        <Button 
-                          variant="outline"
-                          onClick={() => {
-                            console.log('Mark as Unread', alert.id)
-                            setSelectedAlertForDetails(null)
-                            setViewAllAlertsOpen(false)
-                          }}
-                        >
-                          Mark as Unread
-                        </Button>
-                        <Button 
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                          onClick={() => {
-                            console.log('Take Action', alert.id)
-                            setSelectedAlertForDetails(null)
-                            setViewAllAlertsOpen(false)
-                            setTriggerNewActivity(true)
-                          }}
-                        >
-                          Take Action
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-            }
-
-            // List view
-            return (
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
-                      <p className="text-sm text-gray-500 mt-1">{combinedAlertsData.alerts.length} alerts requiring attention</p>
-                    </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        System alerts and notifications requiring attention
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-3">
-                    {combinedAlertsData.alerts.map((alert: any) => (
-                      <div 
-                        key={alert.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                          alert.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
-                          alert.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
-                          alert.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
-                          alert.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
-                          alert.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
-                          alert.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
-                          'hover:bg-gray-50'
-                        } hover:shadow-md`}
-                        onClick={() => setSelectedAlertForDetails(alert.id)}
-                      >
-                        {/* Icon */}
-                        <div className={`w-8 h-8 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                          <FiAlertTriangle className={`h-4 w-4 ${alert.iconColor}`} />
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="text-sm font-medium text-[#202020] truncate">{alert.title}</h4>
-                                <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
-                                  alert.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
-                                  alert.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
-                                  alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
-                                  alert.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
-                                  alert.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
-                                  alert.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
-                                  'bg-gray-50/80 text-gray-700 border-gray-300'
-                                }`}>
-                                  {alert.label}
-                                </div>
-                              </div>
-                              <p className="text-xs text-[#6B6B6B] mb-1">{alert.description}</p>
-                              <p className="text-xs text-[#9CA3AF]">{alert.timestamp}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
-        </DialogContent>
-      </Dialog>
+      <AlertsModal
+        open={viewAllAlertsOpen}
+        onOpenChange={setViewAllAlertsOpen}
+        alertsData={combinedAlertsData}
+        selectedAlertForDetails={selectedAlertForDetails}
+        setSelectedAlertForDetails={setSelectedAlertForDetails}
+        onTakeAction={() => setTriggerNewActivity(true)}
+      />
     </PortalLayout>
   )
 }

@@ -10,7 +10,19 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "KSB Executive Portal",
   description: "Kenya Sugar Board Executive Management Platform",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: [
+      { url: '/icon.png' },
+      { url: '/images/ksb2.png' },
+    ],
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+    other: {
+      rel: 'apple-touch-icon-precomposed',
+      url: '/icon.png',
+    },
+  },
 }
 
 export default function RootLayout({
