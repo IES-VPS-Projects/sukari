@@ -15,9 +15,9 @@ interface ViewPlanCardProps {
 const ViewPlanCard = ({ className }: ViewPlanCardProps) => {
   const [viewPlanOpen, setViewPlanOpen] = useState(false)
 
-  // Sample plan overview data based on KSB Strategic Plan 2024-2029 (Production & Productivity KRA)
+  // Sample plan overview data based on KSB Strategic Implementation Plan 2024-2029 (Production & Productivity KRA)
   const planOverview = {
-    title: "Strategic Plan 2024-2029",
+    title: "Strategic Implementation Plan 2024-2029",
     progress: 58,
     totalObjectives: 4,
     completedObjectives: 0,
@@ -51,7 +51,8 @@ const ViewPlanCard = ({ className }: ViewPlanCardProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-2xl font-bold text-[#202020]">
+              <CardTitle className="text-[#202020] flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600" />
                 View Strategic Plan
               </CardTitle>
             </div>

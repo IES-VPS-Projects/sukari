@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
@@ -21,15 +21,29 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, MapPin, Award, Filter } from "lucide-react"
+import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Award, Filter } from "lucide-react"
 import ViewPlanCard from "./ViewPlanCard"
+import ResourceCenterCard from "./ResourceCenterCard"
 import SucroseContentCard from "./SucroseContentCard"
 import ProductionPulseCard from "./ProductionPulseCard"
-import { loadChartData, SucroseDataPoint, ProductionDataPoint } from "@/lib/csv-data-service"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  ArcElement,
+  Filler,
+} from 'chart.js'
+import { Line as ChartLine } from 'react-chartjs-2'
+import { useState as useStateReact, useEffect } from "react"
 
 // Custom Gauge Meter Component
 const GaugeMeter = ({ value, size = 120 }: { value: number; size?: number }) => {
-  const [animatedValue, setAnimatedValue] = useState(0)
+  const [animatedValue, setAnimatedValue] = useStateReact(0)
   
   // Animation effect
   useEffect(() => {
@@ -211,6 +225,18 @@ const GaugeMeter = ({ value, size = 120 }: { value: number; size?: number }) => 
   )
 }
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  ArcElement,
+  Filler
+)
+
 const productionData = [
   { month: "Jul", production: 2400, target: 2800 },
   { month: "Aug", production: 2600, target: 2800 },
@@ -218,6 +244,26 @@ const productionData = [
   { month: "Oct", production: 3200, target: 2800 },
   { month: "Nov", production: 2900, target: 2800 },
   { month: "Dec", production: 3100, target: 2800 },
+]
+
+// Mock data for ProductionPulseCard
+const productionPulseData = [
+  { month: "Jul", year: 2024, factory: "Mumias", ksbReturns: 45.2, kraReturns: 43.1, target: 50 },
+  { month: "Aug", year: 2024, factory: "Mumias", ksbReturns: 48.5, kraReturns: 46.2, target: 50 },
+  { month: "Sep", year: 2024, factory: "Mumias", ksbReturns: 52.1, kraReturns: 49.8, target: 50 },
+  { month: "Oct", year: 2024, factory: "Mumias", ksbReturns: 47.3, kraReturns: 45.6, target: 50 },
+  { month: "Nov", year: 2024, factory: "Mumias", ksbReturns: 51.8, kraReturns: 48.9, target: 50 },
+  { month: "Dec", year: 2024, factory: "Mumias", ksbReturns: 49.6, kraReturns: 47.2, target: 50 },
+]
+
+// Mock data for SucroseContentCard  
+const sucroseData = [
+  { month: "Jul", year: 2024, butali: 13.2, chemelil: 12.8, muhoroni: 14.1, kibos: 13.5, westKenya: 12.9, nzoia: 13.7, kwale: 12.5, combined: 13.1 },
+  { month: "Aug", year: 2024, butali: 13.5, chemelil: 13.1, muhoroni: 14.3, kibos: 13.8, westKenya: 13.2, nzoia: 14.0, kwale: 12.8, combined: 13.4 },
+  { month: "Sep", year: 2024, butali: 13.8, chemelil: 13.4, muhoroni: 14.6, kibos: 14.1, westKenya: 13.5, nzoia: 14.3, kwale: 13.1, combined: 13.7 },
+  { month: "Oct", year: 2024, butali: 14.1, chemelil: 13.7, muhoroni: 14.9, kibos: 14.4, westKenya: 13.8, nzoia: 14.6, kwale: 13.4, combined: 14.0 },
+  { month: "Nov", year: 2024, butali: 13.9, chemelil: 13.5, muhoroni: 14.7, kibos: 14.2, westKenya: 13.6, nzoia: 14.4, kwale: 13.2, combined: 13.8 },
+  { month: "Dec", year: 2024, butali: 14.2, chemelil: 13.8, muhoroni: 15.0, kibos: 14.5, westKenya: 13.9, nzoia: 14.7, kwale: 13.5, combined: 14.1 },
 ]
 
 const revenueData = [
@@ -241,30 +287,34 @@ const stakeholders = [
   { type: "Molasses Dealers", count: 23, total: 30, location: "Industrial Areas", status: "compliant" },
 ]
 
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+    },
+    title: {
+      display: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: false,
+      stacked: true,
+      grid: {
+        color: '#f3f4f6',
+      },
+    },
+    x: {
+      stacked: true,
+      grid: {
+        color: '#f3f4f6',
+      },
+    },
+  },
+}
+
 export default function DashboardPage() {
-  const [selectedMetric, setSelectedMetric] = useState("Production")
-  const [sucroseData, setSucroseData] = useState<SucroseDataPoint[]>([])
-  const [productionData, setProductionData] = useState<ProductionDataPoint[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Load CSV data on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
-        const { sucroseData, productionData } = await loadChartData()
-        setSucroseData(sucroseData)
-        setProductionData(productionData)
-      } catch (error) {
-        console.error('Error loading chart data:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadData()
-  }, [])
-
   return (
     <PortalLayout pageTitle="Dashboard">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -325,40 +375,13 @@ export default function DashboardPage() {
 
       {/* Dashboard Metrics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* View Strategic Plan - moved to first position */}
+        {/* View Strategic Plan */}
         <ViewPlanCard />
-        
-        {/* Quick Stats - moved to second position */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="text-[#202020]">Quick Stats</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#202020]">156</div>
-                <p className="text-xs text-[#6B6B6B]">New Farmers This Month</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">23</div>
-                <p className="text-xs text-[#6B6B6B]">Pending Licenses</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">7</div>
-                <p className="text-xs text-[#6B6B6B]">Mills Under Review</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">KES 2.4M</div>
-                <p className="text-xs text-[#6B6B6B]">Daily Revenue</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Top Performing Mills - remained in last position */}
+        {/* Resource Center - replaced Quick Stats */}
+        <ResourceCenterCard />
+
+        {/* Top Performing Mills - moved to last position */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardHeader>
             <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
@@ -397,31 +420,10 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Production Analytics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 my-8">
-        {/* Sucrose Content Card */}
-        {isLoading ? (
-          <Card className="rounded-[20px] shadow-lg border-0 bg-white h-[400px] flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="text-gray-600">Loading sucrose content data...</p>
-            </div>
-          </Card>
-        ) : (
-          <SucroseContentCard sucroseData={sucroseData} />
-        )}
-
-        {/* Production Pulse Card */}
-        {isLoading ? (
-          <Card className="rounded-[20px] shadow-lg border-0 bg-white h-[400px] flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="text-gray-600">Loading production data...</p>
-            </div>
-          </Card>
-        ) : (
-          <ProductionPulseCard productionData={productionData} />
-        )}
+      {/* CTU Sucrose Content and Production Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SucroseContentCard sucroseData={sucroseData} />
+        <ProductionPulseCard productionData={productionPulseData} />
       </div>
 
     </div>
