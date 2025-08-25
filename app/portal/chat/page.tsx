@@ -670,7 +670,7 @@ export default function ChatPage() {
     <PortalLayout pageTitle="Chat">
       <div className="flex h-[calc(100vh-5rem)] bg-gray-50">
         {/* Column 1: Primary Navigation Sidebar */}
-        <div className="w-20 bg-green-700 text-white flex flex-col items-center py-6">
+        <div className="hidden md:flex w-20 bg-green-700 text-white flex-col items-center py-6">
           {/* Navigation */}
           <nav className="flex-1 flex flex-col items-center space-y-6">
           <button
@@ -751,7 +751,7 @@ export default function ChatPage() {
 
       {/* Column 2: Secondary Navigation / Conversation List */}
       {(currentView === "channel" || currentView === "dm" || currentView === "saved") && (
-        <div className="w-80 bg-green-50 border-r border-gray-200 flex flex-col">
+        <div className="w-full md:w-80 bg-green-50 border-r border-gray-200 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             {currentView === "saved" ? (

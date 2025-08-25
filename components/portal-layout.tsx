@@ -20,6 +20,7 @@ const navigation = [
   { name: "Chat", href: "/portal/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
   { name: "Reports", href: "/portal/reports", icon: FileText },
+  { name: "Profile", href: "/portal/profile", icon: User },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
@@ -52,14 +53,24 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
               <img 
-                src="/images/ISEAGRILOGO3.png" 
-                alt="AFA Logo" 
-                className="h-16 w-auto"
+                src="/images/ISEAGRILOGO4.png" 
+                alt="ISE Agriculture Logo" 
+                className="h-12 w-auto"
               />
-              <div className="border-l border-gray-300 pl-3">
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {pageTitle === "Dashboard" ? "KENYA SUGAR BOARD" : pageTitle}
+              <div className="h-12 w-0.5 bg-gray-300"></div>
+              <img 
+                src="/images/ksb2.png" 
+                alt="KSB Logo" 
+                className="h-12 w-auto"
+              />
+              <div className="h-12 w-0.5 bg-gray-300"></div>
+              <div className="flex flex-col">
+                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+                  KENYA SUGAR BOARD
                 </h1>
+                <p className="text-sm text-gray-600 leading-tight">
+                  Information Management System
+                </p>
               </div>
             </div>
           </div>
@@ -107,15 +118,15 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
         </header>
         <main className="flex-1 pb-24 overflow-auto">{children}</main>
         <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
-            <div className="flex items-center justify-center px-4 py-3">
-              <div className="flex items-center justify-around w-full max-w-2xl">
+            <div className="flex items-center justify-center px-2 py-3">
+              <div className="flex items-center justify-around w-full max-w-4xl">
                 {navigation.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors min-w-[80px] ${
+                      className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors min-w-[60px] ${
                         isActive ? "bg-green-100 text-green-700" : "text-gray-600 hover:text-green-600 hover:bg-green-50"
                       }`}
                     >

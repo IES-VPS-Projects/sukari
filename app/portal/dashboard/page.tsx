@@ -26,6 +26,7 @@ import ViewPlanCard from "./ViewPlanCard"
 import ResourceCenterCard from "./ResourceCenterCard"
 import SucroseContentCard from "./SucroseContentCard"
 import ProductionPulseCard from "./ProductionPulseCard"
+import PermitsCard from "./PermitsCard"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -331,12 +332,14 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Permits Card - First card */}
+        <PermitsCard />
+
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-[#6B6B6B]">Financial Health</h3>
-              <DollarSign className="h-4 w-4 text-green-500" />
+              <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
             </div>
             <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
             <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
@@ -378,8 +381,8 @@ export default function DashboardPage() {
         {/* View Strategic Plan */}
         <ViewPlanCard />
 
-        {/* Resource Center - replaced Quick Stats */}
-        <ResourceCenterCard />
+        {/* Empty middle section - Resource Center moved to fourth row */}
+        <div></div>
 
         {/* Top Performing Mills - moved to last position */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
@@ -424,6 +427,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SucroseContentCard sucroseData={sucroseData} />
         <ProductionPulseCard productionData={productionPulseData} />
+      </div>
+
+      {/* Fourth Row - Resource Center */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ResourceCenterCard />
       </div>
 
     </div>

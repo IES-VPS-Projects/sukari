@@ -66,8 +66,7 @@ const categories = [
   { id: "all", label: "All Reports", icon: FileText, active: true },
   { id: "operational", label: "Operational", icon: TrendingUp, active: false },
   { id: "financial", label: "Financial", icon: DollarSign, active: false },
-  { id: "compliance", label: "Compliance", icon: AlertTriangle, active: false },
-  { id: "kpi", label: "KPI Reports", icon: CheckCircle, active: false }
+  { id: "compliance", label: "Compliance", icon: AlertTriangle, active: false }
 ]
 
 export default function ReportsPage() {
@@ -86,13 +85,13 @@ export default function ReportsPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto">
           {/* Page Title */}
-          <div className="px-6 py-4">
-            <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
+          <div className="px-4 lg:px-6 py-4">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Reports</h1>
           </div>
 
         {/* Search and Filter Bar - Extended across full width */}
-        <div className="bg-white border-b px-6 py-4 mx-6 rounded-lg shadow-sm mb-6">
-          <div className="flex items-center gap-4">
+        <div className="bg-white border-b px-4 lg:px-6 py-4 mx-4 lg:mx-6 rounded-lg shadow-sm mb-6">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
             {/* Search Bar - Expanded to take remaining space */}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -105,10 +104,10 @@ export default function ReportsPage() {
             </div>
             
             {/* Right Controls Group */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               {/* Sort by Date */}
               <Select defaultValue="date">
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue placeholder="Sort by Date" />
                 </SelectTrigger>
                 <SelectContent>
@@ -120,14 +119,14 @@ export default function ReportsPage() {
               </Select>
               
               {/* Filters Button */}
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
                 <Filter className="h-4 w-4 mr-2" />
                 Filters
               </Button>
               
               {/* Generate Report Button */}
               <Button 
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
                 onClick={() => setCustomReportOpen(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -138,9 +137,9 @@ export default function ReportsPage() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="flex gap-6 px-6">
+        <div className="flex flex-col lg:flex-row gap-6 px-4 lg:px-6">
           {/* Left Sidebar - Categories */}
-          <div className="w-80 bg-white border rounded-lg p-6 h-fit">
+          <div className="w-full lg:w-80 bg-white border rounded-lg p-6 h-fit">
             {/* Categories Section */}
             <div className="mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Categories</h2>
@@ -182,7 +181,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Right Content Area */}
-          <div className="flex-1">
+          <div className="flex-1 w-full lg:w-auto">
             {/* Reports Section */}
             <Card>
               <CardContent className="p-6">

@@ -68,7 +68,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Success Message */}
       {showSuccessMessage && (
         <div className="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2">
@@ -78,9 +78,9 @@ export default function LoginPage() {
       )}
 
       {/* Left Column - Branding */}
-      <div className="w-1/2 p-4 flex items-center justify-center">
+      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center">
         <div
-          className="w-full h-full rounded-l-2xl rounded-tr-2xl rounded-br-2xl flex flex-col items-center justify-center p-12 relative overflow-hidden"
+          className="w-full h-64 lg:h-full rounded-l-2xl rounded-tr-2xl rounded-br-2xl flex flex-col items-center justify-center p-12 relative overflow-hidden"
           style={{
             backgroundImage: "url(/images/login_image.png)",
             backgroundSize: "cover",
@@ -93,15 +93,15 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column - Sign In Form */}
-      <div className="w-1/2 bg-white flex items-center justify-center p-12 pl-0">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 lg:p-12 lg:pl-0">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
             {/* Logo above Sign In */}
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center space-x-4">
-                <Image src="/images/ISEAGRILOGO.png" alt="ISE Agriculture" width={100} height={100} className="" />
-                <div className="h-12 w-px bg-gray-300"></div>
-                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={140} height={90} className="" />
+            <div className="text-center mb-6 lg:mb-8">
+              <div className="flex items-center justify-center space-x-2 lg:space-x-4">
+                <Image src="/images/ISEAGRILOGO.png" alt="ISE Agriculture" width={80} height={80} className="lg:w-[100px] lg:h-[100px]" />
+                <div className="h-8 lg:h-12 w-px bg-gray-300"></div>
+                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={110} height={70} className="lg:w-[140px] lg:h-[90px]" />
               </div>
             </div>
 
