@@ -21,7 +21,7 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Award, Filter } from "lucide-react"
+import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Award, Filter, FileText, Search, Plus, Download, Eye } from "lucide-react"
 import ViewPlanCard from "./ViewPlanCard"
 import ResourceCenterCard from "./ResourceCenterCard"
 import SucroseContentCard from "./SucroseContentCard"
@@ -327,10 +327,50 @@ export default function DashboardPage() {
     { id: "compliance", label: "Compliance" },
     { id: "strategic-plan", label: "Strategic Plan" },
     { id: "reports", label: "Reports" },
-    { id: "ctu-sucrose", label: "CTU Sucrose Content" },
     { id: "production", label: "Production" },
     { id: "resource-center", label: "Resource Center" }
   ]
+
+  // Reports data for the reports tab
+  const reportsData = [
+    {
+      id: 1,
+      title: "Compliance Audit Report",
+      category: "Compliance",
+      date: "28/07/2025",
+      size: "3.2 MB",
+      status: "Draft",
+      lastModified: "2 days ago"
+    },
+    {
+      id: 2,
+      title: "Monthly Production Summary - November 2024",
+      category: "Operational",
+      date: "26/07/2025",
+      size: "2.4 MB",
+      status: "Published",
+      lastModified: "4 days ago"
+    },
+    {
+      id: 3,
+      title: "Financial Performance Q3 2024",
+      category: "Financial",
+      date: "21/07/2025",
+      size: "1.8 MB",
+      status: "Published",
+      lastModified: "1 week ago"
+    }
+  ]
+
+  const categories = [
+    { id: "all", label: "All Reports" },
+    { id: "operational", label: "Operational" },
+    { id: "financial", label: "Financial" },
+    { id: "compliance", label: "Compliance" }
+  ]
+
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
 
   // Function to render content based on active tab
   const renderTabContent = () => {
@@ -679,107 +719,128 @@ export default function DashboardPage() {
 
       case "reports":
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-6">
+            {/* Search and Filter Bar */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Recent Reports</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-2 border rounded">
-                    <span className="text-sm">Q3 Compliance Report</span>
-                    <Badge variant="secondary">New</Badge>
+              <CardContent className="p-6">
+                <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      placeholder="Search reports..."
+                      className="pl-10 w-full p-2 border rounded-md"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                   </div>
-                  <div className="flex justify-between items-center p-2 border rounded">
-                    <span className="text-sm">Production Summary</span>
-                    <Badge variant="outline">Draft</Badge>
-                  </div>
-                  <div className="flex justify-between items-center p-2 border rounded">
-                    <span className="text-sm">Financial Statement</span>
-                    <Badge className="bg-green-100 text-green-800">Published</Badge>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filters
+                    </Button>
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Report
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Report Categories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Operational Reports</span>
-                    <span className="font-semibold">12</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Financial Reports</span>
-                    <span className="font-semibold">8</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Compliance Reports</span>
-                    <span className="font-semibold">15</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Generation Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm">Monthly Reports</span>
-                      <span className="text-sm font-semibold">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm">Quarterly Reports</span>
-                      <span className="text-sm font-semibold">92%</span>
-                    </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
 
-      case "ctu-sucrose":
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SucroseContentCard sucroseData={sucroseData} />
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Sucrose Content Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm">Average Sucrose Content</span>
-                      <span className="text-sm font-semibold">13.7%</span>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Categories Sidebar */}
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Categories</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                          selectedCategory === category.id 
+                            ? 'bg-green-100 text-green-700 font-medium' 
+                            : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        <FileText className="h-4 w-4" />
+                        {category.label}
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Reports List */}
+              <div className="lg:col-span-3">
+                <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                  <CardHeader>
+                    <CardTitle className="text-[#202020]">Reports ({reportsData.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {reportsData.map((report) => (
+                        <div key={report.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <FileText className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-900 mb-1">{report.title}</h3>
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                  <Badge variant="outline" className="text-xs">
+                                    {report.category}
+                                  </Badge>
+                                  <span>•</span>
+                                  <span>{report.date}</span>
+                                  <span>•</span>
+                                  <span>{report.size}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <Badge 
+                              variant={report.status === "Published" ? "default" : "secondary"}
+                              className={report.status === "Published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
+                            >
+                              {report.status}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Report
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <Progress value={68} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm">Target Achievement</span>
-                      <span className="text-sm font-semibold">92%</span>
+                  </CardContent>
+                </Card>
+
+                {/* Custom Report Generator */}
+                <Card className="rounded-[20px] shadow-lg border-0 bg-white mt-6">
+                  <CardHeader>
+                    <CardTitle className="text-[#202020]">Custom Report Generator</CardTitle>
+                    <p className="text-gray-600">Create custom reports with specific metrics and date ranges</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-3">
+                      <Button variant="outline">Production Report</Button>
+                      <Button variant="outline">Financial Summary</Button>
+                      <Button variant="outline">Compliance Audit</Button>
+                      <Button className="bg-green-600 hover:bg-green-700">Custom Builder</Button>
                     </div>
-                    <Progress value={92} className="h-2" />
-                  </div>
-                  <div className="text-sm space-y-2">
-                    <p><strong>Highest:</strong> Muhoroni - 15.0%</p>
-                    <p><strong>Lowest:</strong> Kwale - 13.5%</p>
-                    <p><strong>Industry Standard:</strong> 14.0%</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         )
 
@@ -787,6 +848,7 @@ export default function DashboardPage() {
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ProductionPulseCard productionData={productionPulseData} />
+            <SucroseContentCard sucroseData={sucroseData} />
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
                 <CardTitle className="text-[#202020]">Production Metrics</CardTitle>
@@ -811,6 +873,34 @@ export default function DashboardPage() {
                     <p><strong>Top Producer:</strong> Mumias Sugar</p>
                     <p><strong>Growth Rate:</strong> +12% YoY</p>
                     <p><strong>Target for Q4:</strong> 3,500 tons/month</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Sucrose Content Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Average Sucrose Content</span>
+                      <span className="text-sm font-semibold">13.7%</span>
+                    </div>
+                    <Progress value={68} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Target Achievement</span>
+                      <span className="text-sm font-semibold">92%</span>
+                    </div>
+                    <Progress value={92} className="h-2" />
+                  </div>
+                  <div className="text-sm space-y-2">
+                    <p><strong>Highest:</strong> Muhoroni - 15.0%</p>
+                    <p><strong>Lowest:</strong> Kwale - 13.5%</p>
+                    <p><strong>Industry Standard:</strong> 14.0%</p>
                   </div>
                 </div>
               </CardContent>
@@ -863,20 +953,22 @@ export default function DashboardPage() {
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {/* Tab Bar */}
         <div className="border-b border-gray-200">
-          <nav className="flex flex-wrap gap-6 px-4 -mb-px">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-3 px-1 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-green-500 text-green-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <nav className="flex justify-center px-4 -mb-px">
+            <div className="flex gap-8 items-center justify-center">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-3 px-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "border-green-500 text-green-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
 
