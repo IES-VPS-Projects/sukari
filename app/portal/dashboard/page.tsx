@@ -316,125 +316,576 @@ const chartOptions = {
 }
 
 export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState("overview")
+
+  // Tab definitions
+  const tabs = [
+    { id: "overview", label: "Overview" },
+    { id: "permits", label: "Permits" },
+    { id: "revenue", label: "Revenue" },
+    { id: "stakeholders", label: "Stakeholders" },
+    { id: "compliance", label: "Compliance" },
+    { id: "strategic-plan", label: "Strategic Plan" },
+    { id: "reports", label: "Reports" },
+    { id: "ctu-sucrose", label: "CTU Sucrose Content" },
+    { id: "production", label: "Production" },
+    { id: "resource-center", label: "Resource Center" }
+  ]
+
+  // Function to render content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return (
+          <>
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <PermitsCard />
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
+                  </div>
+                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
+                  <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
+                  <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
+                  <Progress value={92} className="h-2 mb-2" />
+                  <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
+                    <Users className="h-4 w-4 text-green-500" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
+                  <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
+                  <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
+                  <Progress value={78} className="h-2 mb-2" />
+                  <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  </div>
+                  <div className="flex justify-center">
+                    <GaugeMeter value={94} />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Dashboard Metrics Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ViewPlanCard />
+              <div></div>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#202020]">Mumias Sugar Mill</span>
+                      <span className="text-sm font-medium text-green-600">85%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#202020]">Nzoia Sugar Mill</span>
+                      <span className="text-sm font-medium text-green-600">80%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-500 h-2 rounded-full" style={{width: '80%'}}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#202020]">West Kenya Sugar</span>
+                      <span className="text-sm font-medium text-green-600">75%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* CTU Sucrose Content and Production Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SucroseContentCard sucroseData={sucroseData} />
+              <ProductionPulseCard productionData={productionPulseData} />
+            </div>
+
+            {/* Fourth Row - Resource Center */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <ResourceCenterCard />
+            </div>
+          </>
+        )
+
+      case "permits":
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <PermitsCard />
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Permit Applications by Type</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Mill Registration</span>
+                    <span className="font-semibold">45</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Quality Certification</span>
+                    <span className="font-semibold">32</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Export License</span>
+                    <span className="font-semibold">28</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Operation License</span>
+                    <span className="font-semibold">51</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Processing Timeline</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Average Processing Time</span>
+                      <span className="text-sm font-semibold">14 days</span>
+                    </div>
+                    <Progress value={70} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Fast Track Applications</span>
+                      <span className="text-sm font-semibold">7 days</span>
+                    </div>
+                    <Progress value={35} className="h-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "revenue":
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
+                </div>
+                <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
+                <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
+                <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
+                <Progress value={92} className="h-2 mb-2" />
+                <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Revenue Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Sugar Levy</span>
+                    <span className="font-semibold">KSh 1.8B</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">License Fees</span>
+                    <span className="font-semibold">KSh 350M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Penalties</span>
+                    <span className="font-semibold">KSh 125M</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Other Income</span>
+                    <span className="font-semibold">KSh 125M</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Collection Efficiency</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <GaugeMeter value={92} />
+                </div>
+                <p className="text-center text-sm text-gray-600 mt-2">Target: 95%</p>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "stakeholders":
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
+                  <Users className="h-4 w-4 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
+                <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
+                <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
+                <Progress value={78} className="h-2 mb-2" />
+                <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
+              </CardContent>
+            </Card>
+            {stakeholders.map((stakeholder, index) => (
+              <Card key={index} className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020] text-base">{stakeholder.type}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-2xl font-bold">{stakeholder.count}</span>
+                      <span className="text-sm text-gray-600">of {stakeholder.total}</span>
+                    </div>
+                    <Progress value={(stakeholder.count / stakeholder.total) * 100} className="h-2" />
+                    <div className="text-xs text-gray-600">
+                      <p>Location: {stakeholder.location}</p>
+                      <p>Status: {stakeholder.status}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )
+
+      case "compliance":
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                </div>
+                <div className="flex justify-center">
+                  <GaugeMeter value={94} />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Compliance Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Fully Compliant Mills</span>
+                    <span className="font-semibold text-green-600">12</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Partially Compliant</span>
+                    <span className="font-semibold text-yellow-600">2</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Non-Compliant</span>
+                    <span className="font-semibold text-red-600">1</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Audit Schedule</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-sm">
+                    <p className="font-medium">Upcoming Audits: 3</p>
+                    <p className="text-gray-600">Next: Mumias Sugar (Sept 2)</p>
+                  </div>
+                  <div className="text-sm">
+                    <p className="font-medium">Completed: 8/15</p>
+                    <Progress value={53} className="h-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "strategic-plan":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ViewPlanCard />
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Key Objectives Progress</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm">Sugar Production Enhancement</span>
+                    <span className="text-sm font-semibold">65%</span>
+                  </div>
+                  <Progress value={65} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm">Regulatory Framework</span>
+                    <span className="text-sm font-semibold">78%</span>
+                  </div>
+                  <Progress value={78} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm">Market Development</span>
+                    <span className="text-sm font-semibold">45%</span>
+                  </div>
+                  <Progress value={45} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm">Technology Integration</span>
+                    <span className="text-sm font-semibold">52%</span>
+                  </div>
+                  <Progress value={52} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "reports":
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Recent Reports</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 border rounded">
+                    <span className="text-sm">Q3 Compliance Report</span>
+                    <Badge variant="secondary">New</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 border rounded">
+                    <span className="text-sm">Production Summary</span>
+                    <Badge variant="outline">Draft</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 border rounded">
+                    <span className="text-sm">Financial Statement</span>
+                    <Badge className="bg-green-100 text-green-800">Published</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Report Categories</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Operational Reports</span>
+                    <span className="font-semibold">12</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Financial Reports</span>
+                    <span className="font-semibold">8</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Compliance Reports</span>
+                    <span className="font-semibold">15</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Generation Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Monthly Reports</span>
+                      <span className="text-sm font-semibold">85%</span>
+                    </div>
+                    <Progress value={85} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Quarterly Reports</span>
+                      <span className="text-sm font-semibold">92%</span>
+                    </div>
+                    <Progress value={92} className="h-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "ctu-sucrose":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SucroseContentCard sucroseData={sucroseData} />
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Sucrose Content Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Average Sucrose Content</span>
+                      <span className="text-sm font-semibold">13.7%</span>
+                    </div>
+                    <Progress value={68} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Target Achievement</span>
+                      <span className="text-sm font-semibold">92%</span>
+                    </div>
+                    <Progress value={92} className="h-2" />
+                  </div>
+                  <div className="text-sm space-y-2">
+                    <p><strong>Highest:</strong> Muhoroni - 15.0%</p>
+                    <p><strong>Lowest:</strong> Kwale - 13.5%</p>
+                    <p><strong>Industry Standard:</strong> 14.0%</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "production":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProductionPulseCard productionData={productionPulseData} />
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Production Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Monthly Production</span>
+                      <span className="text-sm font-semibold">3,100 tons</span>
+                    </div>
+                    <Progress value={78} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Capacity Utilization</span>
+                      <span className="text-sm font-semibold">85%</span>
+                    </div>
+                    <Progress value={85} className="h-2" />
+                  </div>
+                  <div className="text-sm space-y-2">
+                    <p><strong>Top Producer:</strong> Mumias Sugar</p>
+                    <p><strong>Growth Rate:</strong> +12% YoY</p>
+                    <p><strong>Target for Q4:</strong> 3,500 tons/month</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "resource-center":
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ResourceCenterCard />
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Resource Statistics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Total Documents</span>
+                    <span className="font-semibold">248</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Recently Updated</span>
+                    <span className="font-semibold">15</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Most Downloaded</span>
+                    <span className="font-semibold">Sugar Act 2023</span>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm">Storage Usage</span>
+                      <span className="text-sm font-semibold">67%</span>
+                    </div>
+                    <Progress value={67} className="h-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      default:
+        return null
+    }
+  }
+
   return (
     <PortalLayout pageTitle="Dashboard">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          </div>
-          <div className="flex items-center gap-2">
-          <Badge className="bg-green-100 text-green-800">Live Data</Badge>
-          <Button variant="outline" size="sm">
-            Export Data
-          </Button>
+        {/* Tab Bar */}
+        <div className="border-b border-gray-200">
+          <nav className="flex flex-wrap gap-6 px-4 -mb-px">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3 px-1 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "border-green-500 text-green-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
+
+        {/* Dynamic Content Based on Active Tab */}
+        <div className="space-y-6">
+          {renderTabContent()}
+        </div>
+
       </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Permits Card - First card */}
-        <PermitsCard />
-
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
-            </div>
-            <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
-            <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
-            <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
-            <Progress value={92} className="h-2 mb-2" />
-            <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
-              <Users className="h-4 w-4 text-green-500" />
-            </div>
-            <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
-            <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
-            <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
-            <Progress value={78} className="h-2 mb-2" />
-            <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            </div>
-            <div className="flex justify-center">
-              <GaugeMeter value={94} />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Dashboard Metrics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* View Strategic Plan */}
-        <ViewPlanCard />
-
-        {/* Empty middle section - Resource Center moved to fourth row */}
-        <div></div>
-
-        {/* Top Performing Mills - moved to last position */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader>
-            <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-[#202020]">Mumias Sugar Mill</span>
-                <span className="text-sm font-medium text-green-600">85%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-[#202020]">Nzoia Sugar Mill</span>
-                <span className="text-sm font-medium text-green-600">80%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{width: '80%'}}></div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-[#202020]">West Kenya Sugar</span>
-                <span className="text-sm font-medium text-green-600">75%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* CTU Sucrose Content and Production Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SucroseContentCard sucroseData={sucroseData} />
-        <ProductionPulseCard productionData={productionPulseData} />
-      </div>
-
-      {/* Fourth Row - Resource Center */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <ResourceCenterCard />
-      </div>
-
-    </div>
     </PortalLayout>
   )
 }
