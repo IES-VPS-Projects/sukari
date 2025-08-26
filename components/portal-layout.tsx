@@ -19,7 +19,6 @@ const navigation = [
   { name: "Calendar", href: "/portal/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
-  { name: "Profile", href: "/portal/profile", icon: User },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
