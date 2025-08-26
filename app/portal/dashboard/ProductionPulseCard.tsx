@@ -9,16 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from "recharts"
-import { Factory, TrendingUp, AlertTriangle, Target, Settings } from "lucide-react"
-
-interface ProductionData {
-  month: string
-  year: number
-  factory: string // Factory name
-  ksbReturns: number // in millions KSh
-  kraReturns: number // in millions KSh
-  target: number
-}
+import { Factory, TrendingUp, AlertTriangle, Target, Settings, X } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { ProductionData } from "@/lib/mockdata"
 
 interface ProductionPulseCardProps {
   className?: string
@@ -26,6 +19,7 @@ interface ProductionPulseCardProps {
 }
 
 const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardProps) => {
+  const isMobile = useIsMobile()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedMetric, setSelectedMetric] = useState("ksbReturns")
   const [selectedFactory, setSelectedFactory] = useState("all")
@@ -119,22 +113,22 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
   return (
     <>
       <Card 
-        className={`rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200 h-[400px] ${className}`}
+        className={`rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200 ${isMobile ? 'h-[450px]' : 'h-[400px]'} ${className}`}
       >
         <CardHeader className="pb-2 px-4 pt-4" onClick={() => setModalOpen(true)}>
-          <div className="flex items-center justify-between">
+          <div className={`flex items-center justify-between ${isMobile ? 'flex-col gap-3' : ''}`}>
             <CardTitle className="text-2xl font-bold text-[#202020]">
               Production
             </CardTitle>
             <div 
-              className="flex gap-2" 
+              className={`flex gap-2 ${isMobile ? 'w-full' : ''}`} 
               onClick={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
               onTouchEnd={(e) => e.stopPropagation()}
             >
               <Select value={selectedFactory} onValueChange={setSelectedFactory}>
                 <SelectTrigger 
-                  className="w-32 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  className={`${isMobile ? 'flex-1' : 'w-32'} focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none`}
                   onClick={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -153,7 +147,7 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
               </Select>
               <Select value={selectedMetric} onValueChange={setSelectedMetric}>
                 <SelectTrigger 
-                  className="w-40 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  className={`${isMobile ? 'w-24' : 'w-40'} focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none`}
                   onClick={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -167,7 +161,7 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
               </Select>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger 
-                  className="w-20 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  className={`${isMobile ? 'w-20' : 'w-20'} focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none`}
                   onClick={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -189,31 +183,31 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
         </CardHeader>
         <CardContent className="space-y-3 p-4 cursor-pointer" onClick={() => setModalOpen(true)}>
           {/* Stats moved above chart */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-2`}>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-gray-900">{currentMonthData.totalSupply.toLocaleString()}</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-900`}>{currentMonthData.totalSupply.toLocaleString()}</div>
               <p className="text-xs text-[#6B6B6B]">Total Supply</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-green-600">{currentMonthData.totalProduction.toLocaleString()}</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-green-600`}>{currentMonthData.totalProduction.toLocaleString()}</div>
               <p className="text-xs text-[#6B6B6B]">Total Production</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-blue-600">{currentMonthData.conversionRate}%</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-blue-600`}>{currentMonthData.conversionRate}%</div>
               <p className="text-xs text-[#6B6B6B]">Conversion Rate</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-orange-600">{currentMonthData.peakMonth.value}M</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-orange-600`}>{currentMonthData.peakMonth.value}M</div>
               <p className="text-xs text-[#6B6B6B]">Peak Month ({currentMonthData.peakMonth.month})</p>
             </div>
           </div>
 
           {/* Main Chart */}
-          <div className="h-60">
+          <div className={`${isMobile ? 'h-48' : 'h-60'} overflow-hidden`}>
             <ResponsiveContainer width="100%" height="100%">
               {selectedMetric === "combined" ? (
                 // Stacked Area Chart for Combined view
-                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <AreaChart data={chartData} margin={{ top: 5, right: isMobile ? 2 : 5, left: isMobile ? 2 : 5, bottom: 5 }}>
                   <defs>
                     <linearGradient id="ksbGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -229,14 +223,14 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
                     dataKey="month" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
                     height={20}
                   />
                   <YAxis 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    width={25}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
+                    width={isMobile ? 20 : 25}
                   />
                   <Tooltip 
                     formatter={(value: number, name: string) => [
@@ -272,7 +266,7 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
                 </AreaChart>
               ) : (
                 // Regular Area Chart for individual metrics
-                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <AreaChart data={chartData} margin={{ top: 5, right: isMobile ? 2 : 5, left: isMobile ? 2 : 5, bottom: 5 }}>
                   <defs>
                     <linearGradient id="singleMetricGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={selectedMetric === "ksbReturns" ? "#10b981" : "#3b82f6"} stopOpacity={0.3}/>
@@ -284,14 +278,14 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
                     dataKey="month" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
                     height={20}
                   />
                   <YAxis 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    width={25}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
+                    width={isMobile ? 20 : 25}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`${value}M KSh`, selectedMetric === "ksbReturns" ? "KSB Returns" : "KRA Returns"]}
@@ -329,47 +323,53 @@ const ProductionPulseCard = ({ className, productionData }: ProductionPulseCardP
               <DialogTitle className="text-xl font-bold">
                 Production
               </DialogTitle>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={selectedFactory} onValueChange={setSelectedFactory}>
-                  <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Select Factory" />
-                  </SelectTrigger>
-                  <SelectContent className="z-[70]">
-                    <SelectItem value="all">All Factories</SelectItem>
-                    <SelectItem value="butali">Butali</SelectItem>
-                    <SelectItem value="chemelil">Chemelil</SelectItem>
-                    <SelectItem value="kibos">Kibos</SelectItem>
-                    <SelectItem value="kwale">Kwale</SelectItem>
-                    <SelectItem value="muhoroni">Muhoroni</SelectItem>
-                    <SelectItem value="nzoia">Nzoia</SelectItem>
-                    <SelectItem value="west kenya">West Kenya</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                  <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[70]">
-                    <SelectItem value="ksbReturns">KSB Returns</SelectItem>
-                    <SelectItem value="kraReturns">KRA Returns</SelectItem>
-                    <SelectItem value="combined">Combined</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="w-full sm:w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[70]">
-                    <SelectItem value="2017">2017</SelectItem>
-                    <SelectItem value="2018">2018</SelectItem>
-                    <SelectItem value="2019">2019</SelectItem>
-                    <SelectItem value="2020">2020</SelectItem>
-                    <SelectItem value="2021">2021</SelectItem>
-                    <SelectItem value="2022">2022</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                    <SelectItem value="2024">2024</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Select value={selectedFactory} onValueChange={setSelectedFactory}>
+                    <SelectTrigger className="w-full sm:w-40">
+                      <SelectValue placeholder="Select Factory" />
+                    </SelectTrigger>
+                    <SelectContent className="z-[70]">
+                      <SelectItem value="all">All Factories</SelectItem>
+                      <SelectItem value="butali">Butali</SelectItem>
+                      <SelectItem value="chemelil">Chemelil</SelectItem>
+                      <SelectItem value="muhoroni">Muhoroni</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                    <SelectTrigger className="w-full sm:w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[70]">
+                      <SelectItem value="ksbReturns">KSB Returns</SelectItem>
+                      <SelectItem value="kraReturns">KRA Returns</SelectItem>
+                      <SelectItem value="combined">Combined</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-full sm:w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[70]">
+                      <SelectItem value="2017">2017</SelectItem>
+                      <SelectItem value="2018">2018</SelectItem>
+                      <SelectItem value="2019">2019</SelectItem>
+                      <SelectItem value="2020">2020</SelectItem>
+                      <SelectItem value="2021">2021</SelectItem>
+                      <SelectItem value="2022">2022</SelectItem>
+                      <SelectItem value="2023">2023</SelectItem>
+                      <SelectItem value="2024">2024</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setModalOpen(false)}
+                  className="h-8 w-8 shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </DialogHeader>

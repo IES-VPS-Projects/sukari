@@ -47,27 +47,26 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className={`bg-white border-b border-gray-200 px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
           <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex items-center space-x-3">
               <img 
-                src="/images/ISEAGRILOGO4.png" 
+                src="/images/ISE_Agri_Logo.png" 
                 alt="ISE Agriculture Logo" 
-                className="h-12 w-auto"
+                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
               />
-              <div className="h-12 w-0.5 bg-gray-300"></div>
+              <div className={`${isMobile ? 'h-8' : 'h-12'} w-0.5 bg-gray-300`}></div>
               <img 
                 src="/images/ksb2.png" 
                 alt="KSB Logo" 
-                className="h-12 w-auto"
+                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
               />
-              <div className="h-12 w-0.5 bg-gray-300"></div>
-              <div className="flex flex-col">
-                <h1 className="text-lg font-bold text-gray-900 leading-tight">
+              <div className="flex flex-col ml-2">
+                <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
                   KENYA SUGAR BOARD
                 </h1>
-                <p className="text-sm text-gray-600 leading-tight">
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
                   Information Management System
                 </p>
               </div>
@@ -94,9 +93,11 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
+                  <DropdownMenuItem asChild>
+                    <Link href="/portal/profile" className="flex items-center w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />

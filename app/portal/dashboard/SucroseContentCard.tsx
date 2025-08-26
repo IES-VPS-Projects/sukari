@@ -4,21 +4,11 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogOverlay, DialogPortal } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
-import { TrendingUp, Activity, Calendar, Target } from "lucide-react"
-
-interface SucroseData {
-  month: string
-  year: number
-  butali: number
-  chemelil: number
-  muhoroni: number
-  kibos: number
-  westKenya: number
-  nzoia: number
-  kwale: number
-  combined: number
-}
+import { TrendingUp, Activity, Calendar, Target, X } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { SucroseData } from "@/lib/mockdata"
 
 interface SucroseContentCardProps {
   className?: string
@@ -26,6 +16,7 @@ interface SucroseContentCardProps {
 }
 
 const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps) => {
+  const isMobile = useIsMobile()
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedMiller, setSelectedMiller] = useState("combined")
   const [selectedYear, setSelectedYear] = useState("2024")
@@ -143,22 +134,22 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
   return (
     <>
       <Card 
-        className={`rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200 h-[400px] ${className}`}
+        className={`rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200 ${isMobile ? 'h-[450px]' : 'h-[400px]'} ${className}`}
       >
         <CardHeader className="pb-2 px-4 pt-4" onClick={() => setModalOpen(true)}>
-          <div className="flex items-center justify-between">
+          <div className={`flex items-center justify-between ${isMobile ? 'flex-col gap-3' : ''}`}>
             <CardTitle className="text-2xl font-bold text-[#202020]">
               CTU Sucrose Content
             </CardTitle>
             <div 
-              className="flex gap-2"
+              className={`flex gap-2 ${isMobile ? 'w-full' : ''}`}
               onClick={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
               onTouchEnd={(e) => e.stopPropagation()}
             >
               <Select value={selectedMiller} onValueChange={setSelectedMiller}>
                 <SelectTrigger 
-                  className="w-32 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  className={`${isMobile ? 'flex-1' : 'w-32'} focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none`}
                   onClick={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -177,7 +168,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
               </Select>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger 
-                  className="w-20 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none"
+                  className={`${isMobile ? 'w-20' : 'w-20'} focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 focus:outline-none`}
                   onClick={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
                 >
@@ -199,31 +190,31 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
         </CardHeader>
         <CardContent className="space-y-3 p-4 cursor-pointer" onClick={() => setModalOpen(true)}>
           {/* Stats moved above chart */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-2`}>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-blue-600">{(Math.round(currentMonthData.average * 100) / 100)}%</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-blue-600`}>{(Math.round(currentMonthData.average * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Current Month</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-green-600">{(Math.round(currentMonthData.yearlyAverage * 100) / 100)}%</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-green-600`}>{(Math.round(currentMonthData.yearlyAverage * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Yearly Average</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-orange-600">{(Math.round(currentMonthData.highest.value * 100) / 100)}%</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-orange-600`}>{(Math.round(currentMonthData.highest.value * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Highest ({currentMonthData.highest.month})</p>
             </div>
             <div className="text-center p-2 bg-white rounded-lg shadow-sm border border-gray-100">
-              <div className="text-lg font-bold text-red-600">{(Math.round(currentMonthData.lowest.value * 100) / 100)}%</div>
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-red-600`}>{(Math.round(currentMonthData.lowest.value * 100) / 100)}%</div>
               <p className="text-xs text-[#6B6B6B]">Lowest ({currentMonthData.lowest.month})</p>
             </div>
           </div>
 
           {/* Enhanced Chart */}
-          <div className="h-60 w-full">
+          <div className={`${isMobile ? 'h-48' : 'h-60'} w-full overflow-hidden`}>
             <ResponsiveContainer width="100%" height="100%">
               {selectedMiller === "combined" ? (
                 // Stacked Area Chart for Combined view
-                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <AreaChart data={chartData} margin={{ top: 5, right: isMobile ? 2 : 5, left: isMobile ? 2 : 5, bottom: 5 }}>
                   <defs>
                     <linearGradient id="butaliGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
@@ -239,14 +230,14 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                     dataKey="month" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
                     height={20}
                   />
                   <YAxis 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    width={25}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
+                    width={isMobile ? 20 : 25}
                   />
                   <Tooltip 
                     formatter={(value: number, name: string) => [
@@ -280,7 +271,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                 </AreaChart>
               ) : (
                 // Regular Area Chart for individual millers
-                <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <AreaChart data={chartData} margin={{ top: 5, right: isMobile ? 2 : 5, left: isMobile ? 2 : 5, bottom: 5 }}>
                   <defs>
                     <linearGradient id="singleSucroseGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={getMillerColor(selectedMiller)} stopOpacity={0.3}/>
@@ -292,14 +283,14 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                     dataKey="month" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
                     height={20}
                   />
                   <YAxis 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    width={25}
+                    tick={{ fontSize: isMobile ? 7 : 9, fill: '#64748b' }}
+                    width={isMobile ? 20 : 25}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`${value}%`, getMillerDisplayName(selectedMiller)]}
@@ -337,37 +328,43 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
               <DialogTitle className="text-xl font-bold">
                 CTU Sucrose Content
               </DialogTitle>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={selectedMiller} onValueChange={setSelectedMiller}>
-                  <SelectTrigger className="w-full sm:w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[70]">
-                    <SelectItem value="combined">Combined</SelectItem>
-                    <SelectItem value="butali">Butali</SelectItem>
-                    <SelectItem value="chemelil">Chemelil</SelectItem>
-                    <SelectItem value="muhoroni">Muhoroni</SelectItem>
-                    <SelectItem value="kibos">Kibos</SelectItem>
-                    <SelectItem value="westKenya">West Kenya</SelectItem>
-                    <SelectItem value="nzoia">Nzoia</SelectItem>
-                    <SelectItem value="kwale">Kwale</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="w-full sm:w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="z-[70]">
-                    <SelectItem value="2017">2017</SelectItem>
-                    <SelectItem value="2018">2018</SelectItem>
-                    <SelectItem value="2019">2019</SelectItem>
-                    <SelectItem value="2020">2020</SelectItem>
-                    <SelectItem value="2021">2021</SelectItem>
-                    <SelectItem value="2022">2022</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                    <SelectItem value="2024">2024</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Select value={selectedMiller} onValueChange={setSelectedMiller}>
+                    <SelectTrigger className="w-full sm:w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[70]">
+                      <SelectItem value="combined">All Factories</SelectItem>
+                      <SelectItem value="butali">Butali</SelectItem>
+                      <SelectItem value="chemelil">Chemelil</SelectItem>
+                      <SelectItem value="muhoroni">Muhoroni</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-full sm:w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[70]">
+                      <SelectItem value="2017">2017</SelectItem>
+                      <SelectItem value="2018">2018</SelectItem>
+                      <SelectItem value="2019">2019</SelectItem>
+                      <SelectItem value="2020">2020</SelectItem>
+                      <SelectItem value="2021">2021</SelectItem>
+                      <SelectItem value="2022">2022</SelectItem>
+                      <SelectItem value="2023">2023</SelectItem>
+                      <SelectItem value="2024">2024</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setModalOpen(false)}
+                  className="h-8 w-8 shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </DialogHeader>
@@ -408,6 +405,10 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.6}/>
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
                       </linearGradient>
+                      <linearGradient id="muhoroniModalGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.6}/>
+                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.1}/>
+                      </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                     <XAxis 
@@ -429,8 +430,10 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                     />
                     <Tooltip 
                       formatter={(value: number, name: string) => [
-                        `${value}%`, 
-                        name === "butali" ? "Butali" : "Chemelil"
+                        `${(Math.round(value * 100) / 100).toFixed(2)}%`, 
+                        name === "butali" ? "Butali" : 
+                        name === "chemelil" ? "Chemelil" : 
+                        name === "muhoroni" ? "Muhoroni" : name
                       ]}
                       labelFormatter={(label) => `Month: ${label}`}
                       contentStyle={{
@@ -445,7 +448,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                       dataKey="butali"
                       stackId="1"
                       stroke="#3b82f6" 
-                      strokeWidth={3}
+                      strokeWidth={2}
                       fill="url(#butaliModalGradient)"
                       name="butali"
                     />
@@ -454,9 +457,18 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                       dataKey="chemelil"
                       stackId="1"
                       stroke="#10b981" 
-                      strokeWidth={3}
+                      strokeWidth={2}
                       fill="url(#chemelilModalGradient)"
                       name="chemelil"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="muhoroni"
+                      stackId="1"
+                      stroke="#f59e0b" 
+                      strokeWidth={2}
+                      fill="url(#muhoroniModalGradient)"
+                      name="muhoroni"
                     />
                   </AreaChart>
                 ) : (
@@ -487,7 +499,7 @@ const SucroseContentCard = ({ className, sucroseData }: SucroseContentCardProps)
                       tick={{ fontSize: 12, fill: '#64748b' }}
                     />
                     <Tooltip 
-                      formatter={(value: number) => [`${value}%`, getMillerDisplayName(selectedMiller)]}
+                      formatter={(value: number) => [`${(Math.round(value * 100) / 100).toFixed(2)}%`, getMillerDisplayName(selectedMiller)]}
                       labelFormatter={(label) => `Month: ${label}`}
                       contentStyle={{
                         backgroundColor: 'white',

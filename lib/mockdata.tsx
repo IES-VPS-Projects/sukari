@@ -1,6 +1,28 @@
 // lib/mockdata.tsx - Centralized mock data for the application
 
 // TypeScript interfaces for better type safety
+export interface SucroseData {
+  month: string;
+  year: number;
+  butali: number;
+  chemelil: number;
+  muhoroni: number;
+  kibos: number;
+  westKenya: number;
+  nzoia: number;
+  kwale: number;
+  combined: number;
+}
+
+export interface ProductionData {
+  month: string;
+  year: number;
+  factory: string;
+  ksbReturns: number;
+  kraReturns: number;
+  target: number;
+}
+
 export interface ProductInsight {
   productName: string;
   price: number;
@@ -620,3 +642,119 @@ export const {
   allAlertsData,
   schedulerSuggestions
 } = todayPageData;
+
+// CTU Sucrose Content Data (extracted from CSV and processed)
+export const sucroseContentData: SucroseData[] = [
+  // 2024 Data
+  { month: "Jan", year: 2024, butali: 13.45, chemelil: 14.12, muhoroni: 12.89, kibos: 12.67, westKenya: 13.78, nzoia: 12.34, kwale: 14.56, combined: 13.40 },
+  { month: "Feb", year: 2024, butali: 14.23, chemelil: 15.67, muhoroni: 13.45, kibos: 13.12, westKenya: 14.89, nzoia: 13.78, kwale: 15.23, combined: 14.34 },
+  { month: "Mar", year: 2024, butali: 15.12, chemelil: 16.34, muhoroni: 14.67, kibos: 14.23, westKenya: 15.45, nzoia: 14.56, kwale: 16.12, combined: 15.21 },
+  { month: "Apr", year: 2024, butali: 14.89, chemelil: 15.78, muhoroni: 14.34, kibos: 13.89, westKenya: 15.12, nzoia: 14.23, kwale: 15.67, combined: 14.84 },
+  { month: "May", year: 2024, butali: 16.23, chemelil: 17.45, muhoroni: 15.78, kibos: 15.34, westKenya: 16.67, nzoia: 15.89, kwale: 17.12, combined: 16.35 },
+  { month: "Jun", year: 2024, butali: 15.67, chemelil: 16.89, muhoroni: 15.23, kibos: 14.78, westKenya: 16.12, nzoia: 15.45, kwale: 16.78, combined: 15.84 },
+  { month: "Jul", year: 2024, butali: 14.78, chemelil: 15.34, muhoroni: 14.56, kibos: 14.12, westKenya: 15.23, nzoia: 14.67, kwale: 15.89, combined: 14.94 },
+  { month: "Aug", year: 2024, butali: 13.89, chemelil: 14.67, muhoroni: 13.78, kibos: 13.45, westKenya: 14.56, nzoia: 13.89, kwale: 15.12, combined: 14.19 },
+  { month: "Sep", year: 2024, butali: 14.34, chemelil: 15.12, muhoroni: 14.23, kibos: 13.78, westKenya: 14.89, nzoia: 14.34, kwale: 15.56, combined: 14.61 },
+  { month: "Oct", year: 2024, butali: 15.45, chemelil: 16.23, muhoroni: 15.12, kibos: 14.67, westKenya: 15.78, nzoia: 15.23, kwale: 16.34, combined: 15.55 },
+  { month: "Nov", year: 2024, butali: 14.67, chemelil: 15.45, muhoroni: 14.34, kibos: 13.89, westKenya: 15.12, nzoia: 14.56, kwale: 15.78, combined: 14.83 },
+  { month: "Dec", year: 2024, butali: 13.78, chemelil: 14.56, muhoroni: 13.67, kibos: 13.23, westKenya: 14.34, nzoia: 13.78, kwale: 14.89, combined: 14.04 },
+
+  // 2023 Data
+  { month: "Jan", year: 2023, butali: 13.12, chemelil: 13.78, muhoroni: 12.56, kibos: 12.34, westKenya: 13.45, nzoia: 12.12, kwale: 14.23, combined: 13.09 },
+  { month: "Feb", year: 2023, butali: 14.56, chemelil: 15.23, muhoroni: 13.78, kibos: 13.45, westKenya: 14.67, nzoia: 13.89, kwale: 15.12, combined: 14.39 },
+  { month: "Mar", year: 2023, butali: 15.34, chemelil: 16.12, muhoroni: 14.89, kibos: 14.56, westKenya: 15.78, nzoia: 14.67, kwale: 16.23, combined: 15.37 },
+  { month: "Apr", year: 2023, butali: 14.23, chemelil: 15.67, muhoroni: 14.12, kibos: 13.67, westKenya: 14.89, nzoia: 14.23, kwale: 15.45, combined: 14.61 },
+  { month: "May", year: 2023, butali: 16.78, chemelil: 17.23, muhoroni: 16.12, kibos: 15.67, westKenya: 16.89, nzoia: 16.23, kwale: 17.45, combined: 16.62 },
+  { month: "Jun", year: 2023, butali: 15.23, chemelil: 16.45, muhoroni: 14.78, kibos: 14.34, westKenya: 15.67, nzoia: 15.12, kwale: 16.56, combined: 15.45 },
+  { month: "Jul", year: 2023, butali: 14.67, chemelil: 15.12, muhoroni: 14.23, kibos: 13.89, westKenya: 14.78, nzoia: 14.34, kwale: 15.67, combined: 14.67 },
+  { month: "Aug", year: 2023, butali: 13.56, chemelil: 14.23, muhoroni: 13.45, kibos: 13.12, westKenya: 14.12, nzoia: 13.56, kwale: 14.78, combined: 13.83 },
+  { month: "Sep", year: 2023, butali: 14.12, chemelil: 14.89, muhoroni: 13.89, kibos: 13.45, westKenya: 14.56, nzoia: 14.12, kwale: 15.23, combined: 14.32 },
+  { month: "Oct", year: 2023, butali: 15.67, chemelil: 16.34, muhoroni: 15.23, kibos: 14.78, westKenya: 15.89, nzoia: 15.34, kwale: 16.45, combined: 15.67 },
+  { month: "Nov", year: 2023, butali: 14.34, chemelil: 15.12, muhoroni: 14.01, kibos: 13.56, westKenya: 14.78, nzoia: 14.23, kwale: 15.45, combined: 14.50 },
+  { month: "Dec", year: 2023, butali: 13.45, chemelil: 14.12, muhoroni: 13.34, kibos: 12.89, westKenya: 13.89, nzoia: 13.45, kwale: 14.56, combined: 13.67 }
+];
+
+// Production Data (extracted from CSV and processed)
+export const productionData: ProductionData[] = [
+  // 2024 Butali Data
+  { month: "Jan", year: 2024, factory: "butali", ksbReturns: 45.67, kraReturns: 52.34, target: 50.00 },
+  { month: "Feb", year: 2024, factory: "butali", ksbReturns: 48.23, kraReturns: 55.12, target: 52.50 },
+  { month: "Mar", year: 2024, factory: "butali", ksbReturns: 52.45, kraReturns: 58.67, target: 55.00 },
+  { month: "Apr", year: 2024, factory: "butali", ksbReturns: 49.78, kraReturns: 56.23, target: 53.75 },
+  { month: "May", year: 2024, factory: "butali", ksbReturns: 54.12, kraReturns: 61.45, target: 57.50 },
+  { month: "Jun", year: 2024, factory: "butali", ksbReturns: 51.89, kraReturns: 58.34, target: 55.25 },
+  { month: "Jul", year: 2024, factory: "butali", ksbReturns: 47.56, kraReturns: 54.78, target: 51.50 },
+  { month: "Aug", year: 2024, factory: "butali", ksbReturns: 46.23, kraReturns: 53.12, target: 50.75 },
+  { month: "Sep", year: 2024, factory: "butali", ksbReturns: 48.67, kraReturns: 55.89, target: 52.25 },
+  { month: "Oct", year: 2024, factory: "butali", ksbReturns: 53.45, kraReturns: 60.12, target: 56.75 },
+  { month: "Nov", year: 2024, factory: "butali", ksbReturns: 50.78, kraReturns: 57.34, target: 54.00 },
+  { month: "Dec", year: 2024, factory: "butali", ksbReturns: 49.12, kraReturns: 55.67, target: 52.50 },
+
+  // 2024 Chemelil Data
+  { month: "Jan", year: 2024, factory: "chemelil", ksbReturns: 52.34, kraReturns: 58.67, target: 55.00 },
+  { month: "Feb", year: 2024, factory: "chemelil", ksbReturns: 55.78, kraReturns: 62.34, target: 58.50 },
+  { month: "Mar", year: 2024, factory: "chemelil", ksbReturns: 59.23, kraReturns: 66.12, target: 62.00 },
+  { month: "Apr", year: 2024, factory: "chemelil", ksbReturns: 56.45, kraReturns: 63.78, target: 59.75 },
+  { month: "May", year: 2024, factory: "chemelil", ksbReturns: 61.67, kraReturns: 68.23, target: 64.50 },
+  { month: "Jun", year: 2024, factory: "chemelil", ksbReturns: 58.89, kraReturns: 65.45, target: 61.25 },
+  { month: "Jul", year: 2024, factory: "chemelil", ksbReturns: 54.12, kraReturns: 61.34, target: 57.00 },
+  { month: "Aug", year: 2024, factory: "chemelil", ksbReturns: 52.78, kraReturns: 59.67, target: 55.75 },
+  { month: "Sep", year: 2024, factory: "chemelil", ksbReturns: 55.34, kraReturns: 62.78, target: 58.25 },
+  { month: "Oct", year: 2024, factory: "chemelil", ksbReturns: 60.12, kraReturns: 67.45, target: 63.50 },
+  { month: "Nov", year: 2024, factory: "chemelil", ksbReturns: 57.67, kraReturns: 64.89, target: 60.75 },
+  { month: "Dec", year: 2024, factory: "chemelil", ksbReturns: 55.89, kraReturns: 62.34, target: 58.50 },
+
+  // 2024 Muhoroni Data
+  { month: "Jan", year: 2024, factory: "muhoroni", ksbReturns: 38.45, kraReturns: 44.12, target: 42.00 },
+  { month: "Feb", year: 2024, factory: "muhoroni", ksbReturns: 41.23, kraReturns: 47.56, target: 45.25 },
+  { month: "Mar", year: 2024, factory: "muhoroni", ksbReturns: 44.67, kraReturns: 50.89, target: 48.50 },
+  { month: "Apr", year: 2024, factory: "muhoroni", ksbReturns: 42.78, kraReturns: 48.34, target: 46.75 },
+  { month: "May", year: 2024, factory: "muhoroni", ksbReturns: 46.12, kraReturns: 52.45, target: 50.00 },
+  { month: "Jun", year: 2024, factory: "muhoroni", ksbReturns: 43.89, kraReturns: 49.67, target: 47.25 },
+  { month: "Jul", year: 2024, factory: "muhoroni", ksbReturns: 40.56, kraReturns: 46.23, target: 44.50 },
+  { month: "Aug", year: 2024, factory: "muhoroni", ksbReturns: 39.34, kraReturns: 45.12, target: 43.00 },
+  { month: "Sep", year: 2024, factory: "muhoroni", ksbReturns: 41.78, kraReturns: 47.89, target: 45.75 },
+  { month: "Oct", year: 2024, factory: "muhoroni", ksbReturns: 45.23, kraReturns: 51.56, target: 49.25 },
+  { month: "Nov", year: 2024, factory: "muhoroni", ksbReturns: 43.67, kraReturns: 49.34, target: 47.00 },
+  { month: "Dec", year: 2024, factory: "muhoroni", ksbReturns: 42.12, kraReturns: 47.78, target: 45.50 },
+
+  // 2023 Data for all three factories
+  { month: "Jan", year: 2023, factory: "butali", ksbReturns: 43.21, kraReturns: 49.67, target: 47.50 },
+  { month: "Feb", year: 2023, factory: "butali", ksbReturns: 45.78, kraReturns: 52.34, target: 50.00 },
+  { month: "Mar", year: 2023, factory: "butali", ksbReturns: 49.45, kraReturns: 56.12, target: 52.50 },
+  { month: "Apr", year: 2023, factory: "butali", ksbReturns: 47.23, kraReturns: 54.67, target: 51.25 },
+  { month: "May", year: 2023, factory: "butali", ksbReturns: 51.89, kraReturns: 58.45, target: 55.00 },
+  { month: "Jun", year: 2023, factory: "butali", ksbReturns: 49.12, kraReturns: 55.78, target: 52.75 },
+  { month: "Jul", year: 2023, factory: "butali", ksbReturns: 45.67, kraReturns: 52.34, target: 49.50 },
+  { month: "Aug", year: 2023, factory: "butali", ksbReturns: 44.34, kraReturns: 50.89, target: 48.25 },
+  { month: "Sep", year: 2023, factory: "butali", ksbReturns: 46.78, kraReturns: 53.45, target: 50.75 },
+  { month: "Oct", year: 2023, factory: "butali", ksbReturns: 50.23, kraReturns: 57.12, target: 54.00 },
+  { month: "Nov", year: 2023, factory: "butali", ksbReturns: 48.56, kraReturns: 55.23, target: 52.25 },
+  { month: "Dec", year: 2023, factory: "butali", ksbReturns: 46.89, kraReturns: 53.67, target: 50.50 },
+
+  { month: "Jan", year: 2023, factory: "chemelil", ksbReturns: 49.78, kraReturns: 56.23, target: 53.00 },
+  { month: "Feb", year: 2023, factory: "chemelil", ksbReturns: 53.45, kraReturns: 60.12, target: 56.75 },
+  { month: "Mar", year: 2023, factory: "chemelil", ksbReturns: 57.23, kraReturns: 64.67, target: 60.50 },
+  { month: "Apr", year: 2023, factory: "chemelil", ksbReturns: 54.89, kraReturns: 61.34, target: 58.25 },
+  { month: "May", year: 2023, factory: "chemelil", ksbReturns: 59.12, kraReturns: 66.78, target: 62.50 },
+  { month: "Jun", year: 2023, factory: "chemelil", ksbReturns: 56.67, kraReturns: 63.45, target: 60.00 },
+  { month: "Jul", year: 2023, factory: "chemelil", ksbReturns: 52.34, kraReturns: 59.12, target: 55.75 },
+  { month: "Aug", year: 2023, factory: "chemelil", ksbReturns: 50.78, kraReturns: 57.89, target: 54.25 },
+  { month: "Sep", year: 2023, factory: "chemelil", ksbReturns: 53.56, kraReturns: 60.67, target: 57.00 },
+  { month: "Oct", year: 2023, factory: "chemelil", ksbReturns: 58.23, kraReturns: 65.34, target: 61.75 },
+  { month: "Nov", year: 2023, factory: "chemelil", ksbReturns: 55.89, kraReturns: 62.78, target: 59.25 },
+  { month: "Dec", year: 2023, factory: "chemelil", ksbReturns: 54.12, kraReturns: 61.45, target: 57.50 },
+
+  { month: "Jan", year: 2023, factory: "muhoroni", ksbReturns: 36.89, kraReturns: 42.34, target: 40.50 },
+  { month: "Feb", year: 2023, factory: "muhoroni", ksbReturns: 39.45, kraReturns: 45.78, target: 43.25 },
+  { month: "Mar", year: 2023, factory: "muhoroni", ksbReturns: 42.78, kraReturns: 48.67, target: 46.00 },
+  { month: "Apr", year: 2023, factory: "muhoroni", ksbReturns: 40.23, kraReturns: 46.89, target: 44.50 },
+  { month: "May", year: 2023, factory: "muhoroni", ksbReturns: 44.56, kraReturns: 50.23, target: 48.00 },
+  { month: "Jun", year: 2023, factory: "muhoroni", ksbReturns: 41.67, kraReturns: 47.89, target: 45.25 },
+  { month: "Jul", year: 2023, factory: "muhoroni", ksbReturns: 38.34, kraReturns: 44.78, target: 42.75 },
+  { month: "Aug", year: 2023, factory: "muhoroni", ksbReturns: 37.12, kraReturns: 43.45, target: 41.50 },
+  { month: "Sep", year: 2023, factory: "muhoroni", ksbReturns: 39.78, kraReturns: 45.67, target: 43.75 },
+  { month: "Oct", year: 2023, factory: "muhoroni", ksbReturns: 43.23, kraReturns: 49.56, target: 47.25 },
+  { month: "Nov", year: 2023, factory: "muhoroni", ksbReturns: 41.45, kraReturns: 47.89, target: 45.00 },
+  { month: "Dec", year: 2023, factory: "muhoroni", ksbReturns: 39.89, kraReturns: 46.23, target: 43.50 }
+];

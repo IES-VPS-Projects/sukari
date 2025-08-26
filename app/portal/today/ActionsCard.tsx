@@ -19,12 +19,14 @@ import {
   User,
   Star,
   Share,
-  MoreHorizontal
+  MoreHorizontal,
+  X
 } from "lucide-react"
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
 import { GoInfo } from 'react-icons/go'
 import { BsBuildings } from 'react-icons/bs'
 import { allActionsData } from "@/lib/mockdata"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface ActionsCardProps {
   selectedItemId: string | null
@@ -36,6 +38,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("overview")
   const [comment, setComment] = useState("")
+  const isMobile = useIsMobile()
 
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
@@ -195,7 +198,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
         setViewAllActionsOpen(false)
         setSelectedActionForDetails(null)
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+        <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} p-0 [&>button]:hidden`}>
           <DialogTitle className="sr-only">
             {selectedActionForDetails ? 'Action Details' : 'Actions'}
           </DialogTitle>
@@ -230,9 +233,9 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
               
               if (action) {
                 return (
-                  <div className="flex flex-col h-full">
+                  <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
                     {/* Header */}
-                    <div className="p-6 border-b bg-white">
+                    <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b bg-white`}>
                       <div className="flex items-center gap-3 mb-4">
                         <Button
                           variant="ghost"
@@ -242,46 +245,48 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                         >
                           <ArrowLeft className="h-4 w-4" />
                         </Button>
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={`w-12 h-12 ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} ${action.iconBg} rounded-lg flex items-center justify-center`}>
                             {action.type === 'approval' ? (
-                              <CheckCircle className={`h-6 w-6 ${action.iconColor}`} />
+                              <CheckCircle className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
                             ) : (
-                              <Users className={`h-6 w-6 ${action.iconColor}`} />
+                              <Users className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
                             )}
                           </div>
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h1 className="text-xl font-semibold text-gray-900">{action.title}</h1>
-                              <Badge className="bg-red-500/10 text-red-700 border border-red-200/30 backdrop-blur-sm">
+                              <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 truncate`}>{action.title}</h1>
+                              <Badge className="bg-red-500/10 text-red-700 border border-red-200/30 backdrop-blur-sm shrink-0">
                                 High
                               </Badge>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <BsBuildings className="h-4 w-4" />
-                              <span>{action.type === 'vote' ? 'Kenya Sugar Board - Policy Committee' : 'Tropical Confectioners Limited'}</span>
+                              <BsBuildings className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{action.type === 'vote' ? 'Kenya Sugar Board - Policy Committee' : 'Tropical Confectioners Limited'}</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Star className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Share className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          {!isMobile && (
+                            <div className="flex items-center gap-2">
+                              <Button variant="ghost" size="icon">
+                                <Star className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon">
+                                <Share className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
 
                       {/* Tabs */}
-                      <div className="mt-6">
-                        <div className="flex border-b border-gray-200">
+                      <div className={`${isMobile ? 'mt-4' : 'mt-6'}`}>
+                        <div className="flex border-b border-gray-200 overflow-x-auto">
                           <button
                             onClick={() => setActiveTab("overview")}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                            className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                               activeTab === "overview"
                                 ? "text-blue-600 border-blue-600"
                                 : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
@@ -291,7 +296,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                           </button>
                           <button
                             onClick={() => setActiveTab("documents")}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                            className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                               activeTab === "documents"
                                 ? "text-blue-600 border-blue-600"
                                 : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
@@ -301,7 +306,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                           </button>
                           <button
                             onClick={() => setActiveTab("activities")}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                            className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                               activeTab === "activities"
                                 ? "text-blue-600 border-blue-600"
                                 : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
@@ -314,9 +319,9 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 overflow-hidden flex flex-col">
+                    <div className={`flex-1 ${isMobile ? 'overflow-hidden flex flex-col min-h-0' : 'overflow-hidden flex flex-col'}`}>
                       {activeTab === "overview" && (
-                        <div className="flex-1 overflow-y-auto p-6">
+                        <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
                           <div className="space-y-6">
                             {/* Summary */}
                             <div>
@@ -333,7 +338,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                             <div>
                               <h3 className="text-sm font-medium text-gray-900 mb-3">Key Details</h3>
                               {action.type === 'vote' ? (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
                                   <div className="space-y-3">
                                     <div className="flex justify-between">
                                       <span className="text-sm text-gray-500">Meeting Date:</span>
@@ -348,23 +353,25 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                                       <span className="text-sm font-medium">Committee Vote</span>
                                     </div>
                                   </div>
-                                  <div className="space-y-3">
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Members Present:</span>
-                                      <span className="text-sm font-medium">8 of 10</span>
+                                  {!isMobile && (
+                                    <div className="space-y-3">
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Members Present:</span>
+                                        <span className="text-sm font-medium">8 of 10</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Members Absent:</span>
+                                        <span className="text-sm font-medium">2</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Quorum Status:</span>
+                                        <span className="text-sm font-medium text-green-600">Met</span>
+                                      </div>
                                     </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Members Absent:</span>
-                                      <span className="text-sm font-medium">2</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Quorum Status:</span>
-                                      <span className="text-sm font-medium text-green-600">Met</span>
-                                    </div>
-                                  </div>
+                                  )}
                                 </div>
                               ) : (
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
                                   <div className="space-y-3">
                                     <div className="flex justify-between">
                                       <span className="text-sm text-gray-500">Quantity Requested:</span>
@@ -379,27 +386,29 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                                       <span className="text-sm font-medium">Brazil</span>
                                     </div>
                                   </div>
-                                  <div className="space-y-3">
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Delivery Timeline:</span>
-                                      <span className="text-sm font-medium">Q4 2025</span>
+                                  {!isMobile && (
+                                    <div className="space-y-3">
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Delivery Timeline:</span>
+                                        <span className="text-sm font-medium">Q4 2025</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Port of Entry:</span>
+                                        <span className="text-sm font-medium">Mombasa</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-sm text-gray-500">Compliance Status:</span>
+                                        <span className="text-sm font-medium text-green-600">Verified</span>
+                                      </div>
                                     </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Port of Entry:</span>
-                                      <span className="text-sm font-medium">Mombasa</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-sm text-gray-500">Compliance Status:</span>
-                                      <span className="text-sm font-medium text-green-600">Verified</span>
-                                    </div>
-                                  </div>
+                                  )}
                                 </div>
                               )}
                             </div>
 
                             {/* Status Information */}
                             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                              <div className="flex items-center justify-between">
+                              <div className={`flex ${isMobile ? 'flex-col gap-4' : 'items-center justify-between'}`}>
                                 <div className="text-center">
                                   <div className="text-xs text-gray-500 uppercase tracking-wide">CREATE DATE</div>
                                   <div className="text-sm font-medium text-gray-900 mt-1">15 Sep, 2021</div>
@@ -421,7 +430,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                       )}
 
                       {activeTab === "documents" && (
-                        <div className="flex-1 overflow-y-auto p-6">
+                        <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
                           <div className="space-y-4">
                             <h3 className="text-sm font-medium text-gray-900">Resources</h3>
                             
@@ -588,7 +597,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                       )}
 
                       {activeTab === "activities" && (
-                        <div className="h-[350px] overflow-y-auto scrollbar-hide p-6">
+                        <div className={`${isMobile ? 'flex-1 overflow-y-auto overflow-x-hidden px-4 py-4' : 'h-[350px] overflow-y-auto scrollbar-hide p-6'}`}>
                           <div className="space-y-8">
                             {action.type === 'vote' ? (
                               // Voting History
@@ -809,7 +818,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                       )}
 
                     {/* Comments Section & Action Buttons */}
-                    <div className="border-t bg-gray-50 p-6">
+                    <div className={`border-t bg-gray-50 flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
                       <div className="space-y-4">
                         <div>
                           <label className="text-sm font-medium text-gray-900 mb-2 block">
@@ -820,23 +829,23 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             rows={3}
-                            className="w-full"
+                            className={`w-full ${isMobile ? 'text-sm' : ''}`}
                           />
                         </div>
                         
-                        <div className="flex justify-end gap-3">
+                        <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-end'} gap-3`}>
                           {action.type === 'vote' ? (
                             // Vote buttons
                             <>
                               <Button 
                                 variant="outline"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
                                 onClick={() => handleActionDecision('vote_no', action.id)}
                               >
                                 Vote No
                               </Button>
                               <Button 
-                                className="bg-green-600 hover:bg-green-700 text-white"
+                                className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
                                 onClick={() => handleActionDecision('vote_yes', action.id)}
                               >
                                 Vote Yes
@@ -847,20 +856,20 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                             <>
                               <Button 
                                 variant="outline"
-                                className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
+                                className={`text-yellow-600 border-yellow-200 hover:bg-yellow-50 ${isMobile ? 'w-full' : ''}`}
                                 onClick={() => handleActionDecision('defer', action.id)}
                               >
                                 Defer
                               </Button>
                               <Button 
                                 variant="outline"
-                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
                                 onClick={() => handleActionDecision('reject', action.id)}
                               >
                                 Reject
                               </Button>
                               <Button 
-                                className="bg-green-600 hover:bg-green-700 text-white"
+                                className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
                                 onClick={() => handleActionDecision('approve', action.id)}
                               >
                                 Approve
@@ -878,23 +887,36 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
 
             // List view
             return (
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
+              <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
+                <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Actions</h2>
+                      <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}>Actions</h2>
                       <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
                     </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        List of actions requiring approval or voting decisions
+                    <div className="flex items-center gap-2">
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          List of actions requiring approval or voting decisions
+                        </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedActionForDetails(null)
+                          setViewAllActionsOpen(false)
+                        }}
+                        className="shrink-0 h-8 w-8"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
                   <div className="space-y-3">
                     {allActionsData.map((action) => (
                       <div 

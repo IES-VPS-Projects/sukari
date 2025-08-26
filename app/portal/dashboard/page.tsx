@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PortalLayout } from "@/components/portal-layout"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
   BarChart,
   Bar,
@@ -27,6 +28,8 @@ import ResourceCenterCard from "./ResourceCenterCard"
 import SucroseContentCard from "./SucroseContentCard"
 import ProductionPulseCard from "./ProductionPulseCard"
 import PermitsCard from "./PermitsCard"
+import VesselTrackingCard from "./VesselTrackingCard"
+import { sucroseContentData, productionData as mockProductionData } from "@/lib/mockdata"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -247,26 +250,6 @@ const productionData = [
   { month: "Dec", production: 3100, target: 2800 },
 ]
 
-// Mock data for ProductionPulseCard
-const productionPulseData = [
-  { month: "Jul", year: 2024, factory: "Mumias", ksbReturns: 45.2, kraReturns: 43.1, target: 50 },
-  { month: "Aug", year: 2024, factory: "Mumias", ksbReturns: 48.5, kraReturns: 46.2, target: 50 },
-  { month: "Sep", year: 2024, factory: "Mumias", ksbReturns: 52.1, kraReturns: 49.8, target: 50 },
-  { month: "Oct", year: 2024, factory: "Mumias", ksbReturns: 47.3, kraReturns: 45.6, target: 50 },
-  { month: "Nov", year: 2024, factory: "Mumias", ksbReturns: 51.8, kraReturns: 48.9, target: 50 },
-  { month: "Dec", year: 2024, factory: "Mumias", ksbReturns: 49.6, kraReturns: 47.2, target: 50 },
-]
-
-// Mock data for SucroseContentCard  
-const sucroseData = [
-  { month: "Jul", year: 2024, butali: 13.2, chemelil: 12.8, muhoroni: 14.1, kibos: 13.5, westKenya: 12.9, nzoia: 13.7, kwale: 12.5, combined: 13.1 },
-  { month: "Aug", year: 2024, butali: 13.5, chemelil: 13.1, muhoroni: 14.3, kibos: 13.8, westKenya: 13.2, nzoia: 14.0, kwale: 12.8, combined: 13.4 },
-  { month: "Sep", year: 2024, butali: 13.8, chemelil: 13.4, muhoroni: 14.6, kibos: 14.1, westKenya: 13.5, nzoia: 14.3, kwale: 13.1, combined: 13.7 },
-  { month: "Oct", year: 2024, butali: 14.1, chemelil: 13.7, muhoroni: 14.9, kibos: 14.4, westKenya: 13.8, nzoia: 14.6, kwale: 13.4, combined: 14.0 },
-  { month: "Nov", year: 2024, butali: 13.9, chemelil: 13.5, muhoroni: 14.7, kibos: 14.2, westKenya: 13.6, nzoia: 14.4, kwale: 13.2, combined: 13.8 },
-  { month: "Dec", year: 2024, butali: 14.2, chemelil: 13.8, muhoroni: 15.0, kibos: 14.5, westKenya: 13.9, nzoia: 14.7, kwale: 13.5, combined: 14.1 },
-]
-
 const revenueData = [
   { month: "Jul", revenue: 42 },
   { month: "Aug", revenue: 45 },
@@ -282,10 +265,14 @@ const complianceData = [
 ]
 
 const stakeholders = [
-  { type: "Active Mills", count: 12, total: 15, location: "Western Region", status: "operational" },
+  { type: "Sugar Millers", count: 12, total: 15, location: "Western Region", status: "operational" },
   { type: "Registered Farmers", count: 2847, total: 3200, location: "Nationwide", status: "active" },
   { type: "Sugar Dealers", count: 156, total: 180, location: "Major Cities", status: "licensed" },
   { type: "Molasses Dealers", count: 23, total: 30, location: "Industrial Areas", status: "compliant" },
+  { type: "Field Extension Officers", count: 84, total: 120, location: "Rural Areas", status: "active" },
+  { type: "Agrovets", count: 178, total: 200, location: "Regional Centers", status: "licensed" },
+  { type: "Sugar Importers", count: 45, total: 60, location: "Port Cities", status: "registered" },
+  { type: "Sugar Exporters", count: 18, total: 25, location: "Export Hubs", status: "certified" },
 ]
 
 const chartOptions = {
@@ -317,6 +304,7 @@ const chartOptions = {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview")
+  const isMobile = useIsMobile()
 
   // Tab definitions
   const tabs = [
@@ -396,7 +384,7 @@ export default function DashboardPage() {
               <Card className="rounded-[20px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Stakeholders</h3>
                     <Users className="h-4 w-4 text-green-500" />
                   </div>
                   <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
@@ -461,8 +449,8 @@ export default function DashboardPage() {
 
             {/* CTU Sucrose Content and Production Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SucroseContentCard sucroseData={sucroseData} />
-              <ProductionPulseCard productionData={productionPulseData} />
+              <SucroseContentCard sucroseData={sucroseContentData} />
+              <ProductionPulseCard productionData={mockProductionData} />
             </div>
 
             {/* Fourth Row - Resource Center */}
@@ -587,7 +575,7 @@ export default function DashboardPage() {
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-[#6B6B6B]">Active Stakeholders</h3>
+                  <h3 className="text-sm font-medium text-[#6B6B6B]">Stakeholders</h3>
                   <Users className="h-4 w-4 text-green-500" />
                 </div>
                 <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
@@ -622,56 +610,64 @@ export default function DashboardPage() {
 
       case "compliance":
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                </div>
-                <div className="flex justify-center">
-                  <GaugeMeter value={94} />
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Compliance Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Fully Compliant Mills</span>
-                    <span className="font-semibold text-green-600">12</span>
+          <div className="space-y-6">
+            {/* First row - existing compliance cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Partially Compliant</span>
-                    <span className="font-semibold text-yellow-600">2</span>
+                  <div className="flex justify-center">
+                    <GaugeMeter value={94} />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Non-Compliant</span>
-                    <span className="font-semibold text-red-600">1</span>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Compliance Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Fully Compliant Mills</span>
+                      <span className="font-semibold text-green-600">12</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Partially Compliant</span>
+                      <span className="font-semibold text-yellow-600">2</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Non-Compliant</span>
+                      <span className="font-semibold text-red-600">1</span>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardHeader>
-                <CardTitle className="text-[#202020]">Audit Schedule</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="text-sm">
-                    <p className="font-medium">Upcoming Audits: 3</p>
-                    <p className="text-gray-600">Next: Mumias Sugar (Sept 2)</p>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Audit Schedule</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="text-sm">
+                      <p className="font-medium">Upcoming Audits: 3</p>
+                      <p className="text-gray-600">Next: Mumias Sugar (Sept 2)</p>
+                    </div>
+                    <div className="text-sm">
+                      <p className="font-medium">Completed: 8/15</p>
+                      <Progress value={53} className="h-2" />
+                    </div>
                   </div>
-                  <div className="text-sm">
-                    <p className="font-medium">Completed: 8/15</p>
-                    <Progress value={53} className="h-2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Second row - Vessel Tracking */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <VesselTrackingCard />
+            </div>
           </div>
         )
 
@@ -847,8 +843,8 @@ export default function DashboardPage() {
       case "production":
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ProductionPulseCard productionData={productionPulseData} />
-            <SucroseContentCard sucroseData={sucroseData} />
+            <ProductionPulseCard productionData={mockProductionData} />
+            <SucroseContentCard sucroseData={sucroseContentData} />
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
                 <CardTitle className="text-[#202020]">Production Metrics</CardTitle>
@@ -953,23 +949,44 @@ export default function DashboardPage() {
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {/* Tab Bar */}
         <div className="border-b border-gray-200">
-          <nav className="flex justify-center px-4 -mb-px">
-            <div className="flex gap-8 items-center justify-center">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-3 px-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "border-green-500 text-green-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          {isMobile ? (
+            // Mobile: Dropdown
+            <div className="px-4 py-3">
+              <Select value={activeTab} onValueChange={setActiveTab}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a section">
+                    {tabs.find(tab => tab.id === activeTab)?.label}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {tabs.map((tab) => (
+                    <SelectItem key={tab.id} value={tab.id}>
+                      {tab.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </nav>
+          ) : (
+            // Desktop: Tab Bar
+            <nav className="flex justify-center px-4 -mb-px">
+              <div className="flex gap-8 items-center justify-center">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-3 px-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "border-green-500 text-green-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          )}
         </div>
 
         {/* Dynamic Content Based on Active Tab */}

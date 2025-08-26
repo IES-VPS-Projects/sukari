@@ -18,7 +18,8 @@ import {
   ArrowLeft,
   Clock,
   MapPin,
-  User
+  User,
+  X
 } from "lucide-react"
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
@@ -374,11 +375,24 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                       <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
                       <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
                     </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        Tasks and activities needing completion
+                    <div className="flex items-center gap-2">
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          Tasks and activities needing completion
+                        </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedActivityForDetails(null)
+                          setViewAllActivitiesOpen(false)
+                        }}
+                        className="shrink-0 h-8 w-8"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>

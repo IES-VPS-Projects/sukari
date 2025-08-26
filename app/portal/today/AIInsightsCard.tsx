@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { CheckCircle, ArrowLeft } from "lucide-react"
+import { CheckCircle, ArrowLeft, X } from "lucide-react"
 import { GoInfo } from 'react-icons/go'
 import { allAIInsightsData } from "@/lib/mockdata"
 
@@ -228,11 +228,24 @@ export default function AIInsightsCard({
                       <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
                       <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
                     </div>
-                    <div className="group relative">
-                      <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                      <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        AI-generated insights and recommendations
+                    <div className="flex items-center gap-2">
+                      <div className="group relative">
+                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                          AI-generated insights and recommendations
+                        </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedAIInsightForDetails(null)
+                          setViewAllAIInsightsOpen(false)
+                        }}
+                        className="shrink-0 h-8 w-8"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>

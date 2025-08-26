@@ -16,38 +16,15 @@ const PermitsCard = () => {
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-[#202020]">
-          Permits
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Summary Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center p-2 bg-gray-50 rounded-lg">
-            <div className="text-lg font-bold text-[#202020]">{permitsData.totalPermits}</div>
-            <p className="text-xs text-[#6B6B6B]">Total Permits</p>
-          </div>
-          <div className="text-center p-2 bg-gray-50 rounded-lg">
-            <div className="text-lg font-bold text-green-600">{permitsData.approved}</div>
-            <p className="text-xs text-[#6B6B6B]">Approved</p>
-          </div>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-[#6B6B6B]">Permits</h3>
         </div>
-
-        {/* Approval Rate */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-[#202020]">Approval Rate</span>
-            <span className="text-sm font-bold text-blue-600">{permitsData.approvalRate}%</span>
-          </div>
-          <Progress value={permitsData.approvalRate} className="h-2" />
-        </div>
-
-        {/* Growth Indicator */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[#6B6B6B]">Monthly Growth</span>
-          <span className="text-xs text-green-600">+{permitsData.monthlyGrowth}%</span>
-        </div>
+        <div className="text-2xl font-bold text-[#202020] mb-1">{permitsData.totalPermits}</div>
+        <p className="text-xs text-[#6B6B6B] mb-3">total permits processed</p>
+        <p className="text-xs text-green-600 mb-2">+{permitsData.monthlyGrowth}% from last month</p>
+        <Progress value={permitsData.approvalRate} className="h-2 mb-2" />
+        <div className="text-xs text-[#6B6B6B]">Approval Rate: {permitsData.approvalRate}%</div>
       </CardContent>
     </Card>
   )
