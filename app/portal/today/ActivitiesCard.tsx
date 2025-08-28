@@ -24,6 +24,7 @@ import {
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
 import { allActivitiesData } from "@/lib/mockdata"
+import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
 
 interface ActivitiesCardProps {
   className?: string
@@ -36,6 +37,16 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [newActivityOpen, setNewActivityOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
   const [selectedActivityForDetails, setSelectedActivityForDetails] = useState<string | null>(null)
+  const [activityDetailsOpen, setActivityDetailsOpen] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState<any>(null)
+
+  const handleActivityClick = (activityId: string) => {
+    const activity = allActivitiesData.find(a => a.id === activityId)
+    if (activity) {
+      setSelectedActivity(activity)
+      setActivityDetailsOpen(true)
+    }
+  }
 
   // Form state
   const [activityForm, setActivityForm] = useState({
@@ -94,10 +105,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardContent className="space-y-2 p-4">
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedActivityForDetails('activity-1')
-              setViewAllActivitiesOpen(true)
-            }}
+            onClick={() => handleActivityClick('activity-1')}
           >
             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
@@ -109,10 +117,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
           </div>
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedActivityForDetails('activity-2')
-              setViewAllActivitiesOpen(true)
-            }}
+            onClick={() => handleActivityClick('activity-2')}
           >
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
               <Calendar className="h-4 w-4 text-blue-600" />
@@ -124,10 +129,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
           </div>
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedActivityForDetails('activity-3')
-              setViewAllActivitiesOpen(true)
-            }}
+            onClick={() => handleActivityClick('activity-3')}
           >
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
               <CheckCircle className="h-4 w-4 text-purple-600" />
@@ -403,7 +405,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                       <div 
                         key={activity.id}
                         className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                        onClick={() => setSelectedActivityForDetails(activity.id)}
+                        onClick={() => handleActivityClick(activity.id)}
                       >
                         {/* Icon */}
                         <div className={`w-8 h-8 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -435,6 +437,13 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
           })()}
         </DialogContent>
       </Dialog>
+
+      {/* Activity Details Modal */}
+      <ActivityDetailsModal 
+        open={activityDetailsOpen} 
+        onOpenChange={setActivityDetailsOpen} 
+        activity={selectedActivity} 
+      />
     </>
   )
 }

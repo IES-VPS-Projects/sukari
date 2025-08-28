@@ -19,6 +19,7 @@ const navigation = [
   { name: "Calendar", href: "/portal/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
+  { name: "Profile", href: "/portal/profile", icon: User },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
@@ -55,7 +56,11 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                 alt="ISE Agriculture Logo" 
                 className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
               />
-              <div className={`${isMobile ? 'h-8' : 'h-12'} w-0.5 bg-gray-300`}></div>
+              <img 
+                src="/images/kenya_vertical_separator.jpg" 
+                alt="Vertical Separator" 
+                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+              />
               <img 
                 src="/images/ksb2.png" 
                 alt="KSB Logo" 

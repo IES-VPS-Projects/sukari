@@ -18,10 +18,32 @@ import {
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
 import { allMeetingsData } from "@/lib/mockdata"
-import { ScheduleMeetingModal } from "@/components/modals/schedule-meeting-modal"
+import { ScheduleMeetingModal, MeetingDetailsModal } from "@/components/modals/schedule-meeting-modal"
 
 interface MeetingsCardProps {
   className?: string
+}
+
+// Function to convert allMeetingsData format to Meeting format
+const convertToMeeting = (meetingData: any) => {
+  const typeMapping: Record<string, "tactical-briefing" | "strategic-planning" | "mission-debrief" | "training-exercise" | "intelligence-briefing"> = {
+    "Board Meeting": "strategic-planning",
+    "Stakeholder Meeting": "tactical-briefing", 
+    "Operations Review": "mission-debrief",
+    "Training Session": "training-exercise",
+    "Intelligence Briefing": "intelligence-briefing"
+  }
+
+  return {
+    id: parseInt(meetingData.id.replace('meeting-', '')),
+    title: meetingData.title,
+    description: meetingData.description,
+    time: meetingData.time,
+    location: meetingData.location,
+    attendees: meetingData.attendees,
+    type: typeMapping[meetingData.type] || "tactical-briefing",
+    priority: "Medium" as "Critical" | "High" | "Medium" | "Low"
+  }
 }
 
 const MeetingsCard = ({ className }: MeetingsCardProps) => {
@@ -29,6 +51,16 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
   const [newMeetingOpen, setNewMeetingOpen] = useState(false)
   const [viewAllMeetingsOpen, setViewAllMeetingsOpen] = useState(false)
   const [selectedMeetingForDetails, setSelectedMeetingForDetails] = useState<string | null>(null)
+  const [meetingDetailsOpen, setMeetingDetailsOpen] = useState(false)
+  const [selectedMeeting, setSelectedMeeting] = useState<any>(null)
+
+  const handleMeetingClick = (meetingId: string) => {
+    const meeting = allMeetingsData.find(m => m.id === meetingId)
+    if (meeting) {
+      setSelectedMeeting(convertToMeeting(meeting))
+      setMeetingDetailsOpen(true)
+    }
+  }
 
   return (
     <>
@@ -52,10 +84,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
         <CardContent className="space-y-2 p-4">
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedMeetingForDetails('meeting-1')
-              setViewAllMeetingsOpen(true)
-            }}
+            onClick={() => handleMeetingClick('meeting-1')}
           >
             <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
             <div>
@@ -65,10 +94,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
           </div>
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedMeetingForDetails('meeting-2')
-              setViewAllMeetingsOpen(true)
-            }}
+            onClick={() => handleMeetingClick('meeting-2')}
           >
             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
             <div>
@@ -78,10 +104,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
           </div>
           <div 
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => {
-              setSelectedMeetingForDetails('meeting-3')
-              setViewAllMeetingsOpen(true)
-            }}
+            onClick={() => handleMeetingClick('meeting-3')}
           >
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <div>
@@ -94,6 +117,13 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
 
       {/* New Meeting Modal */}
       <ScheduleMeetingModal open={newMeetingOpen} onOpenChange={setNewMeetingOpen} />
+      
+      {/* Meeting Details Modal */}
+      <MeetingDetailsModal 
+        open={meetingDetailsOpen} 
+        onOpenChange={setMeetingDetailsOpen} 
+        meeting={selectedMeeting} 
+      />
 
       {/* Meetings Modal */}
       <Dialog open={viewAllMeetingsOpen} onOpenChange={setViewAllMeetingsOpen}>
@@ -224,7 +254,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
                       <div 
                         key={meeting.id}
                         className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                        onClick={() => setSelectedMeetingForDetails(meeting.id)}
+                        onClick={() => handleMeetingClick(meeting.id)}
                       >
                         {/* Icon */}
                         <div className={`w-8 h-8 ${meeting.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
