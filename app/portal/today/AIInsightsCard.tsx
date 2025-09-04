@@ -20,69 +20,71 @@ export default function AIInsightsCard({
   const [viewAllAIInsightsOpen, setViewAllAIInsightsOpen] = useState(false)
   const [selectedAIInsightForDetails, setSelectedAIInsightForDetails] = useState<string | null>(null)
 
+  // Helper function to get indicator color based on insight
+  const getInsightColor = (id: string, title: string) => {
+    if (id === 'insight-1' || title === 'Productivity') return 'bg-blue-500'
+    if (id === 'insight-2' || title === 'Compliance') return 'bg-yellow-500'
+    if (id === 'insight-3' || title === 'Weather') return 'bg-green-400'
+    if (title === 'Predictive Risk Forecast') return 'bg-purple-500'
+    if (title === 'Opportunity Alert') return 'bg-blue-800'
+    if (title === 'Financial Insight') return 'bg-orange-500'
+    if (title === 'Traceability Gap Detection') return 'bg-red-500'
+    if (title === 'Stakeholder Engagement Update') return 'bg-teal-500'
+    if (title === 'Sustainability Metric') return 'bg-green-800'
+    if (title === 'Market Trend Analysis') return 'bg-indigo-500'
+    return 'bg-gray-500'
+  }
+
+  // Helper function to get hover background color
+  const getHoverBg = (id: string, title: string) => {
+    if (id === 'insight-1' || title === 'Productivity') return 'hover:bg-blue-50'
+    if (id === 'insight-2' || title === 'Compliance') return 'hover:bg-yellow-50'
+    if (id === 'insight-3' || title === 'Weather') return 'hover:bg-green-50'
+    if (title === 'Predictive Risk Forecast') return 'hover:bg-purple-50'
+    if (title === 'Opportunity Alert') return 'hover:bg-blue-100'
+    if (title === 'Financial Insight') return 'hover:bg-orange-50'
+    if (title === 'Traceability Gap Detection') return 'hover:bg-red-50'
+    if (title === 'Stakeholder Engagement Update') return 'hover:bg-teal-50'
+    if (title === 'Sustainability Metric') return 'hover:bg-green-100'
+    if (title === 'Market Trend Analysis') return 'hover:bg-indigo-50'
+    return 'hover:bg-gray-50'
+  }
+
   return (
     <>
       <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[#202020] cursor-pointer" onClick={() => {
+        <CardHeader className="pb-1">
+          <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
             setSelectedAIInsightForDetails(null)
             setViewAllAIInsightsOpen(true)
           }}>
             AI Insights
           </CardTitle>
-          <CardDescription className="text-[#6B6B6B]">
-            Intelligent insights based on current data patterns
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div 
-            className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-            onClick={(e) => {
-              if (!(e.target as HTMLElement).closest('button')) {
-                setSelectedAIInsightForDetails('insight-1')
-                setViewAllAIInsightsOpen(true)
-              }
-            }}
-          >
-            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-[#202020]">Productivity</p>
-              <p className="text-xs text-[#6B6B6B]">
-                Consider visiting Mumias region – 15% production drop – Requires executive attention for on-site assessments.
-              </p>
-            </div>
-          </div>
-
-          <div 
-            className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-            onClick={(e) => {
-              if (!(e.target as HTMLElement).closest('button')) {
-                setSelectedAIInsightForDetails('insight-2')
-                setViewAllAIInsightsOpen(true)
-              }
-            }}
-          >
-            <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-[#202020]">Compliance</p>
-              <p className="text-xs text-[#6B6B6B]">Recommended policy review – 25% increase in compliance violations this quarter – Update frameworks to align with Sugar Act 2024.</p>
-            </div>
-          </div>
-
-          <div 
-            className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-            onClick={(e) => {
-              if (!(e.target as HTMLElement).closest('button')) {
-                setSelectedAIInsightForDetails('insight-3')
-                setViewAllAIInsightsOpen(true)
-              }
-            }}
-          >
-            <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-[#202020]">Weather</p>
-              <p className="text-xs text-[#6B6B6B]">Weather alert preparation – Prepare drought mitigation for Western region based on upcoming forecasts.</p>
-            </div>
+        <CardContent className="px-3 py-4">
+          {/* Scrollable insights list - showing all insights */}
+          <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-hover">
+            {allAIInsightsData.map((insight) => (
+              <div 
+                key={insight.id}
+                className={`flex items-start gap-3 p-3 rounded-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer hover-shadow-border ${getHoverBg(insight.id, insight.title)}`}
+                onClick={(e) => {
+                  if (!(e.target as HTMLElement).closest('button')) {
+                    setSelectedAIInsightForDetails(insight.id)
+                    setViewAllAIInsightsOpen(true)
+                  }
+                }}
+              >
+                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getInsightColor(insight.id, insight.title)}`}></div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-medium text-[#202020]">{insight.title}</p>
+                  </div>
+                  <p className="text-xs text-[#6B6B6B] mb-1 line-clamp-2">{insight.description}</p>
+                  <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>

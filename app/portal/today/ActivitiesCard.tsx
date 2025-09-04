@@ -21,7 +21,7 @@ import {
   User,
   X
 } from "lucide-react"
-import { LuSquarePen } from 'react-icons/lu'
+import { LuSquarePen, LuTriangleAlert, LuCalendar } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
 import { allActivitiesData } from "@/lib/mockdata"
 import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
@@ -102,42 +102,41 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2 p-4">
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleActivityClick('activity-1')}
-          >
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">Compliance Review Due</p>
-              <p className="text-xs text-[#6B6B6B]">Mumias Mill - Tomorrow</p>
-            </div>
-          </div>
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleActivityClick('activity-2')}
-          >
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <Calendar className="h-4 w-4 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">Site Visit Scheduled</p>
-              <p className="text-xs text-[#6B6B6B]">Chemelil Sugar Mill - Friday</p>
-            </div>
-          </div>
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleActivityClick('activity-3')}
-          >
-            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="h-4 w-4 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">License Renewal Reminder</p>
-              <p className="text-xs text-[#6B6B6B]">Nzoia Sugar Co. - Next Week</p>
-            </div>
+        <CardContent className="px-3 py-4">
+          {/* Scrollable activities list - showing all activities */}
+          <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
+            {allActivitiesData.map((activity) => {
+              // Get icon component based on activity type
+              const getActivityIcon = (type: string) => {
+                switch (type) {
+                  case 'Compliance Review': return LuTriangleAlert
+                  case 'Site Visit': return LuCalendar
+                  case 'License Renewal': return CheckCircle
+                  case 'Training': return Users
+                  case 'Quality Assessment': return FileText
+                  case 'Performance Monitoring': return TrendingUp
+                  default: return CheckCircle
+                }
+              }
+
+              const IconComponent = getActivityIcon(activity.type)
+
+              return (
+                <div 
+                  key={activity.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${activity.hoverBg}`}
+                  onClick={() => handleActivityClick(activity.id)}
+                >
+                  <div className={`w-8 h-8 ${activity.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
+                    <IconComponent className={`h-4 w-4 ${activity.iconColor}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#202020] truncate">{activity.title}</p>
+                    <p className="text-xs text-[#6B6B6B]">{activity.dueDate}</p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

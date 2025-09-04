@@ -69,34 +69,13 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
         }}>
           <CardTitle className="text-[#202020]">Actions</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
-          {/* Actions Content - List of actions requiring approval/votes (limited to 2) */}
-          <div className="space-y-3">
-            {[
-              {
-                id: 'action-1',
-                title: 'Sugar Import Allocation Approval',
-                description: 'Approve allocation of 50,000 MT sugar imports to Tropical Confectioners Limited',
-                type: 'approval',
-                timestamp: '2 hours ago',
-                iconColor: 'text-blue-600',
-                iconBg: 'bg-blue-100',
-                hoverBg: 'hover:bg-blue-50'
-              },
-              {
-                id: 'action-2', 
-                title: 'Cane Pricing Committee Vote',
-                description: 'Vote on proposed cane pricing structure for 2024/25 season',
-                type: 'vote',
-                timestamp: '4 hours ago',
-                iconColor: 'text-green-600',
-                iconBg: 'bg-green-100',
-                hoverBg: 'hover:bg-green-50'
-              }
-            ].map((item) => (
+        <CardContent className="px-3 py-2">
+          {/* Scrollable actions list - showing all actions */}
+          <div className="space-y-3 max-h-32 overflow-y-auto scrollbar-hover">
+            {allActionsData.map((item) => (
               <div 
                 key={item.id} 
-                className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${item.hoverBg} hover:shadow-md`}
+                className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${item.hoverBg}`}
                 onClick={(e: React.MouseEvent) => {
                   // Only trigger if not clicking on the ellipsis button
                   if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
@@ -118,8 +97,8 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
-                      <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                      <h4 className="text-sm font-medium text-[#202020] mb-1 truncate">{item.title}</h4>
+                      <p className="text-xs text-[#6B6B6B] mb-1 line-clamp-2">{item.description}</p>
                       <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
                     </div>
                     
@@ -152,33 +131,33 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                                   onClick={() => handleItemAction('reject', item.id)}
                                   className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
                                 >
-                                  <AlertTriangle className="h-3 w-3" />
+                                  <X className="h-3 w-3" />
                                   Reject
                                 </button>
                               </>
                             ) : (
                               <>
                                 <button
-                                  onClick={() => handleItemAction('vote-yes', item.id)}
+                                  onClick={() => handleItemAction('vote_for', item.id)}
                                   className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-green-50 text-green-700"
                                 >
                                   <CheckCircle className="h-3 w-3" />
-                                  Vote Yes
+                                  Vote For
                                 </button>
                                 <button
-                                  onClick={() => handleItemAction('vote-no', item.id)}
+                                  onClick={() => handleItemAction('vote_against', item.id)}
                                   className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-red-50 text-red-700"
                                 >
-                                  <AlertTriangle className="h-3 w-3" />
-                                  Vote No
+                                  <X className="h-3 w-3" />
+                                  Vote Against
                                 </button>
                               </>
                             )}
                             <button
                               onClick={() => handleItemAction('details', item.id)}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50"
+                              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-gray-50 text-gray-700"
                             >
-                              <FileText className="h-3 w-3" />
+                              <GoInfo className="h-3 w-3" />
                               View Details
                             </button>
                           </div>

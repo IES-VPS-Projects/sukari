@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FiAlertTriangle } from 'react-icons/fi'
+import { allAlertsData } from "@/lib/mockdata"
 
 interface AlertsCardProps {
   className?: string
@@ -33,6 +34,9 @@ const AlertsCard = ({
     }
   }
 
+  // Combine all alerts from both alertsData and allAlertsData for comprehensive view
+  const allCombinedAlerts = [...(alertsData?.alerts || []), ...(allAlertsData || [])]
+
   return (
     <Card className={`rounded-[20px] shadow-lg border-0 bg-white ${className || ''}`}>
       <CardHeader className="pb-1">
@@ -41,13 +45,13 @@ const AlertsCard = ({
           setViewAllAlertsOpen(true)
         }}>Alerts</CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        {/* Alert Content - No tabs, just alerts (limited to 3 most recent) */}
-        <div className="space-y-3">
-          {alertsData.alerts.slice(0, 3).map((item: any) => (
+      <CardContent className="p-2 pb-1">
+        {/* Scrollable alerts list - showing all alerts */}
+        <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
+          {allCombinedAlerts.map((item: any) => (
             <div 
               key={item.id} 
-              className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+              className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${
                 item.iconColor === 'text-red-600' ? 'hover:bg-red-50' :
                 item.iconColor === 'text-orange-600' ? 'hover:bg-orange-50' :
                 item.iconColor === 'text-yellow-600' ? 'hover:bg-yellow-50' :
@@ -55,7 +59,7 @@ const AlertsCard = ({
                 item.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
                 item.iconColor === 'text-purple-600' ? 'hover:bg-purple-50' :
                 'hover:bg-gray-50'
-              } hover:shadow-md`}
+              }`}
               onClick={(e: React.MouseEvent) => {
                 // Only trigger if not clicking on the ellipsis button
                 if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
@@ -87,8 +91,11 @@ const AlertsCard = ({
                         {item.label}
                       </div>
                     </div>
-                    <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                    <p className="text-xs text-[#6B6B6B] mb-1 line-clamp-2">{item.description}</p>
                     <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
+                    {item.area && (
+                      <p className="text-xs text-[#9CA3AF] mt-1">Area: {item.area}</p>
+                    )}
                   </div>
                 </div>
               </div>

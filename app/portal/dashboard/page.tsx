@@ -947,13 +947,33 @@ export default function DashboardPage() {
   return (
     <PortalLayout pageTitle="Dashboard">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Tab Bar */}
-        <div className="border-b border-gray-200">
-          {isMobile ? (
-            // Mobile: Dropdown
-            <div className="px-4 py-3">
+        {/* Navigation Card - Similar to KDF Design - Updated */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/images/ksb2.png" 
+                  alt="KSB Logo" 
+                  className="h-8 w-auto"
+                />
+                <div>
+                  <CardTitle className="text-[#202020] text-lg">KENYA SUGAR BOARD</CardTitle>
+                  <CardDescription className="text-[#6B6B6B] text-sm">
+                    Dashboard Navigation - Information Management System
+                  </CardDescription>
+                </div>
+              </div>
+              <Badge className="bg-green-100 text-green-700 px-3 py-1 text-sm">
+                Active Session
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-2">
+            {isMobile ? (
+              // Mobile: Dropdown in Card
               <Select value={activeTab} onValueChange={setActiveTab}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full rounded-xl border-gray-200">
                   <SelectValue placeholder="Select a section">
                     {tabs.find(tab => tab.id === activeTab)?.label}
                   </SelectValue>
@@ -966,28 +986,26 @@ export default function DashboardPage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          ) : (
-            // Desktop: Tab Bar
-            <nav className="flex justify-center px-4 -mb-px">
-              <div className="flex gap-8 items-center justify-center">
+            ) : (
+              // Desktop: Pill Navigation in Card
+              <div className="flex flex-wrap gap-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`py-3 px-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                       activeTab === tab.id
-                        ? "border-green-500 text-green-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        ? "bg-green-600 text-white shadow-md"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800"
                     }`}
                   >
                     {tab.label}
                   </button>
                 ))}
               </div>
-            </nav>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Dynamic Content Based on Active Tab */}
         <div className="space-y-6">

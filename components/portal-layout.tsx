@@ -47,35 +47,36 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className={`bg-white border-b border-gray-200 px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
+      <div className={`bg-gray-50 px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
+        <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/images/ISE_Agri_Logo.png" 
-                alt="ISE Agriculture Logo" 
-                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
-              />
-              <img 
-                src="/images/kenya_vertical_separator.jpg" 
-                alt="Vertical Separator" 
-                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
-              />
-              <img 
-                src="/images/ksb2.png" 
-                alt="KSB Logo" 
-                className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
-              />
-              <div className="flex flex-col ml-2">
-                <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
-                  KENYA SUGAR BOARD
-                </h1>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
-                  Information Management System
-                </p>
+            <div className="flex items-center">
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/images/ISE_Agri_Logo.png" 
+                  alt="ISE Agriculture Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/kenya_vertical_separator.jpg" 
+                  alt="Vertical Separator" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/ksb2.png" 
+                  alt="KSB Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <div className="flex flex-col ml-2">
+                  <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
+                    KENYA SUGAR BOARD
+                  </h1>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
+                    Information Management System
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
             <div className="flex items-center gap-3">
               <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -120,6 +121,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
             </div>
           </div>
         </header>
+      </div>
         <main className="flex-1 pb-24 overflow-auto">{children}</main>
         <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
             <div className="flex items-center justify-center px-2 py-3">

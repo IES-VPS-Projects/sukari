@@ -99,9 +99,9 @@ export default function LoginPage() {
             {/* Logo above Sign In */}
             <div className="text-center mb-6 lg:mb-8">
               <div className="flex items-center justify-center space-x-2 lg:space-x-4">
-                <Image src="/images/ISEAGRILOGO.png" alt="ISE Agriculture" width={80} height={80} className="lg:w-[100px] lg:h-[100px]" />
+                <Image src="/images/ISE_Agri_Logo.png" alt="ISE Agriculture" width={80} height={60} className="lg:w-[100px] lg:h-[60px]" />
                 <div className="h-8 lg:h-12 w-px bg-gray-300"></div>
-                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={110} height={70} className="lg:w-[140px] lg:h-[90px]" />
+                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={110} height={60} className="lg:w-[140px] lg:h-[60px]" />
               </div>
             </div>
 

@@ -81,36 +81,51 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2 p-4">
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-yellow-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleMeetingClick('meeting-1')}
-          >
-            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">Board Meeting</p>
-              <p className="text-xs text-[#6B6B6B]">Today, 2:00 PM</p>
-            </div>
-          </div>
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleMeetingClick('meeting-2')}
-          >
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">Farmer Representatives</p>
-              <p className="text-xs text-[#6B6B6B]">Tomorrow, 10:00 AM</p>
-            </div>
-          </div>
-          <div 
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-green-50 hover:shadow-md cursor-pointer transition-all duration-200"
-            onClick={() => handleMeetingClick('meeting-3')}
-          >
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <div>
-              <p className="text-sm font-medium text-[#202020]">Mill Operators Review</p>
-              <p className="text-xs text-[#6B6B6B]">Friday, 3:00 PM</p>
-            </div>
+        <CardContent className="px-3 py-4">
+          {/* Scrollable meetings list - showing all meetings */}
+          <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
+            {allMeetingsData.map((meeting) => {
+              // Get color based on meeting type or status
+              const getIndicatorColor = (type: string) => {
+                switch (type) {
+                  case 'Board Meeting': return 'bg-yellow-500'
+                  case 'Stakeholder Meeting': return 'bg-blue-500'
+                  case 'Operations Review': return 'bg-green-500'
+                  case 'Training Session': return 'bg-purple-500'
+                  case 'Intelligence Briefing': return 'bg-red-500'
+                  default: return 'bg-gray-500'
+                }
+              }
+
+              const getHoverBg = (type: string) => {
+                switch (type) {
+                  case 'Board Meeting': return 'hover:bg-yellow-50'
+                  case 'Stakeholder Meeting': return 'hover:bg-blue-50'
+                  case 'Operations Review': return 'hover:bg-green-50'
+                  case 'Training Session': return 'hover:bg-purple-50'
+                  case 'Intelligence Briefing': return 'hover:bg-red-50'
+                  default: return 'hover:bg-gray-50'
+                }
+              }
+
+              return (
+                <div 
+                  key={meeting.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${getHoverBg(meeting.type)}`}
+                  onClick={() => handleMeetingClick(meeting.id)}
+                >
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getIndicatorColor(meeting.type)}`}></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#202020] truncate">{meeting.title}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-[#9CA3AF]">{meeting.timestamp}</p>
+                      <span className="text-xs text-[#9CA3AF]">•</span>
+                      <p className="text-xs text-[#6B6B6B]">{meeting.location}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

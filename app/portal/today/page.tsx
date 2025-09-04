@@ -33,7 +33,7 @@ import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { AlertsModal } from "@/components/modals/alerts-modal"
 import AlertsCard from "./AlertsCard"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
-import Autoplay from "embla-carousel-autoplay"
+import AutoPlay from "embla-carousel-autoplay"
 import { 
   allActionsData, 
   allAIInsightsData, 
@@ -350,7 +350,7 @@ export default function TodayPage() {
                 <CardTitle className="text-[#202020]">Industry News</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <Carousel className="w-full" opts={{ loop: true }} plugins={[Autoplay({ delay: 4000 })]}>
+                <Carousel className="w-full" opts={{ loop: true }} plugins={[AutoPlay({ delay: 4000 })]}>
                   <CarouselContent>
                     <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
                       Sugar Prices Surge
