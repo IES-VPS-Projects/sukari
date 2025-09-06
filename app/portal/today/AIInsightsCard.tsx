@@ -61,13 +61,23 @@ export default function AIInsightsCard({
             AI Insights
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 py-4">
+        <CardContent className="px-4 py-4 overflow-hidden">
           {/* Scrollable insights list - showing all insights */}
-          <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-hover">
+          <div className="space-y-3 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hover pr-1">
             {allAIInsightsData.map((insight) => (
               <div 
                 key={insight.id}
-                className={`flex items-start gap-3 p-3 rounded-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer hover-shadow-border ${getHoverBg(insight.id, insight.title)}`}
+                className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md transform-gpu ${getHoverBg(insight.id, insight.title)}`}
+                style={{
+                  transform: 'scale(1)',
+                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.01)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                }}
                 onClick={(e) => {
                   if (!(e.target as HTMLElement).closest('button')) {
                     setSelectedAIInsightForDetails(insight.id)
@@ -78,10 +88,12 @@ export default function AIInsightsCard({
                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getInsightColor(insight.id, insight.title)}`}></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium text-[#202020]">{insight.title}</p>
+                    <p className="text-sm font-medium text-[#202020] truncate">{insight.title}</p>
                   </div>
-                  <p className="text-xs text-[#6B6B6B] mb-1 line-clamp-2">{insight.description}</p>
-                  <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
+                  <div className="flex items-end justify-between gap-2">
+                    <p className="text-xs text-[#6B6B6B] line-clamp-2 flex-1">{insight.description}</p>
+                    <p className="text-xs text-[#9CA3AF] whitespace-nowrap">{insight.timestamp}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -298,9 +310,9 @@ export default function AIInsightsCard({
                                 <div className="flex items-center gap-2 mb-1">
                                   <h4 className="text-sm font-medium text-[#202020] truncate">{insight.title}</h4>
                                 </div>
-                                <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>
-                                <div className="flex items-center gap-4">
-                                  <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
+                                <div className="flex items-end justify-between gap-2">
+                                  <p className="text-xs text-[#6B6B6B] line-clamp-2 flex-1">{insight.description}</p>
+                                  <p className="text-xs text-[#9CA3AF] whitespace-nowrap">{insight.timestamp}</p>
                                 </div>
                               </div>
                             </div>

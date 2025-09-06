@@ -11,13 +11,13 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Camera, Mail, Phone, MapPin, Calendar, Shield, Target, Save, X, Edit3, Building, User, Award } from "lucide-react"
 
-interface ServiceInfoModalProps {
+interface ProfileInfoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   profileData: any
 }
 
-export function ServiceInfoModal({ open, onOpenChange, profileData }: ServiceInfoModalProps) {
+export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInfoModalProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(profileData)
 
@@ -41,9 +41,9 @@ export function ServiceInfoModal({ open, onOpenChange, profileData }: ServiceInf
         <DialogHeader className="p-4 sm:p-6 border-b">
           <DialogTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Service Information
+            Profile Information
           </DialogTitle>
-          <DialogDescription>Manage your service record and professional information</DialogDescription>
+          <DialogDescription>Manage your profile information</DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">

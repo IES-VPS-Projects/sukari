@@ -5,12 +5,12 @@ import { Shield, Activity, Target, Award, FileText, Calendar, Users, Clock, Chec
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ServiceInfoModal } from "@/components/modals/service-info-modal"
-import { OperationsModal } from "@/components/modals/operations-modal"
+import { PortalLayout } from "@/components/portal-layout"
+import { ProfileInfoModal } from "@/components/modals/profile-info-modal"
+import { ActivitiesModal } from "@/components/modals/activities-modal"
 import { PerformanceModal } from "@/components/modals/performance-modal"
 import { AchievementsModal } from "@/components/modals/achievements-modal"
 import { ApplicationsModal } from "@/components/modals/applications-modal"
-import { VisitorManagementModal } from "@/components/modals/visitor-management-modal"
 import { DutiesModal } from "@/components/modals/duties-modal"
 
 export default function ProfilePage() {
@@ -32,67 +32,59 @@ export default function ProfilePage() {
   })
 
   // Modal states
-  const [serviceInfoModalOpen, setServiceInfoModalOpen] = useState(false)
-  const [operationsModalOpen, setOperationsModalOpen] = useState(false)
+  const [profileInfoModalOpen, setProfileInfoModalOpen] = useState(false)
+  const [activitiesModalOpen, setActivitiesModalOpen] = useState(false)
   const [performanceModalOpen, setPerformanceModalOpen] = useState(false)
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false)
   const [applicationsModalOpen, setApplicationsModalOpen] = useState(false)
-  const [visitorManagementModalOpen, setVisitorManagementModalOpen] = useState(false)
   const [dutiesModalOpen, setDutiesModalOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PortalLayout pageTitle="Profile">
       <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Employee Profile</h1>
-          <p className="text-sm sm:text-base text-gray-600">Manage your service record and operational information</p>
-        </div>
-      </div>
-
-      {/* Profile Header */}
-      <Card className="rounded-[20px] shadow-lg border-0 bg-white p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-          <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-            <AvatarImage src="/placeholder.svg" alt="Profile" />
-            <AvatarFallback className="text-lg sm:text-xl bg-green-100 text-green-800">
-              {profileData.firstName[0]}{profileData.lastName[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <h2 className="text-xl sm:text-2xl font-bold">
-              {profileData.firstName} {profileData.lastName}
-            </h2>
-            <p className="text-gray-600 mt-1">{profileData.role}</p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs sm:text-sm">
-                {profileData.organization}
-              </Badge>
-              <Badge variant="outline" className="border-gray-300 text-xs sm:text-sm">
-                {profileData.clearanceLevel}
-              </Badge>
+        {/* Profile Header */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+            <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
+              <AvatarImage src="/placeholder.svg" alt="Profile" />
+              <AvatarFallback className="text-lg sm:text-xl bg-green-100 text-green-800">
+                {profileData.firstName[0]}{profileData.lastName[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {profileData.firstName} {profileData.lastName}
+              </h2>
+              <p className="text-gray-600 mt-1">{profileData.role}</p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs sm:text-sm">
+                  {profileData.organization}
+                </Badge>
+                <Badge variant="outline" className="border-gray-300 text-xs sm:text-sm">
+                  {profileData.clearanceLevel}
+                </Badge>
+              </div>
+            </div>
+            <div className="text-left sm:text-right w-full sm:w-auto">
+              <p className="text-xs sm:text-sm text-gray-600">Employee ID</p>
+              <p className="font-semibold text-sm sm:text-base">{profileData.employeeId}</p>
             </div>
           </div>
-          <div className="text-left sm:text-right w-full sm:w-auto">
-            <p className="text-xs sm:text-sm text-gray-600">Employee ID</p>
-            <p className="font-semibold text-sm sm:text-base">{profileData.employeeId}</p>
-          </div>
-        </div>
-      </Card>
+        </Card>
 
       {/* Cards Grid */}
       <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Service Info Card */}
+        {/* Profile Info Card */}
         <Card 
           className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setServiceInfoModalOpen(true)}
+          onClick={() => setProfileInfoModalOpen(true)}
         >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Shield className="h-5 w-5" />
-              Service Info
+              Profile Info
             </CardTitle>
-            <CardDescription>Personal and service details</CardDescription>
+            <CardDescription>Personal details</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -116,15 +108,15 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Operations Card */}
+        {/* Activities Card */}
         <Card 
           className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setOperationsModalOpen(true)}
+          onClick={() => setActivitiesModalOpen(true)}
         >
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Activity className="h-5 w-5" />
-              Operations
+              Activities
             </CardTitle>
             <CardDescription>Recent operational activities</CardDescription>
           </CardHeader>
@@ -252,40 +244,6 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Visitor Management Card */}
-        <Card 
-          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setVisitorManagementModalOpen(true)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="h-5 w-5" />
-              Visitor Management
-            </CardTitle>
-            <CardDescription>Visitor requests & access control</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Requests</span>
-                <span className="font-semibold text-black">24</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Approved</span>
-                <span className="font-semibold text-black">18</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Pending</span>
-                <span className="font-semibold text-black">4</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Today's Visitors</span>
-                <span className="font-semibold text-black">3</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Duties Card */}
         <Card 
           className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
@@ -322,14 +280,14 @@ export default function ProfilePage() {
       </div>
 
       {/* Modals */}
-      <ServiceInfoModal 
-        open={serviceInfoModalOpen} 
-        onOpenChange={setServiceInfoModalOpen}
+      <ProfileInfoModal 
+        open={profileInfoModalOpen} 
+        onOpenChange={setProfileInfoModalOpen}
         profileData={profileData}
       />
-      <OperationsModal 
-        open={operationsModalOpen} 
-        onOpenChange={setOperationsModalOpen}
+      <ActivitiesModal 
+        open={activitiesModalOpen} 
+        onOpenChange={setActivitiesModalOpen}
       />
       <PerformanceModal 
         open={performanceModalOpen} 
@@ -343,15 +301,11 @@ export default function ProfilePage() {
         open={applicationsModalOpen} 
         onOpenChange={setApplicationsModalOpen}
       />
-      <VisitorManagementModal 
-        open={visitorManagementModalOpen} 
-        onOpenChange={setVisitorManagementModalOpen}
-      />
       <DutiesModal 
         open={dutiesModalOpen} 
         onOpenChange={setDutiesModalOpen}
       />
       </div>
-    </div>
+    </PortalLayout>
   )
 }

@@ -947,29 +947,9 @@ export default function DashboardPage() {
   return (
     <PortalLayout pageTitle="Dashboard">
       <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Navigation Card - Similar to KDF Design - Updated */}
+        {/* Navigation Card - Tab Bar Only */}
         <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/images/ksb2.png" 
-                  alt="KSB Logo" 
-                  className="h-8 w-auto"
-                />
-                <div>
-                  <CardTitle className="text-[#202020] text-lg">KENYA SUGAR BOARD</CardTitle>
-                  <CardDescription className="text-[#6B6B6B] text-sm">
-                    Dashboard Navigation - Information Management System
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge className="bg-green-100 text-green-700 px-3 py-1 text-sm">
-                Active Session
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="p-4">
             {isMobile ? (
               // Mobile: Dropdown in Card
               <Select value={activeTab} onValueChange={setActiveTab}>

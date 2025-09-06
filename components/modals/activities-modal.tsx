@@ -3,12 +3,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Activity } from "lucide-react"
 
-interface OperationsModalProps {
+interface ActivitiesModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function OperationsModal({ open, onOpenChange }: OperationsModalProps) {
+export function ActivitiesModal({ open, onOpenChange }: ActivitiesModalProps) {
   const recentActivity = [
     { action: "Completed Sugar Quality Assessment", target: "Mumias Sugar Factory", time: "2 hours ago", type: "assessment" },
     { action: "Filed Compliance Report", target: "Factory Audit Q3 2024", time: "1 day ago", type: "report" },
@@ -57,9 +57,9 @@ export function OperationsModal({ open, onOpenChange }: OperationsModalProps) {
         <DialogHeader className="p-4 sm:p-6 border-b">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Activity className="h-5 w-5" />
-            Recent Operations
+            Activity Overview
           </DialogTitle>
-          <DialogDescription className="text-sm">Your recent operational activities and project assignments</DialogDescription>
+          <DialogDescription className="text-sm">Manage your operational activities and project assignments</DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">

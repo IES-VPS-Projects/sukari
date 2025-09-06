@@ -81,10 +81,10 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="px-3 py-4">
-          {/* Scrollable meetings list - showing all meetings */}
+        <CardContent className="px-3 py-2">
+          {/* Scrollable meetings list - showing 3 meetings */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allMeetingsData.map((meeting) => {
+            {allMeetingsData.slice(0, 3).map((meeting) => {
               // Get color based on meeting type or status
               const getIndicatorColor = (type: string) => {
                 switch (type) {

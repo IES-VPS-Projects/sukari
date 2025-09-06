@@ -19,7 +19,9 @@ import {
   Clock,
   MapPin,
   User,
-  X
+  X,
+  Shield,
+  Award
 } from "lucide-react"
 import { LuSquarePen, LuTriangleAlert, LuCalendar } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
@@ -102,33 +104,75 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="px-3 py-4">
-          {/* Scrollable activities list - showing all activities */}
+        <CardContent className="px-3 py-2">
+          {/* Scrollable activities list - showing 3 activities */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allActivitiesData.map((activity) => {
-              // Get icon component based on activity type
-              const getActivityIcon = (type: string) => {
+            {allActivitiesData.slice(0, 3).map((activity) => {
+              // Get icon component and styling based on activity type
+              const getActivityIconAndStyle = (type: string) => {
                 switch (type) {
-                  case 'Compliance Review': return LuTriangleAlert
-                  case 'Site Visit': return LuCalendar
-                  case 'License Renewal': return CheckCircle
-                  case 'Training': return Users
-                  case 'Quality Assessment': return FileText
-                  case 'Performance Monitoring': return TrendingUp
-                  default: return CheckCircle
+                  case 'compliance': 
+                    return { 
+                      icon: Shield, 
+                      iconColor: 'text-orange-600', 
+                      iconBg: 'bg-orange-100',
+                      hoverBg: 'hover:bg-orange-50'
+                    }
+                  case 'visit': 
+                    return { 
+                      icon: MapPin, 
+                      iconColor: 'text-blue-600', 
+                      iconBg: 'bg-blue-100',
+                      hoverBg: 'hover:bg-blue-50'
+                    }
+                  case 'renewal': 
+                    return { 
+                      icon: Award, 
+                      iconColor: 'text-purple-600', 
+                      iconBg: 'bg-purple-100',
+                      hoverBg: 'hover:bg-purple-50'
+                    }
+                  case 'training': 
+                    return { 
+                      icon: Users, 
+                      iconColor: 'text-green-600', 
+                      iconBg: 'bg-green-100',
+                      hoverBg: 'hover:bg-green-50'
+                    }
+                  case 'quality': 
+                    return { 
+                      icon: FileText, 
+                      iconColor: 'text-indigo-600', 
+                      iconBg: 'bg-indigo-100',
+                      hoverBg: 'hover:bg-indigo-50'
+                    }
+                  case 'monitoring': 
+                    return { 
+                      icon: TrendingUp, 
+                      iconColor: 'text-teal-600', 
+                      iconBg: 'bg-teal-100',
+                      hoverBg: 'hover:bg-teal-50'
+                    }
+                  default: 
+                    return { 
+                      icon: CheckCircle, 
+                      iconColor: 'text-gray-600', 
+                      iconBg: 'bg-gray-100',
+                      hoverBg: 'hover:bg-gray-50'
+                    }
                 }
               }
 
-              const IconComponent = getActivityIcon(activity.type)
+              const { icon: IconComponent, iconColor, iconBg, hoverBg } = getActivityIconAndStyle(activity.type)
 
               return (
                 <div 
                   key={activity.id}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${activity.hoverBg}`}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-200 hover-shadow-border ${hoverBg}`}
                   onClick={() => handleActivityClick(activity.id)}
                 >
-                  <div className={`w-8 h-8 ${activity.iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
-                    <IconComponent className={`h-4 w-4 ${activity.iconColor}`} />
+                  <div className={`w-8 h-8 ${iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
+                    <IconComponent className={`h-4 w-4 ${iconColor}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#202020] truncate">{activity.title}</p>
@@ -400,35 +444,94 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                 
                 <div className="flex-1 overflow-y-auto p-6">
                   <div className="space-y-3">
-                    {allActivitiesData.map((activity) => (
-                      <div 
-                        key={activity.id}
-                        className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                        onClick={() => handleActivityClick(activity.id)}
-                      >
-                        {/* Icon */}
-                        <div className={`w-8 h-8 ${activity.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                          <AlertTriangle className={`h-4 w-4 ${activity.iconColor}`} />
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
-                              <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
-                              <div className="flex items-center gap-3 text-xs text-[#9CA3AF]">
-                                <span>{activity.dueDate}</span>
-                                <span>•</span>
-                                <span>{activity.location}</span>
-                                <span>•</span>
-                                <span>{activity.assignee || 'Unassigned'}</span>
+                    {allActivitiesData.map((activity) => {
+                      // Get icon component and styling based on activity type (same as main card)
+                      const getActivityIconAndStyle = (type: string) => {
+                        switch (type) {
+                          case 'compliance': 
+                            return { 
+                              icon: Shield, 
+                              iconColor: 'text-orange-600', 
+                              iconBg: 'bg-orange-100',
+                              hoverBg: 'hover:bg-orange-50'
+                            }
+                          case 'visit': 
+                            return { 
+                              icon: MapPin, 
+                              iconColor: 'text-blue-600', 
+                              iconBg: 'bg-blue-100',
+                              hoverBg: 'hover:bg-blue-50'
+                            }
+                          case 'renewal': 
+                            return { 
+                              icon: Award, 
+                              iconColor: 'text-purple-600', 
+                              iconBg: 'bg-purple-100',
+                              hoverBg: 'hover:bg-purple-50'
+                            }
+                          case 'training': 
+                            return { 
+                              icon: Users, 
+                              iconColor: 'text-green-600', 
+                              iconBg: 'bg-green-100',
+                              hoverBg: 'hover:bg-green-50'
+                            }
+                          case 'quality': 
+                            return { 
+                              icon: FileText, 
+                              iconColor: 'text-indigo-600', 
+                              iconBg: 'bg-indigo-100',
+                              hoverBg: 'hover:bg-indigo-50'
+                            }
+                          case 'monitoring': 
+                            return { 
+                              icon: TrendingUp, 
+                              iconColor: 'text-teal-600', 
+                              iconBg: 'bg-teal-100',
+                              hoverBg: 'hover:bg-teal-50'
+                            }
+                          default: 
+                            return { 
+                              icon: CheckCircle, 
+                              iconColor: 'text-gray-600', 
+                              iconBg: 'bg-gray-100',
+                              hoverBg: 'hover:bg-gray-50'
+                            }
+                        }
+                      }
+
+                      const { icon: IconComponent, iconColor, iconBg } = getActivityIconAndStyle(activity.type)
+
+                      return (
+                        <div 
+                          key={activity.id}
+                          className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                          onClick={() => handleActivityClick(activity.id)}
+                        >
+                          {/* Icon */}
+                          <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                            <IconComponent className={`h-4 w-4 ${iconColor}`} />
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
+                                <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
+                                <div className="flex items-center gap-3 text-xs text-[#9CA3AF]">
+                                  <span>{activity.dueDate}</span>
+                                  <span>•</span>
+                                  <span>{activity.location}</span>
+                                  <span>•</span>
+                                  <span>{activity.assignee || 'Unassigned'}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               </div>
