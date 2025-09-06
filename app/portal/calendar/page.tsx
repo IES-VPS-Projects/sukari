@@ -86,8 +86,9 @@ const quickActions = [
 ]
 
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 8)) // August 8, 2025 (current date)
+  const [currentDate, setCurrentDate] = useState(new Date()) // Use actual current date
   const [selectedDate, setSelectedDate] = useState<Date | null>(null) // No date selected by default
+  const [isManuallyNavigated, setIsManuallyNavigated] = useState(false) // Track if user manually navigated away
   const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month")
   const [newEventOpen, setNewEventOpen] = useState(false)
   const [aiModalOpen, setAiModalOpen] = useState(false)
@@ -154,6 +155,7 @@ export default function CalendarPage() {
       newDate.setMonth(newDate.getMonth() + 1)
     }
     setCurrentDate(newDate)
+    setIsManuallyNavigated(true) // User manually navigated
   }
 
   const navigateYear = (direction: 'prev' | 'next') => {
@@ -164,6 +166,7 @@ export default function CalendarPage() {
       newDate.setFullYear(newDate.getFullYear() + 1)
     }
     setCurrentDate(newDate)
+    setIsManuallyNavigated(true) // User manually navigated
   }
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -174,6 +177,14 @@ export default function CalendarPage() {
       newDate.setDate(newDate.getDate() + 7)
     }
     setCurrentDate(newDate)
+    setIsManuallyNavigated(true) // User manually navigated
+  }
+
+  // Navigate to current date (today)
+  const navigateToToday = () => {
+    const today = new Date()
+    setCurrentDate(new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+    setIsManuallyNavigated(false) // Reset manual navigation flag
   }
 
   // Generate calendar days
@@ -369,6 +380,49 @@ export default function CalendarPage() {
     applyFilters()
   }, [filters])
 
+  // Auto-update calendar to current date and check for date changes
+  useEffect(() => {
+    // Function to update to current date if it's different
+    const updateToCurrentDate = () => {
+      // Only auto-update if user hasn't manually navigated away
+      if (isManuallyNavigated) return
+      
+      const now = new Date()
+      const currentYear = currentDate.getFullYear()
+      const currentMonth = currentDate.getMonth()
+      const actualYear = now.getFullYear()
+      const actualMonth = now.getMonth()
+      
+      // If we're in a different month/year than the current one, update to current date
+      if (currentYear !== actualYear || currentMonth !== actualMonth) {
+        setCurrentDate(new Date(actualYear, actualMonth, 1)) // Set to first day of current month
+      }
+    }
+
+    // Update immediately on mount (only if not manually navigated)
+    updateToCurrentDate()
+
+    // Set up interval to check for date changes every hour
+    const interval = setInterval(updateToCurrentDate, 60 * 60 * 1000) // Check every hour
+
+    // Also check at midnight each day
+    const now = new Date()
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    const msUntilMidnight = tomorrow.getTime() - now.getTime()
+    
+    const midnightTimeout = setTimeout(() => {
+      updateToCurrentDate()
+      // Set up daily interval after first midnight
+      const dailyInterval = setInterval(updateToCurrentDate, 24 * 60 * 60 * 1000)
+      return () => clearInterval(dailyInterval)
+    }, msUntilMidnight)
+
+    return () => {
+      clearInterval(interval)
+      clearTimeout(midnightTimeout)
+    }
+  }, [isManuallyNavigated, currentDate]) // Include dependencies
+
   // Selected date information
   const selectedDateStr = selectedDate ? selectedDate.toLocaleDateString("en-US", {
     weekday: "long",
@@ -449,6 +503,28 @@ export default function CalendarPage() {
                     onClick={() => getNavigateFunction()('next')}
                   >
                     <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  
+                  {/* Today Button */}
+                  <Button 
+                    variant={(() => {
+                      const now = new Date()
+                      const isCurrentMonth = currentDate.getFullYear() === now.getFullYear() && 
+                                           currentDate.getMonth() === now.getMonth()
+                      return isCurrentMonth ? "default" : "outline"
+                    })()} 
+                    size="sm"
+                    onClick={navigateToToday}
+                    className={(() => {
+                      const now = new Date()
+                      const isCurrentMonth = currentDate.getFullYear() === now.getFullYear() && 
+                                           currentDate.getMonth() === now.getMonth()
+                      return isCurrentMonth 
+                        ? "ml-4 bg-green-600 text-white hover:bg-green-700" 
+                        : "ml-4 text-green-600 border-green-600 hover:bg-green-50"
+                    })()}
+                  >
+                    Today
                   </Button>
                 </div>
                 

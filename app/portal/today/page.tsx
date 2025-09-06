@@ -31,6 +31,8 @@ import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
 import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { AlertsModal } from "@/components/modals/alerts-modal"
+import { IndustryNewsModal } from "@/components/modals/industry-news-modal"
+import { rssService, RSSArticle } from "@/lib/rss-service"
 import AlertsCard from "./AlertsCard"
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
 import AutoPlay from "embla-carousel-autoplay"
@@ -249,6 +251,9 @@ export default function TodayPage() {
   const [selectedLocation, setSelectedLocation] = useState("")
   const [greeting, setGreeting] = useState("")
   const [dynamicAlerts, setDynamicAlerts] = useState<any[]>([])
+  const [industryNewsOpen, setIndustryNewsOpen] = useState(false)
+  const [industryNewsArticles, setIndustryNewsArticles] = useState<RSSArticle[]>([])
+  const [isLoadingNews, setIsLoadingNews] = useState(true)
   const { user } = useAuth()
   
   // Tasks card state (now only for alerts)
@@ -284,6 +289,26 @@ export default function TodayPage() {
   useEffect(() => {
     setGreeting(getTimeBasedGreeting())
   }, [user])
+
+  // Load industry news articles
+  useEffect(() => {
+    const loadIndustryNews = async () => {
+      setIsLoadingNews(true)
+      try {
+        const categories = await rssService.fetchAllArticles()
+        // Get articles from all categories and take the first 7
+        const allArticles = categories.flatMap(category => category.articles)
+        setIndustryNewsArticles(allArticles.slice(0, 7))
+      } catch (error) {
+        console.error('Failed to load industry news:', error)
+        // Keep empty array on error
+      } finally {
+        setIsLoadingNews(false)
+      }
+    }
+    
+    loadIndustryNews()
+  }, [])
 
   // Load and listen for production alerts
   useEffect(() => {
@@ -321,10 +346,25 @@ export default function TodayPage() {
     setScheduleVisitOpen(true)
   }
 
-  // Combine static alerts with dynamic production alerts
+  // Combine static alerts with dynamic production alerts and additional data
   const combinedAlertsData = {
     ...updatesData,
-    alerts: [...dynamicAlerts, ...updatesData.alerts]
+    alerts: [
+      ...dynamicAlerts, 
+      ...updatesData.alerts,
+      ...allAlertsData.map((alert, index) => ({
+        id: `additional-alert-${index}`,
+        title: alert.title,
+        label: alert.label,
+        description: alert.description,
+        timestamp: alert.timestamp,
+        category: alert.area || 'General',
+        priority: alert.label === 'Critical' ? 'high' : alert.label === 'Warning' ? 'medium' : 'low',
+        labelColor: alert.labelColor,
+        iconBg: alert.iconBg,
+        iconColor: alert.iconColor
+      }))
+    ]
   }
 
   return (
@@ -345,24 +385,58 @@ export default function TodayPage() {
             <MarketInsightsCard />
             
             {/* Industry News Card */}
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setIndustryNewsOpen(true)}>
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Industry News</CardTitle>
+                <CardTitle className="text-[#202020] flex items-center justify-between">
+                  Industry News
+                  <Badge className="bg-gray-100 text-green-600 flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    Live
+                  </Badge>
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <Carousel className="w-full" opts={{ loop: true }} plugins={[AutoPlay({ delay: 4000 })]}>
-                  <CarouselContent>
-                    <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      Sugar Prices Surge
-                    </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/cane_tech.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      New Tech Boosts Yields
-                    </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      Government Subsidies
-                    </CarouselItem>
-                  </CarouselContent>
-                </Carousel>
+                {isLoadingNews ? (
+                  <div className="h-48 flex items-center justify-center bg-gray-100 rounded-lg">
+                    <div className="text-gray-500">Loading latest news...</div>
+                  </div>
+                ) : (
+                  <Carousel className="w-full" opts={{ loop: true }} plugins={[AutoPlay({ delay: 4000 })]}>
+                    <CarouselContent>
+                      {industryNewsArticles.length > 0 ? industryNewsArticles.map((article, index) => (
+                        <CarouselItem key={article.id || index}>
+                          <div 
+                            className="relative h-48 rounded-lg overflow-hidden"
+                            style={{
+                              backgroundImage: `url('${article.imageUrl || '/images/loading.gif'}')`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center'
+                            }}
+                          >
+                            <div className="absolute inset-0 bg-black/40"></div>
+                            <div className="relative h-full flex items-center justify-center p-4">
+                              <div className="bg-black/50 p-4 rounded-lg text-center">
+                                <h3 className="text-white font-bold text-sm leading-tight line-clamp-3">
+                                  {article.title}
+                                </h3>
+                                <p className="text-gray-200 text-xs mt-2">
+                                  {article.source}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      )) : (
+                        // Fallback to static content if no articles
+                        <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
+                          <div className="bg-black/50 p-4 rounded-lg">
+                            Sugar Prices Surge
+                          </div>
+                        </CarouselItem>
+                      )}
+                    </CarouselContent>
+                  </Carousel>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -414,6 +488,11 @@ export default function TodayPage() {
         selectedAlertForDetails={selectedAlertForDetails}
         setSelectedAlertForDetails={setSelectedAlertForDetails}
         onTakeAction={() => setTriggerNewActivity(true)}
+      />
+
+      <IndustryNewsModal
+        open={industryNewsOpen}
+        onOpenChange={setIndustryNewsOpen}
       />
     </PortalLayout>
   )

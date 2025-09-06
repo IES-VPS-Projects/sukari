@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle } from "lucide-react"
+import { allAlertsData } from "@/lib/mockdata"
 
 // KSB Alerts data customized for sugar industry operations
 const alertsData = {
@@ -79,56 +80,95 @@ const alertsData = {
       labelColor: 'bg-blue-500',
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600'
-    }
+    },
+    ...allAlertsData.map((alert, index) => ({
+      id: `alert-${index + 7}`,
+      title: alert.title,
+      label: alert.label,
+      description: alert.description,
+      timestamp: alert.timestamp,
+      category: alert.area || 'General',
+      priority: alert.label === 'Critical' ? 'high' : alert.label === 'Warning' ? 'medium' : 'low',
+      labelColor: alert.labelColor,
+      iconBg: alert.iconBg,
+      iconColor: alert.iconColor
+    }))
   ]
 }
 
 interface AlertsCardProps {
   className?: string;
+  selectedItemId?: string | null;
+  setSelectedItemId?: (id: string | null) => void;
   setViewAllAlertsOpen?: (open: boolean) => void;
   setSelectedAlertForDetails?: (id: string | null) => void;
+  alertsData?: any;
 }
 
 // Alerts Card Component
 const AlertsCard: React.FC<AlertsCardProps> = ({ 
   className = "",
+  selectedItemId,
+  setSelectedItemId,
   setViewAllAlertsOpen,
-  setSelectedAlertForDetails
+  setSelectedAlertForDetails,
+  alertsData: externalAlertsData
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Equipment' | 'Compliance' | 'Weather' | 'Performance' | 'Payments' | 'Quality' | 'Operations' | 'Safety'>('All')
+  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Equipment' | 'Compliance' | 'Weather' | 'Performance' | 'Payments' | 'Quality' | 'Operations' | 'Safety' | 'General'>('All')
   
+  // Use the external alerts data passed from parent (which already includes combined data)
+  const allAlertsForCard = externalAlertsData?.alerts || alertsData.alerts
+
   const categoryCounts = {
-    Equipment: alertsData.alerts.filter(a => a.category === 'Equipment').length,
-    Compliance: alertsData.alerts.filter(a => a.category === 'Compliance').length,
-    Weather: alertsData.alerts.filter(a => a.category === 'Weather').length,
-    Performance: alertsData.alerts.filter(a => a.category === 'Equipment' || a.category === 'Quality').length,
-    Quality: alertsData.alerts.filter(a => a.category === 'Quality').length,
-    Operations: alertsData.alerts.filter(a => a.category === 'Operations').length,
-    Safety: alertsData.alerts.filter(a => a.category === 'Safety').length,
-    Payments: alertsData.alerts.filter(a => a.category === 'Operations' && a.title.toLowerCase().includes('payment')).length,
+    Equipment: allAlertsForCard.filter((a: any) => a.category === 'Equipment').length,
+    Compliance: allAlertsForCard.filter((a: any) => a.category === 'Compliance').length,
+    Weather: allAlertsForCard.filter((a: any) => a.category === 'Weather').length,
+    Performance: allAlertsForCard.filter((a: any) => a.category === 'Equipment' || a.category === 'Quality').length,
+    Quality: allAlertsForCard.filter((a: any) => a.category === 'Quality').length,
+    Operations: allAlertsForCard.filter((a: any) => a.category === 'Operations').length,
+    Safety: allAlertsForCard.filter((a: any) => a.category === 'Safety').length,
+    Payments: allAlertsForCard.filter((a: any) => a.category === 'Operations' && a.title.toLowerCase().includes('payment')).length,
+    General: allAlertsForCard.filter((a: any) => a.category === 'General').length,
+  }
+
+  // Get background color based on priority for hover effect
+  const getHoverBgByPriority = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'hover:bg-red-50'
+      case 'medium':
+        return 'hover:bg-orange-50'
+      case 'low':
+        return 'hover:bg-green-50'
+      default:
+        return 'hover:bg-gray-50'
+    }
   }
 
   return (
-    <Card className={`rounded-[20px] shadow-lg border-0 bg-white h-[360px] flex flex-col ${className}`}>
-      <CardContent className="p-4 min-h-[340px] h-full flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <h3 
-            className="text-lg font-semibold text-foreground cursor-pointer" 
-            onClick={() => {
-              if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
-              if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
-            }}
-          >
-            Alerts
-          </h3>
-        </div>
+    <Card className={`rounded-[20px] shadow-lg border-0 bg-white ${className}`}>
+      <CardHeader className="pb-1">
+        <CardTitle 
+          className="text-[#202020] cursor-pointer" 
+          onClick={() => {
+            if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
+            if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
+          }}
+        >
+          Alerts
+        </CardTitle>
         
-        <div className="flex items-center gap-2 mb-3 border-b overflow-hidden">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+        {/* Category Tab Bar */}
+        <div className="flex items-center gap-2 mt-4 border-b">
+          <div className="flex items-center gap-2 flex-wrap">
             {(['All','Compliance','Weather','Performance','Payments'] as const).map((category) => (
               <button
                 key={category}
-                className={`text-xs pb-2 -mb-px border-b-2 whitespace-nowrap flex-shrink-0 ${selectedCategory === category ? 'border-green-600 text-green-600' : 'border-transparent text-muted-foreground'} flex items-center gap-1`}
+                className={`text-xs pb-2 -mb-px border-b-2 whitespace-nowrap flex-shrink-0 transition-colors ${
+                  selectedCategory === category 
+                    ? 'border-blue-600 text-blue-600 font-medium' 
+                    : 'border-transparent text-muted-foreground hover:text-gray-700 hover:border-gray-300'
+                } flex items-center gap-1`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
@@ -144,80 +184,61 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
             ))}
           </div>
         </div>
-        
+      </CardHeader>
+      
+      <CardContent className="p-4 pt-2">
         <div 
-          className="space-y-2 overflow-y-auto pr-1 flex-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400" 
-          style={{ 
-            maxHeight: '280px', 
-            minHeight: '280px'
-          }}
+          className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-none hover:scrollbar-thin hover:scrollbar-track-transparent hover:scrollbar-thumb-gray-300" 
+          style={{ maxHeight: '240px' }}
         >
-          {alertsData.alerts
-            .filter((item) => {
+          {allAlertsForCard
+            .filter((item: any) => {
               if (selectedCategory === 'All') return true
               if (selectedCategory === 'Performance') return item.category === 'Equipment' || item.category === 'Quality'
               if (selectedCategory === 'Payments') return item.category === 'Operations' && item.title.toLowerCase().includes('payment')
               return item.category === selectedCategory
             })
-            .slice(0, 3) // Limit to maximum 3 options in viewport
-            .map((item) => {
-              // Get icon color based on priority
-              const getIconColorByPriority = (priority: string) => {
-                switch (priority) {
-                  case 'high':
-                    return 'text-red-600'
-                  case 'medium':
-                    return 'text-orange-600'
-                  case 'low':
-                    return 'text-green-600'
-                  default:
-                    return 'text-gray-600'
-                }
-              }
-
+            .map((item: any) => {
               return (
                 <div 
                   key={item.id} 
-                  className="flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50"
+                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${getHoverBgByPriority(item.priority)} hover:shadow-md transform hover:scale-[1.02]`}
                   onClick={() => {
                     if (setSelectedAlertForDetails) setSelectedAlertForDetails(item.id)
                     if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
                   }}
                 >
                   {/* Icon with priority-based color */}
-                  <div className="w-6 h-6 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
-                    <AlertTriangle className={`h-3 w-3 ${getIconColorByPriority(item.priority)}`} />
+                  <div className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <AlertTriangle className={`h-4 w-4 ${item.iconColor}`} />
                   </div>
                   
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <h4 className="text-xs font-medium text-foreground truncate">{item.title}</h4>
-                          <div className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium border backdrop-blur-sm ${
-                            item.label?.toUpperCase() === 'HIGH' ? 'bg-red-100 text-red-700 border-gray-300' :
-                            item.label?.toUpperCase() === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700 border-gray-300' :
-                            item.label?.toUpperCase() === 'LOW' ? 'bg-green-100 text-green-700 border-gray-300' :
-                            item.labelColor === 'bg-red-500' ? 'bg-red-100 text-red-700 border-gray-300' :
-                            item.labelColor === 'bg-yellow-500' ? 'bg-yellow-100 text-yellow-700 border-gray-300' :
-                            item.labelColor === 'bg-green-500' ? 'bg-green-100 text-green-700 border-gray-300' :
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="text-sm font-medium text-[#202020] truncate">{item.title}</h4>
+                          <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                            item.label?.toUpperCase() === 'HIGH' || item.label === 'Critical' ? 'bg-red-100 text-red-700 border-red-200/30' :
+                            item.label?.toUpperCase() === 'MEDIUM' || item.label === 'Warning' ? 'bg-orange-100 text-orange-700 border-orange-200/30' :
+                            item.label?.toUpperCase() === 'LOW' || item.label === 'Info' ? 'bg-green-100 text-green-700 border-green-200/30' :
                             'bg-gray-50/80 text-gray-700 border-gray-300'
                           }`}>
-                          {item.label}
+                            {item.label}
+                          </div>
                         </div>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground mb-0.5">{item.description}</p>
-                        <p className="text-[10px] text-muted-foreground">{item.timestamp}</p>
+                        <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
+                        <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               )
             })}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

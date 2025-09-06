@@ -259,20 +259,24 @@ export default function AIInterfacePage() {
                 <div className="text-xs font-medium text-gray-500 mb-2 px-2">Chats</div>
                 {sessions.map((session) => (
                   <div key={session.id} className="mb-2">
-                    <button
-                      onClick={() => handleLoadSession(session.id)}
-                      className={`w-full text-left p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors mb-1 flex items-center justify-between group ${
+                    <div
+                      className={`w-full text-left p-2 text-sm rounded-lg hover:bg-gray-100 transition-colors mb-1 flex items-center justify-between group cursor-pointer ${
                         currentSession?.id === session.id ? 'bg-gray-200' : ''
                       }`}
                     >
-                      <div className="truncate flex-1">{session.title}</div>
+                      <div 
+                        className="truncate flex-1"
+                        onClick={() => handleLoadSession(session.id)}
+                      >
+                        {session.title}
+                      </div>
                       <button
                         onClick={(e) => handleDeleteSession(session.id, e)}
                         className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all"
                       >
                         <Trash2Icon className="w-3 h-3 text-gray-500" />
                       </button>
-                    </button>
+                    </div>
                     <div className="text-xs text-gray-400 px-2 mb-1">
                       {session.updatedAt.toLocaleDateString()}
                     </div>
