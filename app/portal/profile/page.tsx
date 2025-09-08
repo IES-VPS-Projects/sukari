@@ -74,143 +74,7 @@ export default function ProfilePage() {
 
       {/* Cards Grid */}
       <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Profile Info Card */}
-        <Card 
-          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setProfileInfoModalOpen(true)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Shield className="h-5 w-5" />
-              Profile Info
-            </CardTitle>
-            <CardDescription>Personal details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Position</span>
-                <span className="font-semibold">{profileData.role}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Department</span>
-                <span className="font-semibold">{profileData.department}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Projects</span>
-                <span className="font-semibold">{profileData.deployments}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Service Years</span>
-                <span className="font-semibold">5+</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Activities Card */}
-        <Card 
-          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setActivitiesModalOpen(true)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Activity className="h-5 w-5" />
-              Activities
-            </CardTitle>
-            <CardDescription>Recent operational activities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Operations</span>
-                <span className="font-semibold text-black">47</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Successful Projects</span>
-                <span className="font-semibold text-black">45</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Active Operations</span>
-                <span className="font-semibold text-black">3</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Personnel Involved</span>
-                <span className="font-semibold text-black">1,234</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Performance Card */}
-        <Card 
-          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setPerformanceModalOpen(true)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="h-5 w-5" />
-              Performance
-            </CardTitle>
-            <CardDescription>Service performance metrics</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Project Success Rate</span>
-                <span className="font-semibold text-black">98%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Leadership Rating</span>
-                <span className="font-semibold text-black">4.9</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Personnel Trained</span>
-                <span className="font-semibold text-black">234</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Training Sessions</span>
-                <span className="font-semibold text-black">89</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Achievements Card */}
-        <Card 
-          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-          onClick={() => setAchievementsModalOpen(true)}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Award className="h-5 w-5" />
-              Achievements
-            </CardTitle>
-            <CardDescription>Professional honors & awards</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Awards</span>
-                <span className="font-semibold text-black">6</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Service Awards</span>
-                <span className="font-semibold text-black">3</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Excellence Awards</span>
-                <span className="font-semibold text-black">2</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Certificates</span>
-                <span className="font-semibold text-black">1</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Applications Card */}
+        {/* Applications Card - First position */}
         <Card 
           className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
           onClick={() => setApplicationsModalOpen(true)}
@@ -244,7 +108,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        {/* Duties Card */}
+        {/* Duties Card - Second position */}
         <Card 
           className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
           onClick={() => setDutiesModalOpen(true)}
@@ -273,6 +137,142 @@ export default function ProfilePage() {
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Next Duty</span>
                 <span className="font-semibold text-black">06:00</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Performance Card - Third position */}
+        <Card 
+          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+          onClick={() => setPerformanceModalOpen(true)}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Target className="h-5 w-5" />
+              Performance
+            </CardTitle>
+            <CardDescription>Service performance metrics</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Project Success Rate</span>
+                <span className="font-semibold text-black">98%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Leadership Rating</span>
+                <span className="font-semibold text-black">4.9</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Personnel Trained</span>
+                <span className="font-semibold text-black">234</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Training Sessions</span>
+                <span className="font-semibold text-black">89</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Info Card - Fourth position (second row, first position) */}
+        <Card 
+          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+          onClick={() => setProfileInfoModalOpen(true)}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Shield className="h-5 w-5" />
+              Profile Info
+            </CardTitle>
+            <CardDescription>Personal details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Position</span>
+                <span className="font-semibold">{profileData.role}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Department</span>
+                <span className="font-semibold">{profileData.department}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Projects</span>
+                <span className="font-semibold">{profileData.deployments}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Service Years</span>
+                <span className="font-semibold">5+</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Activities Card - Fifth position (second row, second position) */}
+        <Card 
+          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+          onClick={() => setActivitiesModalOpen(true)}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Activity className="h-5 w-5" />
+              Activities
+            </CardTitle>
+            <CardDescription>Recent operational activities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Total Operations</span>
+                <span className="font-semibold text-black">47</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Successful Projects</span>
+                <span className="font-semibold text-black">45</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Active Operations</span>
+                <span className="font-semibold text-black">3</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Personnel Involved</span>
+                <span className="font-semibold text-black">1,234</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Achievements Card - Sixth position (second row, third position) */}
+        <Card 
+          className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+          onClick={() => setAchievementsModalOpen(true)}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Award className="h-5 w-5" />
+              Achievements
+            </CardTitle>
+            <CardDescription>Professional honors & awards</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Total Awards</span>
+                <span className="font-semibold text-black">6</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Service Awards</span>
+                <span className="font-semibold text-black">3</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Excellence Awards</span>
+                <span className="font-semibold text-black">2</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Certificates</span>
+                <span className="font-semibold text-black">1</span>
               </div>
             </div>
           </CardContent>

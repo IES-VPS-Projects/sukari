@@ -452,11 +452,6 @@ export default function DashboardPage() {
               <SucroseContentCard sucroseData={sucroseContentData} />
               <ProductionPulseCard productionData={mockProductionData} />
             </div>
-
-            {/* Fourth Row - Resource Center */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <ResourceCenterCard />
-            </div>
           </>
         )
 

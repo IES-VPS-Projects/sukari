@@ -365,7 +365,22 @@ export default function TodayPage() {
         label: alert.label,
         description: alert.description,
         timestamp: alert.timestamp,
-        category: alert.area || 'General',
+        category: alert.title === 'Locust Infestation' ? 'Production' :
+                  alert.title === 'Weather Alert' ? 'Production' :
+                  alert.title === 'Weather' ? 'Production' :
+                  alert.title === 'Disbursement Approval' ? 'Revenue' :
+                  alert.title === 'Equipment Maintenance' ? 'Stakeholders' :
+                  alert.title === 'Quality Control Notice' ? 'Stakeholders' :
+                  alert.title === 'System Performance Alert' ? 'Stakeholders' :
+                  alert.area === 'Equipment' ? 'Production' :
+                  alert.area === 'Quality' ? 'Production' :
+                  alert.area === 'Operations' ? 'Production' :
+                  alert.area === 'Safety' ? 'Compliance' :
+                  alert.area === 'Payments' ? 'Revenue' :
+                  alert.area === 'Performance' ? 'Reports' :
+                  alert.area === 'Weather' ? 'Production' :
+                  alert.area === 'Disaster' ? 'Compliance' :
+                  alert.area === 'General' ? 'Reports' : 'Reports',
         priority: alert.label === 'HIGH' ? 'high' : alert.label === 'MEDIUM' ? 'medium' : 'low',
         labelColor: alert.labelColor,
         iconBg: alert.iconBg,
