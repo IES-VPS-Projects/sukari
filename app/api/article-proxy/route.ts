@@ -69,11 +69,57 @@ export async function GET(request: NextRequest) {
     for (const selector of contentSelectors) {
       const element = $(selector).first()
       if (element.length > 0) {
-        // Remove unwanted elements
-        element.find('script, style, nav, aside, footer, .comments, .sidebar').remove()
+        // Remove unwanted elements but keep the main content structure
+        element.find('script, style, nav, aside, footer, .comments, .sidebar, .advertisement, .ad, .widget').remove()
         
-        content = element.text().trim()
-        if (content.length > 100) { // Only use if we got substantial content
+        // Enhanced content extraction that preserves text around images
+        let extractedContent = ''
+        
+        // Check if this is a ragus.co.uk site (known to have images interrupting text)
+        const isRagusSite = url.includes('ragus.co.uk')
+        
+        if (isRagusSite) {
+          // Special handling for ragus.co.uk - extract all text content and ignore images
+          element.find('p, div, span, h1, h2, h3, h4, h5, h6').each((_, elem) => {
+            const text = $(elem).text().trim()
+            if (text.length > 20) { // Only include substantial text
+              extractedContent += text + '\n\n'
+            }
+          })
+        } else if (url.includes('ussugar.com')) {
+          // Special handling for US Sugar - text only, no inline image processing
+          extractedContent = element.clone()
+            .find('img, picture, figure, video, iframe')
+            .remove()
+            .end()
+            .text()
+            .trim()
+        } else if (url.includes('dwmco.com')) {
+          // Special handling for DWM Co - more aggressive content extraction
+          // Remove images and get all text content, including from nested elements
+          element.find('img, picture, figure, video, iframe, .image-container, .photo').remove()
+          
+          // Extract text from all meaningful elements
+          const meaningfulElements = element.find('p, div:not(.sidebar):not(.widget), article, section, .content, .text')
+          
+          meaningfulElements.each((_, elem) => {
+            const text = $(elem).text().trim()
+            if (text.length > 30 && !text.match(/^(image|photo|click|download|share)/i)) {
+              extractedContent += text + '\n\n'
+            }
+          })
+          
+          // Fallback: if no content found, get all text
+          if (extractedContent.length < 100) {
+            extractedContent = element.text().trim()
+          }
+        } else {
+          // Default handling for other sites
+          extractedContent = element.text().trim()
+        }
+        
+        if (extractedContent.length > 100) {
+          content = extractedContent
           break
         }
       }

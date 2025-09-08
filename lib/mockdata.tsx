@@ -218,9 +218,9 @@ export const todayPageData = {
         label: 'LOW',
         description: 'Minor pest activity detected in western region',
         timestamp: '9:30 AM • Butali',
-        labelColor: 'bg-yellow-500',
-        iconBg: 'bg-yellow-100',
-        iconColor: 'text-yellow-600'
+        labelColor: 'bg-green-500',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       }
     ] as AlertItem[],
     notifications: [
@@ -578,22 +578,11 @@ export const todayPageData = {
   // All alerts data for modals
   allAlertsData: [
     {
-      id: 'alert-1',
-      title: 'Equipment Maintenance Required',
-      description: 'Mill #3 efficiency dropped by 12% in the last 24 hours. Immediate attention required.',
-      timestamp: '2 hours ago',
-      label: 'Critical',
-      labelColor: 'bg-red-500',
-      iconColor: 'text-red-600',
-      iconBg: 'bg-red-100',
-      area: 'Performance'
-    },
-    {
       id: 'alert-2', 
       title: 'Compliance Issue Detected',
       description: 'Environmental standards review required for West Zone operations.',
       timestamp: '4 hours ago',
-      label: 'Warning',
+      label: 'MEDIUM',
       labelColor: 'bg-orange-500',
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
@@ -604,10 +593,10 @@ export const todayPageData = {
       title: 'Quality Control Notice',
       description: 'Sugar purity levels in Batch #247 below standard requirements.',
       timestamp: '6 hours ago',
-      label: 'Medium',
-      labelColor: 'bg-yellow-500',
-      iconColor: 'text-yellow-600',
-      iconBg: 'bg-yellow-100',
+      label: 'MEDIUM',
+      labelColor: 'bg-orange-500',
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
       area: 'Compliance'
     },
     {
@@ -615,7 +604,7 @@ export const todayPageData = {
       title: 'Disbursement Approval',
       description: 'Farmer payment disbursement requires executive approval for Western region.',
       timestamp: '1 day ago',
-      label: 'High',
+      label: 'HIGH',
       labelColor: 'bg-red-500',
       iconColor: 'text-red-600',
       iconBg: 'bg-red-100',
@@ -626,7 +615,7 @@ export const todayPageData = {
       title: 'Weather Alert',
       description: 'Heavy rainfall expected in the next 24 hours. Potential impact on cane transportation.',
       timestamp: '3 hours ago',
-      label: 'Warning',
+      label: 'MEDIUM',
       labelColor: 'bg-orange-500',
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
@@ -637,10 +626,10 @@ export const todayPageData = {
       title: 'System Performance Alert',
       description: 'Processing system efficiency below optimal levels. Monitoring required.',
       timestamp: '5 hours ago',
-      label: 'Medium',
-      labelColor: 'bg-yellow-500',
-      iconColor: 'text-yellow-600',
-      iconBg: 'bg-yellow-100',
+      label: 'MEDIUM',
+      labelColor: 'bg-orange-500',
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
       area: 'Performance'
     }
   ] as AlertItem[],

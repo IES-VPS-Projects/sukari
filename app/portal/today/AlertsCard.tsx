@@ -88,7 +88,7 @@ const alertsData = {
       description: alert.description,
       timestamp: alert.timestamp,
       category: alert.area || 'General',
-      priority: alert.label === 'Critical' || alert.label === 'High' ? 'high' : alert.label === 'Warning' || alert.label === 'Medium' ? 'medium' : 'low',
+      priority: alert.label === 'HIGH' || alert.label === 'Critical' ? 'high' : alert.label === 'MEDIUM' || alert.label === 'Warning' || alert.label === 'Medium' ? 'medium' : 'low',
       labelColor: alert.labelColor,
       iconBg: alert.iconBg,
       iconColor: alert.iconColor
@@ -114,7 +114,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
   setSelectedAlertForDetails,
   alertsData: externalAlertsData
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Equipment' | 'Compliance' | 'Weather' | 'Performance' | 'Payments' | 'Quality' | 'Operations' | 'Safety' | 'General'>('All')
+  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Equipment' | 'Compliance' | 'Weather' | 'Performance' | 'Payments' | 'Quality' | 'Operations' | 'Safety' | 'General' | 'Disaster'>('All')
   
   // Use the external alerts data passed from parent (which already includes combined data)
   const allAlertsForCard = externalAlertsData?.alerts || alertsData.alerts
@@ -129,20 +129,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
     Safety: allAlertsForCard.filter((a: any) => a.category === 'Safety').length,
     Payments: allAlertsForCard.filter((a: any) => a.category === 'Payments').length,
     General: allAlertsForCard.filter((a: any) => a.category === 'General').length,
-  }
-
-  // Get background color based on priority for hover effect
-  const getHoverBgByPriority = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'hover:bg-red-50'
-      case 'medium':
-        return 'hover:bg-orange-50'
-      case 'low':
-        return 'hover:bg-green-50'
-      default:
-        return 'hover:bg-gray-50'
-    }
+    Disaster: allAlertsForCard.filter((a: any) => a.category === 'Disaster').length,
   }
 
   return (
@@ -161,7 +148,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
         {/* Category Tab Bar */}
         <div className="flex items-center gap-2 mt-4 border-b">
           <div className="flex items-center gap-2 flex-wrap">
-            {(['All','Compliance','Weather','Performance','Payments'] as const).map((category) => (
+            {(['All','Compliance','Weather','Performance','Payments','Disaster'] as const).map((category) => (
               <button
                 key={category}
                 className={`text-xs pb-2 -mb-px border-b-2 whitespace-nowrap flex-shrink-0 transition-colors ${
@@ -177,7 +164,8 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                     {category === 'Compliance' ? categoryCounts.Compliance : 
                      category === 'Weather' ? categoryCounts.Weather : 
                      category === 'Performance' ? categoryCounts.Performance :
-                     category === 'Payments' ? categoryCounts.Payments : 0}
+                     category === 'Payments' ? categoryCounts.Payments :
+                     category === 'Disaster' ? categoryCounts.Disaster : 0}
                   </Badge>
                 )}
                 {category === 'All' && (
@@ -201,13 +189,19 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
               if (selectedCategory === 'All') return true
               if (selectedCategory === 'Performance') return item.category === 'Performance'
               if (selectedCategory === 'Payments') return item.category === 'Payments'
+              if (selectedCategory === 'Disaster') return item.category === 'Disaster'
               return item.category === selectedCategory
             })
             .map((item: any) => {
               return (
                 <div 
                   key={item.id} 
-                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${getHoverBgByPriority(item.priority)} hover:shadow-md transform hover:scale-[1.02]`}
+                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    item.priority === 'high' || item.label?.toUpperCase() === 'HIGH' ? 'hover:bg-red-50' :
+                    item.priority === 'medium' || item.label?.toUpperCase() === 'MEDIUM' ? 'hover:bg-orange-50' :
+                    item.priority === 'low' || item.label?.toUpperCase() === 'LOW' ? 'hover:bg-green-50' :
+                    'hover:bg-gray-50'
+                  } hover:shadow-md transform hover:scale-[1.02]`}
                   onClick={() => {
                     if (setSelectedAlertForDetails) setSelectedAlertForDetails(item.id)
                     if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
@@ -225,9 +219,9 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="text-sm font-medium text-[#202020] truncate">{item.title}</h4>
                           <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
-                            item.label?.toUpperCase() === 'HIGH' || item.label === 'Critical' ? 'bg-red-100 text-red-700 border-red-200/30' :
-                            item.label?.toUpperCase() === 'MEDIUM' || item.label === 'Warning' ? 'bg-orange-100 text-orange-700 border-orange-200/30' :
-                            item.label?.toUpperCase() === 'LOW' || item.label === 'Info' ? 'bg-green-100 text-green-700 border-green-200/30' :
+                            item.label?.toUpperCase() === 'HIGH' ? 'bg-red-100 text-red-700 border-red-200/30' :
+                            item.label?.toUpperCase() === 'MEDIUM' ? 'bg-orange-100 text-orange-700 border-orange-200/30' :
+                            item.label?.toUpperCase() === 'LOW' ? 'bg-green-100 text-green-700 border-green-200/30' :
                             'bg-gray-50/80 text-gray-700 border-gray-300'
                           }`}>
                             {item.label}

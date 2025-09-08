@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, MapPin, Users, FileText, CheckCircle, AlertTriangle, Star, Phone, ChevronRight, ChevronLeft, Menu, Plus, X } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Calendar, Clock, MapPin, Users, FileText, CheckCircle, AlertTriangle, Star, Phone, ChevronRight, ChevronLeft, Menu, Plus, X, Send, Check } from "lucide-react"
 import { format, addDays, isToday, isTomorrow } from "date-fns"
 import { Separator } from "@/components/ui/separator"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -60,21 +61,22 @@ interface DutyFormData {
   specialInstructions: string
 }
 
-interface DutyFormData {
-  title: string
-  description: string
-  assignedTo: string
-  dueDate: Date | undefined
-  priority: 'high' | 'medium' | 'low'
-  category: 'administrative' | 'strategic' | 'operational' | 'compliance' | 'stakeholder'
-  estimatedHours: string
-  specialInstructions: string
+interface FollowUpMessage {
+  id: string
+  dutyId: string
+  message: string
+  timestamp: Date
+  status: 'sent' | 'delivered' | 'read'
 }
 
 export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
   const [viewMode, setViewMode] = useState<'assign' | 'manage'>('manage')
   const [showAssignForm, setShowAssignForm] = useState(false)
   const [selectedDuty, setSelectedDuty] = useState<string | null>(null)
+  const [editingDuty, setEditingDuty] = useState<AssignedDuty | null>(null)
+  const [followUpDuty, setFollowUpDuty] = useState<string | null>(null)
+  const [followUpMessage, setFollowUpMessage] = useState('')
+  const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([])
   
   // Mock data for middle-level managers reporting to CEO
   const middleManagers: MiddleManager[] = [
@@ -230,9 +232,37 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
     }
   }
 
+  const renderMessageStatus = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return <Check className="h-3 w-3 text-gray-400" />
+      case 'delivered':
+        return (
+          <div className="flex -space-x-1">
+            <Check className="h-3 w-3 text-gray-400" />
+            <Check className="h-3 w-3 text-gray-400" />
+          </div>
+        )
+      case 'read':
+        return (
+          <div className="flex -space-x-1">
+            <Check className="h-3 w-3 text-blue-500" />
+            <Check className="h-3 w-3 text-blue-500" />
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
   const handleAssignDuty = () => {
-    console.log('Assigning duty:', dutyForm)
-    // Reset form
+    if (editingDuty) {
+      console.log('Modifying duty:', { id: editingDuty.id, ...dutyForm })
+    } else {
+      console.log('Assigning new duty:', dutyForm)
+    }
+    
+    // Reset form and editing state
     setDutyForm({
       title: '',
       description: '',
@@ -243,17 +273,82 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
       estimatedHours: '',
       specialInstructions: ''
     })
-    setShowAssignForm(false)
+    setEditingDuty(null)
+    setViewMode('manage')
   }
 
   const handleDutyAction = (action: string, dutyId: string) => {
-    console.log(`${action} duty:`, dutyId)
+    const duty = assignedDuties.find(d => d.id === dutyId)
+    
+    if (action === 'modify' && duty) {
+      // Find the manager ID based on the assigned name
+      const manager = middleManagers.find(m => m.name === duty.assignedTo.name)
+      
+      // Populate form with existing duty data
+      setDutyForm({
+        title: duty.title,
+        description: duty.description,
+        assignedTo: manager?.id || '',
+        dueDate: duty.dueDate,
+        priority: duty.priority,
+        category: duty.category,
+        estimatedHours: duty.estimatedHours,
+        specialInstructions: ''
+      })
+      setEditingDuty(duty)
+      setViewMode('assign')
+    } else if (action === 'followup') {
+      setFollowUpDuty(dutyId)
+      setFollowUpMessage('')
+    } else {
+      console.log(`${action} duty:`, dutyId)
+    }
+  }
+
+  const handleSendFollowUp = () => {
+    if (!followUpMessage.trim() || !followUpDuty) return
+    
+    const newMessage: FollowUpMessage = {
+      id: Date.now().toString(),
+      dutyId: followUpDuty,
+      message: followUpMessage.trim(),
+      timestamp: new Date(),
+      status: 'sent'
+    }
+    
+    setFollowUpMessages(prev => [...prev, newMessage])
+    
+    // Simulate message status updates
+    setTimeout(() => {
+      setFollowUpMessages(prev => 
+        prev.map(msg => 
+          msg.id === newMessage.id ? { ...msg, status: 'delivered' } : msg
+        )
+      )
+    }, 1000)
+    
+    setTimeout(() => {
+      setFollowUpMessages(prev => 
+        prev.map(msg => 
+          msg.id === newMessage.id ? { ...msg, status: 'read' } : msg
+        )
+      )
+    }, 3000)
+    
+    console.log('Sending follow-up message:', {
+      dutyId: followUpDuty,
+      message: followUpMessage,
+      timestamp: new Date()
+    })
+    
+    // Reset follow-up message but keep the chat open
+    setFollowUpMessage('')
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-6xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
-        <DialogHeader className="p-4 sm:p-6 border-b">
+      <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0" hideCloseButton>
+        <DialogHeader className="p-4 sm:p-6 border-b bg-gray-50">
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="flex items-center gap-2">
@@ -264,7 +359,7 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
                 Assign and manage duties for middle-level management team
               </DialogDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button
                 variant={viewMode === 'manage' ? 'default' : 'outline'}
                 size="sm"
@@ -282,6 +377,14 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
                 <Plus className="h-4 w-4 mr-1" />
                 Assign New
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                className="h-8 w-8 p-0 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </DialogHeader>
@@ -298,204 +401,301 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
 
               <div className="grid gap-4">
                 {assignedDuties.map((duty) => (
-                  <div key={duty.id} className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-lg mb-1">{duty.title}</h4>
-                        <p className="text-gray-600 text-sm mb-2">{duty.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span>Assigned to: <strong>{duty.assignedTo.name}</strong></span>
-                          <span>•</span>
-                          <span>Due: <strong>{format(duty.dueDate, 'MMM dd, yyyy')}</strong></span>
-                          <span>•</span>
-                          <span>Est. Time: <strong>{duty.estimatedHours}</strong></span>
+                  <div key={duty.id}>
+                    <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-lg mb-1">{duty.title}</h4>
+                          <p className="text-gray-600 text-sm mb-2">{duty.description}</p>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>Assigned to: <strong>{duty.assignedTo.name}</strong></span>
+                            <span>•</span>
+                            <span>Due: <strong>{format(duty.dueDate, 'MMM dd, yyyy')}</strong></span>
+                            <span>•</span>
+                            <span>Duration: <strong>{duty.estimatedHours}</strong></span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className={getPriorityColor(duty.priority)}>
+                            {duty.priority}
+                          </Badge>
+                          <Badge className={getStatusColor(duty.status)}>
+                            {duty.status}
+                          </Badge>
+                          <Badge className={getCategoryColor(duty.category)}>
+                            {duty.category}
+                          </Badge>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getPriorityColor(duty.priority)}>
-                          {duty.priority}
-                        </Badge>
-                        <Badge className={getStatusColor(duty.status)}>
-                          {duty.status}
-                        </Badge>
-                        <Badge className={getCategoryColor(duty.category)}>
-                          {duty.category}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-3 border-t">
-                      <div className="text-sm text-gray-500">
-                        Assigned by {duty.assignedBy} on {format(duty.dateAssigned, 'MMM dd, yyyy')}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDutyAction('modify', duty.id)}
-                        >
-                          Modify
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDutyAction('followup', duty.id)}
-                        >
-                          Follow Up
-                        </Button>
-                        {duty.status === 'completed' && (
+                      
+                      <div className="flex items-center justify-between pt-3 border-t">
+                        <div className="text-sm text-gray-500">
+                          Assigned by {duty.assignedBy} on {format(duty.dateAssigned, 'MMM dd, yyyy')}
+                        </div>
+                        <div className="flex gap-2">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="text-green-600 hover:text-green-700"
-                            onClick={() => handleDutyAction('approve', duty.id)}
+                            onClick={() => handleDutyAction('modify', duty.id)}
                           >
-                            ✓ Approve
+                            Modify
                           </Button>
-                        )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDutyAction('followup', duty.id)}
+                          >
+                            Follow Up
+                          </Button>
+                          {duty.status === 'completed' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-green-600 hover:text-green-700"
+                              onClick={() => handleDutyAction('approve', duty.id)}
+                            >
+                              ✓ Approve
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* Follow-up chat interface */}
+                    {followUpDuty === duty.id && (
+                      <div className="ml-8 mt-4 space-y-3">
+                        {/* Display sent messages */}
+                        {followUpMessages
+                          .filter(msg => msg.dutyId === duty.id)
+                          .map((msg) => (
+                            <div key={msg.id} className="flex items-start gap-3">
+                              <Avatar className="h-8 w-8 mt-1">
+                                <AvatarFallback className="bg-green-600 text-white text-xs">
+                                  GB
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="bg-white border rounded-lg p-3 shadow-sm max-w-md">
+                                  <p className="text-sm text-gray-800">{msg.message}</p>
+                                  <div className="flex items-center justify-between mt-2">
+                                    <span className="text-xs text-gray-500">
+                                      {format(msg.timestamp, 'MMM dd, HH:mm')}
+                                    </span>
+                                    <div className="flex items-center">
+                                      {renderMessageStatus(msg.status)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        
+                        {/* Message input */}
+                        <div className="flex items-start gap-3">
+                          <Avatar className="h-8 w-8 mt-1">
+                            <AvatarFallback className="bg-green-600 text-white text-xs">
+                              GB
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 space-y-2">
+                            <div className="relative">
+                              <Textarea
+                                value={followUpMessage}
+                                onChange={(e) => setFollowUpMessage(e.target.value)}
+                                placeholder={`Write a follow-up message to ${duty.assignedTo.name}...`}
+                                rows={2}
+                                className="resize-none border-gray-200 focus:border-blue-400 pr-12"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault()
+                                    if (followUpMessage.trim()) {
+                                      handleSendFollowUp()
+                                    }
+                                  }
+                                }}
+                              />
+                              <div className="absolute bottom-2 right-2 flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setFollowUpDuty(null)}
+                                  className="h-7 w-7 p-0 text-gray-400 hover:text-gray-600"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={handleSendFollowUp}
+                                  disabled={!followUpMessage.trim()}
+                                  className="h-7 w-7 p-0 bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300"
+                                >
+                                  <Send className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Assign New Duty</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="duty-title">Duty Title</Label>
-                    <Input
-                      id="duty-title"
-                      placeholder="e.g., Strategic Planning Review"
-                      value={dutyForm.title}
-                      onChange={(e) => setDutyForm({...dutyForm, title: e.target.value})}
-                    />
-                  </div>
+              <div className="space-y-4 max-w-2xl mx-auto">
+                <div>
+                  <Label htmlFor="duty-title">Duty Title</Label>
+                  <Input
+                    id="duty-title"
+                    placeholder="e.g., Strategic Planning Review"
+                    value={dutyForm.title}
+                    onChange={(e) => setDutyForm({...dutyForm, title: e.target.value})}
+                  />
+                </div>
 
+                <div>
+                  <Label htmlFor="assigned-to">Assign To</Label>
+                  <Select value={dutyForm.assignedTo} onValueChange={(value) => setDutyForm({...dutyForm, assignedTo: value})}>
+                    <SelectTrigger className="h-12 items-start text-left">
+                      <SelectValue placeholder="Select manager to assign duty">
+                        {dutyForm.assignedTo && (() => {
+                          const selectedManager = middleManagers.find(m => m.id === dutyForm.assignedTo)
+                          return selectedManager ? (
+                            <div className="flex flex-col items-start text-left">
+                              <span className="font-medium text-sm">{selectedManager.name}</span>
+                              <span className="text-xs text-gray-500">{selectedManager.position} - {selectedManager.department}</span>
+                            </div>
+                          ) : null
+                        })()}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {middleManagers.map((manager) => (
+                        <SelectItem key={manager.id} value={manager.id}>
+                          <div className="flex flex-col items-start text-left py-1">
+                            <span className="font-medium text-sm">{manager.name}</span>
+                            <span className="text-xs text-gray-500">{manager.position} - {manager.department}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="assigned-to">Assign To</Label>
-                    <Select value={dutyForm.assignedTo} onValueChange={(value) => setDutyForm({...dutyForm, assignedTo: value})}>
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select value={dutyForm.priority} onValueChange={(value: 'high' | 'medium' | 'low') => setDutyForm({...dutyForm, priority: value})}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select manager to assign duty" />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {middleManagers.map((manager) => (
-                          <SelectItem key={manager.id} value={manager.id}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{manager.name}</span>
-                              <span className="text-xs text-gray-500">{manager.position} - {manager.department}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="priority">Priority</Label>
-                      <Select value={dutyForm.priority} onValueChange={(value: 'high' | 'medium' | 'low') => setDutyForm({...dutyForm, priority: value})}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="low">Low</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="category">Category</Label>
-                      <Select value={dutyForm.category} onValueChange={(value: any) => setDutyForm({...dutyForm, category: value})}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="administrative">Administrative</SelectItem>
-                          <SelectItem value="strategic">Strategic</SelectItem>
-                          <SelectItem value="operational">Operational</SelectItem>
-                          <SelectItem value="compliance">Compliance</SelectItem>
-                          <SelectItem value="stakeholder">Stakeholder</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
                   <div>
-                    <Label htmlFor="estimated-hours">Estimated Hours</Label>
-                    <Input
-                      id="estimated-hours"
-                      placeholder="e.g., 8 hours, 2 days"
-                      value={dutyForm.estimatedHours}
-                      onChange={(e) => setDutyForm({...dutyForm, estimatedHours: e.target.value})}
-                    />
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={dutyForm.category} onValueChange={(value: any) => setDutyForm({...dutyForm, category: value})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="administrative">Administrative</SelectItem>
+                        <SelectItem value="strategic">Strategic</SelectItem>
+                        <SelectItem value="operational">Operational</SelectItem>
+                        <SelectItem value="compliance">Compliance</SelectItem>
+                        <SelectItem value="stakeholder">Stakeholder</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Detailed description of the duty and expectations..."
-                      rows={4}
-                      value={dutyForm.description}
-                      onChange={(e) => setDutyForm({...dutyForm, description: e.target.value})}
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    placeholder="e.g., 8 hours, 2 days"
+                    value={dutyForm.estimatedHours}
+                    onChange={(e) => setDutyForm({...dutyForm, estimatedHours: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label htmlFor="special-instructions">Special Instructions</Label>
-                    <Textarea
-                      id="special-instructions"
-                      placeholder="Any special instructions, deadlines, or requirements..."
-                      rows={3}
-                      value={dutyForm.specialInstructions}
-                      onChange={(e) => setDutyForm({...dutyForm, specialInstructions: e.target.value})}
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Detailed description of the duty and expectations..."
+                    rows={4}
+                    value={dutyForm.description}
+                    onChange={(e) => setDutyForm({...dutyForm, description: e.target.value})}
+                  />
+                </div>
 
-                  <div>
-                    <Label>Due Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                          <Calendar className="mr-2 h-4 w-4" />
-                          {dutyForm.dueDate ? format(dutyForm.dueDate, 'PPP') : 'Select due date'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <CalendarComponent
-                          mode="single"
-                          selected={dutyForm.dueDate}
-                          onSelect={(date) => setDutyForm({...dutyForm, dueDate: date})}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                <div>
+                  <Label htmlFor="special-instructions">Special Instructions</Label>
+                  <Textarea
+                    id="special-instructions"
+                    placeholder="Any special instructions, deadlines, or requirements..."
+                    rows={3}
+                    value={dutyForm.specialInstructions}
+                    onChange={(e) => setDutyForm({...dutyForm, specialInstructions: e.target.value})}
+                  />
+                </div>
+
+                <div>
+                  <Label>Due Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {dutyForm.dueDate ? format(dutyForm.dueDate, 'PPP') : 'Select due date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={dutyForm.dueDate}
+                        onSelect={(date) => setDutyForm({...dutyForm, dueDate: date})}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  
+                  {/* Buttons positioned directly below due date */}
+                  <div className="flex justify-end gap-3 mt-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setViewMode('manage')
+                        setEditingDuty(null)
+                        setDutyForm({
+                          title: '',
+                          description: '',
+                          assignedTo: '',
+                          dueDate: undefined,
+                          priority: 'medium',
+                          category: 'administrative',
+                          estimatedHours: '',
+                          specialInstructions: ''
+                        })
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleAssignDuty}
+                      disabled={!dutyForm.title || !dutyForm.assignedTo || !dutyForm.description}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {editingDuty ? 'Update Duty' : 'Assign Duty'}
+                    </Button>
                   </div>
                 </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-6 border-t">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setViewMode('manage')}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleAssignDuty}
-                  disabled={!dutyForm.title || !dutyForm.assignedTo || !dutyForm.description}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Assign Duty
-                </Button>
               </div>
             </div>
           )}

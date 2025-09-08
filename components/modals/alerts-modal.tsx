@@ -45,7 +45,7 @@ export function AlertsModal({
             if (alert) {
               return (
                 <div className="flex flex-col h-full min-h-0">
-                  <div className="p-6 border-b flex-shrink-0">
+                  <div className="p-6 border-b bg-gray-50 flex-shrink-0">
                     <div className="flex items-center gap-3">
                       <Button
                         variant="ghost"
@@ -162,7 +162,7 @@ export function AlertsModal({
           // List view
           return (
             <div className="flex flex-col h-full min-h-0">
-              <div className="p-6 border-b flex-shrink-0">
+              <div className="p-6 border-b bg-gray-50 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
@@ -217,9 +217,9 @@ export function AlertsModal({
                               <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
                                 alert.labelColor === 'bg-red-500' ? 'bg-red-50/80 text-red-700 border-gray-300' :
                                 alert.labelColor === 'bg-orange-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
-                                alert.labelColor === 'bg-yellow-500' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
-                                alert.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
                                 alert.labelColor === 'bg-green-500' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                                alert.labelColor === 'bg-yellow-500' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
+                                alert.labelColor === 'bg-blue-500' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
                                 alert.labelColor === 'bg-purple-500' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
                                 'bg-gray-50/80 text-gray-700 border-gray-300'
                               }`}>

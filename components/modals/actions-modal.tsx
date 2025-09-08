@@ -93,7 +93,7 @@ const ActionsModal = ({
               return (
                 <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
                   {/* Header */}
-                  <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b bg-white`}>
+                  <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b bg-gray-50`}>
                     <div className="flex items-center gap-3 mb-4">
                       <Button
                         variant="ghost"
@@ -746,7 +746,7 @@ const ActionsModal = ({
           // List view
           return (
             <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
-              <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b`}>
+              <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} border-b bg-gray-50`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}>Actions</h2>
@@ -773,10 +773,21 @@ const ActionsModal = ({
               
               <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
                 <div className="space-y-3">
-                  {allActionsData.map((action) => (
+                  {allActionsData.map((action) => {
+                    const getHoverBg = (iconColor: string) => {
+                      if (iconColor.includes('blue')) return 'hover:bg-blue-50'
+                      if (iconColor.includes('green')) return 'hover:bg-green-50'
+                      if (iconColor.includes('red')) return 'hover:bg-red-50'
+                      if (iconColor.includes('orange')) return 'hover:bg-orange-50'
+                      if (iconColor.includes('purple')) return 'hover:bg-purple-50'
+                      if (iconColor.includes('yellow')) return 'hover:bg-yellow-50'
+                      return 'hover:bg-gray-50'
+                    }
+
+                    return (
                     <div 
                       key={action.id}
-                      className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                      className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${getHoverBg(action.iconColor)} hover:shadow-md transform hover:scale-[1.02]`}
                       onClick={() => setSelectedActionForDetails(action.id)}
                     >
                       {/* Icon */}
@@ -807,7 +818,8 @@ const ActionsModal = ({
                         </div>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>

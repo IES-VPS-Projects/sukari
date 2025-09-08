@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ActivitiesModal } from "@/components/modals/activities-modal"
 import {
   AlertTriangle,
   Calendar,
@@ -15,16 +16,13 @@ import {
   FileText,
   Users,
   TrendingUp,
-  ArrowLeft,
   Clock,
   MapPin,
   User,
-  X,
   Shield,
   Award
 } from "lucide-react"
-import { LuSquarePen, LuTriangleAlert, LuCalendar } from 'react-icons/lu'
-import { GoInfo } from 'react-icons/go'
+import { LuSquarePen } from 'react-icons/lu'
 import { allActivitiesData } from "@/lib/mockdata"
 import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
 
@@ -38,7 +36,6 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   // Modal states
   const [newActivityOpen, setNewActivityOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
-  const [selectedActivityForDetails, setSelectedActivityForDetails] = useState<string | null>(null)
   const [activityDetailsOpen, setActivityDetailsOpen] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
 
@@ -91,7 +88,6 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardHeader className="pb-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-[#202020] cursor-pointer" onClick={() => {
-              setSelectedActivityForDetails(null)
               setViewAllActivitiesOpen(true)
             }}>Activities</CardTitle>
             <Button 
@@ -152,6 +148,13 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                       iconColor: 'text-teal-600', 
                       iconBg: 'bg-teal-100',
                       hoverBg: 'hover:bg-teal-50'
+                    }
+                  case 'maintenance':
+                    return { 
+                      icon: CheckCircle, 
+                      iconColor: 'text-green-600', 
+                      iconBg: 'bg-green-100',
+                      hoverBg: 'hover:bg-green-50'
                     }
                   default: 
                     return { 
@@ -316,229 +319,10 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
       </Dialog>
 
       {/* Activities Modal */}
-      <Dialog open={viewAllActivitiesOpen} onOpenChange={setViewAllActivitiesOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
-          <DialogTitle className="sr-only">
-            {selectedActivityForDetails ? 'Activity Details' : 'Activities'}
-          </DialogTitle>
-          {(() => {
-            if (selectedActivityForDetails) {
-              const activity = allActivitiesData.find(a => a.id === selectedActivityForDetails)
-              
-              if (activity) {
-                return (
-                  <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className="p-6 border-b bg-white">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedActivityForDetails(null)}
-                          className="shrink-0"
-                        >
-                          <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={`w-12 h-12 ${activity.iconBg} rounded-lg flex items-center justify-center`}>
-                            <AlertTriangle className={`h-6 w-6 ${activity.iconColor}`} />
-                          </div>
-                          <div className="flex-1">
-                            <h1 className="text-xl font-semibold text-gray-900">{activity.title}</h1>
-                            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                <span>{activity.dueDate}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-4 w-4" />
-                                <span>{activity.location}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <User className="h-4 w-4" />
-                                <span>{activity.assignee || 'Unassigned'}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                              Edit
-                            </Button>
-                            <Button size="sm" onClick={() => {
-                              setSelectedActivityForDetails(null)
-                              setViewAllActivitiesOpen(false)
-                            }}>
-                              Mark Complete
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Activity Details</h3>
-                          <p className="text-gray-700">{activity.description}</p>
-                        </div>
-                        
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-3">Checklist</h3>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-sm line-through text-gray-500">Prepare inspection documentation</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-sm line-through text-gray-500">Schedule site visit</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                              <span className="text-sm">Conduct compliance assessment</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                              <span className="text-sm">Submit compliance report</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-            }
-
-            // List view
-            return (
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="group relative">
-                        <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
-                        <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                          Tasks and activities needing completion
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setSelectedActivityForDetails(null)
-                          setViewAllActivitiesOpen(false)
-                        }}
-                        className="shrink-0 h-8 w-8"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-3">
-                    {allActivitiesData.map((activity) => {
-                      // Get icon component and styling based on activity type (same as main card)
-                      const getActivityIconAndStyle = (type: string) => {
-                        switch (type) {
-                          case 'compliance': 
-                            return { 
-                              icon: Shield, 
-                              iconColor: 'text-orange-600', 
-                              iconBg: 'bg-orange-100',
-                              hoverBg: 'hover:bg-orange-50'
-                            }
-                          case 'visit': 
-                            return { 
-                              icon: MapPin, 
-                              iconColor: 'text-blue-600', 
-                              iconBg: 'bg-blue-100',
-                              hoverBg: 'hover:bg-blue-50'
-                            }
-                          case 'renewal': 
-                            return { 
-                              icon: Award, 
-                              iconColor: 'text-purple-600', 
-                              iconBg: 'bg-purple-100',
-                              hoverBg: 'hover:bg-purple-50'
-                            }
-                          case 'training': 
-                            return { 
-                              icon: Users, 
-                              iconColor: 'text-green-600', 
-                              iconBg: 'bg-green-100',
-                              hoverBg: 'hover:bg-green-50'
-                            }
-                          case 'quality': 
-                            return { 
-                              icon: FileText, 
-                              iconColor: 'text-indigo-600', 
-                              iconBg: 'bg-indigo-100',
-                              hoverBg: 'hover:bg-indigo-50'
-                            }
-                          case 'monitoring': 
-                            return { 
-                              icon: TrendingUp, 
-                              iconColor: 'text-teal-600', 
-                              iconBg: 'bg-teal-100',
-                              hoverBg: 'hover:bg-teal-50'
-                            }
-                          default: 
-                            return { 
-                              icon: CheckCircle, 
-                              iconColor: 'text-gray-600', 
-                              iconBg: 'bg-gray-100',
-                              hoverBg: 'hover:bg-gray-50'
-                            }
-                        }
-                      }
-
-                      const { icon: IconComponent, iconColor, iconBg } = getActivityIconAndStyle(activity.type)
-
-                      return (
-                        <div 
-                          key={activity.id}
-                          className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                          onClick={() => handleActivityClick(activity.id)}
-                        >
-                          {/* Icon */}
-                          <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                            <IconComponent className={`h-4 w-4 ${iconColor}`} />
-                          </div>
-                          
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
-                                <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
-                                <div className="flex items-center gap-3 text-xs text-[#9CA3AF]">
-                                  <span>{activity.dueDate}</span>
-                                  <span>•</span>
-                                  <span>{activity.location}</span>
-                                  <span>•</span>
-                                  <span>{activity.assignee || 'Unassigned'}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
-        </DialogContent>
-      </Dialog>
+      <ActivitiesModal 
+        open={viewAllActivitiesOpen}
+        onOpenChange={setViewAllActivitiesOpen}
+      />
 
       {/* Activity Details Modal */}
       <ActivityDetailsModal 

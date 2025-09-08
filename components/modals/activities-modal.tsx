@@ -1,7 +1,32 @@
 "use client"
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Activity } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  FileText,
+  Users,
+  TrendingUp,
+  ArrowLeft,
+  Clock,
+  MapPin,
+  User,
+  X,
+  Shield,
+  Award
+} from "lucide-react"
+import { LuSquarePen, LuTriangleAlert, LuCalendar } from 'react-icons/lu'
+import { GoInfo } from 'react-icons/go'
+import { allActivitiesData } from "@/lib/mockdata"
+import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
 
 interface ActivitiesModalProps {
   open: boolean
@@ -9,138 +34,160 @@ interface ActivitiesModalProps {
 }
 
 export function ActivitiesModal({ open, onOpenChange }: ActivitiesModalProps) {
-  const recentActivity = [
-    { action: "Completed Sugar Quality Assessment", target: "Mumias Sugar Factory", time: "2 hours ago", type: "assessment" },
-    { action: "Filed Compliance Report", target: "Factory Audit Q3 2024", time: "1 day ago", type: "report" },
-    { action: "Updated Production Records", target: "Chemelil Sugar Company", time: "2 days ago", type: "update" },
-    { action: "Scheduled Factory Inspection", target: "Nzoia Sugar Company", time: "3 days ago", type: "schedule" },
-    { action: "Conducted Cane Quality Review", target: "Busia Region", time: "1 week ago", type: "review" },
-    { action: "Coordinated Farmer Training", target: "Western Kenya Growers", time: "2 weeks ago", type: "coordination" },
-  ]
+  // Modal states
+  const [selectedActivity, setSelectedActivity] = useState<any>(null)
+  const [activityDetailsOpen, setActivityDetailsOpen] = useState(false)
 
-  const operationsData = {
-    totalOperations: 47,
-    successfulOperations: 45,
-    activeOperations: 3,
-    personnelInvolved: 1234,
-    recentOperations: [
-      {
-        id: 1,
-        name: "Sugar Quality Assessment - Mumias",
-        status: "Completed",
-        date: "2024-08-28",
-        outcome: "Successful",
-        personnel: 8
-      },
-      {
-        id: 2,
-        name: "Factory Compliance Audit - Chemelil",
-        status: "In Progress",
-        date: "2024-09-01",
-        outcome: "Ongoing",
-        personnel: 12
-      },
-      {
-        id: 3,
-        name: "Farmer Training Program - Busia",
-        status: "Completed",
-        date: "2024-08-25",
-        outcome: "Successful",
-        personnel: 25
-      }
-    ]
+  const handleActivityClick = (activityId: string) => {
+    const activity = allActivitiesData.find(a => a.id === activityId)
+    if (activity) {
+      setSelectedActivity(activity)
+      setActivityDetailsOpen(true)
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
-        <DialogHeader className="p-4 sm:p-6 border-b">
-          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Activity className="h-5 w-5" />
-            Activity Overview
-          </DialogTitle>
-          <DialogDescription className="text-sm">Manage your operational activities and project assignments</DialogDescription>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="space-y-4 sm:space-y-6">
-            {/* Recent Operations Activity */}
-            <div className="space-y-3 sm:space-y-4">
-              {recentActivity.map((activity, index) => (
-                <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border">
-                  <div
-                    className={`h-2 w-2 rounded-full flex-shrink-0 ${
-                      activity.type === "assessment"
-                        ? "bg-green-500"
-                        : activity.type === "report"
-                        ? "bg-blue-500"
-                        : activity.type === "update"
-                          ? "bg-orange-500"
-                          : activity.type === "schedule"
-                            ? "bg-purple-500"
-                            : activity.type === "review"
-                              ? "bg-yellow-500"
-                              : "bg-indigo-500"
-                  }`}
-                />
-                <div className="flex-1">
-                  <p className="font-medium">{activity.action}</p>
-                  <p className="text-sm text-muted-foreground">{activity.target}</p>
+    <>
+      {/* Activities Modal */}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+          <DialogTitle className="sr-only">Activities</DialogTitle>
+          
+          <div className="flex flex-col h-full">
+            <div className="p-6 border-b bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
+                  <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
                 </div>
-                <div className="text-sm text-muted-foreground">{activity.time}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Operations Statistics and Recent Projects */}
-          <div className="grid gap-6 md:grid-cols-2 mt-6">
-            <div className="p-6 border rounded-lg">
-              <h3 className="font-semibold mb-4">Operations Statistics</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Total Operations</span>
-                  <span className="font-semibold">47</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Successful Projects</span>
-                  <span className="font-semibold text-green-600">45</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Active Operations</span>
-                  <span className="font-semibold text-blue-600">3</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Personnel Involved</span>
-                  <span className="font-semibold">1,234</span>
+                <div className="flex items-center gap-2">
+                  <div className="group relative">
+                    <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                    <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                      Tasks and activities needing completion
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onOpenChange(false)}
+                    className="shrink-0 h-8 w-8"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
-
-            <div className="p-6 border rounded-lg">
-              <h3 className="font-semibold mb-4">Recent Projects</h3>
+            
+            <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Sugar Quality Initiative</span>
-                  <span className="text-sm text-muted-foreground">2 weeks ago</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Factory Modernization</span>
-                  <span className="text-sm text-muted-foreground">1 month ago</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Farmer Capacity Building</span>
-                  <span className="text-sm text-muted-foreground">2 months ago</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm sm:text-base">Technology Upgrade</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">3 months ago</span>
-                </div>
+                {allActivitiesData.map((activity) => {
+                  // Get icon component and styling based on activity type
+                  const getActivityIconAndStyle = (type: string) => {
+                    switch (type) {
+                      case 'compliance': 
+                        return { 
+                          icon: Shield, 
+                          iconColor: 'text-orange-600', 
+                          iconBg: 'bg-orange-100',
+                          hoverBg: 'hover:bg-orange-50'
+                        }
+                      case 'visit': 
+                        return { 
+                          icon: MapPin, 
+                          iconColor: 'text-blue-600', 
+                          iconBg: 'bg-blue-100',
+                          hoverBg: 'hover:bg-blue-50'
+                        }
+                      case 'renewal': 
+                        return { 
+                          icon: Award, 
+                          iconColor: 'text-purple-600', 
+                          iconBg: 'bg-purple-100',
+                          hoverBg: 'hover:bg-purple-50'
+                        }
+                      case 'training': 
+                        return { 
+                          icon: Users, 
+                          iconColor: 'text-green-600', 
+                          iconBg: 'bg-green-100',
+                          hoverBg: 'hover:bg-green-50'
+                        }
+                      case 'quality': 
+                        return { 
+                          icon: FileText, 
+                          iconColor: 'text-indigo-600', 
+                          iconBg: 'bg-indigo-100',
+                          hoverBg: 'hover:bg-indigo-50'
+                        }
+                      case 'monitoring': 
+                        return { 
+                          icon: TrendingUp, 
+                          iconColor: 'text-teal-600', 
+                          iconBg: 'bg-teal-100',
+                          hoverBg: 'hover:bg-teal-50'
+                        }
+                      case 'maintenance':
+                        return { 
+                          icon: CheckCircle, 
+                          iconColor: 'text-green-600', 
+                          iconBg: 'bg-green-100',
+                          hoverBg: 'hover:bg-green-50'
+                        }
+                      default: 
+                        return { 
+                          icon: CheckCircle, 
+                          iconColor: 'text-gray-600', 
+                          iconBg: 'bg-gray-100',
+                          hoverBg: 'hover:bg-gray-50'
+                        }
+                    }
+                  }
+
+                  const { icon: IconComponent, iconColor, iconBg, hoverBg } = getActivityIconAndStyle(activity.type)
+
+                  return (
+                    <div 
+                      key={activity.id}
+                      className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${hoverBg}`}
+                      onClick={() => handleActivityClick(activity.id)}
+                    >
+                      {/* Icon */}
+                      <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        <IconComponent className={`h-4 w-4 ${iconColor}`} />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-[#202020] truncate">{activity.title}</h4>
+                            <p className="text-xs text-[#6B6B6B] mb-1">{activity.description}</p>
+                            <div className="flex items-center gap-3 text-xs text-[#9CA3AF]">
+                              <span>{activity.dueDate}</span>
+                              <span>•</span>
+                              <span>{activity.location}</span>
+                              <span>•</span>
+                              <span>{activity.assignee || 'Unassigned'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
-        </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Activity Details Modal */}
+      <ActivityDetailsModal 
+        open={activityDetailsOpen} 
+        onOpenChange={setActivityDetailsOpen} 
+        activity={selectedActivity} 
+      />
+    </>
   )
 }

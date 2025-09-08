@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { PortalLayout } from "@/components/portal-layout"
 import { ProfileInfoModal } from "@/components/modals/profile-info-modal"
-import { ActivitiesModal } from "@/components/modals/activities-modal"
+import { ProfileActivitiesModal } from "@/components/modals/profile-activities-modal"
 import { PerformanceModal } from "@/components/modals/performance-modal"
 import { AchievementsModal } from "@/components/modals/achievements-modal"
 import { ApplicationsModal } from "@/components/modals/applications-modal"
@@ -285,7 +285,7 @@ export default function ProfilePage() {
         onOpenChange={setProfileInfoModalOpen}
         profileData={profileData}
       />
-      <ActivitiesModal 
+      <ProfileActivitiesModal 
         open={activitiesModalOpen} 
         onOpenChange={setActivitiesModalOpen}
       />

@@ -92,18 +92,19 @@ export function AchievementsModal({ open, onOpenChange }: AchievementsModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            <Award className="h-6 w-6" />
-            Achievements & Recognition
+      <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="p-4 sm:p-6 border-b bg-gray-50">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Award className="h-5 w-5" />
+            Achievements
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             Professional honors, awards, and recognition for outstanding service
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="space-y-6">
           {/* Achievement Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
@@ -240,6 +241,7 @@ export function AchievementsModal({ open, onOpenChange }: AchievementsModalProps
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -134,6 +134,7 @@ const updatesData = {
       label: 'MEDIUM',
       description: 'Nzoia Sugar Mill compliance violations reported',
       timestamp: '10:15 AM • Nzoia',
+      category: 'Compliance',
       labelColor: 'bg-orange-500',
       iconBg: 'bg-orange-100',
       iconColor: 'text-orange-600'
@@ -144,9 +145,10 @@ const updatesData = {
       label: 'LOW',
       description: 'Minor pest activity detected in western region',
       timestamp: '9:30 AM • Butali',
-      labelColor: 'bg-yellow-500',
-      iconBg: 'bg-yellow-100',
-      iconColor: 'text-yellow-600'
+      category: 'Disaster',
+      labelColor: 'bg-green-500',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600'
     },
     {
       id: '4',
@@ -154,6 +156,7 @@ const updatesData = {
       label: 'MEDIUM',
       description: 'Routine maintenance scheduled for sugar mill equipment',
       timestamp: '8:15 AM • Chemelil',
+      category: 'Performance',
       labelColor: 'bg-orange-500',
       iconBg: 'bg-orange-100',
       iconColor: 'text-orange-600'
@@ -161,12 +164,13 @@ const updatesData = {
     {
       id: '5',
       title: 'Weather Alert',
-      label: 'HIGH',
+      label: 'MEDIUM',
       description: 'Heavy rainfall warning affects cane harvesting schedule',
       timestamp: '7:45 AM • Kakamega Region',
-      labelColor: 'bg-red-500',
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600'
+      category: 'Weather',
+      labelColor: 'bg-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
     }
   ],
   notifications: [
@@ -351,7 +355,10 @@ export default function TodayPage() {
     ...updatesData,
     alerts: [
       ...dynamicAlerts, 
-      ...updatesData.alerts,
+      ...updatesData.alerts.map(alert => ({
+        ...alert,
+        category: alert.category || 'General'
+      })),
       ...allAlertsData.map((alert, index) => ({
         id: `additional-alert-${index}`,
         title: alert.title,
@@ -359,7 +366,7 @@ export default function TodayPage() {
         description: alert.description,
         timestamp: alert.timestamp,
         category: alert.area || 'General',
-        priority: alert.label === 'Critical' ? 'high' : alert.label === 'Warning' ? 'medium' : 'low',
+        priority: alert.label === 'HIGH' ? 'high' : alert.label === 'MEDIUM' ? 'medium' : 'low',
         labelColor: alert.labelColor,
         iconBg: alert.iconBg,
         iconColor: alert.iconColor

@@ -155,14 +155,18 @@ export function IndustryNewsModal({ open, onOpenChange }: IndustryNewsModalProps
     }
   }
 
-  const formatArticleContent = (content: string): ArticleContentItem[] => {
+  const formatArticleContent = (content: string, articleSource?: string): ArticleContentItem[] => {
     if (!content) return []
     
     // First check if content contains HTML
     const hasHTML = /<[^>]*>/g.test(content)
     
     if (hasHTML) {
-      // Parse HTML content and extract text with images
+      // For US Sugar articles, strip images and only get text
+      if (articleSource === 'US Sugar') {
+        return [{ type: 'text', content: content.replace(/<[^>]*>/g, '').trim() }]
+      }
+      // Parse HTML content and extract text with images for other sources
       return parseHTMLContent(content)
     }
     
@@ -458,7 +462,7 @@ export function IndustryNewsModal({ open, onOpenChange }: IndustryNewsModalProps
                   {selectedArticle.content && selectedArticle.content !== selectedArticle.description && (
                     <div className="space-y-6">
                       {(() => {
-                        const formattedContent = formatArticleContent(selectedArticle.content);
+                        const formattedContent = formatArticleContent(selectedArticle.content, selectedArticle.source);
                         return formattedContent.map((item, index) => (
                           <div key={index} className="group">
                             {item.type === 'text' ? (

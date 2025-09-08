@@ -342,7 +342,7 @@ export function ApplicationsModal({ open, onOpenChange }: ApplicationsModalProps
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
-        <DialogHeader className="p-4 sm:p-6 border-b">
+        <DialogHeader className="p-4 sm:p-6 border-b bg-gray-50">
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Applications

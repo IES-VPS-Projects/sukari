@@ -40,20 +40,19 @@ export function PerformanceModal({ open, onOpenChange }: PerformanceModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="pb-4">
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+      <DialogContent className="w-[95vw] max-w-4xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="p-4 sm:p-6 border-b bg-gray-50">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Activity className="h-5 w-5" />
             Performance Metrics
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             Your KSB operational performance ratings and detailed metrics
           </DialogDescription>
         </DialogHeader>
-        
-        <Separator className="mb-6" />
-        
-        <div className="space-y-6">
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="space-y-6">
           {/* Service Performance Metrics */}
           <Card>
             <CardHeader>
@@ -219,6 +218,7 @@ export function PerformanceModal({ open, onOpenChange }: PerformanceModalProps) 
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>
