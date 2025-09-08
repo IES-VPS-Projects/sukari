@@ -579,25 +579,25 @@ export const todayPageData = {
   allAlertsData: [
     {
       id: 'alert-1',
-      title: 'System Performance Alert',
+      title: 'Equipment Maintenance Required',
       description: 'Mill #3 efficiency dropped by 12% in the last 24 hours. Immediate attention required.',
       timestamp: '2 hours ago',
       label: 'Critical',
       labelColor: 'bg-red-500',
       iconColor: 'text-red-600',
       iconBg: 'bg-red-100',
-      area: 'Production Systems'
+      area: 'Performance'
     },
     {
       id: 'alert-2', 
-      title: 'Compliance Warning',
+      title: 'Compliance Issue Detected',
       description: 'Environmental standards review required for West Zone operations.',
       timestamp: '4 hours ago',
       label: 'Warning',
       labelColor: 'bg-orange-500',
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-100',
-      area: 'Environmental Compliance'
+      area: 'Compliance'
     },
     {
       id: 'alert-3',
@@ -608,18 +608,40 @@ export const todayPageData = {
       labelColor: 'bg-yellow-500',
       iconColor: 'text-yellow-600',
       iconBg: 'bg-yellow-100',
-      area: 'Quality Assurance'
+      area: 'Compliance'
     },
     {
       id: 'alert-4',
-      title: 'Maintenance Reminder',
-      description: 'Scheduled maintenance for conveyor belt system due tomorrow.',
+      title: 'Disbursement Approval',
+      description: 'Farmer payment disbursement requires executive approval for Western region.',
       timestamp: '1 day ago',
-      label: 'Info',
-      labelColor: 'bg-blue-500',
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-100',
-      area: 'Equipment Maintenance'
+      label: 'High',
+      labelColor: 'bg-red-500',
+      iconColor: 'text-red-600',
+      iconBg: 'bg-red-100',
+      area: 'Payments'
+    },
+    {
+      id: 'alert-5',
+      title: 'Weather Alert',
+      description: 'Heavy rainfall expected in the next 24 hours. Potential impact on cane transportation.',
+      timestamp: '3 hours ago',
+      label: 'Warning',
+      labelColor: 'bg-orange-500',
+      iconColor: 'text-orange-600',
+      iconBg: 'bg-orange-100',
+      area: 'Weather'
+    },
+    {
+      id: 'alert-6',
+      title: 'System Performance Alert',
+      description: 'Processing system efficiency below optimal levels. Monitoring required.',
+      timestamp: '5 hours ago',
+      label: 'Medium',
+      labelColor: 'bg-yellow-500',
+      iconColor: 'text-yellow-600',
+      iconBg: 'bg-yellow-100',
+      area: 'Performance'
     }
   ] as AlertItem[],
 

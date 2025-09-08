@@ -30,7 +30,7 @@ const DEFAULT_CREDENTIALS = [
     user: {
       id: "1",
       email: "executive@ksb.go.ke",
-      name: "Jude Chesire",
+      name: "Gerald Bosire",
       role: "Chief Executive",
     },
   },
@@ -56,7 +56,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check if user is logged in on mount
     const savedUser = localStorage.getItem("ksb_user")
     if (savedUser) {
-      setUser(JSON.parse(savedUser))
+      const parsedUser = JSON.parse(savedUser)
+      // Clear localStorage if it contains outdated user data (old names)
+      if (parsedUser.name === "Jude Chesire" || parsedUser.name.includes("General")) {
+        localStorage.removeItem("ksb_user")
+        setUser(null)
+      } else {
+        setUser(parsedUser)
+      }
     }
     setIsLoading(false)
   }, [])

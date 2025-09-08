@@ -79,7 +79,7 @@ export function MeetingDetailsModal({ open, onOpenChange, meeting }: MeetingDeta
   const getPersonnelForMeeting = (meetingTitle: string) => {
     if (meetingTitle.includes("Board Meeting")) {
       return [
-        { name: "Jude Chesire", role: "Chief Executive Officer", status: "Confirmed", required: true },
+        { name: "Gerald Bosire", role: "Chief Executive Officer", status: "Confirmed", required: true },
         { name: "Sarah Mwangi", role: "Finance Director", status: "Confirmed", required: true },
         { name: "James Kiprotich", role: "Operations Manager", status: "Pending", required: true },
         { name: "Mary Otieno", role: "Legal Advisor", status: "Confirmed", required: false },

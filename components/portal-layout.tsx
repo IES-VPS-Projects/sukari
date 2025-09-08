@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useAuth } from "@/components/auth-provider"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings } from "lucide-react"
@@ -19,7 +19,7 @@ const navigation = [
   { name: "Calendar", href: "/portal/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
-  { name: "Profile", href: "/portal/profile", icon: User },
+  { name: "Operations", href: "/portal/profile", icon: User },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
@@ -84,10 +84,11 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                   <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
                     <div className="relative">
                       <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-green-300 transition-all border-2 border-gray-300">
+                        <AvatarImage src="/images/KSB_CEO.png" alt="Profile" />
                         <AvatarFallback className="bg-green-100 text-green-800">
                           {user?.name
                             ?.split(" ")
-                            .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
+                            .filter((part, index) => index === 0 || index === 1) // Get "Gerald" and "Bosire"
                             .map((n) => n[0])
                             .join("") || "U"}
                         </AvatarFallback>
@@ -124,20 +125,20 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
       </div>
         <main className="flex-1 pb-24 overflow-auto">{children}</main>
         <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
-            <div className="flex items-center justify-center px-2 py-3">
-              <div className="flex items-center justify-around w-full max-w-4xl">
+            <div className="flex items-center justify-center px-1 py-3">
+              <div className="flex items-center justify-around w-full max-w-3xl gap-1">
                 {navigation.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors min-w-[60px] ${
-                        isActive ? "bg-green-100 text-green-700" : "text-gray-600 hover:text-green-600 hover:bg-green-50"
+                      className={`flex flex-col items-center gap-1 px-1 py-2 rounded-lg transition-all duration-300 ease-in-out min-w-[55px] ${
+                        isActive ? "bg-green-100 text-green-700 scale-105" : "text-gray-600 hover:text-green-600 hover:bg-green-50 hover:scale-105"
                       }`}
                     >
-                      <item.icon className="h-5 w-5" />
-                      <span className="text-xs font-medium">{item.name}</span>
+                      <item.icon className="h-5 w-5 transition-transform duration-200" />
+                      <span className="text-xs font-medium transition-colors duration-200">{item.name}</span>
                     </Link>
                   )
                 })}

@@ -107,7 +107,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardContent className="px-3 py-2">
           {/* Scrollable activities list - showing 3 activities */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allActivitiesData.slice(0, 3).map((activity) => {
+            {allActivitiesData.map((activity) => {
               // Get icon component and styling based on activity type
               const getActivityIconAndStyle = (type: string) => {
                 switch (type) {

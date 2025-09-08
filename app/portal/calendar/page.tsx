@@ -91,6 +91,7 @@ export default function CalendarPage() {
   const [isManuallyNavigated, setIsManuallyNavigated] = useState(false) // Track if user manually navigated away
   const [viewMode, setViewMode] = useState<"year" | "month" | "week">("month")
   const [newEventOpen, setNewEventOpen] = useState(false)
+  const [eventTemplateData, setEventTemplateData] = useState<{title?: string, eventType?: string, priority?: string} | undefined>(undefined)
   const [aiModalOpen, setAiModalOpen] = useState(false)
   const [filterOpen, setFilterOpen] = useState(false)
   const [editEventOpen, setEditEventOpen] = useState(false)
@@ -281,22 +282,44 @@ export default function CalendarPage() {
   }
 
   const handleQuickAction = (action: string) => {
+    let templateData: {title?: string, eventType?: string, priority?: string} = {}
+    
     switch (action) {
       case "Schedule Board Meeting":
-        setNewEventOpen(true)
+        templateData = {
+          title: "Board Meeting - ",
+          eventType: "meeting",
+          priority: "high"
+        }
         break
       case "Plan Mill Inspection":
-        setNewEventOpen(true)
+        templateData = {
+          title: "Mill Inspection - ",
+          eventType: "inspection", 
+          priority: "medium"
+        }
         break
       case "Set Compliance Deadline":
-        setNewEventOpen(true)
+        templateData = {
+          title: "Compliance Deadline - ",
+          eventType: "compliance",
+          priority: "high"
+        }
         break
       case "Book Stakeholder Meeting":
-        setNewEventOpen(true)
+        templateData = {
+          title: "Stakeholder Meeting - ",
+          eventType: "meeting",
+          priority: "medium"
+        }
         break
       default:
         console.log(`Quick action: ${action}`)
+        return
     }
+    
+    setEventTemplateData(templateData)
+    setNewEventOpen(true)
   }
 
   // AI Chat handlers
@@ -503,28 +526,6 @@ export default function CalendarPage() {
                     onClick={() => getNavigateFunction()('next')}
                   >
                     <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  
-                  {/* Today Button */}
-                  <Button 
-                    variant={(() => {
-                      const now = new Date()
-                      const isCurrentMonth = currentDate.getFullYear() === now.getFullYear() && 
-                                           currentDate.getMonth() === now.getMonth()
-                      return isCurrentMonth ? "default" : "outline"
-                    })()} 
-                    size="sm"
-                    onClick={navigateToToday}
-                    className={(() => {
-                      const now = new Date()
-                      const isCurrentMonth = currentDate.getFullYear() === now.getFullYear() && 
-                                           currentDate.getMonth() === now.getMonth()
-                      return isCurrentMonth 
-                        ? "ml-4 bg-green-600 text-white hover:bg-green-700" 
-                        : "ml-4 text-green-600 border-green-600 hover:bg-green-50"
-                    })()}
-                  >
-                    Today
                   </Button>
                 </div>
                 
@@ -1031,7 +1032,17 @@ export default function CalendarPage() {
         </DialogContent>
       </Dialog>
 
-      <NewEventModal open={newEventOpen} onOpenChange={setNewEventOpen} />
+      <NewEventModal 
+        open={newEventOpen} 
+        onOpenChange={(open) => {
+          setNewEventOpen(open)
+          if (!open) {
+            // Clear template data when modal closes
+            setEventTemplateData(undefined)
+          }
+        }} 
+        templateData={eventTemplateData}
+      />
     </div>
     </PortalLayout>
   )

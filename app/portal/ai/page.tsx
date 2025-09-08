@@ -42,7 +42,10 @@ export default function AIInterfacePage() {
 
   // Get the first name from the user's full name
   const getFirstName = (fullName: string) => {
-    return fullName.split(' ')[0]
+    if (!fullName) return 'User'
+    // Handle "Gerald Bosire" correctly
+    const names = fullName.trim().split(' ')
+    return names[0] || 'User'
   }
 
   // Get user ID consistently
@@ -53,8 +56,9 @@ export default function AIInterfacePage() {
 
   // Select a random greeting when the component mounts
   useEffect(() => {
-    if (user) {
+    if (user && user.name) {
       const firstName = getFirstName(user.name)
+      console.log('Current user name:', user.name, 'First name extracted:', firstName) // Debug log
       const randomIndex = Math.floor(Math.random() * dynamicGreetings.length)
       const greeting = dynamicGreetings[randomIndex].replace('{name}', firstName)
       setDynamicGreeting(greeting)

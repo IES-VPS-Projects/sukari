@@ -15,9 +15,9 @@ import { DutiesModal } from "@/components/modals/duties-modal"
 
 export default function ProfilePage() {
   const [profileData] = useState({
-    firstName: "Jude",
-    lastName: "Chesire",
-    email: "jude.chesire@ksb.go.ke",
+    firstName: "Gerald",
+    lastName: "Bosire",
+    email: "gerald.bosire@ksb.go.ke",
     phone: "+254 712 345 678",
     location: "Nairobi, Kenya",
     department: "Executive Management",
@@ -46,7 +46,7 @@ export default function ProfilePage() {
         <Card className="rounded-[20px] shadow-lg border-0 bg-white p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
             <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-              <AvatarImage src="/placeholder.svg" alt="Profile" />
+              <AvatarImage src="/images/KSB_CEO.png" alt="Profile" />
               <AvatarFallback className="text-lg sm:text-xl bg-green-100 text-green-800">
                 {profileData.firstName[0]}{profileData.lastName[0]}
               </AvatarFallback>

@@ -3,191 +3,202 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, MapPin, Users, FileText, CheckCircle, AlertTriangle, Star, Phone, ChevronRight, ChevronLeft, Menu } from "lucide-react"
+import { Calendar, Clock, MapPin, Users, FileText, CheckCircle, AlertTriangle, Star, Phone, ChevronRight, ChevronLeft, Menu, Plus, X } from "lucide-react"
 import { format, addDays, isToday, isTomorrow } from "date-fns"
 import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 
 interface DutiesModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-interface Participant {
+interface AssignedDuty {
+  id: string
+  title: string
+  assignedTo: {
+    name: string
+    employeeId: string
+    position: string
+    department: string
+  }
+  assignedBy: string
+  dueDate: Date
+  priority: 'high' | 'medium' | 'low'
+  status: 'pending' | 'in-progress' | 'completed' | 'overdue'
+  description: string
+  category: 'administrative' | 'strategic' | 'operational' | 'compliance' | 'stakeholder'
+  estimatedHours: string
+  dateAssigned: Date
+}
+
+interface MiddleManager {
+  id: string
   name: string
   employeeId: string
   position: string
+  department: string
+  email: string
   phone: string
+  reportingTo: string
 }
 
-interface Duty {
-  id: string
+interface DutyFormData {
   title: string
-  dutyRole: string
-  shiftType: string
-  specialInstructions?: string
-  startDate: Date
-  endDate: Date
-  startTime: string
-  endTime: string
-  duration: string
-  totalWorkedHours?: string
-  location: string
-  type: 'meeting' | 'inspection' | 'administrative' | 'review' | 'stakeholder' | 'planning' | 'operational'
+  description: string
+  assignedTo: string
+  dueDate: Date | undefined
   priority: 'high' | 'medium' | 'low'
-  status: 'upcoming' | 'in-progress' | 'completed' | 'cancelled'
-  participants: Participant[]
-  inCharge: boolean
+  category: 'administrative' | 'strategic' | 'operational' | 'compliance' | 'stakeholder'
+  estimatedHours: string
+  specialInstructions: string
+}
+
+interface DutyFormData {
+  title: string
+  description: string
+  assignedTo: string
+  dueDate: Date | undefined
+  priority: 'high' | 'medium' | 'low'
+  category: 'administrative' | 'strategic' | 'operational' | 'compliance' | 'stakeholder'
+  estimatedHours: string
+  specialInstructions: string
 }
 
 export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [viewMode, setViewMode] = useState<'assign' | 'manage'>('manage')
+  const [showAssignForm, setShowAssignForm] = useState(false)
   const [selectedDuty, setSelectedDuty] = useState<string | null>(null)
-  const [sidebarExpanded, setSidebarExpanded] = useState(false)
   
-  // KSB duties data - adapted from the current duties modal content
-  const duties: Duty[] = [
+  // Mock data for middle-level managers reporting to CEO
+  const middleManagers: MiddleManager[] = [
     {
       id: '1',
-      title: 'Sugar Production Review Meeting',
-      dutyRole: 'Meeting Chairperson',
-      shiftType: 'day',
-      specialInstructions: 'Weekly review of sugar production across all factories - focus on efficiency improvements',
-      startDate: new Date(),
-      endDate: new Date(),
-      startTime: '09:00',
-      endTime: '11:00',
-      duration: '2 hours',
-      location: 'Conference Room A',
-      type: 'meeting',
-      priority: 'high',
-      status: 'upcoming',
-      participants: [
-        { name: 'John Munyaka', employeeId: 'KSB-2021-0034', position: 'Production Manager', phone: '0701234567' },
-        { name: 'Mary Wanjiku', employeeId: 'KSB-2019-0087', position: 'Quality Assurance Lead', phone: '0722345678' }
-      ],
-      inCharge: true
+      name: 'John Munyaka',
+      employeeId: 'KSB-2021-0034',
+      position: 'Production Manager',
+      department: 'Production',
+      email: 'john.munyaka@ksb.go.ke',
+      phone: '0701234567',
+      reportingTo: 'Gerald Bosire'
     },
     {
       id: '2',
-      title: 'Farmer Liaison Committee Meeting',
-      dutyRole: 'Agricultural Officer',
-      shiftType: 'day',
-      startDate: new Date(),
-      endDate: new Date(),
-      startTime: '14:00',
-      endTime: '16:00',
-      duration: '2 hours',
-      location: 'Board Room',
-      type: 'stakeholder',
-      priority: 'medium',
-      status: 'upcoming',
-      participants: [
-        { name: 'Peter Kiprotich', employeeId: 'KSB-2020-0156', position: 'Agricultural Extension Officer', phone: '0733456789' }
-      ],
-      inCharge: false
+      name: 'Mary Wanjiku',
+      employeeId: 'KSB-2019-0087',
+      position: 'Quality Assurance Manager',
+      department: 'Quality Control',
+      email: 'mary.wanjiku@ksb.go.ke',
+      phone: '0722345678',
+      reportingTo: 'Gerald Bosire'
     },
     {
       id: '3',
-      title: 'Board of Directors Presentation',
-      dutyRole: 'Presenter',
-      shiftType: 'day',
-      startDate: addDays(new Date(), 1),
-      endDate: addDays(new Date(), 1),
-      startTime: '10:00',
-      endTime: '12:00',
-      duration: '2 hours',
-      location: 'Executive Conference Hall',
-      type: 'administrative',
-      priority: 'high',
-      status: 'upcoming',
-      participants: [
-        { name: 'Sarah Njeri', employeeId: 'KSB-2018-0012', position: 'Senior Manager', phone: '0744567890' }
-      ],
-      inCharge: true
+      name: 'Peter Kiprotich',
+      employeeId: 'KSB-2020-0156',
+      position: 'Agricultural Development Manager',
+      department: 'Agriculture',
+      email: 'peter.kiprotich@ksb.go.ke',
+      phone: '0733456789',
+      reportingTo: 'Gerald Bosire'
     },
     {
       id: '4',
-      title: 'Factory Safety Inspection',
-      dutyRole: 'Lead Inspector',
-      shiftType: 'day',
-      startDate: addDays(new Date(), 2),
-      endDate: addDays(new Date(), 2),
-      startTime: '08:00',
-      endTime: '12:00',
-      duration: '4 hours',
-      location: 'Chemelil Sugar Factory',
-      type: 'inspection',
-      priority: 'medium',
-      status: 'upcoming',
-      participants: [
-        { name: 'David Ochieng', employeeId: 'KSB-2022-0089', position: 'Safety Officer', phone: '0755678901' },
-        { name: 'Grace Wanjala', employeeId: 'KSB-2021-0234', position: 'Factory Manager', phone: '0766789012' }
-      ],
-      inCharge: true
+      name: 'Sarah Njeri',
+      employeeId: 'KSB-2018-0012',
+      position: 'Finance Manager',
+      department: 'Finance',
+      email: 'sarah.njeri@ksb.go.ke',
+      phone: '0744567890',
+      reportingTo: 'Gerald Bosire'
     },
     {
       id: '5',
-      title: 'Strategic Planning Session',
-      dutyRole: 'Strategic Planning Coordinator',
-      shiftType: 'day',
-      startDate: addDays(new Date(), 0),
-      endDate: addDays(new Date(), 3),
-      startTime: '09:00',
-      endTime: '17:00',
-      duration: '8 hours',
-      totalWorkedHours: '16 hours (2 of 4 days completed)',
-      location: 'Retreat Center',
-      type: 'planning',
-      priority: 'high',
-      status: 'in-progress',
-      participants: [
-        { name: 'Michael Kimani', employeeId: 'KSB-2017-0045', position: 'Executive Team Lead', phone: '0777890123' },
-        { name: 'Janet Akinyi', employeeId: 'KSB-2019-0156', position: 'Department Head', phone: '0788901234' }
-      ],
-      inCharge: true
+      name: 'David Ochieng',
+      employeeId: 'KSB-2022-0089',
+      position: 'Compliance Manager',
+      department: 'Legal & Compliance',
+      email: 'david.ochieng@ksb.go.ke',
+      phone: '0755678901',
+      reportingTo: 'Gerald Bosire'
     }
   ]
 
-  const getDateRange = () => {
-    const dates = []
-    for (let i = 0; i < 7; i++) {
-      dates.push(addDays(new Date(), i))
+  // Mock assigned duties data
+  const assignedDuties: AssignedDuty[] = [
+    {
+      id: '1',
+      title: 'Q3 Production Report Compilation',
+      assignedTo: {
+        name: 'John Munyaka',
+        employeeId: 'KSB-2021-0034',
+        position: 'Production Manager',
+        department: 'Production'
+      },
+      assignedBy: 'Gerald Bosire',
+      dueDate: addDays(new Date(), 7),
+      priority: 'high',
+      status: 'in-progress',
+      description: 'Compile comprehensive production report for Q3 including efficiency metrics, quality benchmarks, and improvement recommendations',
+      category: 'administrative',
+      estimatedHours: '16 hours',
+      dateAssigned: addDays(new Date(), -3)
+    },
+    {
+      id: '2',
+      title: 'Farmer Payment System Review',
+      assignedTo: {
+        name: 'Sarah Njeri',
+        employeeId: 'KSB-2018-0012',
+        position: 'Finance Manager',
+        department: 'Finance'
+      },
+      assignedBy: 'Gerald Bosire',
+      dueDate: addDays(new Date(), 5),
+      priority: 'medium',
+      status: 'pending',
+      description: 'Review and optimize the farmer payment disbursement process to reduce delays and improve transparency',
+      category: 'operational',
+      estimatedHours: '12 hours',
+      dateAssigned: addDays(new Date(), -1)
+    },
+    {
+      id: '3',
+      title: 'Regulatory Compliance Audit Preparation',
+      assignedTo: {
+        name: 'David Ochieng',
+        employeeId: 'KSB-2022-0089',
+        position: 'Compliance Manager',
+        department: 'Legal & Compliance'
+      },
+      assignedBy: 'Gerald Bosire',
+      dueDate: addDays(new Date(), 14),
+      priority: 'high',
+      status: 'pending',
+      description: 'Prepare comprehensive documentation and processes for upcoming regulatory compliance audit',
+      category: 'compliance',
+      estimatedHours: '24 hours',
+      dateAssigned: new Date()
     }
-    return dates
-  }
+  ]
 
-  const getDutiesForDate = (date: Date) => {
-    return duties.filter(duty => 
-      duty.startDate.toDateString() === date.toDateString()
-    )
-  }
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'meeting': return <Users className="h-4 w-4" />
-      case 'inspection': return <CheckCircle className="h-4 w-4" />
-      case 'administrative': return <FileText className="h-4 w-4" />
-      case 'review': return <Clock className="h-4 w-4" />
-      case 'stakeholder': return <Users className="h-4 w-4" />
-      case 'planning': return <Star className="h-4 w-4" />
-      case 'operational': return <MapPin className="h-4 w-4" />
-      default: return <Clock className="h-4 w-4" />
-    }
-  }
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'meeting': return 'bg-blue-100 text-blue-800'
-      case 'inspection': return 'bg-yellow-100 text-yellow-800'
-      case 'administrative': return 'bg-purple-100 text-purple-800'
-      case 'review': return 'bg-green-100 text-green-800'
-      case 'stakeholder': return 'bg-orange-100 text-orange-800'
-      case 'planning': return 'bg-red-100 text-red-800'
-      case 'operational': return 'bg-indigo-100 text-indigo-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
+  // Form state for new duty assignment
+  const [dutyForm, setDutyForm] = useState<DutyFormData>({
+    title: '',
+    description: '',
+    assignedTo: '',
+    dueDate: undefined,
+    priority: 'medium',
+    category: 'administrative',
+    estimatedHours: '',
+    specialInstructions: ''
+  })
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -198,229 +209,296 @@ export function DutiesModal({ open, onOpenChange }: DutiesModalProps) {
     }
   }
 
-  const formatDateLabel = (date: Date) => {
-    if (isToday(date)) return 'Today'
-    if (isTomorrow(date)) return 'Tomorrow'
-    return format(date, 'MMM dd')
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-gray-100 text-gray-800'
+      case 'in-progress': return 'bg-blue-100 text-blue-800'
+      case 'completed': return 'bg-green-100 text-green-800'
+      case 'overdue': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
   }
 
-  const selectedDateDuties = getDutiesForDate(selectedDate)
-  const activeDuty = selectedDuty ? duties.find(d => d.id === selectedDuty) : selectedDateDuties[0]
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'administrative': return 'bg-purple-100 text-purple-800'
+      case 'strategic': return 'bg-indigo-100 text-indigo-800'
+      case 'operational': return 'bg-blue-100 text-blue-800'
+      case 'compliance': return 'bg-orange-100 text-orange-800'
+      case 'stakeholder': return 'bg-green-100 text-green-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const handleAssignDuty = () => {
+    console.log('Assigning duty:', dutyForm)
+    // Reset form
+    setDutyForm({
+      title: '',
+      description: '',
+      assignedTo: '',
+      dueDate: undefined,
+      priority: 'medium',
+      category: 'administrative',
+      estimatedHours: '',
+      specialInstructions: ''
+    })
+    setShowAssignForm(false)
+  }
+
+  const handleDutyAction = (action: string, dutyId: string) => {
+    console.log(`${action} duty:`, dutyId)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-6xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
         <DialogHeader className="p-4 sm:p-6 border-b">
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Assigned Duties
-          </DialogTitle>
-          <DialogDescription>
-            View and manage your assigned duties and responsibilities
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Duty Management
+              </DialogTitle>
+              <DialogDescription>
+                Assign and manage duties for middle-level management team
+              </DialogDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'manage' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('manage')}
+                className={viewMode === 'manage' ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                Manage Duties
+              </Button>
+              <Button
+                variant={viewMode === 'assign' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('assign')}
+                className={viewMode === 'assign' ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Assign New
+              </Button>
+            </div>
+          </div>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="space-y-6">
-            {/* Date Selection */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Select Date</h3>
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {getDateRange().map((date) => (
-                  <Button
-                    key={date.toISOString()}
-                    variant={selectedDate.toDateString() === date.toDateString() ? "default" : "outline"}
-                    className={`min-w-[100px] flex-shrink-0 ${
-                      selectedDate.toDateString() === date.toDateString() 
-                        ? "bg-green-600 hover:bg-green-700" 
-                        : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedDate(date)
-                      setSelectedDuty(null)
-                    }}
-                  >
-                    <div className="text-center">
-                      <div className="text-sm font-medium">{formatDateLabel(date)}</div>
-                      <div className="text-xs opacity-75">{format(date, 'EEE')}</div>
+          {viewMode === 'manage' ? (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Active Duty Assignments</h3>
+                <Badge variant="outline" className="border-gray-300">
+                  {assignedDuties.length} duties assigned
+                </Badge>
+              </div>
+
+              <div className="grid gap-4">
+                {assignedDuties.map((duty) => (
+                  <div key={duty.id} className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg mb-1">{duty.title}</h4>
+                        <p className="text-gray-600 text-sm mb-2">{duty.description}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span>Assigned to: <strong>{duty.assignedTo.name}</strong></span>
+                          <span>•</span>
+                          <span>Due: <strong>{format(duty.dueDate, 'MMM dd, yyyy')}</strong></span>
+                          <span>•</span>
+                          <span>Est. Time: <strong>{duty.estimatedHours}</strong></span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getPriorityColor(duty.priority)}>
+                          {duty.priority}
+                        </Badge>
+                        <Badge className={getStatusColor(duty.status)}>
+                          {duty.status}
+                        </Badge>
+                        <Badge className={getCategoryColor(duty.category)}>
+                          {duty.category}
+                        </Badge>
+                      </div>
                     </div>
-                  </Button>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t">
+                      <div className="text-sm text-gray-500">
+                        Assigned by {duty.assignedBy} on {format(duty.dateAssigned, 'MMM dd, yyyy')}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDutyAction('modify', duty.id)}
+                        >
+                          Modify
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDutyAction('followup', duty.id)}
+                        >
+                          Follow Up
+                        </Button>
+                        {duty.status === 'completed' && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-green-600 hover:text-green-700"
+                            onClick={() => handleDutyAction('approve', duty.id)}
+                          >
+                            ✓ Approve
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
+          ) : (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold">Assign New Duty</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="duty-title">Duty Title</Label>
+                    <Input
+                      id="duty-title"
+                      placeholder="e.g., Strategic Planning Review"
+                      value={dutyForm.title}
+                      onChange={(e) => setDutyForm({...dutyForm, title: e.target.value})}
+                    />
+                  </div>
 
-            {/* Selected Date Summary */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  Duties for {format(selectedDate, 'EEEE, MMMM dd, yyyy')}
-                </h3>
-                <Badge variant="outline" className="border-gray-300">
-                  {selectedDateDuties.length} {selectedDateDuties.length === 1 ? 'Duty' : 'Duties'}
-                </Badge>
+                  <div>
+                    <Label htmlFor="assigned-to">Assign To</Label>
+                    <Select value={dutyForm.assignedTo} onValueChange={(value) => setDutyForm({...dutyForm, assignedTo: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select manager to assign duty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {middleManagers.map((manager) => (
+                          <SelectItem key={manager.id} value={manager.id}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{manager.name}</span>
+                              <span className="text-xs text-gray-500">{manager.position} - {manager.department}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="priority">Priority</Label>
+                      <Select value={dutyForm.priority} onValueChange={(value: 'high' | 'medium' | 'low') => setDutyForm({...dutyForm, priority: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="category">Category</Label>
+                      <Select value={dutyForm.category} onValueChange={(value: any) => setDutyForm({...dutyForm, category: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="administrative">Administrative</SelectItem>
+                          <SelectItem value="strategic">Strategic</SelectItem>
+                          <SelectItem value="operational">Operational</SelectItem>
+                          <SelectItem value="compliance">Compliance</SelectItem>
+                          <SelectItem value="stakeholder">Stakeholder</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="estimated-hours">Estimated Hours</Label>
+                    <Input
+                      id="estimated-hours"
+                      placeholder="e.g., 8 hours, 2 days"
+                      value={dutyForm.estimatedHours}
+                      onChange={(e) => setDutyForm({...dutyForm, estimatedHours: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Detailed description of the duty and expectations..."
+                      rows={4}
+                      value={dutyForm.description}
+                      onChange={(e) => setDutyForm({...dutyForm, description: e.target.value})}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="special-instructions">Special Instructions</Label>
+                    <Textarea
+                      id="special-instructions"
+                      placeholder="Any special instructions, deadlines, or requirements..."
+                      rows={3}
+                      value={dutyForm.specialInstructions}
+                      onChange={(e) => setDutyForm({...dutyForm, specialInstructions: e.target.value})}
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Due Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start text-left font-normal">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {dutyForm.dueDate ? format(dutyForm.dueDate, 'PPP') : 'Select due date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <CalendarComponent
+                          mode="single"
+                          selected={dutyForm.dueDate}
+                          onSelect={(date) => setDutyForm({...dutyForm, dueDate: date})}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-6 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode('manage')}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleAssignDuty}
+                  disabled={!dutyForm.title || !dutyForm.assignedTo || !dutyForm.description}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Assign Duty
+                </Button>
               </div>
             </div>
-
-            {/* Duties List */}
-            {selectedDateDuties.length === 0 ? (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No duties scheduled</h3>
-                <p className="text-gray-600">You have no assigned duties for this date.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-12 gap-3 sm:gap-6 relative">
-                {/* Duty List Sidebar - Collapsible */}
-                <div className={`${sidebarExpanded ? 'col-span-4' : 'col-span-2 sm:col-span-1'} space-y-3 transition-all duration-300`}>
-                  <div className="flex items-center justify-between">
-                    <h3 className={`font-medium text-gray-700 mb-2 ${!sidebarExpanded && 'sr-only'}`}>Duties List</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 w-7 p-0 rounded-full"
-                      onClick={() => setSidebarExpanded(!sidebarExpanded)}
-                    >
-                      {sidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                {selectedDateDuties.map((duty) => (
-                      <div 
-                        key={duty.id} 
-                        className={`rounded-lg border cursor-pointer transition-all ${
-                          selectedDuty === duty.id ? 'bg-green-600 text-white border-green-600' : 'bg-white hover:bg-gray-50'
-                        } ${sidebarExpanded ? 'p-3' : 'p-2'}`}
-                        onClick={() => setSelectedDuty(duty.id)}
-                      >
-                        {sidebarExpanded ? (
-                          <>
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-2">
-                            {getTypeIcon(duty.type)}
-                                <span className="font-medium">{duty.title}</span>
-                              </div>
-                              <Badge className={`${selectedDuty === duty.id ? 'bg-white text-green-600' : getTypeColor(duty.type)}`}>
-                                {duty.type}
-                            </Badge>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className={selectedDuty === duty.id ? 'text-gray-200' : 'text-gray-500'}>
-                                {duty.startTime} - {duty.endTime}
-                              </span>
-                              <span className={selectedDuty === duty.id ? 'text-gray-200' : 'text-gray-500'}>
-                                {duty.location}
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center py-1 text-center">
-                            <div className={`rounded-full p-1.5 ${selectedDuty === duty.id ? 'bg-white' : 'bg-gray-100'} mb-1`}>
-                              {getTypeIcon(duty.type)}
-                            </div>
-                            <span className="text-xs font-medium truncate w-full">
-                              {duty.startTime}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Duty Details */}
-                <div className={`${sidebarExpanded ? 'col-span-8' : 'col-span-10 sm:col-span-11'} transition-all duration-300`}>
-                  {activeDuty && (
-                    <div className="border rounded-lg overflow-hidden bg-gray-50 transition-all duration-300">
-                      {/* Officer in charge banner */}
-                      {activeDuty.inCharge && (
-                        <div className="bg-orange-500 text-white px-4 py-3 flex items-center gap-2">
-                          <Star className="h-4 w-4" />
-                          <span>You are in charge of this duty</span>
-                        </div>
-                      )}
-                      
-                      <div className="p-6">
-                        <h3 className="text-lg font-semibold mb-4">Assignment Details</h3>
-                        
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-6 mb-6">
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Duty Role:</span>
-                            <span className="font-medium">{activeDuty.dutyRole}</span>
-                          </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Shift Type:</span>
-                            <span className="font-medium">{activeDuty.shiftType}</span>
-                          </div>
-                          <div className="flex gap-8 col-span-2">
-                            <span className="text-gray-600 min-w-[120px]">Special Instructions:</span>
-                            <span className="font-medium">{activeDuty.specialInstructions || '-'}</span>
-                          </div>
-                        </div>
-                        
-                        <h3 className="text-lg font-semibold mb-4">Schedule</h3>
-                        
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-6 mb-6">
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Start Date:</span>
-                            <span className="font-medium">{format(activeDuty.startDate, 'MMMM do yyyy')}</span>
-                          </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">End Date:</span>
-                            <span className="font-medium">{format(activeDuty.endDate, 'MMMM do yyyy')}</span>
-                          </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Start Time:</span>
-                            <span className="font-medium">{activeDuty.startTime}</span>
-                          </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">End Time:</span>
-                            <span className="font-medium">{activeDuty.endTime}</span>
-                      </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Duration:</span>
-                            <span className="font-medium">{activeDuty.duration}</span>
-                              </div>
-                          <div className="flex gap-8">
-                            <span className="text-gray-600 min-w-[120px]">Total Worked Hours:</span>
-                            <span className="font-medium">{activeDuty.totalWorkedHours || 'Not started'}</span>
-                          </div>
-                        </div>
-
-                        <h3 className="text-lg font-semibold mb-4">Team Information</h3>
-                        
-                        <div className="space-y-3 mb-6">
-                          {activeDuty.participants.map((participant, index) => (
-                            <div key={index} className="bg-white rounded border p-3 flex flex-col gap-1">
-                              <div className="font-medium">{participant.name}</div>
-                              <div className="grid grid-cols-3 text-sm">
-                                <div className="flex gap-2">
-                                  <span className="text-gray-500">Employee ID:</span>
-                                  <span>{participant.employeeId}</span>
-                                </div>
-                                <div className="flex gap-2">
-                                  <span className="text-gray-500">Position:</span>
-                                  <span>{participant.position}</span>
-                                </div>
-                                <div className="flex gap-2">
-                                  <span className="text-gray-500">Phone:</span>
-                                  <span>{participant.phone}</span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          </div>
-                        
-                        <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                          Submit Report
-                        </Button>
-                      </div>
-                        </div>
-                      )}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

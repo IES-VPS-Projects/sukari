@@ -35,7 +35,7 @@ export function AlertsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+      <DialogContent className="max-w-4xl h-[90vh] max-h-[90vh] p-0 flex flex-col [&>button]:hidden">
         <DialogTitle className="sr-only">
           {selectedAlertForDetails ? 'Alert Details' : 'Alerts'}
         </DialogTitle>
@@ -44,8 +44,8 @@ export function AlertsModal({
             const alert = alertsData.alerts.find((a: any) => a.id === selectedAlertForDetails)
             if (alert) {
               return (
-                <div className="flex flex-col h-full">
-                  <div className="p-6 border-b">
+                <div className="flex flex-col h-full min-h-0">
+                  <div className="p-6 border-b flex-shrink-0">
                     <div className="flex items-center gap-3">
                       <Button
                         variant="ghost"
@@ -67,7 +67,7 @@ export function AlertsModal({
                     </div>
                   </div>
                   
-                  <div className="flex-1 overflow-y-auto p-6">
+                  <div className="flex-1 overflow-y-auto p-6 min-h-0">
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 mb-2">Alert Details</h3>
@@ -110,7 +110,7 @@ export function AlertsModal({
                     </div>
                   </div>
 
-                  <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
+                  <div className="p-6 border-t bg-gray-50 flex justify-between items-center flex-shrink-0">
                     <div className="flex gap-3">
                       <Button 
                         variant="outline"
@@ -161,8 +161,8 @@ export function AlertsModal({
 
           // List view
           return (
-            <div className="flex flex-col h-full">
-              <div className="p-6 border-b">
+            <div className="flex flex-col h-full min-h-0">
+              <div className="p-6 border-b flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
@@ -187,7 +187,7 @@ export function AlertsModal({
                 </div>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-6 min-h-0">
                 <div className="space-y-3">
                   {alertsData.alerts.map((alert: any) => (
                     <div 

@@ -75,7 +75,7 @@ export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInf
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative">
                     <Avatar className="h-32 w-32">
-                      <AvatarImage src="/placeholder.svg" alt="Profile" />
+                      <AvatarImage src="/images/KSB_CEO.png" alt="Profile" />
                       <AvatarFallback className="text-2xl bg-green-100 text-green-800">
                         {formData.firstName[0]}
                         {formData.lastName[0]}

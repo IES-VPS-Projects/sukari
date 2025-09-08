@@ -88,7 +88,7 @@ const alertsData = {
       description: alert.description,
       timestamp: alert.timestamp,
       category: alert.area || 'General',
-      priority: alert.label === 'Critical' ? 'high' : alert.label === 'Warning' ? 'medium' : 'low',
+      priority: alert.label === 'Critical' || alert.label === 'High' ? 'high' : alert.label === 'Warning' || alert.label === 'Medium' ? 'medium' : 'low',
       labelColor: alert.labelColor,
       iconBg: alert.iconBg,
       iconColor: alert.iconColor
@@ -123,11 +123,11 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
     Equipment: allAlertsForCard.filter((a: any) => a.category === 'Equipment').length,
     Compliance: allAlertsForCard.filter((a: any) => a.category === 'Compliance').length,
     Weather: allAlertsForCard.filter((a: any) => a.category === 'Weather').length,
-    Performance: allAlertsForCard.filter((a: any) => a.category === 'Equipment' || a.category === 'Quality').length,
+    Performance: allAlertsForCard.filter((a: any) => a.category === 'Performance').length,
     Quality: allAlertsForCard.filter((a: any) => a.category === 'Quality').length,
     Operations: allAlertsForCard.filter((a: any) => a.category === 'Operations').length,
     Safety: allAlertsForCard.filter((a: any) => a.category === 'Safety').length,
-    Payments: allAlertsForCard.filter((a: any) => a.category === 'Operations' && a.title.toLowerCase().includes('payment')).length,
+    Payments: allAlertsForCard.filter((a: any) => a.category === 'Payments').length,
     General: allAlertsForCard.filter((a: any) => a.category === 'General').length,
   }
 
@@ -180,6 +180,11 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                      category === 'Payments' ? categoryCounts.Payments : 0}
                   </Badge>
                 )}
+                {category === 'All' && (
+                  <Badge className="bg-gray-100 text-gray-700 text-[10px] px-1">
+                    {allAlertsForCard.length}
+                  </Badge>
+                )}
               </button>
             ))}
           </div>
@@ -188,14 +193,14 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
       
       <CardContent className="p-4 pt-2">
         <div 
-          className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-none hover:scrollbar-thin hover:scrollbar-track-transparent hover:scrollbar-thumb-gray-300" 
+          className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover" 
           style={{ maxHeight: '240px' }}
         >
           {allAlertsForCard
             .filter((item: any) => {
               if (selectedCategory === 'All') return true
-              if (selectedCategory === 'Performance') return item.category === 'Equipment' || item.category === 'Quality'
-              if (selectedCategory === 'Payments') return item.category === 'Operations' && item.title.toLowerCase().includes('payment')
+              if (selectedCategory === 'Performance') return item.category === 'Performance'
+              if (selectedCategory === 'Payments') return item.category === 'Payments'
               return item.category === selectedCategory
             })
             .map((item: any) => {

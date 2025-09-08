@@ -48,9 +48,9 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-2">
-          {/* Actions Content - Show only first 2 items with hidden scrollbar */}
+          {/* Actions Content - Show all items with hidden horizontal scrollbar */}
           <div 
-            className="space-y-3 overflow-y-auto scrollbar-none hover:scrollbar-thin hover:scrollbar-track-transparent hover:scrollbar-thumb-gray-300 group"
+            className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover group"
             style={{ maxHeight: '200px' }}
           >
             {allActionsForCard.map((item) => (
