@@ -10,6 +10,7 @@ interface User {
   email: string
   name: string
   role: string
+  userType: 'ceo' | 'importer'
 }
 
 interface AuthContextType {
@@ -32,6 +33,19 @@ const DEFAULT_CREDENTIALS = [
       email: "executive@ksb.go.ke",
       name: "Gerald Bosire",
       role: "Chief Executive",
+      userType: "ceo" as const,
+    },
+  },
+  {
+    email: "importer@ksb.go.ke",
+    phone: "0700222234",
+    password: "Import2024!",
+    user: {
+      id: "3",
+      email: "importer@ksb.go.ke",
+      name: "Bernard Kasavuli",
+      role: "Sugar Importer",
+      userType: "importer" as const,
     },
   },
   {
@@ -43,6 +57,7 @@ const DEFAULT_CREDENTIALS = [
       email: "admin@ksb.go.ke",
       name: "John Doe",
       role: "Administrator",
+      userType: "ceo" as const,
     },
   },
 ]

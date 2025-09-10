@@ -32,10 +32,9 @@ import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { AlertsModal } from "@/components/modals/alerts-modal"
 import { IndustryNewsModal } from "@/components/modals/industry-news-modal"
-import { rssService, RSSArticle } from "@/lib/rss-service"
 import AlertsCard from "./AlertsCard"
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
-import AutoPlay from "embla-carousel-autoplay"
+import IndustryNewsCard from "./IndustryNewsCard"
+import MarketInsightsCard from "./MarketInsightsCard"
 import { 
   allActionsData, 
   allAIInsightsData, 
@@ -49,65 +48,7 @@ import MeetingsCard from "./MeetingsCard"
 import ActivitiesCard from "./ActivitiesCard"
 import AIInsightsCard from "./AIInsightsCard"
 
-// Market Insights data schema
-interface ProductInsight {
-  productName: string
-  price: number
-  currency: string
-  priceUnit: string
-  weeklyChangePercent: number
-  weeklyChangeDirection: 'up' | 'down'
-  importVolume: number
-  exportVolume: number
-  volumeUnit: string
-}
 
-const marketData: ProductInsight[] = [
-  {
-    productName: "Sugarcane",
-    price: 4500,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    weeklyChangePercent: 5,
-    weeklyChangeDirection: 'up',
-    importVolume: 1000,
-    exportVolume: 200,
-    volumeUnit: "tonnes"
-  },
-  {
-    productName: "Sugar",
-    price: 85,
-    currency: "KSh",
-    priceUnit: "per kg",
-    weeklyChangePercent: 2,
-    weeklyChangeDirection: 'down',
-    importVolume: 2450,
-    exportVolume: 890,
-    volumeUnit: "tonnes"
-  },
-  {
-    productName: "Molasses",
-    price: 15000,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    weeklyChangePercent: 3,
-    weeklyChangeDirection: 'up',
-    importVolume: 500,
-    exportVolume: 300,
-    volumeUnit: "tonnes"
-  },
-  {
-    productName: "Fertilizer",
-    price: 2500,
-    currency: "KSh",
-    priceUnit: "per 50 kg bag",
-    weeklyChangePercent: 1,
-    weeklyChangeDirection: 'down',
-    importVolume: 1200,
-    exportVolume: 100,
-    volumeUnit: "tonnes"
-  }
-]
 
 // Transcript data for the audio briefing
 const transcriptData = [
@@ -203,52 +144,7 @@ const schedulerSuggestions = [
   'Reminder to read Farmer Daily Article'
 ];
 
-// Market Insights Component
-const MarketInsightsCard = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
 
-  const handleNext = () => {
-    setCurrentIndex((prev: number) => (prev + 1) % marketData.length)
-  }
-
-  const currentProduct = marketData[currentIndex]
-
-  return (
-    <Card 
-      className="rounded-[24px] shadow-lg border-0 bg-white relative overflow-hidden cursor-pointer"
-      onClick={handleNext}
-    >
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-[#202020]">Market Insights</CardTitle>
-        <Badge className="bg-gray-100 text-green-600 flex items-center gap-1">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          Live
-        </Badge>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-[#6B6B6B]">{currentProduct.productName}</h3>
-          {currentProduct.weeklyChangeDirection === 'up' ? (
-            <TrendingUp className="h-4 w-4 text-green-500" />
-          ) : (
-            <TrendingDown className="h-4 w-4 text-red-500" />
-          )}
-        </div>
-        <div className="text-2xl font-bold text-[#202020] mb-1">{currentProduct.currency} {currentProduct.price}</div>
-        <p className="text-xs text-[#6B6B6B] mb-3">{currentProduct.priceUnit}</p>
-        <p className="text-xs text-green-600 mb-2">{currentProduct.weeklyChangeDirection === 'up' ? '+' : '-'}{currentProduct.weeklyChangePercent}% from last week</p>
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-[#6B6B6B]">Import Volume</span>
-          <span className="font-medium">{currentProduct.importVolume} {currentProduct.volumeUnit}</span>
-        </div>
-        <div className="flex justify-between text-xs">
-          <span className="text-[#6B6B6B]">Export Volume</span>
-          <span className="font-medium">{currentProduct.exportVolume} {currentProduct.volumeUnit}</span>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
 export default function TodayPage() {
   const [scheduleVisitOpen, setScheduleVisitOpen] = useState(false)
@@ -256,8 +152,6 @@ export default function TodayPage() {
   const [greeting, setGreeting] = useState("")
   const [dynamicAlerts, setDynamicAlerts] = useState<any[]>([])
   const [industryNewsOpen, setIndustryNewsOpen] = useState(false)
-  const [industryNewsArticles, setIndustryNewsArticles] = useState<RSSArticle[]>([])
-  const [isLoadingNews, setIsLoadingNews] = useState(true)
   const { user } = useAuth()
   
   // Tasks card state (now only for alerts)
@@ -294,25 +188,7 @@ export default function TodayPage() {
     setGreeting(getTimeBasedGreeting())
   }, [user])
 
-  // Load industry news articles
-  useEffect(() => {
-    const loadIndustryNews = async () => {
-      setIsLoadingNews(true)
-      try {
-        const categories = await rssService.fetchAllArticles()
-        // Get articles from all categories and take the first 7
-        const allArticles = categories.flatMap(category => category.articles)
-        setIndustryNewsArticles(allArticles.slice(0, 7))
-      } catch (error) {
-        console.error('Failed to load industry news:', error)
-        // Keep empty array on error
-      } finally {
-        setIsLoadingNews(false)
-      }
-    }
-    
-    loadIndustryNews()
-  }, [])
+
 
   // Load and listen for production alerts
   useEffect(() => {
@@ -407,60 +283,9 @@ export default function TodayPage() {
             <MarketInsightsCard />
             
             {/* Industry News Card */}
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow" onClick={() => setIndustryNewsOpen(true)}>
-              <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020] flex items-center justify-between">
-                  Industry News
-                  <Badge className="bg-gray-100 text-green-600 flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Live
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                {isLoadingNews ? (
-                  <div className="h-48 flex items-center justify-center bg-gray-100 rounded-lg">
-                    <div className="text-gray-500">Loading latest news...</div>
-                  </div>
-                ) : (
-                  <Carousel className="w-full" opts={{ loop: true }} plugins={[AutoPlay({ delay: 4000 })]}>
-                    <CarouselContent>
-                      {industryNewsArticles.length > 0 ? industryNewsArticles.map((article, index) => (
-                        <CarouselItem key={article.id || index}>
-                          <div 
-                            className="relative h-48 rounded-lg overflow-hidden"
-                            style={{
-                              backgroundImage: `url('${article.imageUrl || '/images/loading.gif'}')`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center'
-                            }}
-                          >
-                            <div className="absolute inset-0 bg-black/40"></div>
-                            <div className="relative h-full flex items-center justify-center p-4">
-                              <div className="bg-black/50 p-4 rounded-lg text-center">
-                                <h3 className="text-white font-bold text-sm leading-tight line-clamp-3">
-                                  {article.title}
-                                </h3>
-                                <p className="text-gray-200 text-xs mt-2">
-                                  {article.source}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </CarouselItem>
-                      )) : (
-                        // Fallback to static content if no articles
-                        <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                          <div className="bg-black/50 p-4 rounded-lg">
-                            Sugar Prices Surge
-                          </div>
-                        </CarouselItem>
-                      )}
-                    </CarouselContent>
-                  </Carousel>
-                )}
-              </CardContent>
-            </Card>
+            <IndustryNewsCard 
+              onNewsClick={() => setIndustryNewsOpen(true)}
+            />
           </div>
 
           {/* AI Recommendations and Updates */}

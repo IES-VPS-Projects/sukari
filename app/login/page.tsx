@@ -53,17 +53,26 @@ export default function LoginPage() {
 
     const success = await login(emailToUse, formData.password)
     if (success) {
-      router.push("/portal/today")
+      // Redirect based on user type will be handled by the portal layout
+      router.push("/portal")
     } else {
       setError("Invalid credentials. Please check your phone number and password.")
     }
   }
 
-  const fillDemoCredentials = () => {
+  const fillCEOCredentials = () => {
     setFormData(prev => ({
       ...prev,
       identifier: "0700111123",
       password: "KSB2024!"
+    }))
+  }
+
+  const fillImporterCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700222234",
+      password: "Import2024!"
     }))
   }
 
@@ -196,14 +205,21 @@ export default function LoginPage() {
                 {isLoading ? "Signing In..." : "Sign In"}
               </button>
 
-              {/* Demo Credentials Button */}
-              <div className="text-center">
+              {/* Demo Credentials Buttons */}
+              <div className="flex gap-3 justify-center">
                 <button
                   type="button"
-                  onClick={fillDemoCredentials}
-                  className="text-sm text-green-600 hover:text-green-700 font-medium"
+                  onClick={fillCEOCredentials}
+                  className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
                 >
-                  Use Demo Credentials
+                  Demo CEO
+                </button>
+                <button
+                  type="button"
+                  onClick={fillImporterCredentials}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
+                >
+                  Demo Importer
                 </button>
               </div>
             </form>

@@ -10,7 +10,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (user) {
-      router.push("/portal/today")
+      router.push("/portal")
     } else {
       router.push("/login")
     }

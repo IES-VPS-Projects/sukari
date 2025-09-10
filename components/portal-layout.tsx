@@ -13,13 +13,17 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 
-const navigation = [
-  { name: "Today", href: "/portal/today", icon: Home },
-  { name: "AI", href: "/portal/ai", icon: HiSparkles },
-  { name: "Calendar", href: "/portal/calendar", icon: Calendar },
-  { name: "Chat", href: "/portal/chat", icon: MessageSquare },
-  { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
-  { name: "Operations", href: "/portal/profile", icon: User },
+const ceoNavigation = [
+  { name: "Today", href: "/portal/ceo/today", icon: Home },
+  { name: "AI", href: "/portal/ceo/ai", icon: HiSparkles },
+  { name: "Calendar", href: "/portal/ceo/calendar", icon: Calendar },
+  { name: "Chat", href: "/portal/ceo/chat", icon: MessageSquare },
+  { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
+  { name: "Operations", href: "/portal/ceo", icon: User },
+]
+
+const importerNavigation = [
+  { name: "Portal", href: "/portal/importer", icon: Home },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
@@ -28,6 +32,9 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   const [isVisible, setIsVisible] = useState(true)
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
+
+  // Get appropriate navigation based on user type
+  const navigation = user?.userType === "importer" ? importerNavigation : ceoNavigation
 
   useEffect(() => {
     let lastScroll = 0
@@ -83,24 +90,31 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                 <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
                   <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
                     <div className="relative">
-                      <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-green-300 transition-all border-2 border-gray-300">
-                        <AvatarImage src="/images/KSB_CEO.png" alt="Profile" />
-                        <AvatarFallback className="bg-green-100 text-green-800">
+                      <Avatar className={`h-10 w-10 cursor-pointer transition-all border-2 border-gray-300 ${
+                        user?.userType === "importer" ? "hover:ring-2 hover:ring-blue-300" : "hover:ring-2 hover:ring-green-300"
+                      }`}>
+                        <AvatarImage 
+                          src={user?.userType === "importer" ? "/images/importer-avatar.png" : "/images/KSB_CEO.png"} 
+                          alt="Profile" 
+                        />
+                        <AvatarFallback className={user?.userType === "importer" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}>
                           {user?.name
                             ?.split(" ")
-                            .filter((part, index) => index === 0 || index === 1) // Get "Gerald" and "Bosire"
+                            .filter((part, index) => index === 0 || index === 1)
                             .map((n) => n[0])
                             .join("") || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      {/* Green status indicator */}
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                      {/* Status indicator */}
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
+                        user?.userType === "importer" ? "bg-blue-500" : "bg-green-500"
+                      }`}></div>
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
                   <DropdownMenuItem asChild>
-                    <Link href="/portal/profile" className="flex items-center w-full">
+                    <Link href={user?.userType === "importer" ? "/portal/importer" : "/portal/ceo"} className="flex items-center w-full">
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </Link>
@@ -123,8 +137,9 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           </div>
         </header>
       </div>
-        <main className="flex-1 pb-24 overflow-auto">{children}</main>
-        <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
+        <main className={`flex-1 overflow-auto ${user?.userType === "importer" ? "pb-6" : "pb-24"}`}>{children}</main>
+        {user?.userType !== "importer" && (
+          <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
             <div className="flex items-center justify-center px-1 py-3">
               <div className="flex items-center justify-around w-full max-w-3xl gap-1">
                 {navigation.map((item) => {
@@ -134,7 +149,9 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                       key={item.name}
                       href={item.href}
                       className={`flex flex-col items-center gap-1 px-1 py-2 rounded-lg transition-all duration-300 ease-in-out min-w-[55px] ${
-                        isActive ? "bg-green-100 text-green-700 scale-105" : "text-gray-600 hover:text-green-600 hover:bg-green-50 hover:scale-105"
+                        isActive 
+                          ? "bg-green-100 text-green-700 scale-105"
+                          : "text-gray-600 hover:text-green-600 hover:bg-green-50 hover:scale-105"
                       }`}
                     >
                       <item.icon className="h-5 w-5 transition-transform duration-200" />
@@ -145,6 +162,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
               </div>
             </div>
           </nav>
+        )}
     </div>
   )
 }
