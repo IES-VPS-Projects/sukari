@@ -76,6 +76,14 @@ export default function LoginPage() {
     }))
   }
 
+  const fillFieldCoordinatorCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0733444555",
+      password: "Field2024!"
+    }))
+  }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Success Message */}
@@ -206,7 +214,7 @@ export default function LoginPage() {
               </button>
 
               {/* Demo Credentials Buttons */}
-              <div className="flex gap-3 justify-center">
+              <div className="flex gap-3 justify-center flex-wrap">
                 <button
                   type="button"
                   onClick={fillCEOCredentials}
@@ -220,6 +228,13 @@ export default function LoginPage() {
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
                 >
                   Demo Importer
+                </button>
+                <button
+                  type="button"
+                  onClick={fillFieldCoordinatorCredentials}
+                  className="text-sm text-orange-600 hover:text-orange-700 font-medium border border-orange-600 px-4 py-2 rounded-lg hover:bg-orange-50"
+                >
+                  Demo Field Coordinator
                 </button>
               </div>
             </form>

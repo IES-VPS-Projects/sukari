@@ -26,6 +26,15 @@ const importerNavigation = [
   { name: "Portal", href: "/portal/importer", icon: Home },
 ]
 
+const fieldCoordinatorNavigation = [
+  { name: "Dashboard", href: "/portal/field-coordinator", icon: Home },
+  { name: "Farms", href: "/portal/field-coordinator/farms", icon: FileText },
+  { name: "Farmers", href: "/portal/field-coordinator/farmers", icon: User },
+  { name: "Visits", href: "/portal/field-coordinator/visits/scheduled", icon: Calendar },
+  { name: "Reports", href: "/portal/field-coordinator/reports", icon: BarChart3 },
+  { name: "Profile", href: "/portal/field-coordinator/profile", icon: User },
+]
+
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
@@ -34,7 +43,10 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   const isMobile = useIsMobile()
 
   // Get appropriate navigation based on user type
-  const navigation = user?.userType === "importer" ? importerNavigation : ceoNavigation
+  const navigation = 
+    user?.userType === "importer" ? importerNavigation : 
+    user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 
+    ceoNavigation
 
   useEffect(() => {
     let lastScroll = 0
@@ -91,13 +103,23 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                   <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
                     <div className="relative">
                       <Avatar className={`h-10 w-10 cursor-pointer transition-all border-2 border-gray-300 ${
-                        user?.userType === "importer" ? "hover:ring-2 hover:ring-blue-300" : "hover:ring-2 hover:ring-green-300"
+                        user?.userType === "importer" ? "hover:ring-2 hover:ring-blue-300" : 
+                        user?.userType === "field-coordinator" ? "hover:ring-2 hover:ring-orange-300" :
+                        "hover:ring-2 hover:ring-green-300"
                       }`}>
                         <AvatarImage 
-                          src={user?.userType === "importer" ? "/images/importer-avatar.png" : "/images/KSB_CEO.png"} 
+                          src={
+                            user?.userType === "importer" ? "/images/importer-avatar.png" : 
+                            user?.userType === "field-coordinator" ? "/placeholder-user.jpg" : 
+                            "/images/KSB_CEO.png"
+                          } 
                           alt="Profile" 
                         />
-                        <AvatarFallback className={user?.userType === "importer" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}>
+                        <AvatarFallback className={
+                          user?.userType === "importer" ? "bg-blue-100 text-blue-800" : 
+                          user?.userType === "field-coordinator" ? "bg-orange-100 text-orange-800" :
+                          "bg-green-100 text-green-800"
+                        }>
                           {user?.name
                             ?.split(" ")
                             .filter((part, index) => index === 0 || index === 1)
@@ -107,7 +129,9 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                       </Avatar>
                       {/* Status indicator */}
                       <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
-                        user?.userType === "importer" ? "bg-blue-500" : "bg-green-500"
+                        user?.userType === "importer" ? "bg-blue-500" : 
+                        user?.userType === "field-coordinator" ? "bg-orange-500" :
+                        "bg-green-500"
                       }`}></div>
                     </div>
                   </Button>
@@ -137,8 +161,8 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           </div>
         </header>
       </div>
-        <main className={`flex-1 overflow-auto ${user?.userType === "importer" ? "pb-6" : "pb-24"}`}>{children}</main>
-        {user?.userType !== "importer" && (
+    <main className={`flex-1 overflow-auto ${user?.userType === "importer" || user?.userType === "field-coordinator" ? "pb-6" : "pb-24"}`}>{children}</main>
+    {(user?.userType !== "importer" && user?.userType !== "field-coordinator") && (
           <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
             <div className="flex items-center justify-center px-1 py-3">
               <div className="flex items-center justify-around w-full max-w-3xl gap-1">

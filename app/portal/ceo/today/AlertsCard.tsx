@@ -252,7 +252,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
       <CardContent className="p-4 pt-2">
         <div 
           className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover" 
-          style={{ maxHeight: '240px' }}
+          style={{ maxHeight: '200px' }}
         >
           {allAlertsForCard
             .filter((item: any) => {
@@ -282,7 +282,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                     item.priority === 'medium' || item.label?.toUpperCase() === 'MEDIUM' ? 'hover:bg-orange-50' :
                     item.priority === 'low' || item.label?.toUpperCase() === 'LOW' ? 'hover:bg-green-50' :
                     'hover:bg-gray-50'
-                  } hover:shadow-md transform hover:scale-[1.02]`}
+                  } hover:shadow-md hover:shadow-gray-300/50 transform hover:scale-[1.02]`}
                   onClick={() => {
                     if (setSelectedAlertForDetails) setSelectedAlertForDetails(item.id)
                     if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
@@ -316,6 +316,21 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                 </div>
               )
             })}
+        </div>
+        
+        {/* View All Button Row */}
+        <div 
+          className="mt-4 -mx-4 -mb-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer rounded-b-[20px] group"
+          onClick={() => {
+            if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
+            if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
+          }}
+        >
+          <div className="px-4 py-3 flex items-center justify-center">
+            <Button variant="ghost" className="text-gray-600 group-hover:text-gray-800">
+              View All Alerts
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
