@@ -28,11 +28,6 @@ const importerNavigation = [
 
 const fieldCoordinatorNavigation = [
   { name: "Dashboard", href: "/portal/field-coordinator", icon: Home },
-  { name: "Farms", href: "/portal/field-coordinator/farms", icon: FileText },
-  { name: "Farmers", href: "/portal/field-coordinator/farmers", icon: User },
-  { name: "Visits", href: "/portal/field-coordinator/visits/scheduled", icon: Calendar },
-  { name: "Reports", href: "/portal/field-coordinator/reports", icon: BarChart3 },
-  { name: "Profile", href: "/portal/field-coordinator/profile", icon: User },
 ]
 
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {

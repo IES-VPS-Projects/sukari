@@ -190,6 +190,32 @@ const actions = [
 export default function FieldCoordinatorDashboard() {
   const { user } = useAuth()
   
+  // Helper function to get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return "Good Morning"
+    if (hour < 17) return "Good Afternoon"
+    return "Good Evening"
+  }
+  
+  // Helper function to format date and time
+  const getCurrentDateTime = () => {
+    const now = new Date()
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }
+    const date = now.toLocaleDateString('en-US', options)
+    const time = now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+    return `${date} at ${time}`
+  }
+  
   // Modal states
   const [visitsModalOpen, setVisitsModalOpen] = useState(false)
   const [farmsModalOpen, setFarmsModalOpen] = useState(false)
@@ -214,25 +240,15 @@ export default function FieldCoordinatorDashboard() {
         <div className="flex flex-col gap-6 p-4 bg-gray-50/50 rounded-xl">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Field Coordinator Dashboard</h1>
-              <p className="text-gray-500">Welcome back, Bernice Kasavuli. Here's what's happening in your jurisdiction.</p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setAlertsModalOpen(true)}>
-                <Bell className="mr-2 h-4 w-4" />
-                Notifications
-              </Button>
-              <Button variant="outline">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
+              <h1 className="text-2xl font-bold">{getGreeting()}, Bernice</h1>
+              <p className="text-gray-500">{getCurrentDateTime()}</p>
             </div>
           </div>
 
           {/* Stats Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => (
-              <Card key={stat.title} className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAnalyticsModalOpen(true)}>
+              <Card key={stat.title} className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAnalyticsModalOpen(true)}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
                   <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                   <div className={`p-2 rounded-full ${
@@ -266,7 +282,7 @@ export default function FieldCoordinatorDashboard() {
           </div>
 
           {/* Actions Section */}
-          <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setActionsModalOpen(true)}>
+          <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setActionsModalOpen(true)}>
             <CardHeader className="bg-muted/20">
               <CardTitle className="flex items-center gap-2">
                 <ClipboardList className="h-5 w-5" />
@@ -276,15 +292,25 @@ export default function FieldCoordinatorDashboard() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {actions.map((action, index) => (
-                  <div key={index} className="flex flex-col items-center text-center gap-2 p-4 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className={`p-3 rounded-full ${action.color}`}>
-                      <action.icon className="h-6 w-6" />
+                {actions.map((action, index) => {
+                  const getHoverColor = (color: string) => {
+                    if (color.includes('blue-100')) return 'hover:bg-blue-50'
+                    if (color.includes('green-100')) return 'hover:bg-green-50'
+                    if (color.includes('purple-100')) return 'hover:bg-purple-50'
+                    if (color.includes('orange-100')) return 'hover:bg-orange-50'
+                    return 'hover:bg-gray-100'
+                  }
+                  
+                  return (
+                    <div key={index} className={`flex flex-col items-center text-center gap-2 p-4 rounded-lg ${getHoverColor(action.color)} transition-all duration-200 transform hover:scale-[1.02] hover:shadow-md cursor-pointer`}>
+                      <div className={`p-3 rounded-full ${action.color}`}>
+                        <action.icon className="h-6 w-6" />
+                      </div>
+                      <h3 className="font-medium">{action.title}</h3>
+                      <p className="text-xs text-muted-foreground">{action.description}</p>
                     </div>
-                    <h3 className="font-medium">{action.title}</h3>
-                    <p className="text-xs text-muted-foreground">{action.description}</p>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </CardContent>
           </Card>
@@ -292,7 +318,7 @@ export default function FieldCoordinatorDashboard() {
           {/* Field Visits and Alerts Section - Side by Side */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Field Visits */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setVisitsModalOpen(true)}>
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all">
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
@@ -302,7 +328,15 @@ export default function FieldCoordinatorDashboard() {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {upcomingVisits.map((visit) => (
-                  <div key={visit.id} className="flex items-center space-x-4 rounded-lg border p-3">
+                  <div 
+                    key={visit.id} 
+                    className="flex items-center space-x-4 rounded-lg border p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Open visit details modal with visit.id
+                      console.log('Opening visit details for:', visit.id);
+                    }}
+                  >
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium leading-none">{visit.farmName}</p>
@@ -321,43 +355,56 @@ export default function FieldCoordinatorDashboard() {
                   </div>
                 ))}
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter 
+                className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setVisitsModalOpen(true);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View All Visits
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
 
-            {/* Alerts & Warnings */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAlertsModalOpen(true)}>
+            {/* Alerts */}
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAlertsModalOpen(true)}>
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-orange-500" />
-                  Alerts & Warnings
+                  Alerts
                 </CardTitle>
                 <CardDescription>Important notifications requiring attention</CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-3">
-                <div className="flex items-center gap-3 rounded-lg bg-orange-50 p-3">
+                <div className="flex items-center gap-3 rounded-lg bg-orange-50 p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200">
                   <AlertTriangle className="h-4 w-4 text-orange-500" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">Weather Alert</p>
                     <p className="text-xs text-muted-foreground">Heavy rainfall expected in Sector 5</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-lg bg-red-50 p-3">
+                <div className="flex items-center gap-3 rounded-lg bg-red-50 p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">Disease Outbreak</p>
                     <p className="text-xs text-muted-foreground">Blight detected in 3 farms</p>
                   </div>
                 </div>
+                <div className="flex items-center gap-3 rounded-lg bg-green-50 p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">System Update</p>
+                    <p className="text-xs text-muted-foreground">New features available for field management</p>
+                  </div>
+                </div>
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer">
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View All Alerts
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
@@ -366,7 +413,7 @@ export default function FieldCoordinatorDashboard() {
           {/* Farms & Farmers Section */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Farms */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setFarmsModalOpen(true)}>
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all">
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <Tractor className="h-5 w-5" />
@@ -376,7 +423,15 @@ export default function FieldCoordinatorDashboard() {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {recentFarms.map((farm) => (
-                  <div key={farm.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div 
+                    key={farm.id} 
+                    className="flex items-center justify-between rounded-lg border p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Open farm details modal with farm.id
+                      console.log('Opening farm details for:', farm.id);
+                    }}
+                  >
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{farm.name}</p>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -392,16 +447,22 @@ export default function FieldCoordinatorDashboard() {
                   </div>
                 ))}
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter 
+                className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFarmsModalOpen(true);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View All Farms
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
 
             {/* Farmers */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setFarmersModalOpen(true)}>
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all">
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
@@ -411,7 +472,15 @@ export default function FieldCoordinatorDashboard() {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {recentFarmers.map((farmer) => (
-                  <div key={farmer.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div 
+                    key={farmer.id} 
+                    className="flex items-center justify-between rounded-lg border p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Open farmer details modal with farmer.id
+                      console.log('Opening farmer details for:', farmer.id);
+                    }}
+                  >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback>
@@ -437,10 +506,16 @@ export default function FieldCoordinatorDashboard() {
                   </div>
                 ))}
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter 
+                className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFarmersModalOpen(true);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View All Farmers
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
@@ -449,7 +524,7 @@ export default function FieldCoordinatorDashboard() {
           {/* Reports & Analytics Section */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Reports */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setReportsModalOpen(true)}>
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all">
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
@@ -459,7 +534,15 @@ export default function FieldCoordinatorDashboard() {
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 {recentReports.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div 
+                    key={report.id} 
+                    className="flex items-center justify-between rounded-lg border p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Open report details modal with report.id
+                      console.log('Opening report details for:', report.id);
+                    }}
+                  >
                     <div className="space-y-1">
                       <p className="text-sm font-medium">{report.title}</p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -473,16 +556,22 @@ export default function FieldCoordinatorDashboard() {
                   </div>
                 ))}
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter 
+                className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReportsModalOpen(true);
+                }}
+              >
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View All Reports
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
 
             {/* Analytics */}
-            <Card className="overflow-hidden border border-muted rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAnalyticsModalOpen(true)}>
+            <Card className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={() => setAnalyticsModalOpen(true)}>
               <CardHeader className="bg-muted/20">
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
@@ -506,7 +595,7 @@ export default function FieldCoordinatorDashboard() {
                     </div>
                     <Progress value={94.2} className="h-2" />
                   </div>
-                  <div className="flex items-center gap-3 rounded-lg bg-green-50 p-3">
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50 p-3 transform hover:scale-[1.02] hover:shadow-md transition-all duration-200">
                     <Activity className="h-4 w-4 text-green-500" />
                     <div className="flex-1">
                       <p className="text-sm font-medium">Performance Trend</p>
@@ -515,10 +604,10 @@ export default function FieldCoordinatorDashboard() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="bg-muted/30 py-3">
-                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center">
+              <CardFooter className="bg-muted/30 py-3 hover:bg-muted/50 transition-colors group cursor-pointer">
+                <Button variant="ghost" size="sm" className="w-full flex items-center justify-center group-hover:bg-transparent">
                   View Detailed Analytics
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
                 </Button>
               </CardFooter>
             </Card>
