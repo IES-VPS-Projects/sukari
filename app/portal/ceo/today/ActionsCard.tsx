@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Users, AlertTriangle, FileText } from "lucide-react"
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
 import { allActionsData } from "@/lib/mockdata"
-import ActionsModal from "@/components/modals/actions-modal"
+import { ActionsModal } from "@/components/modals/actions-modal"
 import React from "react"
 
 interface ActionsCardProps {
@@ -155,13 +155,13 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
 
       {/* Actions Modal */}
       <ActionsModal
-        isOpen={viewAllActionsOpen}
-        onClose={() => {
-          setViewAllActionsOpen(false)
-          setSelectedActionForDetails(null)
+        open={viewAllActionsOpen}
+        onOpenChange={(open) => {
+          setViewAllActionsOpen(open)
+          if (!open) {
+            setSelectedActionForDetails(null)
+          }
         }}
-        selectedActionForDetails={selectedActionForDetails}
-        setSelectedActionForDetails={setSelectedActionForDetails}
       />
     </>
   )
