@@ -17,7 +17,7 @@ interface AlertsModalProps {
 }
 
 export function AlertsModal({ 
-  open, 
+  open,  
   onOpenChange, 
   alertsData, 
   selectedAlertForDetails, 
