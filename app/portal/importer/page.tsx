@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { PortalLayout } from "@/components/portal-layout"
 import { ImporterApplicationsModal } from "@/components/modals/importer-applications-modal"
 import { ImporterProfileModal } from "@/components/modals/importer-profile-modal"
 import { ImporterSettingsModal } from "@/components/modals/importer-settings-modal"
@@ -68,7 +69,7 @@ export default function ImporterProfilePage() {
   const [alertsModalOpen, setAlertsModalOpen] = useState(false)
 
   return (
-    <>
+    <PortalLayout pageTitle="Importer Portal">
       {/* Modals */}
       <ImporterApplicationsModal 
         open={applicationsModalOpen} 
@@ -118,6 +119,6 @@ export default function ImporterProfilePage() {
           </div>
         </div>
       </div>
-    </>
+    </PortalLayout>
   )
 }

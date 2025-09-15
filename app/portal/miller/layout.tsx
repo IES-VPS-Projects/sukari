@@ -3,11 +3,10 @@
 import type React from "react"
 
 import { useAuth } from "@/components/auth-provider"
-import { PortalLayout } from "@/components/portal-layout"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
-export default function CEOLayoutWrapper({
+export default function MillerLayoutWrapper({
   children,
 }: {
   children: React.ReactNode
@@ -18,12 +17,12 @@ export default function CEOLayoutWrapper({
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login")
-    } else if (!isLoading && user && user.userType !== "ceo") {
+    } else if (!isLoading && user && user.userType !== "miller") {
       // Redirect to appropriate portal based on user type
-      if (user.userType === "importer") {
+      if (user.userType === "ceo") {
+        router.push("/portal/ceo")
+      } else if (user.userType === "importer") {
         router.push("/portal/importer")
-      } else if (user.userType === "miller") {
-        router.push("/portal/miller")
       } else if (user.userType === "field-coordinator") {
         router.push("/portal/field-coordinator")
       } else {
@@ -40,7 +39,7 @@ export default function CEOLayoutWrapper({
     )
   }
 
-  if (!user || user.userType !== "ceo") {
+  if (!user || user.userType !== "miller") {
     return null
   }
 

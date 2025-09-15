@@ -14,7 +14,7 @@ export default function PortalPage() {
       if (!user) {
         router.push("/login")
       } else if (user.userType === "ceo" && pathname === "/portal") {
-        router.push("/portal/ceo")
+        router.push("/portal/ceo/today")
       } else if (user.userType === "importer" && pathname === "/portal") {
         router.push("/portal/importer")
       } else if (user.userType === "field-coordinator" && pathname === "/portal") {
