@@ -84,6 +84,14 @@ export default function LoginPage() {
     }))
   }
 
+  const fillMillerCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700333456",
+      password: "Miller2024!"
+    }))
+  }
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Success Message */}
@@ -214,28 +222,41 @@ export default function LoginPage() {
               </button>
 
               {/* Demo Credentials Buttons */}
-              <div className="flex gap-3 justify-center flex-wrap">
-                <button
-                  type="button"
-                  onClick={fillCEOCredentials}
-                  className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
-                >
-                  Demo CEO
-                </button>
-                <button
-                  type="button"
-                  onClick={fillImporterCredentials}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
-                >
-                  Demo Importer
-                </button>
-                <button
-                  type="button"
-                  onClick={fillFieldCoordinatorCredentials}
-                  className="text-sm text-orange-600 hover:text-orange-700 font-medium border border-orange-600 px-4 py-2 rounded-lg hover:bg-orange-50"
-                >
-                  Demo Field Coordinator
-                </button>
+              <div className="flex flex-col gap-3 justify-center">
+                {/* First Row */}
+                <div className="flex gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={fillCEOCredentials}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
+                  >
+                    Demo CEO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fillImporterCredentials}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
+                  >
+                    Demo Importer
+                  </button>
+                </div>
+                {/* Second Row */}
+                <div className="flex gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={fillFieldCoordinatorCredentials}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium border border-orange-600 px-4 py-2 rounded-lg hover:bg-orange-50"
+                  >
+                    Demo FEO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fillMillerCredentials}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
+                  >
+                    Demo Miller
+                  </button>
+                </div>
               </div>
             </form>
 

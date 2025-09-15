@@ -1,35 +1,36 @@
 "use client"
 
 import { useState } from "react"
-import { ImporterApplicationsModal } from "@/components/modals/importer-applications-modal"
-import { ImporterProfileModal } from "@/components/modals/importer-profile-modal"
-import { ImporterSettingsModal } from "@/components/modals/importer-settings-modal"
-import { ImporterReturnsModal } from "@/components/modals/importer-returns-modal"
+import { PortalLayout } from "@/components/portal-layout"
+import { MillerApplicationsModal } from "@/components/modals/miller-applications-modal"
+import { MillerProfileModal } from "@/components/modals/miller-profile-modal"
+import { MillerSettingsModal } from "@/components/modals/miller-settings-modal"
+import { MillerReturnsModal } from "@/components/modals/miller-returns-modal"
 import { AnalyticsModal } from "@/components/modals/analytics-modal"
 import { AlertsModal } from "@/components/modals/alerts-modal"
 import {
   StatsCards,
-  ImportApplicationProgressCard,
-  RecentImportsCard,
+  ApplicationProgressCard,
+  RecentReturnsCard,
   AlertsCard,
-  ImportReturnsCard,
+  CompanyProfileCard,
   PerformanceAnalyticsCard
 } from "./components"
 
-export default function ImporterProfilePage() {
+export default function MillerProfilePage() {
   const [profileData] = useState({
-    firstName: "Bernard",
-    lastName: "Kasavuli",
-    email: "bernard.kasavuli@sugarimports.co.ke",
-    phone: "+254 700 222 234",
-    location: "Nairobi, Kenya",
-    company: "Kasavuli Sugar Imports Ltd",
-    role: "Sugar Importer",
-    licenseNumber: "SIL-2024-001",
-    organization: "Licensed Sugar Importer",
-    bio: "Experienced sugar importer with over 10 years in the sugar trade industry. Specialized in international trade, sugar quality assessment, and regulatory compliance across the East African sugar market.",
-    licenseDate: "March 2020",
-    imports: 45,
+    firstName: "James",
+    lastName: "Mwangi",
+    email: "james.mwangi@mumiasmills.co.ke",
+    phone: "+254 700 333 456",
+    location: "Mumias, Kenya",
+    company: "Mumias Sugar Mills Ltd",
+    role: "Sugar Miller",
+    licenseNumber: "SML-2024-003",
+    organization: "Licensed Sugar Miller",
+    bio: "Experienced sugar miller with over 15 years in sugar production and processing. Specialized in industrial sugar processing, quality control, and regulatory compliance in the Kenyan sugar industry.",
+    licenseDate: "January 2019",
+    productionCapacity: "2500 MT/day",
     complianceLevel: "Fully Compliant"
   })
 
@@ -46,7 +47,7 @@ export default function ImporterProfilePage() {
     const now = new Date()
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'long',
-      year: 'numeric',
+      year: 'numeric', 
       month: 'long',
       day: 'numeric'
     }
@@ -68,22 +69,22 @@ export default function ImporterProfilePage() {
   const [alertsModalOpen, setAlertsModalOpen] = useState(false)
 
   return (
-    <>
+    <PortalLayout pageTitle="Miller Portal">
       {/* Modals */}
-      <ImporterApplicationsModal 
+      <MillerApplicationsModal 
         open={applicationsModalOpen} 
         onOpenChange={setApplicationsModalOpen}
       />
-      <ImporterReturnsModal 
+      <MillerReturnsModal 
         open={returnsModalOpen} 
         onOpenChange={setReturnsModalOpen}
       />
-      <ImporterProfileModal 
+      <MillerProfileModal 
         open={profileModalOpen} 
         onOpenChange={setProfileModalOpen}
         profileData={profileData}
       />
-      <ImporterSettingsModal 
+      <MillerSettingsModal 
         open={settingsModalOpen} 
         onOpenChange={setSettingsModalOpen}
       />
@@ -102,22 +103,25 @@ export default function ImporterProfilePage() {
           {/* Stats Cards */}
           <StatsCards onAnalyticsClick={() => setAnalyticsModalOpen(true)} />
 
-          {/* Import Application Progress Section */}
-          <ImportApplicationProgressCard onViewAllClick={() => setApplicationsModalOpen(true)} />
+          {/* Application Progress Section */}
+          <ApplicationProgressCard onViewAllClick={() => setApplicationsModalOpen(true)} />
 
-          {/* Recent Imports and Alerts Section - Side by Side */}
+          {/* Returns and Alerts Section - Side by Side */}
           <div className="grid gap-6 md:grid-cols-2">
-            <RecentImportsCard onViewAllClick={() => setReturnsModalOpen(true)} />
+            <RecentReturnsCard onViewAllClick={() => setReturnsModalOpen(true)} />
             <AlertsCard onViewAllClick={() => setAlertsModalOpen(true)} />
           </div>
 
-          {/* Returns & Performance Analytics Section */}
+          {/* Profile & Analytics Section */}
           <div className="grid gap-6 md:grid-cols-2">
-            <ImportReturnsCard onViewAllClick={() => setReturnsModalOpen(true)} />
+            <CompanyProfileCard 
+              profileData={profileData} 
+              onViewProfileClick={() => setProfileModalOpen(true)} 
+            />
             <PerformanceAnalyticsCard onViewAnalyticsClick={() => setAnalyticsModalOpen(true)} />
           </div>
         </div>
       </div>
-    </>
+    </PortalLayout>
   )
 }

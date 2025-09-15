@@ -30,6 +30,10 @@ const fieldCoordinatorNavigation = [
   { name: "Dashboard", href: "/portal/field-coordinator", icon: Home },
 ]
 
+const millerNavigation = [
+  { name: "Portal", href: "/portal/miller", icon: Home },
+]
+
 export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
@@ -41,6 +45,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   const navigation = 
     user?.userType === "importer" ? importerNavigation : 
     user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 
+    user?.userType === "miller" ? millerNavigation :
     ceoNavigation
 
   useEffect(() => {
@@ -100,12 +105,14 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                       <Avatar className={`h-10 w-10 cursor-pointer transition-all border-2 border-gray-300 ${
                         user?.userType === "importer" ? "hover:ring-2 hover:ring-blue-300" : 
                         user?.userType === "field-coordinator" ? "hover:ring-2 hover:ring-orange-300" :
+                        user?.userType === "miller" ? "hover:ring-2 hover:ring-green-300" :
                         "hover:ring-2 hover:ring-green-300"
                       }`}>
                         <AvatarImage 
                           src={
                             user?.userType === "importer" ? "/images/importer-avatar.png" : 
                             user?.userType === "field-coordinator" ? "/placeholder-user.jpg" : 
+                            user?.userType === "miller" ? "/images/miller-avatar.png" :
                             "/images/KSB_CEO.png"
                           } 
                           alt="Profile" 
@@ -113,6 +120,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                         <AvatarFallback className={
                           user?.userType === "importer" ? "bg-blue-100 text-blue-800" : 
                           user?.userType === "field-coordinator" ? "bg-orange-100 text-orange-800" :
+                          user?.userType === "miller" ? "bg-green-100 text-green-800" :
                           "bg-green-100 text-green-800"
                         }>
                           {user?.name
@@ -126,6 +134,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                       <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
                         user?.userType === "importer" ? "bg-blue-500" : 
                         user?.userType === "field-coordinator" ? "bg-orange-500" :
+                        user?.userType === "miller" ? "bg-green-500" :
                         "bg-green-500"
                       }`}></div>
                     </div>
@@ -133,7 +142,11 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
                   <DropdownMenuItem asChild>
-                    <Link href={user?.userType === "importer" ? "/portal/importer" : "/portal/ceo"} className="flex items-center w-full">
+                    <Link href={
+                      user?.userType === "importer" ? "/portal/importer" : 
+                      user?.userType === "miller" ? "/portal/miller" : 
+                      "/portal/ceo"
+                    } className="flex items-center w-full">
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </Link>
@@ -156,8 +169,8 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           </div>
         </header>
       </div>
-    <main className={`flex-1 overflow-auto ${user?.userType === "importer" || user?.userType === "field-coordinator" ? "pb-6" : "pb-24"}`}>{children}</main>
-    {(user?.userType !== "importer" && user?.userType !== "field-coordinator") && (
+    <main className={`flex-1 overflow-auto ${user?.userType === "importer" || user?.userType === "field-coordinator" || user?.userType === "miller" ? "pb-6" : "pb-24"}`}>{children}</main>
+    {(user?.userType !== "importer" && user?.userType !== "field-coordinator" && user?.userType !== "miller") && (
           <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
             <div className="flex items-center justify-center px-1 py-3">
               <div className="flex items-center justify-around w-full max-w-3xl gap-1">

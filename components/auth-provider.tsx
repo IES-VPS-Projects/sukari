@@ -10,7 +10,7 @@ interface User {
   email: string
   name: string
   role: string
-  userType: 'ceo' | 'importer' | 'field-coordinator'
+  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller'
 }
 
 interface AuthContextType {
@@ -70,6 +70,18 @@ const DEFAULT_CREDENTIALS = [
       name: "Bernice Kasavuli",
       role: "Field Coordinator",
       userType: "field-coordinator" as const,
+    },
+  },
+  {
+    email: "miller@ksb.go.ke", 
+    phone: "0700333456",
+    password: "Miller2024!",
+    user: {
+      id: "5",
+      email: "miller@ksb.go.ke",
+      name: "James Mwangi",
+      role: "Sugar Miller",
+      userType: "miller" as const,
     },
   },
 ]
