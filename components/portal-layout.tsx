@@ -65,8 +65,8 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className={`bg-gray-50 px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fbf9f1' }}>
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: '#fbf9f1' }}>
         <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
