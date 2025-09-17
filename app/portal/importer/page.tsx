@@ -1,123 +1,147 @@
 "use client"
 
 import { useState } from "react"
+import { FileText, Truck, User, TrendingUp } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { PortalLayout } from "@/components/portal-layout"
-import { ImporterApplicationsModal } from "@/components/modals/importer-applications-modal"
-import { ImporterProfileModal } from "@/components/modals/importer-profile-modal"
-import { ImporterSettingsModal } from "@/components/modals/importer-settings-modal"
-import { ImporterReturnsModal } from "@/components/modals/importer-returns-modal"
-import { AnalyticsModal } from "@/components/modals/analytics-modal"
-import { AlertsModal } from "@/components/modals/alerts-modal"
-import {
-  StatsCards,
-  ImportApplicationProgressCard,
-  RecentImportsCard,
-  AlertsCard,
-  ImportReturnsCard,
-  PerformanceAnalyticsCard
-} from "./components"
+import { MillerApplicationsModal } from "@/components/modals/miller-applications-modal"
+import { MillerProfileModal } from "@/components/modals/miller-profile-modal"
+import { MillerReturnsModal } from "@/components/modals/miller-returns-modal"
+import { MillerProductionModal } from "@/components/modals/miller-production-modal"
 
-export default function ImporterProfilePage() {
+export default function ImporterPage() {
   const [profileData] = useState({
     firstName: "Bernard",
     lastName: "Kasavuli",
-    email: "bernard.kasavuli@sugarimports.co.ke",
-    phone: "+254 700 222 234",
+    email: "bernard.kasavuli@sunshinesugar.co.ke",
+    phone: "+254 722 456 789",
     location: "Nairobi, Kenya",
-    company: "Kasavuli Sugar Imports Ltd",
-    role: "Sugar Importer",
+    company: "Sunshine Sugar Imports Ltd",
+    role: "Import Manager",
     licenseNumber: "SIL-2024-001",
     organization: "Licensed Sugar Importer",
-    bio: "Experienced sugar importer with over 10 years in the sugar trade industry. Specialized in international trade, sugar quality assessment, and regulatory compliance across the East African sugar market.",
-    licenseDate: "March 2020",
-    imports: 45,
+    bio: "Experienced sugar import manager with over 10 years in sugar import and distribution. Specialized in import operations, quality control, and supply chain management.",
+    licenseDate: "January 2020",
+    imports: 256,
+    importCapacity: "500 MT/Month",
+    productionCapacity: "500 MT/Month",
     complianceLevel: "Fully Compliant"
   })
 
-  // Helper function to get greeting based on time
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return "Good Morning"
-    if (hour < 17) return "Good Afternoon"
-    return "Good Evening"
-  }
-  
-  // Helper function to format date and time
-  const getCurrentDateTime = () => {
-    const now = new Date()
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }
-    const date = now.toLocaleDateString('en-US', options)
-    const time = now.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    })
-    return `${date} at ${time}`
-  }
-
   // Modal states
   const [applicationsModalOpen, setApplicationsModalOpen] = useState(false)
-  const [profileModalOpen, setProfileModalOpen] = useState(false)
-  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [productionModalOpen, setProductionModalOpen] = useState(false)
   const [returnsModalOpen, setReturnsModalOpen] = useState(false)
-  const [analyticsModalOpen, setAnalyticsModalOpen] = useState(false)
-  const [alertsModalOpen, setAlertsModalOpen] = useState(false)
+  const [profileModalOpen, setProfileModalOpen] = useState(false)
 
   return (
     <PortalLayout pageTitle="Importer Portal">
-      {/* Modals */}
-      <ImporterApplicationsModal 
-        open={applicationsModalOpen} 
-        onOpenChange={setApplicationsModalOpen}
-      />
-      <ImporterReturnsModal 
-        open={returnsModalOpen} 
-        onOpenChange={setReturnsModalOpen}
-      />
-      <ImporterProfileModal 
-        open={profileModalOpen} 
-        onOpenChange={setProfileModalOpen}
-        profileData={profileData}
-      />
-      <ImporterSettingsModal 
-        open={settingsModalOpen} 
-        onOpenChange={setSettingsModalOpen}
-      />
-      <AnalyticsModal open={analyticsModalOpen} onOpenChange={setAnalyticsModalOpen} />
-      <AlertsModal open={alertsModalOpen} onOpenChange={setAlertsModalOpen} />
-      
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col gap-6 p-4 bg-gray-50/50 rounded-xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">{getGreeting()}, {profileData.firstName}</h1>
-              <p className="text-gray-500">{getCurrentDateTime()}</p>
+      <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Profile Header */}
+        <Card className="rounded-[20px] shadow-lg border-0 bg-white p-4 sm:p-6 h-32">
+          <div className="flex items-center gap-4 sm:gap-6 h-full">
+            <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full overflow-hidden">
+              <img 
+                src="/images/sunshine_sugar.png" 
+                alt="Sunshine Sugar Logo" 
+                className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
+              />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {profileData.company}
+              </h1>
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">
+                {profileData.firstName} {profileData.lastName}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs sm:text-sm text-gray-500">License Number</p>
+              <p className="font-semibold text-sm sm:text-base text-gray-900">{profileData.licenseNumber}</p>
             </div>
           </div>
+        </Card>
 
-          {/* Stats Cards */}
-          <StatsCards onAnalyticsClick={() => setAnalyticsModalOpen(true)} />
+        {/* Cards Grid */}
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Applications Card - First position */}
+          <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer h-[240px]"
+            onClick={() => setApplicationsModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5" />
+                Applications
+              </CardTitle>
+              <CardDescription>License and permit requests</CardDescription>
+            </CardHeader>
+          </Card>
 
-          {/* Import Application Progress Section */}
-          <ImportApplicationProgressCard onViewAllClick={() => setApplicationsModalOpen(true)} />
+          {/* Production Card - Second position */}
+          <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer h-[240px]"
+            onClick={() => setProductionModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Truck className="h-5 w-5" />
+                Imports
+              </CardTitle>
+              <CardDescription>Import tracking and management</CardDescription>
+            </CardHeader>
+          </Card>
 
-          {/* Recent Imports and Alerts Section - Side by Side */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <RecentImportsCard onViewAllClick={() => setReturnsModalOpen(true)} />
-            <AlertsCard onViewAllClick={() => setAlertsModalOpen(true)} />
-          </div>
+          {/* Returns Card - Third position */}
+          <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer h-[240px]"
+            onClick={() => setReturnsModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <TrendingUp className="h-5 w-5" />
+                Returns
+              </CardTitle>
+              <CardDescription>Financial and compliance reports</CardDescription>
+            </CardHeader>
+          </Card>
 
-          {/* Returns & Performance Analytics Section */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <ImportReturnsCard onViewAllClick={() => setReturnsModalOpen(true)} />
-            <PerformanceAnalyticsCard onViewAnalyticsClick={() => setAnalyticsModalOpen(true)} />
-          </div>
+          {/* Profile Info Card - Fourth position */}
+          <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer h-[240px]"
+            onClick={() => setProfileModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <User className="h-5 w-5" />
+                Profile
+              </CardTitle>
+              <CardDescription>Company details & settings</CardDescription>
+            </CardHeader>
+          </Card>
+
         </div>
+
+        {/* Modals */}
+        <MillerApplicationsModal 
+          open={applicationsModalOpen} 
+          onOpenChange={setApplicationsModalOpen}
+        />
+        <MillerProductionModal 
+          open={productionModalOpen} 
+          onOpenChange={setProductionModalOpen}
+        />
+        <MillerReturnsModal 
+          open={returnsModalOpen} 
+          onOpenChange={setReturnsModalOpen}
+        />
+        <MillerProfileModal 
+          open={profileModalOpen} 
+          onOpenChange={setProfileModalOpen}
+          profileData={profileData}
+        />
       </div>
     </PortalLayout>
   )

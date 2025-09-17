@@ -174,7 +174,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Miller Applications</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Applications</DialogTitle>
           <DialogDescription>
             Apply for Letters of Comfort, Permits, and License Applications & Renewals
           </DialogDescription>
@@ -205,9 +205,10 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
         {/* Status Tab */}
         {activeTab === 'status' && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Current Applications</h3>
-            <div className="grid gap-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Current Applications</h3>
+              <div className="grid gap-4">
               {existingApplications.map((app) => (
                 <div key={app.id} className="border rounded-lg p-4 bg-gray-50">
                   <div className="flex justify-between items-start mb-2">
@@ -245,13 +246,15 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   )}
                 </div>
               ))}
+              </div>
             </div>
           </div>
         )}
 
         {/* Letter of Comfort Tab */}
         {activeTab === 'comfort' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">Letter of Comfort Application</h3>
             
             <div className="grid gap-4 sm:grid-cols-2">
@@ -345,12 +348,14 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
 
         {/* Permit Application Tab */}
         {activeTab === 'permit' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">Permit Application</h3>
             
             <div className="grid gap-4 sm:grid-cols-2">
@@ -455,12 +460,14 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
 
         {/* License Application Tab */}
         {activeTab === 'license' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">License Application & Renewal</h3>
             
             <div className="grid gap-4 sm:grid-cols-2">
@@ -577,7 +584,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
       </DialogContent>
     </Dialog>

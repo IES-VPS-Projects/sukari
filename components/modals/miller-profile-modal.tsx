@@ -186,7 +186,7 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Miller Profile</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Profile</DialogTitle>
           <DialogDescription>
             Manage company information and access control for your miller organization
           </DialogDescription>
@@ -215,7 +215,8 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
 
         {/* Company Information Tab */}
         {activeTab === 'company' && (
-          <div className="space-y-6">
+          <div className="h-[60vh] overflow-y-auto">
+            <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">Company Profile</h3>
               <Button
@@ -340,12 +341,14 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
                 </div>
               </div>
             </div>
+            </div>
           </div>
         )}
 
         {/* Access Management Tab */}
         {activeTab === 'access' && (
-          <div className="space-y-6">
+          <div className="h-[60vh] overflow-y-auto">
+            <div className="space-y-6">
             <h3 className="text-lg font-semibold">Access Management</h3>
 
             {/* Add New User Section */}
@@ -483,6 +486,7 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
                   </div>
                 ) : null
               })}
+            </div>
             </div>
           </div>
         )}

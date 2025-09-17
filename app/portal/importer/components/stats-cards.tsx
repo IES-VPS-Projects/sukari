@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendingUp, Ship, FileText, DollarSign, Shield } from "lucide-react"
+import { LiaMoneyBillSolid } from 'react-icons/lia'
 
 // Sample data for stats cards
 const stats = [
@@ -23,10 +24,10 @@ const stats = [
   },
   {
     title: "Import Value",
-    value: "$2.4M",
+    value: "Ksh. 2.4M",
     change: "+18%",
     changeType: "positive" as const,
-    icon: DollarSign,
+    icon: LiaMoneyBillSolid,
     description: "This quarter",
   },
   {
@@ -47,7 +48,7 @@ export function StatsCards({ onAnalyticsClick }: StatsCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <Card key={stat.title} className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={onAnalyticsClick}>
+        <Card key={stat.title} className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
             <div className={`p-2 rounded-full ${

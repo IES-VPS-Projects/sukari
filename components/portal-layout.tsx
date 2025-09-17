@@ -5,13 +5,14 @@ import { useAuth } from "@/components/auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings, Bell } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { ImporterAlertsModal } from "@/app/portal/importer/modals/importer-alerts-modal"
 
 const ceoNavigation = [
   { name: "Today", href: "/portal/ceo/today", icon: Home },
@@ -19,7 +20,7 @@ const ceoNavigation = [
   { name: "Calendar", href: "/portal/ceo/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/ceo/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
-  { name: "Operations", href: "/portal/ceo", icon: User },
+  { name: "Operations", href: "/portal/ceo/operations", icon: User },
 ]
 
 const importerNavigation = [
@@ -40,6 +41,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   const [isVisible, setIsVisible] = useState(true)
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
+  const [alertsModalOpen, setAlertsModalOpen] = useState(false)
 
   // Get appropriate navigation based on user type
   const navigation = 
@@ -65,8 +67,15 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fbf9f1' }}>
-      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: '#fbf9f1' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : '#fbf9f1' }}>
+      {/* Import alerts modal */}
+      {user?.userType === "importer" && (
+        <ImporterAlertsModal 
+          open={alertsModalOpen} 
+          onOpenChange={setAlertsModalOpen}
+        />
+      )}
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" || user?.userType === "miller" ? '#f3f4f6' : '#fbf9f1' }}>
         <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -91,7 +100,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                     KENYA SUGAR BOARD
                   </h1>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
-                    Information Management System
+                    Sugar Industry Management Information System
                   </p>
                 </div>
               </div>
@@ -141,19 +150,14 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
-                  <DropdownMenuItem asChild>
-                    <Link href={
-                      user?.userType === "importer" ? "/portal/importer" : 
-                      user?.userType === "miller" ? "/portal/miller" : 
-                      "/portal/ceo"
-                    } className="flex items-center w-full">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                  <DropdownMenuItem onClick={() => {
+                    setOpen(false);
+                    if (user?.userType === "importer") {
+                      setAlertsModalOpen(true);
+                    }
+                  }}>
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notifications
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <HelpCircle className="mr-2 h-4 w-4" />

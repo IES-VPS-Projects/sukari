@@ -256,7 +256,7 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Miller Returns</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Returns</DialogTitle>
           <DialogDescription>
             File Daily, Monthly, and Annual returns for your sugar milling operations
           </DialogDescription>
@@ -287,7 +287,8 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
 
         {/* Status Tab */}
         {activeTab === 'status' && (
-          <div className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <div className="space-y-4">
             <h3 className="text-lg font-semibold">Returns History</h3>
             <div className="grid gap-4">
               {existingReturns.map((returnItem) => (
@@ -324,12 +325,14 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
                 </div>
               ))}
             </div>
+            </div>
           </div>
         )}
 
         {/* Daily Return Tab */}
         {activeTab === 'daily' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">Daily Production Return</h3>
             
             <div>
@@ -399,12 +402,14 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
 
         {/* Monthly Return Tab */}
         {activeTab === 'monthly' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">Monthly Production Return</h3>
             
             <div>
@@ -485,12 +490,14 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
 
         {/* Annual Return Tab */}
         {activeTab === 'annual' && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="h-[60vh] overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <h3 className="text-lg font-semibold">Annual Production Return</h3>
             
             <div>
@@ -575,7 +582,8 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
                 )}
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         )}
       </DialogContent>
     </Dialog>
