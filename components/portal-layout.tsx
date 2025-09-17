@@ -20,7 +20,7 @@ const ceoNavigation = [
   { name: "Calendar", href: "/portal/ceo/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/ceo/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
-  { name: "Operations", href: "/portal/ceo/operations", icon: User },
+  { name: "Operations", href: "/portal/ceo", icon: User },
 ]
 
 const importerNavigation = [
@@ -75,7 +75,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           onOpenChange={setAlertsModalOpen}
         />
       )}
-      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" || user?.userType === "miller" ? '#f3f4f6' : '#fbf9f1' }}>
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : '#fbf9f1' }}>
         <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
