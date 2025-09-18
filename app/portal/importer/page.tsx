@@ -6,10 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { PortalLayout } from "@/components/portal-layout"
-import { MillerApplicationsModal } from "@/components/modals/miller-applications-modal"
-import { MillerProfileModal } from "@/components/modals/miller-profile-modal"
-import { MillerReturnsModal } from "@/components/modals/miller-returns-modal"
-import { MillerProductionModal } from "@/components/modals/miller-production-modal"
+import { ImporterApplicationsModal } from "./modals/importer-applications-modal"
+import { ImporterProfileModal } from "./modals/importer-profile-modal"
+import { ImporterReturnsModal } from "./modals/importer-returns-modal"
+import { ImporterImportsModal } from "./modals/importer-imports-modal"
 
 export default function ImporterPage() {
   const [profileData] = useState({
@@ -32,7 +32,7 @@ export default function ImporterPage() {
 
   // Modal states
   const [applicationsModalOpen, setApplicationsModalOpen] = useState(false)
-  const [productionModalOpen, setProductionModalOpen] = useState(false)
+  const [importsModalOpen, setImportsModalOpen] = useState(false)
   const [returnsModalOpen, setReturnsModalOpen] = useState(false)
   const [profileModalOpen, setProfileModalOpen] = useState(false)
 
@@ -80,10 +80,10 @@ export default function ImporterPage() {
             </CardHeader>
           </Card>
 
-          {/* Production Card - Second position */}
+          {/* Imports Card - Second position */}
           <Card 
             className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer h-[240px]"
-            onClick={() => setProductionModalOpen(true)}
+            onClick={() => setImportsModalOpen(true)}
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -125,19 +125,19 @@ export default function ImporterPage() {
         </div>
 
         {/* Modals */}
-        <MillerApplicationsModal 
+        <ImporterApplicationsModal 
           open={applicationsModalOpen} 
           onOpenChange={setApplicationsModalOpen}
         />
-        <MillerProductionModal 
-          open={productionModalOpen} 
-          onOpenChange={setProductionModalOpen}
+        <ImporterImportsModal 
+          open={importsModalOpen} 
+          onOpenChange={setImportsModalOpen}
         />
-        <MillerReturnsModal 
+        <ImporterReturnsModal 
           open={returnsModalOpen} 
           onOpenChange={setReturnsModalOpen}
         />
-        <MillerProfileModal 
+        <ImporterProfileModal 
           open={profileModalOpen} 
           onOpenChange={setProfileModalOpen}
           profileData={profileData}

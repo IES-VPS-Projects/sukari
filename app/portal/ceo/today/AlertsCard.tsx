@@ -317,21 +317,6 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
               )
             })}
         </div>
-        
-        {/* View All Button Row */}
-        <div 
-          className="mt-4 -mx-4 -mb-4 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer rounded-b-[20px] group"
-          onClick={() => {
-            if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
-            if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
-          }}
-        >
-          <div className="px-4 py-3 flex items-center justify-center">
-            <Button variant="ghost" className="text-gray-600 group-hover:text-gray-800">
-              View All Alerts
-            </Button>
-          </div>
-        </div>
       </CardContent>
     </Card>
   )

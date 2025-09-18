@@ -222,7 +222,8 @@ export function ImporterProfileModal({ open, onOpenChange, profileData }: Import
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'profile' && (
+          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+            {activeTab === 'profile' && (
             <div className="space-y-6">
               {/* Profile Header */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
@@ -575,6 +576,7 @@ export function ImporterProfileModal({ open, onOpenChange, profileData }: Import
               </div>
             </div>
           )}
+          </div>
         </div>
 
         {isSaved && (

@@ -616,7 +616,9 @@ export function ImporterImportsModal({ open, onOpenChange, selectedImportId }: I
         </DialogHeader>
 
         {selectedImport ? (
-          renderImportDetails()
+          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+            {renderImportDetails()}
+          </div>
         ) : (
           <Tabs defaultValue="all" value={activeTab} onValueChange={(value) => setActiveTab(value as 'all' | 'tracking')}>
             <TabsList className="mb-4">
@@ -629,10 +631,10 @@ export function ImporterImportsModal({ open, onOpenChange, selectedImportId }: I
                 Track Shipment
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="all">
+            <TabsContent value="all" className="min-h-[500px] max-h-[500px] overflow-y-auto">
               {renderImportsList()}
             </TabsContent>
-            <TabsContent value="tracking">
+            <TabsContent value="tracking" className="min-h-[500px] max-h-[500px] overflow-y-auto">
               {renderTrackingTab()}
             </TabsContent>
           </Tabs>

@@ -661,7 +661,9 @@ export function ImporterApplicationsModal({ open, onOpenChange, selectedApplicat
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'status' ? renderStatusTab() : renderApplicationForm()}
+          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+            {activeTab === 'status' ? renderStatusTab() : renderApplicationForm()}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -8,10 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { PortalLayout } from "@/components/portal-layout"
-import { MillerApplicationsModal } from "@/components/modals/miller-applications-modal"
-import { MillerProfileModal } from "@/components/modals/miller-profile-modal"
-import { MillerReturnsModal } from "@/components/modals/miller-returns-modal"
-import { MillerProductionModal } from "@/components/modals/miller-production-modal"
+import { MillerApplicationsModal } from "./modals/miller-applications-modal"
+import { MillerProfileModal } from "./modals/miller-profile-modal"
+import { MillerReturnsModal } from "./modals/miller-returns-modal"
+import { MillerProductionModal } from "./modals/miller-production-modal"
 
 export default function MillerProfilePage() {
   const [profileData] = useState({

@@ -75,7 +75,7 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           onOpenChange={setAlertsModalOpen}
         />
       )}
-      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : '#fbf9f1' }}>
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : user?.userType === "miller" ? '#f3f4f6' : '#fbf9f1' }}>
         <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">

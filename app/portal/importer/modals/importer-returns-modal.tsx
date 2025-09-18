@@ -514,7 +514,9 @@ export function ImporterReturnsModal({ open, onOpenChange, selectedReturnId }: I
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'submitted' ? renderSubmittedReturns() : renderNewReturnForm()}
+          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+            {activeTab === 'submitted' ? renderSubmittedReturns() : renderNewReturnForm()}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
