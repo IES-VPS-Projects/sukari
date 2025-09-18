@@ -33,5 +33,5 @@ export default function PortalLayoutWrapper({
     return null
   }
 
-  return <PortalLayout>{children}</PortalLayout>
+  return <>{children}</>
 }

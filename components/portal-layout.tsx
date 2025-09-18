@@ -2,31 +2,53 @@
 
 import type React from "react"
 import { useAuth } from "@/components/auth-provider"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Home, MessageSquare, Calendar, FileText, BarChart3, Bot, LogOut, ChevronDown, User, HelpCircle } from "lucide-react"
+import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings, Bell } from "lucide-react"
+import { HiSparkles } from 'react-icons/hi2'
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { ImporterAlertsModal } from "@/app/portal/importer/modals/importer-alerts-modal"
 
-const navigation = [
-  { name: "Today", href: "/portal/today", icon: Home },
-  { name: "Chat", href: "/portal/chat", icon: MessageSquare },
-  { name: "Calendar", href: "/portal/calendar", icon: Calendar },
-  { name: "Reports", href: "/portal/reports", icon: FileText },
-  { name: "Dashboard", href: "/portal/dashboard", icon: BarChart3 },
-  { name: "AI Interface", href: "/portal/ai", icon: Bot },
+const ceoNavigation = [
+  { name: "Today", href: "/portal/ceo/today", icon: Home },
+  { name: "AI", href: "/portal/ceo/ai", icon: HiSparkles },
+  { name: "Calendar", href: "/portal/ceo/calendar", icon: Calendar },
+  { name: "Chat", href: "/portal/ceo/chat", icon: MessageSquare },
+  { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
+  { name: "Operations", href: "/portal/ceo", icon: User },
 ]
 
-export function PortalLayout({ children }: { children: React.ReactNode }) {
+const importerNavigation = [
+  { name: "Portal", href: "/portal/importer", icon: Home },
+]
+
+const fieldCoordinatorNavigation = [
+  { name: "Dashboard", href: "/portal/field-coordinator", icon: Home },
+]
+
+const millerNavigation = [
+  { name: "Portal", href: "/portal/miller", icon: Home },
+]
+
+export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(true)
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
+  const [alertsModalOpen, setAlertsModalOpen] = useState(false)
+
+  // Get appropriate navigation based on user type
+  const navigation = 
+    user?.userType === "importer" ? importerNavigation : 
+    user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 
+    user?.userType === "miller" ? millerNavigation :
+    ceoNavigation
 
   useEffect(() => {
     let lastScroll = 0
@@ -45,74 +67,138 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : '#fbf9f1' }}>
+      {/* Import alerts modal */}
+      {user?.userType === "importer" && (
+        <ImporterAlertsModal 
+          open={alertsModalOpen} 
+          onOpenChange={setAlertsModalOpen}
+        />
+      )}
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: user?.userType === "importer" ? '#f3f4f6' : user?.userType === "miller" ? '#f3f4f6' : '#fbf9f1' }}>
+        <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Image src="/images/ksb-logo.jpg" alt="KSB Logo" width={75} height={75} className="rounded-lg" />
-              <div>
-                <h1 className="font-semibold text-green-800">Dashboard</h1>
+            <div className="flex items-center">
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/images/ISE_Agri_Logo.png" 
+                  alt="ISE Agriculture Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/kenya_vertical_separator.jpg" 
+                  alt="Vertical Separator" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/ksb2.png" 
+                  alt="KSB Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <div className="flex flex-col ml-2">
+                  <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
+                    KENYA SUGAR BOARD
+                  </h1>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
+                    Sugar Industry Management Information System
+                  </p>
+                </div>
               </div>
             </div>
 
-            <DropdownMenu open={open} onOpenChange={setOpen}>
-              <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
-                <Button variant="ghost" className="flex items-center gap-2 border-2 border-gray-300 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-green-100 text-green-800">
-                      {user?.name
-                        ?.split(" ")
-                        .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
-                        .map((n) => n[0])
-                        .join("") || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{user?.name}</span>
-                    <span className="text-xs text-gray-500">{user?.role}</span>
-                  </div>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" onMouseLeave={() => setOpen(false)}>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Support
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                  Log Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-3">
+              <DropdownMenu open={open} onOpenChange={setOpen}>
+                <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
+                  <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
+                    <div className="relative">
+                      <Avatar className={`h-10 w-10 cursor-pointer transition-all border-2 border-gray-300 ${
+                        user?.userType === "importer" ? "hover:ring-2 hover:ring-blue-300" : 
+                        user?.userType === "field-coordinator" ? "hover:ring-2 hover:ring-orange-300" :
+                        user?.userType === "miller" ? "hover:ring-2 hover:ring-green-300" :
+                        "hover:ring-2 hover:ring-green-300"
+                      }`}>
+                        <AvatarImage 
+                          src={
+                            user?.userType === "importer" ? "/images/importer-avatar.png" : 
+                            user?.userType === "field-coordinator" ? "/placeholder-user.jpg" : 
+                            user?.userType === "miller" ? "/images/miller-avatar.png" :
+                            "/images/KSB_CEO.png"
+                          } 
+                          alt="Profile" 
+                        />
+                        <AvatarFallback className={
+                          user?.userType === "importer" ? "bg-blue-100 text-blue-800" : 
+                          user?.userType === "field-coordinator" ? "bg-orange-100 text-orange-800" :
+                          user?.userType === "miller" ? "bg-green-100 text-green-800" :
+                          "bg-green-100 text-green-800"
+                        }>
+                          {user?.name
+                            ?.split(" ")
+                            .filter((part, index) => index === 0 || index === 1)
+                            .map((n) => n[0])
+                            .join("") || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Status indicator */}
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
+                        user?.userType === "importer" ? "bg-blue-500" : 
+                        user?.userType === "field-coordinator" ? "bg-orange-500" :
+                        user?.userType === "miller" ? "bg-green-500" :
+                        "bg-green-500"
+                      }`}></div>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
+                  <DropdownMenuItem onClick={() => {
+                    setOpen(false);
+                    if (user?.userType === "importer") {
+                      setAlertsModalOpen(true);
+                    }
+                  }}>
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notifications
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Support
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </header>
-        <main className="flex-1 pb-24 overflow-auto">{children}</main>
-        <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
-            <div className="flex items-center justify-center px-4 py-3">
-              <div className="flex items-center justify-around w-full max-w-2xl">
+      </div>
+    <main className={`flex-1 overflow-auto ${user?.userType === "importer" || user?.userType === "field-coordinator" || user?.userType === "miller" ? "pb-6" : "pb-24"}`}>{children}</main>
+    {(user?.userType !== "importer" && user?.userType !== "field-coordinator" && user?.userType !== "miller") && (
+          <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
+            <div className="flex items-center justify-center px-1 py-3">
+              <div className="flex items-center justify-around w-full max-w-3xl gap-1">
                 {navigation.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors min-w-[80px] ${
-                        isActive ? "bg-green-100 text-green-700" : "text-gray-600 hover:text-green-600 hover:bg-green-50"
+                      className={`flex flex-col items-center gap-1 px-1 py-2 rounded-lg transition-all duration-300 ease-in-out min-w-[55px] ${
+                        isActive 
+                          ? "bg-green-100 text-green-700 scale-105"
+                          : "text-gray-600 hover:text-green-600 hover:bg-green-50 hover:scale-105"
                       }`}
                     >
-                      <item.icon className="h-5 w-5" />
-                      <span className="text-xs font-medium">{item.name}</span>
+                      <item.icon className="h-5 w-5 transition-transform duration-200" />
+                      <span className="text-xs font-medium transition-colors duration-200">{item.name}</span>
                     </Link>
                   )
                 })}
               </div>
             </div>
           </nav>
+        )}
     </div>
   )
 }
