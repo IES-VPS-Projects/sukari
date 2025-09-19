@@ -1,24 +1,29 @@
 "use client"
 
 import { useAuth } from "@/components/auth-provider"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useEffect } from "react"
 
 export default function PortalPage() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
         router.push("/login")
-      } else if (user.userType === "ceo") {
-        router.push("/portal/ceo")
-      } else if (user.userType === "importer") {
+      } else if (user.userType === "ceo" && pathname === "/portal") {
+        router.push("/portal/ceo/today")
+      } else if (user.userType === "importer" && pathname === "/portal") {
         router.push("/portal/importer")
+      } else if (user.userType === "field-coordinator" && pathname === "/portal") {
+        router.push("/portal/field-coordinator")
+      } else if (user.userType === "miller" && pathname === "/portal") {
+        router.push("/portal/miller")
       }
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, router, pathname])
 
   if (isLoading || !user) {
     return (

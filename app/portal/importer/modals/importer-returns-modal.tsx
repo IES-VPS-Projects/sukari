@@ -8,14 +8,17 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Receipt, FileText, Send, CheckCircle, Clock, AlertCircle, Plus, Eye } from "lucide-react"
+import { FileText, Send, CheckCircle, Clock, AlertCircle, Plus, Eye, ArrowLeft, ArrowRight } from "lucide-react"
+import { AiOutlineContainer } from "react-icons/ai"
+import { returnsData } from "../data/returns-data"
 
 interface ImporterReturnsModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  selectedReturnId?: string
 }
 
-export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModalProps) {
+export function ImporterReturnsModal({ open, onOpenChange, selectedReturnId }: ImporterReturnsModalProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<'submitted' | 'new'>('submitted')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedReturn, setSelectedReturn] = useState<any>(null)
@@ -53,41 +56,8 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
   ]
 
   // Mock returns data
-  const submittedReturns = [
-    {
-      id: 'RET-2024-001',
-      period: 'August 2024',
-      submitDate: '2024-09-05',
-      status: 'Approved',
-      volume: '250 MT',
-      sugarType: 'White Sugar',
-      country: 'Brazil',
-      value: '$125,000',
-      taxesPaid: '$12,500'
-    },
-    {
-      id: 'RET-2024-002',
-      period: 'July 2024',
-      submitDate: '2024-08-05',
-      status: 'Under Review',
-      volume: '300 MT',
-      sugarType: 'Raw Sugar',
-      country: 'Thailand',
-      value: '$140,000',
-      taxesPaid: '$14,000'
-    },
-    {
-      id: 'RET-2024-003',
-      period: 'June 2024',
-      submitDate: '2024-07-05',
-      status: 'Approved',
-      volume: '200 MT',
-      sugarType: 'Brown Sugar',
-      country: 'Mauritius',
-      value: '$95,000',
-      taxesPaid: '$9,500'
-    }
-  ]
+  // Additional returns data for the modal - using imported data only
+  const extendedReturnsData = returnsData
 
   const resetForm = () => {
     setFormData({
@@ -109,8 +79,14 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
   useEffect(() => {
     if (!open) {
       resetForm()
+    } else if (selectedReturnId) {
+      const returnData = returnsData.find(r => r.id === selectedReturnId)
+      if (returnData) {
+        setSelectedReturn(returnData)
+        setActiveTab('submitted')
+      }
     }
-  }, [open])
+  }, [open, selectedReturnId])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -143,123 +119,194 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
     }
   }
 
-  const renderSubmittedReturns = () => (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Submitted Returns</h3>
-        <Button
-          onClick={() => setActiveTab('new')}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          New Return
-        </Button>
-      </div>
-      
-      <div className="space-y-3">
-        {submittedReturns.map((returnItem) => (
-          <div key={returnItem.id} className="p-4 border rounded-lg space-y-3">
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-semibold">{returnItem.period} Returns</h4>
-                <p className="text-sm text-gray-600">ID: {returnItem.id}</p>
-              </div>
-              <div className="flex gap-2">
-                <Badge className={getStatusColor(returnItem.status)}>
-                  {returnItem.status}
-                </Badge>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedReturn(returnItem)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
+  const renderSubmittedReturns = () => {
+    if (selectedReturn) {
+      return (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedReturn(null)}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Returns
+            </Button>
+            
+            <Badge className={getStatusColor(selectedReturn.status)}>
+              {selectedReturn.status}
+            </Badge>
+          </div>
+          
+          <div className="bg-blue-50 p-6 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-2">{selectedReturn.type}</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-blue-700">
+              <span>ID: {selectedReturn.id}</span>
+              <span className="hidden sm:inline">•</span>
+              <span>Period: {selectedReturn.period}</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-700">Return Details</h4>
+              <div className="bg-white border rounded-lg p-4 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Submitted By:</span>
+                  <span className="font-medium">{selectedReturn.details.submittedBy}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Submission Date:</span>
+                  <span className="font-medium">{selectedReturn.details.submissionDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Imports:</span>
+                  <span className="font-medium">{selectedReturn.details.totalImports}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Import Value:</span>
+                  <span className="font-medium">{selectedReturn.details.importValue}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Taxes Paid:</span>
+                  <span className="font-medium">{selectedReturn.details.taxesPaid}</span>
+                </div>
+                
+                {selectedReturn.details.approvalDate && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Approval Date:</span>
+                    <span className="font-medium">{selectedReturn.details.approvalDate}</span>
+                  </div>
+                )}
+                
+                {selectedReturn.details.approvedBy && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Approved By:</span>
+                    <span className="font-medium">{selectedReturn.details.approvedBy}</span>
+                  </div>
+                )}
+                
+                {selectedReturn.details.expectedCompletionDate && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Expected Completion:</span>
+                    <span className="font-medium">{selectedReturn.details.expectedCompletionDate}</span>
+                  </div>
+                )}
+                
+                {selectedReturn.details.reviewedBy && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Reviewed By:</span>
+                    <span className="font-medium">{selectedReturn.details.reviewedBy}</span>
+                  </div>
+                )}
               </div>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Submit Date:</span>
-                <p className="font-medium">{new Date(returnItem.submitDate).toLocaleDateString()}</p>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-700">Additional Information</h4>
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium mb-2">Notes</h5>
+                <p className="text-gray-700">{selectedReturn.details.notes}</p>
               </div>
-              <div>
-                <span className="text-gray-600">Volume:</span>
-                <p className="font-medium">{returnItem.volume}</p>
-              </div>
-              <div>
-                <span className="text-gray-600">Sugar Type:</span>
-                <p className="font-medium">{returnItem.sugarType}</p>
-              </div>
-              <div>
-                <span className="text-gray-600">Value:</span>
-                <p className="font-medium">{returnItem.value}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Return Details Modal */}
-      {selectedReturn && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-lg font-semibold">Return Details - {selectedReturn.period}</h4>
-              <Button variant="outline" onClick={() => setSelectedReturn(null)}>
-                Close
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="space-y-3">
-                <div>
-                  <span className="text-gray-600">Return ID:</span>
-                  <p className="font-medium">{selectedReturn.id}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Period:</span>
-                  <p className="font-medium">{selectedReturn.period}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Import Volume:</span>
-                  <p className="font-medium">{selectedReturn.volume}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Sugar Type:</span>
-                  <p className="font-medium">{selectedReturn.sugarType}</p>
+              
+              <div className="bg-white border rounded-lg p-4">
+                <h5 className="font-medium mb-2">Documents</h5>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    <span>Import Return Form {selectedReturn.period}.pdf</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <FileText className="h-4 w-4 text-blue-600" />
+                    <span>Tax Receipt {selectedReturn.id}.pdf</span>
+                  </div>
+                  {selectedReturn.status === "Approved" && (
+                    <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                      <FileText className="h-4 w-4 text-green-600" />
+                      <span>Approval Certificate.pdf</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="space-y-3">
-                <div>
-                  <span className="text-gray-600">Source Country:</span>
-                  <p className="font-medium">{selectedReturn.country}</p>
+              
+              {selectedReturn.status === "Under Review" && (
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-yellow-800">Under Review</p>
+                      <p className="text-sm text-yellow-700">
+                        This return is currently being reviewed by KSB officials. 
+                        You will be notified once the review is complete.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-gray-600">Customs Value:</span>
-                  <p className="font-medium">{selectedReturn.value}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Taxes Paid:</span>
-                  <p className="font-medium">{selectedReturn.taxesPaid}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Status:</span>
-                  <Badge className={getStatusColor(selectedReturn.status)}>
-                    {selectedReturn.status}
-                  </Badge>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
-      )}
-    </div>
-  )
+      )
+    }
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Submitted Returns</h3>
+          <Button
+            onClick={() => setActiveTab('new')}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Return
+          </Button>
+        </div>
+        
+        <div className="space-y-3">
+          {extendedReturnsData.map((returnItem) => (
+            <div 
+              key={returnItem.id} 
+              className="p-4 border rounded-lg space-y-3 hover:bg-gray-50 cursor-pointer"
+              onClick={() => setSelectedReturn(returnItem)}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-semibold">{returnItem.type}</h4>
+                  <p className="text-sm text-gray-600">ID: {returnItem.id} • Period: {returnItem.period}</p>
+                </div>
+                <Badge className={getStatusColor(returnItem.status)}>
+                  {returnItem.status}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Submit Date:</span>
+                  <p className="font-medium">{returnItem.date}</p>
+                </div>
+                <div>
+                  <span className="text-gray-600">Value:</span>
+                  <p className="font-medium">{returnItem.value}</p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button variant="ghost" size="sm" className="text-blue-600">
+                  View Details
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   const renderNewReturnForm = () => (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Receipt className="h-5 w-5" />
+        <AiOutlineContainer className="h-5 w-5" />
         <h3 className="text-lg font-semibold">Submit New Return</h3>
       </div>
 
@@ -362,24 +409,24 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="customsValue">Customs Value (USD)</Label>
+              <Label htmlFor="customsValue">Customs Value (Ksh.)</Label>
               <Input
                 id="customsValue"
                 type="number"
                 value={formData.customsValue}
                 onChange={(e) => handleInputChange('customsValue', e.target.value)}
-                placeholder="Enter customs value"
+                placeholder="Enter customs value in Ksh."
                 required
               />
             </div>
             <div>
-              <Label htmlFor="taxesPaid">Taxes Paid (USD)</Label>
+              <Label htmlFor="taxesPaid">Taxes Paid (Ksh.)</Label>
               <Input
                 id="taxesPaid"
                 type="number"
                 value={formData.taxesPaid}
                 onChange={(e) => handleInputChange('taxesPaid', e.target.value)}
-                placeholder="Enter taxes paid"
+                placeholder="Enter taxes paid in Ksh."
                 required
               />
             </div>
@@ -427,8 +474,8 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Receipt className="h-5 w-5" />
-            Import Returns Management
+            <AiOutlineContainer className="h-5 w-5" />
+            Returns
           </DialogTitle>
           <DialogDescription>
             Submit monthly import returns and track their status
@@ -467,7 +514,9 @@ export function ImporterReturnsModal({ open, onOpenChange }: ImporterReturnsModa
           </div>
 
           {/* Tab Content */}
-          {activeTab === 'submitted' ? renderSubmittedReturns() : renderNewReturnForm()}
+          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+            {activeTab === 'submitted' ? renderSubmittedReturns() : renderNewReturnForm()}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

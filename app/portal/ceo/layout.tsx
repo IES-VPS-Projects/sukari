@@ -19,7 +19,16 @@ export default function CEOLayoutWrapper({
     if (!isLoading && !user) {
       router.push("/login")
     } else if (!isLoading && user && user.userType !== "ceo") {
-      router.push("/portal/importer")
+      // Redirect to appropriate portal based on user type
+      if (user.userType === "importer") {
+        router.push("/portal/importer")
+      } else if (user.userType === "miller") {
+        router.push("/portal/miller")
+      } else if (user.userType === "field-coordinator") {
+        router.push("/portal/field-coordinator")
+      } else {
+        router.push("/portal")
+      }
     }
   }, [user, isLoading, router])
 

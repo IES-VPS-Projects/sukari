@@ -252,7 +252,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
       <CardContent className="p-4 pt-2">
         <div 
           className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover" 
-          style={{ maxHeight: '240px' }}
+          style={{ maxHeight: '200px' }}
         >
           {allAlertsForCard
             .filter((item: any) => {
@@ -282,7 +282,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                     item.priority === 'medium' || item.label?.toUpperCase() === 'MEDIUM' ? 'hover:bg-orange-50' :
                     item.priority === 'low' || item.label?.toUpperCase() === 'LOW' ? 'hover:bg-green-50' :
                     'hover:bg-gray-50'
-                  } hover:shadow-md transform hover:scale-[1.02]`}
+                  } hover:shadow-md hover:shadow-gray-300/50 transform hover:scale-[1.02]`}
                   onClick={() => {
                     if (setSelectedAlertForDetails) setSelectedAlertForDetails(item.id)
                     if (setViewAllAlertsOpen) setViewAllAlertsOpen(true)
