@@ -69,11 +69,12 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                 <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
                   <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
                     <div className="relative">
+                     
                       <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-green-300 transition-all border-2 border-gray-300">
                         <AvatarFallback className="bg-green-100 text-green-800">
                           {user?.name
                             ?.split(" ")
-                            .filter((part, index) => index === 1 || index === 2) // Get "Elvis" and "Kazungu"
+                            .filter((part, index) => index === 0 || index === 1) // Get "Elvis" and "Kazungu"
                             .map((n) => n[0])
                             .join("") || "U"}
                         </AvatarFallback>
