@@ -28,6 +28,7 @@ interface User {
     email?: string
   }
   token?: string
+  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller'
 }
 
 interface AuthContextType {
@@ -39,7 +40,69 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-
+// Default credentials for demo
+const DEFAULT_CREDENTIALS = [
+  {
+    email: "executive@ksb.go.ke",
+    phone: "0700111123",
+    password: "KSB2024!",
+    user: {
+      id: "1",
+      email: "executive@ksb.go.ke",
+      name: "Gerald Bosire",
+      role: "Chief Executive",
+      userType: "ceo" as const,
+    },
+  },
+  {
+    email: "importer@ksb.go.ke",
+    phone: "0700222234",
+    password: "Import2024!",
+    user: {
+      id: "3",
+      email: "importer@ksb.go.ke",
+      name: "Bernard Kasavuli",
+      role: "Sugar Importer",
+      userType: "importer" as const,
+    },
+  },
+  {
+    email: "admin@ksb.go.ke", 
+    phone: "0712345678",
+    password: "Admin123!",
+    user: {
+      id: "2",
+      email: "admin@ksb.go.ke",
+      name: "John Doe",
+      role: "Administrator",
+      userType: "ceo" as const,
+    },
+  },
+  {
+    email: "fieldcoord@ksb.go.ke", 
+    phone: "0733444555",
+    password: "Field2024!",
+    user: {
+      id: "4",
+      email: "fieldcoord@ksb.go.ke",
+      name: "Bernice Kasavuli",
+      role: "Field Coordinator",
+      userType: "field-coordinator" as const,
+    },
+  },
+  {
+    email: "miller@ksb.go.ke", 
+    phone: "0700333456",
+    password: "Miller2024!",
+    user: {
+      id: "5",
+      email: "miller@ksb.go.ke",
+      name: "James Mwangi",
+      role: "Sugar Miller",
+      userType: "miller" as const,
+    },
+  },
+]
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)

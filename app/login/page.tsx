@@ -78,18 +78,66 @@ export default function LoginPage() {
     // Use the existing auth system
     const success = await login(formData.email, formData.pin)
     if (success) {
-      toast.success('Login successful!')
-      router.push("/portal/today")
+      // Redirect based on user type will be handled by the portal layout
+      router.push("/portal")
     } else {
       setError("Invalid credentials. Please check your email and PIN.")
     }
   }
 
-  const fillDemoCredentials = () => {
+  const fillCEOCredentials = () => {
     setFormData(prev => ({
       ...prev,
       email: "9davidmuia@gmail.com",
       pin: "1234"
+    }))
+  }
+
+  const fillImporterCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700222234",
+      password: "Import2024!"
+    }))
+  }
+
+  const fillFieldCoordinatorCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0733444555",
+      password: "Field2024!"
+    }))
+  }
+
+  const fillMillerCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700111123",
+      password: "KSB2024!"
+    }))
+  }
+
+  const fillImporterCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700222234",
+      password: "Import2024!"
+    }))
+  }
+
+  const fillFieldCoordinatorCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0733444555",
+      password: "Field2024!"
+    }))
+  }
+
+  const fillMillerCredentials = () => {
+    setFormData(prev => ({
+      ...prev,
+      identifier: "0700333456",
+      password: "Miller2024!"
     }))
   }
 
@@ -129,9 +177,9 @@ export default function LoginPage() {
       )}
 
       {/* Left Column - Branding */}
-      <div className="w-1/2 p-4 flex items-center justify-center">
+      <div className="w-full lg:w-1/2 p-4 flex items-center justify-center">
         <div
-          className="w-full h-full rounded-l-2xl rounded-tr-2xl rounded-br-2xl flex flex-col items-center justify-center p-12 relative overflow-hidden"
+          className="w-full h-64 lg:h-full rounded-l-2xl rounded-tr-2xl rounded-br-2xl flex flex-col items-center justify-center p-12 relative overflow-hidden"
           style={{
             backgroundImage: "url(/images/login_image.png)",
             backgroundSize: "cover",
@@ -144,15 +192,15 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column - Sign In Form */}
-      <div className="w-1/2 bg-white flex items-center justify-center p-12 pl-0">
+      <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 lg:p-12 lg:pl-0">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
             {/* Logo above Sign In */}
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center space-x-4">
-                <Image src="/images/ISEAGRILOGO.png" alt="ISE Agriculture" width={100} height={100} className="" />
-                <div className="h-12 w-px bg-gray-300"></div>
-                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={140} height={90} className="" />
+            <div className="text-center mb-6 lg:mb-8">
+              <div className="flex items-center justify-center space-x-2 lg:space-x-4">
+                <Image src="/images/ISE_Agri_Logo.png" alt="ISE Agriculture" width={80} height={60} className="lg:w-[100px] lg:h-[60px]" />
+                <div className="h-8 lg:h-12 w-px bg-gray-300"></div>
+                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={110} height={60} className="lg:w-[140px] lg:h-[60px]" />
               </div>
             </div>
 
@@ -250,15 +298,42 @@ export default function LoginPage() {
                 {isLoading ? "Signing In..." : "Sign In"}
               </button>
 
-              {/* Demo Credentials Button */}
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={fillDemoCredentials}
-                  className="text-sm text-green-600 hover:text-green-700 font-medium"
-                >
-                  Use Demo Credentials
-                </button>
+              {/* Demo Credentials Buttons */}
+              <div className="flex flex-col gap-3 justify-center">
+                {/* First Row */}
+                <div className="flex gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={fillCEOCredentials}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
+                  >
+                    Demo CEO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fillImporterCredentials}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium border border-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
+                  >
+                    Demo Importer
+                  </button>
+                </div>
+                {/* Second Row */}
+                <div className="flex gap-3 justify-center">
+                  <button
+                    type="button"
+                    onClick={fillFieldCoordinatorCredentials}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium border border-orange-600 px-4 py-2 rounded-lg hover:bg-orange-50"
+                  >
+                    Demo FEO
+                  </button>
+                  <button
+                    type="button"
+                    onClick={fillMillerCredentials}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium border border-green-600 px-4 py-2 rounded-lg hover:bg-green-50"
+                  >
+                    Demo Miller
+                  </button>
+                </div>
               </div>
             </form>
 

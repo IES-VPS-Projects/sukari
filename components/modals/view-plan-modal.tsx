@@ -8,90 +8,938 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Target, TrendingUp, Calendar, Users, CheckCircle, AlertTriangle, Clock, Award } from "lucide-react"
+import { Target, TrendingUp, Calendar, Users, CheckCircle, AlertTriangle, Clock, Award, Factory, Shield, Leaf, ChevronDown, ChevronRight } from "lucide-react"
 
 interface ViewPlanModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const strategicObjectives = [
+interface ViewPlanModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+const kraData = [
   {
     id: 1,
-    title: "Increase Sugar Production",
-    description: "Boost national sugar production by 25% through mill modernization and farmer support",
-    progress: 78,
+    title: "Production & Productivity",
+    description: "Enhance sugarcane production efficiency and productivity through improved practices, cost reduction, variety adoption, and quality control systems",
+    icon: Factory,
+    color: "green",
+    progress: 58,
     status: "on_track",
-    targetDate: "Dec 2024",
-    kpis: [
-      { name: "Production Volume", current: "18,247 MT", target: "22,000 MT", progress: 83 },
-      { name: "Mill Efficiency", current: "87%", target: "95%", progress: 92 },
-      { name: "Farmer Participation", current: "2,847", target: "3,200", progress: 89 },
-    ],
-    initiatives: [
-      { name: "Mill Equipment Upgrade", status: "completed", completion: 100 },
-      { name: "Farmer Training Program", status: "in_progress", completion: 75 },
-      { name: "Quality Control Enhancement", status: "in_progress", completion: 60 },
-    ],
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Improve average sugarcane yield from 61 TCH to 80 TCH",
+        description: "Enhance sugarcane productivity through modern agronomic practices, farmer training, and improved inputs",
+        progress: 68,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 1,
+            name: "Promote modern agronomic practices",
+            description: "Implementation of best practices for sugarcane cultivation",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "Average cane yield (TCH)",
+              baseline: "61 TCH",
+              target: "80 TCH",
+              current: "69 TCH",
+              progress: 42,
+              yearlyTargets: { Y1: "65", Y2: "69", Y3: "73", Y4: "77", Y5: "80" }
+            }
+          },
+          {
+            id: 2,
+            name: "Train farmers on soil health & fertility",
+            description: "Comprehensive training programs on soil management and fertility improvement",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "% farmers trained",
+              baseline: "0%",
+              target: "80%",
+              current: "40%",
+              progress: 50,
+              yearlyTargets: { Y1: "20%", Y2: "40%", Y3: "60%", Y4: "70%", Y5: "80%" }
+            }
+          },
+          {
+            id: 3,
+            name: "Distribute improved farm inputs",
+            description: "Provision of quality inputs and soil testing services to farmers",
+            status: "in_progress",
+            completion: 43,
+            kpi: {
+              name: "% farms with soil test reports",
+              baseline: "0%",
+              target: "70%",
+              current: "30%",
+              progress: 43,
+              yearlyTargets: { Y1: "10%", Y2: "30%", Y3: "50%", Y4: "60%", Y5: "70%" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Reduce Cost of Production per Hectare by 20%",
+        description: "Optimize production costs through bulk procurement, mechanization, and irrigation improvements",
+        progress: 50,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 4,
+            name: "Bulk procurement of inputs",
+            description: "Collective purchasing strategies to reduce input costs for farmers",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "Average cost per hectare (% reduction)",
+              baseline: "0%",
+              target: "20% reduction",
+              current: "10%",
+              progress: 50,
+              yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "18%", Y5: "20%" }
+            }
+          },
+          {
+            id: 5,
+            name: "Introduce mechanized planting & harvesting",
+            description: "Modernization of farming equipment and mechanized practices",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "% farms mechanized",
+              baseline: "TBD",
+              target: "+25pp",
+              current: "+10pp",
+              progress: 40,
+              yearlyTargets: { Y1: "+5pp", Y2: "+10pp", Y3: "+15pp", Y4: "+20pp", Y5: "+25pp" }
+            }
+          },
+          {
+            id: 6,
+            name: "Optimize irrigation systems",
+            description: "Efficient water management and irrigation infrastructure development",
+            status: "in_progress",
+            completion: 33,
+            kpi: {
+              name: "% irrigated farms",
+              baseline: "TBD",
+              target: "30%",
+              current: "10%",
+              progress: 33,
+              yearlyTargets: { Y1: "5%", Y2: "10%", Y3: "15%", Y4: "20%", Y5: "30%" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Increase adoption of improved sugarcane varieties from 10% to 25%",
+        description: "Promote adoption of high-yielding and disease-resistant sugarcane varieties",
+        progress: 33,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 7,
+            name: "Distribute certified improved seed cane",
+            description: "Provision of quality planting materials to farmers",
+            status: "in_progress",
+            completion: 33,
+            kpi: {
+              name: "% area under improved varieties",
+              baseline: "10%",
+              target: "25%",
+              current: "15%",
+              progress: 33,
+              yearlyTargets: { Y1: "12%", Y2: "15%", Y3: "18%", Y4: "21%", Y5: "25%" }
+            }
+          },
+          {
+            id: 8,
+            name: "Partner with research institutions",
+            description: "Collaboration for variety development and testing",
+            status: "in_progress",
+            completion: 67,
+            kpi: {
+              name: "No. of new varieties introduced",
+              baseline: "0",
+              target: "3",
+              current: "2",
+              progress: 67,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "0", Y5: "0" }
+            }
+          },
+          {
+            id: 9,
+            name: "Conduct field demonstrations",
+            description: "Demonstration plots to showcase improved varieties",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of demo plots",
+              baseline: "0",
+              target: "20",
+              current: "8",
+              progress: 40,
+              yearlyTargets: { Y1: "4", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Operationalize Cane Testing Units (CTUs) by Dec 2027",
+        description: "Establish and operationalize cane testing facilities for improved quality control",
+        progress: 60,
+        status: "on_track",
+        targetDate: "Dec 2027 (Y3)",
+        activities: [
+          {
+            id: 10,
+            name: "Procure and install CTU equipment",
+            description: "Acquisition and installation of specialized testing equipment",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "% CTUs operational",
+              baseline: "0%",
+              target: "100%",
+              current: "60%",
+              progress: 60,
+              yearlyTargets: { Y1: "20%", Y2: "60%", Y3: "100%", Y4: "100%", Y5: "100%" }
+            }
+          },
+          {
+            id: 11,
+            name: "Train CTU staff",
+            description: "Capacity building for testing unit personnel",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "No. staff trained",
+              baseline: "0",
+              target: "50",
+              current: "35",
+              progress: 70,
+              yearlyTargets: { Y1: "15", Y2: "20", Y3: "15", Y4: "0", Y5: "0" }
+            }
+          },
+          {
+            id: 12,
+            name: "Develop CTU SOPs",
+            description: "Standard operating procedures for quality testing operations",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Approved SOPs (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "No", Y2: "Yes", Y3: "Yes", Y4: "Yes", Y5: "Yes" }
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     id: 2,
-    title: "Enhance Regulatory Compliance",
-    description: "Achieve 95% compliance rate across all registered mills and stakeholders",
-    progress: 65,
-    status: "at_risk",
-    targetDate: "Mar 2025",
-    kpis: [
-      { name: "Compliance Rate", current: "87%", target: "95%", progress: 92 },
-      { name: "Violation Reduction", current: "23%", target: "5%", progress: 45 },
-      { name: "License Renewals", current: "89%", target: "98%", progress: 91 },
-    ],
-    initiatives: [
-      { name: "Digital Compliance System", status: "in_progress", completion: 80 },
-      { name: "Stakeholder Training", status: "in_progress", completion: 45 },
-      { name: "Policy Framework Update", status: "planning", completion: 20 },
-    ],
+    title: "Effective Regulation",
+    description: "Create enabling legal frameworks, establish robust compliance systems, and strengthen quality assurance across the sugar industry",
+    icon: Shield,
+    color: "green",
+    progress: 72,
+    status: "on_track",
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Create an enabling legal & regulatory framework",
+        description: "Review and update regulations, digitize licensing systems, and conduct stakeholder consultations",
+        progress: 75,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 1,
+            name: "Review & update sugar regulations",
+            description: "Comprehensive review of pricing, quality, licensing, and traceability regulations",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "No. of regulations reviewed & updated",
+              baseline: "0",
+              target: "8",
+              current: "4",
+              progress: 50,
+              yearlyTargets: { Y1: "2", Y2: "2", Y3: "2", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 2,
+            name: "Draft & submit amendments to Sugar Act 2024",
+            description: "Preparation and submission of legislative amendments",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Amendment proposals submitted (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "Yes", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 3,
+            name: "Conduct stakeholder consultations on reforms",
+            description: "Engagement sessions with industry stakeholders on regulatory reforms",
+            status: "in_progress",
+            completion: 48,
+            kpi: {
+              name: "No. of consultations held",
+              baseline: "0",
+              target: "50",
+              current: "24",
+              progress: 48,
+              yearlyTargets: { Y1: "12", Y2: "12", Y3: "10", Y4: "8", Y5: "8" }
+            }
+          },
+          {
+            id: 4,
+            name: "Digitize licensing & regulatory framework",
+            description: "Implementation of digital systems for licensing and regulatory processes",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "Digital licensing system operational (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Development",
+              progress: 60,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "Yes", Y4: "", Y5: "" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Establish robust compliance & enforcement",
+        description: "Implement comprehensive compliance monitoring and enforcement mechanisms",
+        progress: 70,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 5,
+            name: "Conduct annual compliance inspections",
+            description: "Regular inspections of all licensed entities to ensure compliance",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "% coverage of licensed entities",
+              baseline: "0%",
+              target: "100%",
+              current: "75%",
+              progress: 75,
+              yearlyTargets: { Y1: "60%", Y2: "75%", Y3: "85%", Y4: "95%", Y5: "100%" }
+            }
+          },
+          {
+            id: 6,
+            name: "Enforce corrective action follow-up",
+            description: "Monitor and ensure timely resolution of compliance issues",
+            status: "in_progress",
+            completion: 70,
+            kpi: {
+              name: "% of non-compliance resolved within 90 days",
+              baseline: "0%",
+              target: "90%",
+              current: "70%",
+              progress: 78,
+              yearlyTargets: { Y1: "60%", Y2: "70%", Y3: "80%", Y4: "85%", Y5: "90%" }
+            }
+          },
+          {
+            id: 7,
+            name: "Reduce licensing turnaround time",
+            description: "Streamline processes to reduce license approval timeframes",
+            status: "in_progress",
+            completion: 62,
+            kpi: {
+              name: "Avg. license approval (days)",
+              baseline: "30",
+              target: "≤14",
+              current: "25",
+              progress: 31,
+              yearlyTargets: { Y1: "30", Y2: "25", Y3: "20", Y4: "16", Y5: "14" }
+            }
+          },
+          {
+            id: 8,
+            name: "Market surveillance inspections",
+            description: "Regular market surveillance to ensure product quality and compliance",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of operations per year",
+              baseline: "0",
+              target: "60",
+              current: "22",
+              progress: 37,
+              yearlyTargets: { Y1: "10", Y2: "12", Y3: "12", Y4: "12", Y5: "14" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Strengthen sugar quality assurance",
+        description: "Implement comprehensive quality testing and traceability systems",
+        progress: 68,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 9,
+            name: "Conduct random market product testing",
+            description: "Regular testing of sugar products in the market for quality compliance",
+            status: "in_progress",
+            completion: 60,
+            kpi: {
+              name: "% of samples passing tests",
+              baseline: "88%",
+              target: "≥95%",
+              current: "90%",
+              progress: 29,
+              yearlyTargets: { Y1: "88%", Y2: "90%", Y3: "92%", Y4: "94%", Y5: "95%" }
+            }
+          },
+          {
+            id: 10,
+            name: "Roll out industry traceability system",
+            description: "Implementation of comprehensive traceability system across the industry",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "Traceability system functional (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Testing",
+              progress: 75,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "Yes", Y4: "Yes", Y5: "Yes" }
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     id: 3,
-    title: "Digital Transformation",
-    description: "Implement comprehensive digital platform for sector management and stakeholder engagement",
-    progress: 85,
+    title: "Industry Sustainability",
+    description: "Mainstream ESG compliance, integrate gender & youth participation, strengthen labor rights, and implement sustainable practices with climate resilience",
+    icon: Leaf,
+    color: "emerald",
+    progress: 45,
     status: "on_track",
-    targetDate: "Jun 2024",
-    kpis: [
-      { name: "Platform Adoption", current: "78%", target: "90%", progress: 87 },
-      { name: "Digital Processes", current: "12/15", target: "15/15", progress: 80 },
-      { name: "User Satisfaction", current: "4.2/5", target: "4.5/5", progress: 93 },
-    ],
-    initiatives: [
-      { name: "Executive Portal", status: "completed", completion: 100 },
-      { name: "Mobile Applications", status: "in_progress", completion: 70 },
-      { name: "AI Integration", status: "in_progress", completion: 85 },
-    ],
-  },
-  {
-    id: 4,
-    title: "Stakeholder Engagement",
-    description: "Strengthen relationships with farmers, mills, and other sector stakeholders",
-    progress: 72,
-    status: "on_track",
-    targetDate: "Ongoing",
-    kpis: [
-      { name: "Satisfaction Score", current: "4.2/5", target: "4.5/5", progress: 93 },
-      { name: "Engagement Rate", current: "78%", target: "85%", progress: 92 },
-      { name: "Feedback Response", current: "89%", target: "95%", progress: 94 },
-    ],
-    initiatives: [
-      { name: "Farmer Support Program", status: "in_progress", completion: 85 },
-      { name: "Mill Partnership Initiative", status: "in_progress", completion: 65 },
-      { name: "Community Outreach", status: "in_progress", completion: 70 },
-    ],
-  },
+    targetDate: "End of plan (Y5 - 2029)",
+    objectives: [
+      {
+        id: 1,
+        title: "Mainstream ESG compliance & sustainability",
+        description: "Develop and implement comprehensive ESG frameworks and auditing systems",
+        progress: 60,
+        status: "on_track",
+        targetDate: "Y2 (2025)",
+        activities: [
+          {
+            id: 1,
+            name: "Develop ESG compliance framework",
+            description: "Creation of comprehensive ESG scorecard and compliance framework",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "ESG scorecard developed (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "Yes",
+              progress: 100,
+              yearlyTargets: { Y1: "Yes", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 2,
+            name: "Conduct ESG audits",
+            description: "Regular auditing of ESG compliance across industry entities",
+            status: "in_progress",
+            completion: 25,
+            kpi: {
+              name: "No. of annual ESG audit reports",
+              baseline: "0",
+              target: "4",
+              current: "1",
+              progress: 25,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 3,
+            name: "Conduct ESG sensitization",
+            description: "Awareness and training programs on ESG compliance for stakeholders",
+            status: "in_progress",
+            completion: 56,
+            kpi: {
+              name: "No. of sensitization forums",
+              baseline: "0",
+              target: "36",
+              current: "20",
+              progress: 56,
+              yearlyTargets: { Y1: "20", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Integrate gender & youth in farming & agro-processing",
+        description: "Promote inclusive participation of women and youth in the sugar value chain",
+        progress: 40,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 4,
+            name: "Conduct training programs for youth & women",
+            description: "Capacity building programs targeting youth and women in sugar farming and processing",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of capacity-building programs",
+              baseline: "0",
+              target: "25",
+              current: "10",
+              progress: 40,
+              yearlyTargets: { Y1: "5", Y2: "5", Y3: "5", Y4: "5", Y5: "5" }
+            }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "Strengthen labour rights, OHS & community engagement",
+        description: "Implement industry codes of conduct and strengthen community engagement",
+        progress: 50,
+        status: "on_track",
+        targetDate: "Y3 (2027)",
+        activities: [
+          {
+            id: 5,
+            name: "Adopt industry code of conduct",
+            description: "Development and adoption of comprehensive industry code of conduct",
+            status: "in_progress",
+            completion: 75,
+            kpi: {
+              name: "Code of conduct adopted (Yes/No)",
+              baseline: "No",
+              target: "Yes",
+              current: "In Review",
+              progress: 75,
+              yearlyTargets: { Y1: "-", Y2: "Yes", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 6,
+            name: "Conduct code compliance audits",
+            description: "Regular auditing of code of conduct compliance",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of annual reports",
+              baseline: "0",
+              target: "4",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 7,
+            name: "Roll out anti-child labour campaigns",
+            description: "Awareness campaigns against child labor in sugar mill zones",
+            status: "in_progress",
+            completion: 77,
+            kpi: {
+              name: "No. of awareness campaigns in mill zones",
+              baseline: "0",
+              target: "26",
+              current: "20",
+              progress: 77,
+              yearlyTargets: { Y1: "10", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "Integrate sustainable practices & climate resilience",
+        description: "Implement sustainability projects and establish climate change adaptation measures",
+        progress: 30,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 8,
+            name: "Implement sustainability projects",
+            description: "Implementation of targeted sustainability initiatives across the industry",
+            status: "in_progress",
+            completion: 20,
+            kpi: {
+              name: "No. of projects implemented",
+              baseline: "0",
+              target: "5",
+              current: "1",
+              progress: 20,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 9,
+            name: "Conduct sustainability campaigns",
+            description: "Awareness campaigns on sustainable practices across the industry",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of awareness campaigns",
+              baseline: "0",
+              target: "100",
+              current: "40",
+              progress: 40,
+              yearlyTargets: { Y1: "20", Y2: "20", Y3: "20", Y4: "20", Y5: "20" }
+            }
+          },
+          {
+            id: 10,
+            name: "Establish Climate Change Hub",
+            description: "Creation of dedicated climate change coordination and response hub",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "Climate hub operational (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "NO",
+              progress: 0,
+              yearlyTargets: { Y1: "", Y2: "", Y3: "", Y4: "", Y5: "" }
+            }
+          },
+          {
+            id: 11,
+            name: "Publish climate advisories",
+            description: "Regular publication of climate-related advisories for the industry",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of reports published",
+              baseline: "0",
+              target: "4",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "Sector-wide planning & value-chain financing",
+        description: "Develop comprehensive industry planning and financing mechanisms",
+        progress: 35,
+        status: "on_track",
+        targetDate: "Y5 (2029)",
+        activities: [
+          {
+            id: 12,
+            name: "Develop industry strategic plan",
+            description: "Creation of comprehensive industry strategic development plan",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Strategic plan developed (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "YES",
+              progress: 100,
+              yearlyTargets: { Y1: "YES", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 13,
+            name: "Conduct performance reviews",
+            description: "Regular biannual performance reviews of industry progress",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of biannual reviews",
+              baseline: "0",
+              target: "8",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "2", Y3: "2", Y4: "2", Y5: "2" }
+            }
+          },
+          {
+            id: 14,
+            name: "Establish Stabilization Fund",
+            description: "Creation and capitalization of industry stabilization fund",
+            status: "in_progress",
+            completion: 50,
+            kpi: {
+              name: "Fund capitalization (KES mn)",
+              baseline: "0",
+              target: "2000",
+              current: "1000",
+              progress: 50,
+              yearlyTargets: { Y1: "500", Y2: "500", Y3: "500", Y4: "500", Y5: "500" }
+            }
+          },
+          {
+            id: 15,
+            name: "Enroll smallholders in scheme",
+            description: "Registration of smallholder farmers in stabilization scheme",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "% enrolled",
+              baseline: "0%",
+              target: "100%",
+              current: "0%",
+              progress: 0,
+              yearlyTargets: { Y1: "0%", Y2: "20%", Y3: "40%", Y4: "40%", Y5: "100%" }
+            }
+          },
+          {
+            id: 16,
+            name: "Develop bonus payment system",
+            description: "Creation of performance-based bonus payment framework",
+            status: "completed",
+            completion: 100,
+            kpi: {
+              name: "Approved framework (Yes/No)",
+              baseline: "NO",
+              target: "YES",
+              current: "YES",
+              progress: 100,
+              yearlyTargets: { Y1: "YES", Y2: "-", Y3: "-", Y4: "-", Y5: "-" }
+            }
+          },
+          {
+            id: 17,
+            name: "Conduct lease compliance audits",
+            description: "Regular auditing of land lease compliance",
+            status: "in_progress",
+            completion: 20,
+            kpi: {
+              name: "No. of annual audits",
+              baseline: "0",
+              target: "5",
+              current: "1",
+              progress: 20,
+              yearlyTargets: { Y1: "1", Y2: "1", Y3: "1", Y4: "1", Y5: "1" }
+            }
+          },
+          {
+            id: 18,
+            name: "Hold financial literacy forums",
+            description: "Financial education programs for industry stakeholders",
+            status: "in_progress",
+            completion: 40,
+            kpi: {
+              name: "No. of forums",
+              baseline: "0",
+              target: "20",
+              current: "8",
+              progress: 40,
+              yearlyTargets: { Y1: "4", Y2: "4", Y3: "4", Y4: "4", Y5: "4" }
+            }
+          },
+          {
+            id: 19,
+            name: "Roll out crop insurance",
+            description: "Development and implementation of crop insurance products",
+            status: "planning",
+            completion: 0,
+            kpi: {
+              name: "No. of insurance products",
+              baseline: "0",
+              target: "3",
+              current: "0",
+              progress: 0,
+              yearlyTargets: { Y1: "-", Y2: "1", Y3: "1", Y4: "1", Y5: "-" }
+            }
+          }
+        ]
+      }
+    ]
+  }
 ]
 
+// Helper functions to calculate dynamic percentages
+const calculateObjectiveProgress = (objective: any): number => {
+  if (!objective.activities || objective.activities.length === 0) return 0
+  const totalCompletion = objective.activities.reduce((sum: number, activity: any) => sum + activity.completion, 0)
+  return Math.round(totalCompletion / objective.activities.length)
+}
+
+const calculateKraProgress = (kra: any): number => {
+  if (!kra.objectives || kra.objectives.length === 0) return 0
+  const totalProgress = kra.objectives.reduce((sum: number, objective: any) => {
+    return sum + calculateObjectiveProgress(objective)
+  }, 0)
+  return Math.round(totalProgress / kra.objectives.length)
+}
+
+const getUpdatedKraData = () => {
+  return kraData.map(kra => {
+    const updatedObjectives = kra.objectives.map(objective => {
+      // Update activities to sync KPI progress with activity completion
+      const updatedActivities = objective.activities.map(activity => ({
+        ...activity,
+        kpi: {
+          ...activity.kpi,
+          progress: activity.completion // Sync KPI progress with activity completion
+        }
+      }))
+      
+      return {
+        ...objective,
+        activities: updatedActivities,
+        progress: calculateObjectiveProgress({ ...objective, activities: updatedActivities })
+      }
+    })
+    
+    return {
+      ...kra,
+      objectives: updatedObjectives,
+      progress: calculateKraProgress({ ...kra, objectives: updatedObjectives })
+    }
+  })
+}
+
 export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
-  const [selectedObjective, setSelectedObjective] = useState(strategicObjectives[0])
+  // Use dynamically calculated data
+  const dynamicKraData = getUpdatedKraData()
+  
+  const [selectedKra, setSelectedKra] = useState(() => {
+    if (dynamicKraData && dynamicKraData.length > 0) {
+      return dynamicKraData[0]
+    }
+    return null
+  })
+  const [expandedKra, setExpandedKra] = useState(() => {
+    if (dynamicKraData && dynamicKraData.length > 0) {
+      return dynamicKraData[0].id
+    }
+    return null
+  })
+  const [selectedObjective, setSelectedObjective] = useState(() => {
+    if (dynamicKraData?.[0]?.objectives && dynamicKraData[0].objectives.length > 0) {
+      return dynamicKraData[0].objectives[0]
+    }
+    return null
+  })
+  const [selectedActivity, setSelectedActivity] = useState<any>(null)
+  const [expandedTimelineYears, setExpandedTimelineYears] = useState<string[]>(['Y1']) // Track expanded years in timeline
+
+  // Toggle year expansion in timeline
+  const toggleTimelineYear = (year: string) => {
+    setExpandedTimelineYears(prev => 
+      prev.includes(year) 
+        ? prev.filter(y => y !== year)
+        : [...prev, year]
+    )
+  }
+
+  // Group activities by years based on their completion and timeline
+  const getActivitiesByYear = () => {
+    if (!selectedObjective?.activities) return {}
+    
+    const years = ['Y1', 'Y2', 'Y3', 'Y4', 'Y5']
+    const activitiesByYear: { [key: string]: any[] } = {}
+    
+    years.forEach(year => {
+      activitiesByYear[year] = []
+    })
+    
+    selectedObjective.activities.forEach(activity => {
+      // Determine which year this activity belongs to based on completion status
+      if (activity.completion >= 80) {
+        activitiesByYear['Y1'].push({ ...activity, achievedInYear: 'Y1' })
+      } else if (activity.completion >= 40) {
+        activitiesByYear['Y2'].push({ ...activity, achievedInYear: 'Y2' })
+      } else {
+        // Future activities go to Y3-Y5 based on priority or randomly distribute
+        const futureYears = ['Y3', 'Y4', 'Y5']
+        const randomYear = futureYears[Math.floor(Math.random() * futureYears.length)]
+        activitiesByYear[randomYear].push({ ...activity, achievedInYear: randomYear })
+      }
+    })
+    
+    return activitiesByYear
+  }
+
+  // Update selected objective when KRA changes
+  const handleKraChange = (kra: any) => {
+    setSelectedKra(kra)
+    setExpandedKra(kra.id)
+    if (kra?.objectives && kra.objectives.length > 0) {
+      setSelectedObjective(kra.objectives[0])
+    } else {
+      setSelectedObjective(null)
+    }
+  }
+
+  // Toggle KRA expansion
+  const toggleKraExpansion = (kraId: number) => {
+    if (expandedKra === kraId) {
+      setExpandedKra(null)
+    } else {
+      const kra = dynamicKraData.find(k => k.id === kraId)
+      if (kra) {
+        setExpandedKra(kraId)
+        setSelectedKra(kra)
+        if (kra.objectives && kra.objectives.length > 0) {
+          setSelectedObjective(kra.objectives[0])
+        }
+      }
+    }
+  }
+
+  // Early return if no KRA or objective is selected
+  if (!selectedKra || !selectedObjective) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Strategic Plan Not Available</DialogTitle>
+            <DialogDescription>
+              Unable to load strategic plan data. Please try again later.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -136,55 +984,136 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
     }
   }
 
+  const getKraColorClasses = (color: string) => {
+    switch (color) {
+      case "green":
+        return {
+          bg: "bg-green-50",
+          border: "border-green-200",
+          text: "text-green-800",
+          icon: "text-green-600"
+        }
+      case "blue":
+        return {
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          text: "text-blue-800",
+          icon: "text-blue-600"
+        }
+      case "emerald":
+        return {
+          bg: "bg-emerald-50",
+          border: "border-emerald-200",
+          text: "text-emerald-800",
+          icon: "text-emerald-600"
+        }
+      default:
+        return {
+          bg: "bg-gray-50",
+          border: "border-gray-200",
+          text: "text-gray-800",
+          icon: "text-gray-600"
+        }
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-green-600" />
-            Strategic Plan 2024-2025
+            <selectedKra.icon className={`h-5 w-5 ${getKraColorClasses(selectedKra.color).icon}`} />
+            KRA {selectedKra.id}: {selectedKra.title}
           </DialogTitle>
-          <DialogDescription>Kenya Sugar Board Strategic Objectives and Performance Indicators</DialogDescription>
         </DialogHeader>
 
-        <div className="flex h-[70vh] gap-4">
-          {/* Objectives List */}
+        <div className="flex h-[75vh] gap-4">
+          {/* Collapsible KRA Sidebar & Objectives List */}
           <div className="w-1/3 border-r pr-4">
-            <h3 className="font-medium mb-4">Strategic Objectives</h3>
+            <h3 className="font-medium mb-4">Strategic Plan Overview</h3>
             <ScrollArea className="h-full">
-              <div className="space-y-3">
-                {strategicObjectives.map((objective) => (
-                  <Card
-                    key={objective.id}
-                    className={`cursor-pointer transition-colors ${
-                      selectedObjective.id === objective.id ? "border-green-200 bg-green-50" : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => setSelectedObjective(objective)}
-                  >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-sm">{objective.title}</CardTitle>
-                        <Badge className={`text-xs ${getStatusColor(objective.status)}`}>
-                          {getStatusIcon(objective.status)}
-                          <span className="ml-1">{objective.status.replace("_", " ")}</span>
-                        </Badge>
-                      </div>
-                      <CardDescription className="text-xs">{objective.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <span>Progress</span>
-                          <span>{objective.progress}%</span>
+              <div className="space-y-2">
+                {dynamicKraData.map((kra) => {
+                  const colors = getKraColorClasses(kra.color)
+                  const IconComponent = kra.icon
+                  const isExpanded = expandedKra === kra.id
+                  const isSelected = selectedKra?.id === kra.id
+                  
+                  return (
+                    <div key={kra.id} className="space-y-2">
+                      {/* KRA Header - Collapsible */}
+                      <Card
+                        className={`cursor-pointer transition-all duration-200 ${
+                          isSelected 
+                            ? `${colors.border} ${colors.bg} shadow-md` 
+                            : "hover:bg-gray-50 hover:shadow-sm"
+                        }`}
+                        onClick={() => toggleKraExpansion(kra.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center">
+                              {isExpanded ? (
+                                <ChevronDown className="h-4 w-4 text-gray-500 transition-transform" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-gray-500 transition-transform" />
+                              )}
+                            </div>
+                            <IconComponent className={`h-5 w-5 ${colors.icon}`} />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-sm font-semibold">KRA {kra.id}: {kra.title}</h4>
+                              </div>
+                              <div className="mt-2">
+                                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                  <span>Progress</span>
+                                  <span>{kra.progress}%</span>
+                                </div>
+                                <Progress value={kra.progress} className="h-1.5" />
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Strategic Objectives - Collapsible Content */}
+                      {isExpanded && (
+                        <div className="ml-6 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                          {kra.objectives.map((objective: any) => (
+                            <Card
+                              key={objective.id}
+                              className={`cursor-pointer transition-all duration-150 ${
+                                selectedObjective?.id === objective.id 
+                                  ? `${colors.border} ${colors.bg} shadow-sm` 
+                                  : "hover:bg-gray-50 border-gray-200"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedObjective(objective)
+                                setSelectedKra(kra)
+                              }}
+                            >
+                              <CardContent className="p-3">
+                                <div className="space-y-2">
+                                  <div className="flex items-start justify-between">
+                                    <h5 className="text-xs font-medium leading-tight">{objective.title}</h5>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs">
+                                      <span className="text-gray-500">Progress</span>
+                                      <span className="font-medium">{objective.progress}%</span>
+                                    </div>
+                                    <Progress value={objective.progress} className="h-1.5" />
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
-                        <Progress value={objective.progress} className="h-2" />
-                        <div className="flex justify-between text-xs text-gray-500">
-                          <span>Target: {objective.targetDate}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </ScrollArea>
           </div>
@@ -195,70 +1124,176 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
               <div className="flex items-center justify-between mb-4">
                 <TabsList>
                   <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="activities">Activities</TabsTrigger>
                   <TabsTrigger value="kpis">KPIs</TabsTrigger>
-                  <TabsTrigger value="initiatives">Initiatives</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 </TabsList>
               </div>
 
-              <TabsContent value="overview" className="h-[calc(100%-4rem)]">
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>{selectedObjective.title}</CardTitle>
+              <TabsContent value="overview" className="h-[calc(100%-4rem)] overflow-hidden">
+                <Card className="h-full flex flex-col">
+                  <CardHeader className="flex-shrink-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <CardTitle>{selectedObjective.title}</CardTitle>
+                          <Badge className={getStatusColor(selectedObjective.status)}>
+                            {getStatusIcon(selectedObjective.status)}
+                            <span className="ml-1">{selectedObjective.status.replace("_", " ")}</span>
+                          </Badge>
+                        </div>
                         <CardDescription className="mt-2">{selectedObjective.description}</CardDescription>
                       </div>
-                      <Badge className={getStatusColor(selectedObjective.status)}>
-                        {getStatusIcon(selectedObjective.status)}
-                        <span className="ml-1">{selectedObjective.status.replace("_", " ")}</span>
-                      </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px]">
+                  <CardContent className="flex-1 overflow-hidden">
+                    <ScrollArea className="h-full">
                       <div className="space-y-6">
+                        {/* Year-on-Year and 5-Year Progress Summary */}
+                        <div className="p-4 bg-gray-50 rounded-lg border">
+                          <h4 className="font-medium text-gray-800 mb-3">Strategic Progress Overview</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="text-center p-2 bg-white rounded-lg border">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <Calendar className="h-4 w-4 text-gray-600" />
+                                <span className="text-sm font-medium text-gray-800">Year 2 (Current)</span>
+                              </div>
+                              <p className="text-2xl font-bold text-gray-800">
+                                {selectedObjective?.activities ? 
+                                  Math.round(selectedObjective.activities.reduce((acc, activity) => {
+                                    const currentVal = parseFloat(activity.kpi.current.replace(/[^\d.]/g, ''));
+                                    const yearTargetVal = parseFloat(activity.kpi.yearlyTargets.Y2.replace(/[^\d.]/g, ''));
+                                    return acc + Math.min(100, (currentVal / yearTargetVal) * 100);
+                                  }, 0) / selectedObjective.activities.length) : 0}%
+                              </p>
+                            </div>
+                            
+                            <div className="text-center p-2 bg-white rounded-lg border">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <TrendingUp className="h-4 w-4 text-gray-600" />
+                                <span className="text-sm font-medium text-gray-800">5-Year Plan</span>
+                              </div>
+                              <p className="text-2xl font-bold text-gray-800">
+                                {selectedObjective?.activities ? 
+                                  Math.round(selectedObjective.activities.reduce((acc, activity) => {
+                                    const currentVal = parseFloat(activity.kpi.current.replace(/[^\d.]/g, ''));
+                                    const baselineVal = parseFloat(activity.kpi.baseline.replace(/[^\d.]/g, ''));
+                                    const finalTargetVal = parseFloat(activity.kpi.target.replace(/[^\d.]/g, ''));
+                                    return acc + ((currentVal - baselineVal) / (finalTargetVal - baselineVal)) * 100;
+                                  }, 0) / selectedObjective.activities.length) : 0}%
+                              </p>
+                            </div>
+                            
+                            <div className="text-center p-2 bg-white rounded-lg border">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <Target className="h-4 w-4 text-gray-600" />
+                                <span className="text-sm font-medium text-gray-800">Completion Rate</span>
+                              </div>
+                              <p className="text-2xl font-bold text-gray-800">
+                                {selectedObjective?.activities ? 
+                                  `${selectedObjective.activities.filter(activity => {
+                                    const currentVal = parseFloat(activity.kpi.current.replace(/[^\d.]/g, ''));
+                                    const baselineVal = parseFloat(activity.kpi.baseline.replace(/[^\d.]/g, ''));
+                                    const finalTargetVal = parseFloat(activity.kpi.target.replace(/[^\d.]/g, ''));
+                                    const fiveYearProgress = ((currentVal - baselineVal) / (finalTargetVal - baselineVal)) * 100;
+                                    return fiveYearProgress >= 90;
+                                  }).length}/${selectedObjective.activities.length}` : '0/0'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
-                              <TrendingUp className="h-5 w-5 text-green-600" />
+                              <TrendingUp className="h-5 w-5 text-black" />
                               <span className="font-medium">Overall Progress</span>
                             </div>
-                            <p className="text-2xl font-bold text-green-600">{selectedObjective.progress}%</p>
+                            <p className={`text-2xl font-bold ${
+                              selectedObjective.progress >= 80 ? 'text-green-600' :
+                              selectedObjective.progress >= 51 ? 'text-amber-600' :
+                              'text-red-600'
+                            }`}>{selectedObjective.progress}%</p>
                             <Progress value={selectedObjective.progress} className="mt-2" />
                           </div>
-                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
-                              <Calendar className="h-5 w-5 text-blue-600" />
+                              <Calendar className="h-5 w-5 text-gray-600" />
                               <span className="font-medium">Target Date</span>
                             </div>
-                            <p className="text-lg font-bold text-blue-600">{selectedObjective.targetDate}</p>
+                            <p className="text-lg font-bold text-gray-800">{selectedObjective.targetDate}</p>
                           </div>
-                          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 mb-2">
-                              <Users className="h-5 w-5 text-purple-600" />
-                              <span className="font-medium">Initiatives</span>
+                              <Users className="h-5 w-5 text-gray-600" />
+                              <span className="font-medium">Activities</span>
                             </div>
-                            <p className="text-lg font-bold text-purple-600">{selectedObjective.initiatives.length}</p>
+                            <p className="text-lg font-bold text-gray-800">{selectedObjective?.activities?.length || 0}</p>
                           </div>
                         </div>
 
                         <div>
-                          <h4 className="font-medium mb-3">Key Performance Indicators</h4>
+                          <h4 className="font-medium mb-3">Key Performance Indicators Overview</h4>
                           <div className="space-y-3">
-                            {selectedObjective.kpis.map((kpi, index) => (
-                              <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                                <div className="flex justify-between items-center mb-2">
-                                  <span className="font-medium text-sm">{kpi.name}</span>
-                                  <Badge variant="outline">{kpi.progress}%</Badge>
+                            {selectedObjective?.activities?.map((activity, index) => {
+                              const kpi = activity.kpi;
+                              
+                              // Calculate Year 2 specific progress vs Y2 target
+                              const calculateCurrentYearProgress = (current: string, yearTarget: string) => {
+                                const currentVal = parseFloat(current.replace(/[^\d.]/g, ''));
+                                const yearTargetVal = parseFloat(yearTarget.replace(/[^\d.]/g, ''));
+                                return Math.min(100, Math.round((currentVal / yearTargetVal) * 100));
+                              };
+
+                              // Calculate 5-year overall progress
+                              const calculateFiveYearProgress = (current: string, baseline: string, finalTarget: string) => {
+                                const currentVal = parseFloat(current.replace(/[^\d.]/g, ''));
+                                const baselineVal = parseFloat(baseline.replace(/[^\d.]/g, ''));
+                                const finalTargetVal = parseFloat(finalTarget.replace(/[^\d.]/g, ''));
+                                return Math.round(((currentVal - baselineVal) / (finalTargetVal - baselineVal)) * 100);
+                              };
+
+                              const currentYearProgress = calculateCurrentYearProgress(kpi.current, kpi.yearlyTargets.Y2);
+                              const fiveYearProgress = calculateFiveYearProgress(kpi.current, kpi.baseline, kpi.target);
+
+                              return (
+                                <div key={index} className="p-4 bg-gray-50 rounded-lg border">
+                                  <div className="flex justify-between items-start mb-3">
+                                    <div className="flex-1">
+                                      <span className="font-medium text-sm">{kpi?.name || 'N/A'}</span>
+                                      <div className="text-xs text-gray-500 mt-1">Activity: {activity.name}</div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 gap-3 mb-3">
+                                    <div className="text-center p-3 rounded bg-white border">
+                                      <p className="text-xs text-gray-600">Year 2 Progress</p>
+                                      <p className={`text-lg font-bold ${
+                                        currentYearProgress >= 90 ? 'text-green-600' :
+                                        currentYearProgress >= 70 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>{currentYearProgress}%</p>
+                                      <p className="text-xs text-gray-500 mt-1">Current: {kpi?.current || 'N/A'}</p>
+                                      <div className="mt-2">
+                                        <Progress value={currentYearProgress} className="h-1" />
+                                      </div>
+                                    </div>
+                                    <div className="text-center p-3 rounded bg-white border">
+                                      <p className="text-xs text-gray-600">5-Year Progress</p>
+                                      <p className={`text-lg font-bold ${
+                                        fiveYearProgress >= 90 ? 'text-green-600' :
+                                        fiveYearProgress >= 70 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>{fiveYearProgress}%</p>
+                                      <p className="text-xs text-gray-500 mt-1">Target: {kpi?.target || 'N/A'}</p>
+                                      <div className="mt-2">
+                                        <Progress value={fiveYearProgress} className="h-1" />
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                                  <span>Current: {kpi.current}</span>
-                                  <span>Target: {kpi.target}</span>
-                                </div>
-                                <Progress value={kpi.progress} className="h-2" />
-                              </div>
-                            ))}
+                              );
+                            }) || <div className="text-sm text-gray-500">No activities available</div>}
                           </div>
                         </div>
 
@@ -268,21 +1303,31 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                             <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                               <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                               <div>
-                                <p className="text-sm font-medium">Milestone Achieved</p>
+                                <p className="text-sm font-medium">CTU SOPs Approved</p>
                                 <p className="text-xs text-gray-600">
-                                  Production targets exceeded by 8.2% this quarter
+                                  Standard Operating Procedures for Cane Testing Units have been developed and approved
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">2 days ago</p>
+                                <p className="text-xs text-gray-500 mt-1">Year 2 (2025)</p>
                               </div>
                             </div>
                             <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                               <TrendingUp className="h-5 w-5 text-blue-600 mt-0.5" />
                               <div>
-                                <p className="text-sm font-medium">Progress Update</p>
+                                <p className="text-sm font-medium">Yield Improvement Progress</p>
                                 <p className="text-xs text-gray-600">
-                                  Digital transformation initiative reached 85% completion
+                                  Sugarcane yield improved to 69 TCH in Year 2, showing steady progress toward 80 TCH target
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">1 week ago</p>
+                                <p className="text-xs text-gray-500 mt-1">Year 2 (2025)</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                              <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium">Farmer Training Expansion</p>
+                                <p className="text-xs text-gray-600">
+                                  40% of farmers have been trained on soil health & fertility management as of Year 2
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">Ongoing</p>
                               </div>
                             </div>
                           </div>
@@ -293,90 +1338,240 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="kpis" className="h-[calc(100%-4rem)]">
-                <Card className="h-full">
-                  <CardHeader>
+              <TabsContent value="kpis" className="h-[calc(100%-4rem)] overflow-hidden">
+                <Card className="h-full flex flex-col">
+                  <CardHeader className="flex-shrink-0">
                     <CardTitle>Key Performance Indicators</CardTitle>
                     <CardDescription>Detailed KPI tracking for {selectedObjective.title}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px]">
+                  <CardContent className="flex-1 overflow-hidden">
+                    <ScrollArea className="h-full">
                       <div className="space-y-6">
-                        {selectedObjective.kpis.map((kpi, index) => (
-                          <Card key={index}>
-                            <CardHeader className="pb-3">
-                              <div className="flex justify-between items-center">
-                                <CardTitle className="text-lg">{kpi.name}</CardTitle>
-                                <Badge
-                                  className={
-                                    kpi.progress >= 90
-                                      ? "bg-green-100 text-green-800"
-                                      : kpi.progress >= 70
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-red-100 text-red-800"
-                                  }
-                                >
-                                  {kpi.progress}%
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                        {selectedObjective?.activities?.map((activity, index) => {
+                          const kpi = activity.kpi;
+                          
+                          // Calculate Year 2 specific progress (how much of Y2 target achieved)
+                          const calculateCurrentYearProgress = (current: string, yearTarget: string) => {
+                            const currentVal = parseFloat(current.replace(/[^\d.]/g, ''));
+                            const yearTargetVal = parseFloat(yearTarget.replace(/[^\d.]/g, ''));
+                            // Assuming we're at mid-year, so 50% through the year
+                            return Math.min(100, Math.round((currentVal / yearTargetVal) * 100));
+                          };
+
+                          // Calculate 5-year overall progress (baseline to final target)
+                          const calculateFiveYearProgress = (current: string, baseline: string, finalTarget: string) => {
+                            const currentVal = parseFloat(current.replace(/[^\d.]/g, ''));
+                            const baselineVal = parseFloat(baseline.replace(/[^\d.]/g, ''));
+                            const finalTargetVal = parseFloat(finalTarget.replace(/[^\d.]/g, ''));
+                            return Math.round(((currentVal - baselineVal) / (finalTargetVal - baselineVal)) * 100);
+                          };
+
+                          // Calculate yearly milestone progress (for timeline visualization)
+                          const calculateMilestoneProgress = (yearTarget: string, baseline: string, finalTarget: string) => {
+                            const yearTargetVal = parseFloat(yearTarget.replace(/[^\d.]/g, ''));
+                            const baselineVal = parseFloat(baseline.replace(/[^\d.]/g, ''));
+                            const finalTargetVal = parseFloat(finalTarget.replace(/[^\d.]/g, ''));
+                            return Math.round(((yearTargetVal - baselineVal) / (finalTargetVal - baselineVal)) * 100);
+                          };
+
+                          // Calculate yearly completion percentages for timeline
+                          const yearlyMilestones = {
+                            Y1: calculateMilestoneProgress(kpi.yearlyTargets.Y1, kpi.baseline, kpi.target),
+                            Y2: calculateMilestoneProgress(kpi.yearlyTargets.Y2, kpi.baseline, kpi.target),
+                            Y3: calculateMilestoneProgress(kpi.yearlyTargets.Y3, kpi.baseline, kpi.target),
+                            Y4: calculateMilestoneProgress(kpi.yearlyTargets.Y4, kpi.baseline, kpi.target),
+                            Y5: calculateMilestoneProgress(kpi.yearlyTargets.Y5, kpi.baseline, kpi.target)
+                          };
+
+                          // Current year is Y2 (2025)
+                          const currentYearProgress = calculateCurrentYearProgress(kpi.current, kpi.yearlyTargets.Y2);
+                          const fiveYearProgress = calculateFiveYearProgress(kpi.current, kpi.baseline, kpi.target);
+
+                          return (
+                            <Card key={index} className={`border-l-4 ${
+                              fiveYearProgress >= 90 ? 'border-l-green-500' :
+                              fiveYearProgress >= 70 ? 'border-l-amber-500' :
+                              'border-l-red-500'
+                            }`}>
+                              <CardHeader className="pb-3">
+                                <div className="flex justify-between items-center">
                                   <div>
-                                    <p className="text-sm text-gray-600">Current Value</p>
-                                    <p className="text-xl font-bold">{kpi.current}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-sm text-gray-600">Target Value</p>
-                                    <p className="text-xl font-bold">{kpi.target}</p>
+                                    <CardTitle className="text-lg">{kpi.name}</CardTitle>
+                                    <p className="text-sm text-gray-500">Activity: {activity.name}</p>
                                   </div>
                                 </div>
-                                <div>
-                                  <div className="flex justify-between text-sm mb-1">
-                                    <span>Progress to Target</span>
-                                    <span>{kpi.progress}%</span>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="space-y-4">
+                                  {/* Year on Year and 5-Year Progress Summary */}
+                                  <div className="grid grid-cols-2 gap-4 p-2 bg-gray-50 rounded-lg">
+                                    <div className="text-center">
+                                      <p className="text-sm text-gray-600 mb-1">Current Progress</p>
+                                      <p className={`text-3xl font-bold ${
+                                        currentYearProgress >= 90 ? 'text-green-600' :
+                                        currentYearProgress >= 70 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>{currentYearProgress}%</p>
+                                    </div>
+                                    <div className="text-center">
+                                      <p className="text-sm text-gray-600 mb-1">5-Year Plan Progress</p>
+                                      <p className={`text-3xl font-bold ${
+                                        fiveYearProgress >= 90 ? 'text-green-600' :
+                                        fiveYearProgress >= 70 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>{fiveYearProgress}%</p>
+                                    </div>
                                   </div>
-                                  <Progress value={kpi.progress} className="h-3" />
+                                  <div>
+                                    <div className="flex justify-between text-sm mb-1">
+                                      <span>Progress to Target</span>
+                                      <span>{kpi.progress}%</span>
+                                    </div>
+                                    <Progress value={kpi.progress} className="h-3" />
+                                  </div>
+                                  {kpi.yearlyTargets && (
+                                    <div>
+                                      <p className="text-sm font-medium text-gray-700 mb-3">Year-on-Year Targets</p>
+                                      <div className="grid grid-cols-5 gap-3">
+                                        {(['Y1', 'Y2', 'Y3', 'Y4', 'Y5'] as const).map((year, yearIndex) => {
+                                          const isCurrentYear = year === 'Y2';
+                                          const isCompleted = year === 'Y1';
+                                          const isFutureYear = ['Y3', 'Y4', 'Y5'].includes(year);
+                                          const milestoneProgress = yearlyMilestones[year];
+                                          
+                                          // For current year, show actual progress vs target
+                                          const displayProgress = isCurrentYear ? currentYearProgress : 
+                                                                 isCompleted ? 100 : 
+                                                                 milestoneProgress;
+                                          
+                                          return (
+                                            <div key={year} className={`p-2 rounded-lg border-2 text-center ${
+                                              isCompleted ? 'bg-green-100 border-green-300' :
+                                              isCurrentYear ? 'bg-blue-100 border-blue-300' : 
+                                              isFutureYear ? 'bg-gray-50 border-gray-200' :
+                                              'bg-gray-50 border-gray-200'
+                                            }`}>
+                                              <p className="font-medium text-sm">{year}</p>
+                                              <p className="text-lg font-bold mt-1">{kpi.yearlyTargets[year]}</p>
+                                              
+                                              {/* Progress percentage for each year */}
+                                              <div className="mt-2">
+                                                <p className={`text-xs font-medium ${
+                                                  isCompleted ? 'text-green-700' :
+                                                  isCurrentYear ? 'text-blue-700' :
+                                                  'text-gray-600'
+                                                }`}>
+                                                  {isCompleted ? '✓ Completed' : 
+                                                   isCurrentYear ? `In Progress` : 
+                                                   isFutureYear ? 'Planned' : 'Milestone'}
+                                                </p>
+                                                
+                                              </div>
+                                              
+                                              {/* Status indicator */}
+                                              <div className={`w-2 h-2 rounded-full mx-auto mt-2 ${
+                                                isCompleted ? 'bg-green-500' :
+                                                isCurrentYear ? 'bg-blue-500' :
+                                                'bg-gray-400'
+                                              }`} />
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+
+                                    </div>
+                                  )}
                                 </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </ScrollArea>
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="initiatives" className="h-[calc(100%-4rem)]">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle>Strategic Initiatives</CardTitle>
-                    <CardDescription>Active initiatives supporting {selectedObjective.title}</CardDescription>
+              <TabsContent value="activities" className="h-[calc(100%-4rem)] overflow-hidden">
+                <Card className="h-full flex flex-col">
+                  <CardHeader className="flex-shrink-0">
+                    <CardTitle>Activities</CardTitle>
+                    <CardDescription>Activities and their corresponding KPIs for {selectedObjective.title}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px]">
+                  <CardContent className="flex-1 overflow-hidden">
+                    <ScrollArea className="h-full">
                       <div className="space-y-4">
-                        {selectedObjective.initiatives.map((initiative, index) => (
-                          <Card key={index}>
+                        {selectedObjective?.activities?.map((activity, index) => (
+                          <Card key={index} className={`border-l-4 ${
+                            activity.completion >= 80 ? 'border-l-green-500' :
+                            activity.completion >= 51 ? 'border-l-amber-500' :
+                            'border-l-red-500'
+                          }`}>
                             <CardContent className="pt-4">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <h4 className="font-medium">{initiative.name}</h4>
-                                  <Badge className={`mt-1 ${getInitiativeStatusColor(initiative.status)}`}>
-                                    {initiative.status.replace("_", " ")}
-                                  </Badge>
+                              <div className="space-y-4">
+                                {/* Activity Header */}
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-medium text-lg">{activity.name}</h4>
+                                      <Badge className={`${getInitiativeStatusColor(activity.status)}`}>
+                                        {activity.status.replace("_", " ")}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                                  </div>
+                                  <div className="text-right ml-4">
+                                    <p className="text-sm text-gray-600">Completion</p>
+                                    <p className={`text-2xl font-bold ${
+                                      activity.completion >= 80 ? 'text-green-600' :
+                                      activity.completion >= 51 ? 'text-amber-600' :
+                                      'text-red-600'
+                                    }`}>{activity.completion}%</p>
+                                  </div>
                                 </div>
-                                <div className="text-right">
-                                  <p className="text-sm text-gray-600">Completion</p>
-                                  <p className="text-lg font-bold">{initiative.completion}%</p>
+                                
+                                {/* Progress Bar */}
+                                <Progress value={activity.completion} className="h-2" />
+                                
+                                {/* Associated KPI */}
+                                <div className="bg-gray-50 p-3 rounded-lg border">
+                                  <h5 className="font-medium text-gray-700 mb-2">KPI - {activity.kpi.name}</h5>
+                                  
+                                  <div className="mb-3">
+                                    <div className="flex justify-between text-sm mb-1">
+                                      <span>Progress to Target</span>
+                                      <span>{activity.kpi.progress}%</span>
+                                    </div>
+                                    <Progress value={activity.kpi.progress} className="h-2" />
+                                  </div>
+                                  
+                                  {/* Yearly Targets */}
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-700 mb-2">Yearly Targets</p>
+                                    <div className="grid grid-cols-5 gap-1 text-xs">
+                                      <div className="text-center p-2 bg-white rounded border">
+                                        <p className="font-medium">Y1</p>
+                                        <p>{activity.kpi.yearlyTargets.Y1}</p>
+                                      </div>
+                                      <div className="text-center p-2 bg-blue-50 rounded border border-blue-200">
+                                        <p className="font-medium">Y2</p>
+                                        <p>{activity.kpi.yearlyTargets.Y2}</p>
+                                      </div>
+                                      <div className="text-center p-2 bg-white rounded border">
+                                        <p className="font-medium">Y3</p>
+                                        <p>{activity.kpi.yearlyTargets.Y3}</p>
+                                      </div>
+                                      <div className="text-center p-2 bg-white rounded border">
+                                        <p className="font-medium">Y4</p>
+                                        <p>{activity.kpi.yearlyTargets.Y4}</p>
+                                      </div>
+                                      <div className="text-center p-2 bg-green-50 rounded border border-green-200">
+                                        <p className="font-medium">Y5</p>
+                                        <p>{activity.kpi.yearlyTargets.Y5}</p>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                              <Progress value={initiative.completion} className="mb-3" />
-                              <div className="flex justify-between text-xs text-gray-500">
-                                <span>Status: {initiative.status.replace("_", " ")}</span>
-                                <span>{initiative.completion}% complete</span>
                               </div>
                             </CardContent>
                           </Card>
@@ -387,69 +1582,171 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="timeline" className="h-[calc(100%-4rem)]">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle>Project Timeline</CardTitle>
-                    <CardDescription>Key milestones and deadlines for {selectedObjective.title}</CardDescription>
+              <TabsContent value="timeline" className="h-[calc(100%-4rem)] overflow-hidden">
+                <Card className="h-full flex flex-col">
+                  <CardHeader className="flex-shrink-0">
+                    <CardTitle>Implementation Timeline</CardTitle>
+                    <CardDescription>Year-by-year progress and achieved activities for {selectedObjective.title}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px]">
-                      <div className="space-y-4">
-                        {[
-                          {
-                            date: "Jan 2024",
-                            milestone: "Project Initiation",
-                            status: "completed",
-                            description: "Strategic planning and resource allocation",
-                          },
-                          {
-                            date: "Mar 2024",
-                            milestone: "Phase 1 Completion",
-                            status: "completed",
-                            description: "Initial infrastructure setup and team formation",
-                          },
-                          {
-                            date: "Jun 2024",
-                            milestone: "Mid-term Review",
-                            status: "completed",
-                            description: "Progress assessment and strategy adjustment",
-                          },
-                          {
-                            date: "Sep 2024",
-                            milestone: "Phase 2 Completion",
-                            status: "in_progress",
-                            description: "Core implementation and system deployment",
-                          },
-                          {
-                            date: "Dec 2024",
-                            milestone: "Final Delivery",
-                            status: "upcoming",
-                            description: "Project completion and performance evaluation",
-                          },
-                        ].map((item, index) => (
-                          <div key={index} className="flex items-start gap-4">
-                            <div
-                              className={`w-4 h-4 rounded-full mt-1 ${
-                                item.status === "completed"
-                                  ? "bg-green-500"
-                                  : item.status === "in_progress"
-                                    ? "bg-blue-500"
-                                    : "bg-gray-300"
-                              }`}
-                            />
-                            <div className="flex-1">
-                              <div className="flex justify-between items-center mb-1">
-                                <h4 className="font-medium">{item.milestone}</h4>
-                                <span className="text-sm text-gray-500">{item.date}</span>
+                  <CardContent className="flex-1 overflow-hidden">
+                    <ScrollArea className="h-full">
+                      <div className="space-y-3">
+                        {Object.entries(getActivitiesByYear()).map(([year, activities]) => {
+                          const isExpanded = expandedTimelineYears.includes(year)
+                          const isCurrentYear = year === 'Y2'
+                          const isCompletedYear = year === 'Y1'
+                          const isFutureYear = ['Y3', 'Y4', 'Y5'].includes(year)
+                          
+                          // Calculate year progress based on activities
+                          const yearProgress = activities.length > 0 
+                            ? Math.round(activities.reduce((sum, act) => sum + act.completion, 0) / activities.length)
+                            : 0
+                          
+                          return (
+                            <div key={year} className="border rounded-lg">
+                              {/* Year Header - Clickable to expand/collapse */}
+                              <div 
+                                className={`p-4 cursor-pointer transition-all duration-200 ${
+                                  isCompletedYear ? 'bg-green-50 hover:bg-green-100 border-green-200' :
+                                  isCurrentYear ? 'bg-blue-50 hover:bg-blue-100 border-blue-200' :
+                                  isFutureYear ? 'bg-gray-50 hover:bg-gray-100 border-gray-200' :
+                                  'bg-gray-50 hover:bg-gray-100'
+                                } ${isExpanded ? 'rounded-t-lg' : 'rounded-lg'}`}
+                                onClick={() => toggleTimelineYear(year)}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    {/* Expand/Collapse Icon */}
+                                    {isExpanded ? (
+                                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                                    ) : (
+                                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                                    )}
+                                    
+                                    {/* Year Title and Status */}
+                                    <div>
+                                      <h3 className={`text-lg font-semibold ${
+                                        isCompletedYear ? 'text-green-800' :
+                                        isCurrentYear ? 'text-blue-800' :
+                                        'text-gray-800'
+                                      }`}>
+                                        Year {year.slice(1)} ({year})
+                                      </h3>
+                                      <p className="text-sm text-gray-600">
+                                        {isCompletedYear ? 'Completed Year' :
+                                         isCurrentYear ? 'Current Year' :
+                                         'Planned Year'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-4">
+                                    {/* Activities Count */}
+                                    <div className="text-center">
+                                      <p className="text-lg font-bold text-gray-800">{activities.length}</p>
+                                      <p className="text-xs text-gray-600">Activities</p>
+                                    </div>
+                                    
+                                    {/* Year Progress */}
+                                    <div className="text-center min-w-[80px]">
+                                      <p className={`text-2xl font-bold ${
+                                        yearProgress >= 80 ? 'text-green-600' :
+                                        yearProgress >= 50 ? 'text-amber-600' :
+                                        'text-red-600'
+                                      }`}>
+                                        {yearProgress}%
+                                      </p>
+                                      <p className="text-xs text-gray-600">Progress</p>
+                                    </div>
+                                    
+                                    {/* Status Badge */}
+                                    <Badge className={`${
+                                      isCompletedYear ? 'bg-green-100 text-green-800' :
+                                      isCurrentYear ? 'bg-blue-100 text-blue-800' :
+                                      'bg-gray-100 text-gray-800'
+                                    }`}>
+                                      {isCompletedYear ? 'Completed' :
+                                       isCurrentYear ? 'In Progress' :
+                                       'Planned'}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                
+                                {/* Progress Bar for the year */}
+                                <div className="mt-3">
+                                  <Progress 
+                                    value={yearProgress} 
+                                    className={`h-2 ${
+                                      isCompletedYear ? '[&>div]:bg-green-500' :
+                                      isCurrentYear ? '[&>div]:bg-blue-500' :
+                                      '[&>div]:bg-gray-400'
+                                    }`} 
+                                  />
+                                </div>
                               </div>
-                              <p className="text-sm text-gray-600">{item.description}</p>
-                              <Badge className={`mt-2 ${getInitiativeStatusColor(item.status)}`}>
-                                {item.status.replace("_", " ")}
-                              </Badge>
+                              
+                              {/* Expandable Activities List */}
+                              {isExpanded && (
+                                <div className="border-t bg-white p-4 rounded-b-lg space-y-3 animate-in slide-in-from-top-2 duration-200">
+                                  {activities.length > 0 ? (
+                                    activities.map((activity, index) => (
+                                      <div key={index} className={`p-4 rounded-lg border-l-4 ${
+                                        activity.completion >= 80 ? 'border-l-green-500 bg-green-50' :
+                                        activity.completion >= 50 ? 'border-l-amber-500 bg-amber-50' :
+                                        'border-l-red-500 bg-red-50'
+                                      }`}>
+                                        <div className="flex justify-between items-start">
+                                          <div className="flex-1">
+                                            <h4 className="font-medium text-gray-900">{activity.name}</h4>
+                                            <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                                            
+                                            {/* Activity KPI */}
+                                            <div className="mt-3 p-3 bg-white rounded border">
+                                              <div className="flex justify-between items-center mb-2">
+                                                <span className="text-sm font-medium text-gray-700">
+                                                  KPI: {activity.kpi.name}
+                                                </span>
+                                                <span className="text-sm text-gray-600">
+                                                  Target: {activity.kpi.yearlyTargets[year] || activity.kpi.target}
+                                                </span>
+                                              </div>
+                                              <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                                <span>Progress</span>
+                                                <span>{activity.kpi.progress}%</span>
+                                              </div>
+                                              <Progress value={activity.kpi.progress} className="h-1.5" />
+                                            </div>
+                                          </div>
+                                          
+                                          <div className="text-right ml-4">
+                                            <Badge className={`${getInitiativeStatusColor(activity.status)} mb-2`}>
+                                              {activity.status.replace("_", " ")}
+                                            </Badge>
+                                            <div className="text-center">
+                                              <p className={`text-lg font-bold ${
+                                                activity.completion >= 80 ? 'text-green-600' :
+                                                activity.completion >= 50 ? 'text-amber-600' :
+                                                'text-red-600'
+                                              }`}>
+                                                {activity.completion}%
+                                              </p>
+                                              <p className="text-xs text-gray-600">Complete</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                      <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                      <p className="text-sm">No activities planned for this year</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
                     </ScrollArea>
                   </CardContent>
@@ -463,7 +1760,14 @@ export function ViewPlanModal({ open, onOpenChange }: ViewPlanModalProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button className="bg-green-600 hover:bg-green-700">Export Plan</Button>
+          <Button className={`${
+            selectedKra.color === 'green' ? 'bg-green-600 hover:bg-green-700' :
+            selectedKra.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
+            selectedKra.color === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' :
+            'bg-gray-600 hover:bg-gray-700'
+          }`}>
+            Export Plan
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

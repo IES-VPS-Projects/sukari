@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,26 +19,43 @@ import { format } from "date-fns"
 interface NewEventModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  templateData?: {
+    title?: string
+    eventType?: string
+    priority?: string
+  }
 }
 
-export function NewEventModal({ open, onOpenChange }: NewEventModalProps) {
+export function NewEventModal({ open, onOpenChange, templateData }: NewEventModalProps) {
   const [date, setDate] = useState<Date>()
   const [attendees, setAttendees] = useState<string[]>([])
   const [newAttendee, setNewAttendee] = useState("")
   const [formData, setFormData] = useState({
-    title: "",
+    title: templateData?.title || "",
     description: "",
     location: "",
     startTime: "",
     endTime: "",
-    eventType: "",
+    eventType: templateData?.eventType || "",
     isRecurring: false,
     recurringPattern: "",
     reminderTime: "15",
     isVirtual: false,
     meetingLink: "",
-    priority: "medium",
+    priority: templateData?.priority || "medium",
   })
+
+  // Update form data when template data changes
+  useEffect(() => {
+    if (templateData) {
+      setFormData(prev => ({
+        ...prev,
+        title: templateData.title || "",
+        eventType: templateData.eventType || "",
+        priority: templateData.priority || "medium",
+      }))
+    }
+  }, [templateData])
 
   const handleAddAttendee = () => {
     if (newAttendee.trim() && !attendees.includes(newAttendee.trim())) {
