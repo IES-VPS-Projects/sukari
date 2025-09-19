@@ -1,36 +1,12 @@
 import { useQuery } from "@tanstack/react-query"
+import { iprsApi, ApiResponse, IPRSData } from "@/lib/api-client"
 
-// Types for IPRS API response
-export interface IPRSData {
-  id: string
-  id_no: string
-  passport_no: string | null
-  first_name: string
-  middle_name: string | null
-  last_name: string
-  nationality: string
-  gender: string
-  county_of_birth: string | null
-  district_of_birth: string | null
-  division_of_birth: string | null
-  location_of_birth: string | null
-  date_of_birth: string
-  email_address: string | null
-  phone_no: string | null
-  current_county: string | null
-  current_sub_county: string | null
-  mug_shot: string | null
-  createdAt: string
-  updatedAt: string
-}
+// Re-export types for backward compatibility
+export type { IPRSData }
 
-export interface IPRSResponse {
-  success: boolean
-  data: IPRSData
-  message: string
-}
+export interface IPRSResponse extends ApiResponse<IPRSData> {}
 
-// API function to fetch IPRS data from backend server
+// API function to fetch IPRS data from backend server using axios
 const fetchIPRSData = async (idNumber: string): Promise<IPRSResponse> => {
   if (!idNumber || idNumber.length !== 8) {
     throw new Error("Invalid National ID format")
@@ -38,26 +14,20 @@ const fetchIPRSData = async (idNumber: string): Promise<IPRSResponse> => {
 
   console.log(`Fetching IPRS data for ID: ${idNumber}`)
   
-  const response = await fetch(`http://localhost:3001/api/iprs/${idNumber}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-
-  if (!response.ok) {
-    if (response.status === 404) {
+  try {
+    const response = await iprsApi.verify(idNumber)
+    console.log('IPRS API Response:', response)
+    return response
+  } catch (error: any) {
+    // Handle axios errors
+    if (error.response?.status === 404) {
       throw new Error("National ID not found. Please check the number and try again.")
-    } else if (response.status === 400) {
+    } else if (error.response?.status === 400) {
       throw new Error("Invalid National ID format. Please enter a valid 8-digit number.")
     } else {
       throw new Error("Verification service is temporarily unavailable. Please try again later.")
     }
   }
-
-  const data = await response.json()
-  console.log('IPRS API Response:', data)
-  return data
 }
 
 // Custom hook for IPRS verification
@@ -86,7 +56,9 @@ export const formatIPRSData = (data: IPRSResponse) => {
 
   // Format gender from 'm'/'f' to 'Male'/'Female'
   const formatGender = (gender: string) => {
-    return gender === 'm' ? 'Male' : gender === 'f' ? 'Female' : gender
+    if (gender === 'm') return 'Male';
+    if (gender === 'f') return 'Female';
+    return gender;
   }
 
   const formattedData = {

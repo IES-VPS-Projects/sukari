@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import toast from 'react-hot-toast';
+import { apiService } from '@/lib/axios-service';
 
 export interface CreatePINRequest {
   userId: string;
@@ -16,57 +17,42 @@ export interface UpdatePINRequest {
 }
 
 const createPIN = async (data: CreatePINRequest) => {
-  const response = await fetch('http://localhost:3001/api/pin/create', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(responseData.error || responseData.message || 'Failed to create PIN');
+  try {
+    const responseData = await apiService.post('/api/pin/create', data);
+    return responseData;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.message || 
+                        error.message || 
+                        'Failed to create PIN';
+    throw new Error(errorMessage);
   }
-  
-  return responseData;
 };
 
 const verifyPIN = async (data: VerifyPINRequest) => {
-  const response = await fetch('http://localhost:3001/api/pin/verify', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(responseData.error || responseData.message || 'Failed to verify PIN');
+  try {
+    const responseData = await apiService.post('/api/pin/verify', data);
+    return responseData;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.message || 
+                        error.message || 
+                        'Failed to verify PIN';
+    throw new Error(errorMessage);
   }
-  
-  return responseData;
 };
 
 const updatePIN = async (userId: string, data: UpdatePINRequest) => {
-  const response = await fetch(`http://localhost:3001/api/pin/${userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(responseData.error || responseData.message || 'Failed to update PIN');
+  try {
+    const responseData = await apiService.put(`/api/pin/${userId}`, data);
+    return responseData;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.message || 
+                        error.message || 
+                        'Failed to update PIN';
+    throw new Error(errorMessage);
   }
-  
-  return responseData;
 };
 
 export const useCreatePIN = () => {

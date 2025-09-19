@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query"
+import { entitiesApi, ApiResponse } from "@/lib/api-client"
 
 // Types for continue data
 export interface ContinueData {
@@ -8,21 +9,14 @@ export interface ContinueData {
   iprs_id: string
 }
 
-// API function to submit continue data
-const submitContinueData = async (data: ContinueData) => {
-  const response = await fetch('http://localhost:3001/api/entities', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to submit entity data')
+// API function to submit continue data using axios service
+const submitContinueData = async (data: ContinueData): Promise<ApiResponse> => {
+  try {
+    const response = await entitiesApi.create(data)
+    return response
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to submit entity data')
   }
-
-  return response.json()
 }
 
 // Custom hook for verification continue

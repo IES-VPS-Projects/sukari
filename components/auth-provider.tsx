@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           token: data.data.token
         };
 
-        setUser(userData);
+        setUser(userData as any);
         localStorage.setItem("ksb_user", JSON.stringify(userData));
         localStorage.setItem("ksb_token", data.data.token);
         setIsLoading(false);

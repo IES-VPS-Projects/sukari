@@ -109,29 +109,10 @@ export default function LoginPage() {
     }))
   }
 
-  const fillMillerCredentials = () => {
-    setFormData(prev => ({
-      ...prev,
-      identifier: "0700111123",
-      password: "KSB2024!"
-    }))
-  }
+ 
+ 
 
-  const fillImporterCredentials = () => {
-    setFormData(prev => ({
-      ...prev,
-      identifier: "0700222234",
-      password: "Import2024!"
-    }))
-  }
-
-  const fillFieldCoordinatorCredentials = () => {
-    setFormData(prev => ({
-      ...prev,
-      identifier: "0733444555",
-      password: "Field2024!"
-    }))
-  }
+ 
 
   const fillMillerCredentials = () => {
     setFormData(prev => ({

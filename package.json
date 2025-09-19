@@ -44,6 +44,7 @@
     "@types/pdfjs-dist": "^2.10.377",
     "apexcharts": "^5.3.5",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.12.2",
     "chart.js": "^4.5.0",
     "cheerio": "^1.1.2",
     "class-variance-authority": "^0.7.1",
