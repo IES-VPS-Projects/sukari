@@ -147,7 +147,23 @@ interface AlertsModalProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function AlertsModal({ open, onOpenChange }: AlertsModalProps) {
+export function AlertsModal({ 
+  open,  
+  onOpenChange, 
+  alertsData, 
+  selectedAlertForDetails, 
+  setSelectedAlertForDetails,
+  onTakeAction 
+}: AlertsModalProps) {
+  
+  const handleTakeAction = () => {
+    if (onTakeAction) {
+      onTakeAction()
+    }
+    setSelectedAlertForDetails(null)
+    onOpenChange(false)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
