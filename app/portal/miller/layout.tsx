@@ -15,9 +15,11 @@ export default function MillerLayoutWrapper({
   const router = useRouter()
 
   useEffect(() => {
+    console.log('user', user,user?.role);
     if (!isLoading && !user) {
       router.push("/login")
-    } else if (!isLoading && user && user.userType !== "miller") {
+      
+    } else if (!isLoading && user && user.role !== "miller" && user.role !== "COMPANY" && user.role !== "USER" ) {
       // Redirect to appropriate portal based on user type
       if (user.userType === "ceo") {
         router.push("/portal/ceo")
@@ -27,7 +29,9 @@ export default function MillerLayoutWrapper({
         router.push("/portal/field-coordinator")
       } else {
         router.push("/portal")
-      }
+      } 
+      console.log('user', user,user.role);
+      
     }
   }, [user, isLoading, router])
 
@@ -39,9 +43,9 @@ export default function MillerLayoutWrapper({
     )
   }
 
-  if (!user || user.userType !== "miller") {
-    return null
-  }
+  // if (!user || user.userType !== "miller" ||  user.role !== "COMPANY" && user.role !== "USER") {
+  //   return null
+  // }
 
   return <>{children}</>
 }

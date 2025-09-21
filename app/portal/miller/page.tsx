@@ -12,8 +12,10 @@ import { MillerApplicationsModal } from "./modals/miller-applications-modal"
 import { MillerProfileModal } from "./modals/miller-profile-modal"
 import { MillerReturnsModal } from "./modals/miller-returns-modal"
 import { MillerProductionModal } from "./modals/miller-production-modal"
+import { useAuth } from "@/components/auth-provider"
 
 export default function MillerProfilePage() {
+  const { user } = useAuth()
   const [profileData] = useState({
     firstName: "James",
     lastName: "Mwangi",
@@ -41,26 +43,31 @@ export default function MillerProfilePage() {
       <div className="min-h-screen bg-gray-100">
         <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Profile Header */}
+        
         <Card className="rounded-[20px] shadow-lg border-0 bg-white p-6">
           <div className="flex items-center gap-6">
             <div className="relative">
               <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                 <img 
                   src="/images/mumias_sugar_mills.jpg" 
-                  alt="Mumias Sugar Mills" 
+                  alt={(user?.entityData as any)?.businessId?.legal_name} 
                   className="h-full w-full object-cover"
                 />
               </div>
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-black">
-                Mumias Sugar Mills Ltd
+              {(user?.entityData as any)?.businessId?.legal_name}
+
+            
               </h2>
-              <p className="text-gray-600 mt-1">{profileData.firstName} {profileData.lastName}</p>
+              <p className="text-gray-600 mt-1">{(user as any).name}  </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">License Number</p>
-              <p className="font-semibold text-base">{profileData.licenseNumber}</p>
+              <p className="font-semibold text-base">
+              {(user?.entityData as any)?.businessId?.registration_number}
+              </p>
             </div>
           </div>
         </Card>

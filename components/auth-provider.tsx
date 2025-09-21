@@ -29,7 +29,7 @@ interface User {
     email?: string
   }
   token?: string
-  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller'
+  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller' | 'COMPANY' | 'COMPANY-ADMIN' | 'USER'
 }
 
 interface AuthContextType {

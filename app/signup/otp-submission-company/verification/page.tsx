@@ -112,7 +112,7 @@ export default function OTPSubmission() {
       setShowSuccessMessage(true)
       
       setTimeout(() => {
-        router.push("/signup/create-password")
+        router.push("/signup/otp-submission-company/create-password-company")
       }, 1500)
     } catch (error) {
       console.error("Error verifying OTP:", error)
