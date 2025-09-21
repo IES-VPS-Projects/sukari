@@ -35,7 +35,7 @@ export default function OTPSubmission() {
     
     if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
       console.log('Missing required data, redirecting to verification')
-      router.push("/signup/verification")
+      // router.push("/signup/verification")
       return
     }
 
@@ -94,7 +94,7 @@ export default function OTPSubmission() {
     setError("")
 
     try {
-      const userId = userCreationResponse?.data.id || userCreationResponse?.userId;
+      const userId = (userCreationData as any)?.data?.id || userCreationResponse?.userId;
       if (!userId) {
         setError('User ID not found. Please try again.');
         return;

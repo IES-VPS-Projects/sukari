@@ -77,12 +77,12 @@ export default function LoginPage() {
 
     // Use the existing auth system
     const success = await login(formData.email, formData.pin)
-    if (success) {
-      // Redirect based on user type will be handled by the portal layout
-      router.push("/portal")
-    } else {
-      setError("Invalid credentials. Please check your email and PIN.")
-    }
+    // if (success) {
+    //   // Redirect based on user type will be handled by the portal layout
+    //   // router.push("/portal")
+    // } else {
+    //   setError("Invalid credentials. Please check your email and PIN.")
+    // }
   }
 
   const fillCEOCredentials = () => {

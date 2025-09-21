@@ -7,6 +7,7 @@ import { Search, Building2, User, CheckCircle, AlertCircle, ArrowLeft, ChevronDo
 import SignupHeader from "@/components/signup/SignupHeader"
 import ProgressBar from "@/components/signup/ProgressBar"
 import { useIPRSVerification, formatIPRSData } from "@/hooks/use-iprs"
+import { useBRSVerification, formatBRSData } from "@/hooks/use-brs"
 import { useVerificationContinue } from "@/hooks/use-verification-continue"
 
 export default function VerificationStep() {
@@ -23,9 +24,15 @@ export default function VerificationStep() {
   const {
     data: iprsData,
     isLoading: iprsLoading,
-    error: iprsError,
-    refetch: refetchIPRS
-  } = useIPRSVerification(searchValue, shouldVerify)
+    error: iprsError
+  } = useIPRSVerification(searchValue, shouldVerify && userType === "individual")
+
+  // React Query hook for BRS verification
+  const {
+    data: brsData,
+    isLoading: brsLoading,
+    error: brsError
+  } = useBRSVerification(searchValue, shouldVerify && userType === "company")
 
   // React Query hook for continue submission
   const continueMutation = useVerificationContinue()
@@ -54,6 +61,23 @@ export default function VerificationStep() {
     }
   }, [iprsData, userType])
 
+  // Handle BRS verification results
+  useEffect(() => {
+    if (brsData && userType === "company") {
+      const formattedData = formatBRSData(brsData)
+      localStorage.setItem("brsData", JSON.stringify({
+        ...formattedData,
+        brsData: formattedData
+      }))
+      setVerificationResult({
+        verified: formattedData.verified,
+        data: formattedData
+      })
+      setCompanyFormData(formattedData)
+      setError("")
+    }
+  }, [brsData, userType])
+
   // Handle IPRS errors
   useEffect(() => {
     if (iprsError && userType === "individual") {
@@ -61,6 +85,14 @@ export default function VerificationStep() {
       setVerificationResult(null)
     }
   }, [iprsError, userType])
+
+  // Handle BRS errors
+  useEffect(() => {
+    if (brsError && userType === "company") {
+      setError(brsError.message || "Verification failed. Please try again.")
+      setVerificationResult(null)
+    }
+  }, [brsError, userType])
 
   // Reset verification state when search value changes
   useEffect(() => {
@@ -86,53 +118,15 @@ export default function VerificationStep() {
       // Trigger React Query to fetch IPRS data
       setShouldVerify(true)
     } else {
-      // Simulate BRS company verification (keeping existing logic)
-      if (searchValue.length >= 6) {
-        const companyData = {
-          registrationNumber: searchValue,
-          companyName: "ABC Sugar Company Ltd",
-          establishmentDate: "2015-03-20",
-          status: "Active",
-          businessType: "Private Limited Company",
-          taxId: "P051234567V",
-          companyEmail: "",
-          industry: "",
-          numberOfEmployees: "",
-          postalAddress: "P.O. Box 12345, Nairobi 00100",
-          buildingName: "Sugar Plaza",
-          streetName: "Industrial Area Road",
-          plotNumber: "LR No. 123/45",
-          county: "Nairobi",
-          subCounty: "Embakasi",
-          location: "Industrial Area",
-          ward: "Embakasi South",
-          directors: [
-            {
-              name: "Jane Khafweli",
-              idNumber: "12345678",
-              nationality: "Kenyan",
-              postalAddress: "P.O. Box 789, Nairobi",
-              phoneNumber: "",
-              email: ""
-            },
-            {
-              name: "Robert Matano", 
-              idNumber: "87654321",
-              nationality: "Kenyan",
-              postalAddress: "P.O. Box 456, Nakuru",
-              phoneNumber: "",
-              email: ""
-            }
-          ]
-        }
-        setVerificationResult({
-          verified: true,
-          data: companyData
-        })
-        setCompanyFormData(companyData)
-      } else {
-        setError("Please enter a valid Company Registration Number")
-      }
+      // Validate Company Registration Number format (like SB-20241112-987)
+      // const registrationRegex = /^[A-Z]{2}-\d{8}-\d{3}$/
+      // if (!registrationRegex.test(searchValue)) {
+      //   setError("Please enter a valid Company Registration Number (format: XX-YYYYMMDD-XXX)")
+      //   return
+      // }
+
+      // Trigger React Query to fetch BRS data
+      setShouldVerify(true)
     }
   }
 
@@ -145,7 +139,10 @@ export default function VerificationStep() {
         userType: userType,
         designation: companyFormData.designation,
         phoneNumber: companyFormData.phoneNumber,
-        iprs_id: verificationResult.data.id // This is the IPRS record ID
+        ...(userType === "individual" 
+          ? { iprs_id: verificationResult.data.id } // IPRS record ID for individuals
+          : { brs_id: verificationResult.data.id }  // BRS record ID for companies
+        )
       }
 
       console.log('Sending continue data:', continueData)
@@ -158,43 +155,86 @@ export default function VerificationStep() {
         // Store comprehensive data for next page
         const existingData = JSON.parse(localStorage.getItem("signupData") || "{}")
         
-        // Store IPRS data for user updates
-        const iprsData = {
-          id: verificationResult.data.id,
-          id_no: verificationResult.data.id_no,
-          first_name: verificationResult.data.first_name,
-          middle_name: verificationResult.data.middle_name,
-          last_name: verificationResult.data.last_name,
-          nationality: verificationResult.data.nationality,
-          gender: verificationResult.data.gender,
-          county_of_birth: verificationResult.data.county_of_birth,
-          date_of_birth: verificationResult.data.date_of_birth,
-          email_address: verificationResult.data.email_address,
-          phone_no: verificationResult.data.phone_no,
-          current_county: verificationResult.data.current_county,
-          current_sub_county: verificationResult.data.current_sub_county,
-          mug_shot: verificationResult.data.mug_shot,
-          createdAt: verificationResult.data.createdAt,
-          updatedAt: verificationResult.data.updatedAt
-        }
-        
-        // Store verification and entity data
-        const verificationData = {
+        let verificationData: any = {
           userType: userType,
           designation: companyFormData.designation,
           phoneNumber: companyFormData.phoneNumber,
-          iprs_id: verificationResult.data.id,
-          // Include formatted data for display
-          fullName: verificationResult.data.fullName,
-          formattedDateOfBirth: verificationResult.data.dateOfBirth,
-          formattedGender: verificationResult.data.gender,
-          nationality: verificationResult.data.nationality,
-          countyOfBirth: verificationResult.data.countyOfBirth
+        }
+
+        if (userType === "individual") {
+          // Store IPRS data for user updates
+          const iprsData = {
+            id: verificationResult.data.id,
+            id_no: verificationResult.data.id_no,
+            first_name: verificationResult.data.first_name,
+            middle_name: verificationResult.data.middle_name,
+            last_name: verificationResult.data.last_name,
+            nationality: verificationResult.data.nationality,
+            gender: verificationResult.data.gender,
+            county_of_birth: verificationResult.data.county_of_birth,
+            date_of_birth: verificationResult.data.date_of_birth,
+            email_address: verificationResult.data.email_address,
+            phone_no: verificationResult.data.phone_no,
+            current_county: verificationResult.data.current_county,
+            current_sub_county: verificationResult.data.current_sub_county,
+            mug_shot: verificationResult.data.mug_shot,
+            createdAt: verificationResult.data.createdAt,
+            updatedAt: verificationResult.data.updatedAt
+          }
+          
+          verificationData = {
+            ...verificationData,
+            iprs_id: verificationResult.data.id,
+            // Include formatted data for display
+            fullName: verificationResult.data.fullName,
+            formattedDateOfBirth: verificationResult.data.dateOfBirth,
+            formattedGender: verificationResult.data.gender,
+            nationality: verificationResult.data.nationality,
+            countyOfBirth: verificationResult.data.countyOfBirth
+          }
+
+          existingData.iprsData = iprsData
+        } else {
+          // Store BRS data for company updates
+          const brsData = {
+            id: verificationResult.data.id,
+            registrationNumber: verificationResult.data.registrationNumber,
+            companyName: verificationResult.data.companyName,
+            establishmentDate: verificationResult.data.establishmentDate,
+            status: verificationResult.data.status,
+            businessType: verificationResult.data.businessType,
+            taxId: verificationResult.data.taxId,
+            companyEmail: verificationResult.data.companyEmail,
+            industry: verificationResult.data.industry,
+            numberOfEmployees: verificationResult.data.numberOfEmployees,
+            postalAddress: verificationResult.data.postalAddress,
+            buildingName: verificationResult.data.buildingName,
+            streetName: verificationResult.data.streetName,
+            plotNumber: verificationResult.data.plotNumber,
+            county: verificationResult.data.county,
+            subCounty: verificationResult.data.subCounty,
+            location: verificationResult.data.location,
+            ward: verificationResult.data.ward,
+            directors: verificationResult.data.directors,
+            createdAt: verificationResult.data.createdAt,
+            updatedAt: verificationResult.data.updatedAt
+          }
+          
+          verificationData = {
+            ...verificationData,
+            brs_id: verificationResult.data.id,
+            // Include formatted data for display
+            companyName: verificationResult.data.companyName,
+            registrationNumber: verificationResult.data.registrationNumber,
+            establishmentDate: verificationResult.data.establishmentDate,
+            businessType: verificationResult.data.businessType
+          }
+
+          existingData.brsData = brsData
         }
         
         const updatedData = {
           ...existingData,
-          iprsData: iprsData, // Complete IPRS data for user updates
           verificationData: verificationData, // Form data and formatted display data
           entityData: continueData, // Data sent to /api/entities
           entityResponse: result // Response from /api/entities
@@ -297,10 +337,10 @@ export default function VerificationStep() {
                   <button
                     type="button"
                     onClick={handleSearch}
-                    disabled={iprsLoading || !searchValue.trim()}
+                    disabled={(iprsLoading || brsLoading) || !searchValue.trim()}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {iprsLoading ? (
+                    {(iprsLoading || brsLoading) ? (
                       <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                     ) : (
                       <Search className="h-5 w-5" />
@@ -310,6 +350,11 @@ export default function VerificationStep() {
                 {userType === "individual" && (
                   <p className="mt-2 text-sm text-gray-500">
                     Enter your 8-digit National ID number to verify your identity through IPRS
+                  </p>
+                )}
+                {userType === "company" && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Enter your Company Registration Number (format: XX-YYYYMMDD-XXX) to verify through BRS
                   </p>
                 )}
               </div>
@@ -327,6 +372,14 @@ export default function VerificationStep() {
                 <div className="flex items-center space-x-2 text-blue-600 bg-blue-50 p-3 rounded-lg">
                   <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
                   <span>Verifying your identity through IPRS...</span>
+                </div>
+              )}
+
+              {/* Loading Message for BRS */}
+              {brsLoading && userType === "company" && (
+                <div className="flex items-center space-x-2 text-blue-600 bg-blue-50 p-3 rounded-lg">
+                  <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                  <span>Verifying company registration through BRS...</span>
                 </div>
               )}
 
@@ -627,7 +680,7 @@ export default function VerificationStep() {
                               </button>
                               {expandedDirectors[index] && (
                                 <div className="p-4 border-t border-gray-200 bg-gray-50">
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                                       <input
@@ -656,10 +709,55 @@ export default function VerificationStep() {
                                       />
                                     </div>
                                     <div>
-                                      <label className="block text-sm font-medium text-gray-700 mb-1">Postal Address</label>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                                       <input
                                         type="text"
-                                        value={director.postalAddress || ""}
+                                        value={director.address || ""}
+                                        readOnly
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                                      <input
+                                        type="text"
+                                        value={director.occupation || ""}
+                                        readOnly
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                      <input
+                                        type="text"
+                                        value={director.gender || ""}
+                                        readOnly
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                      <input
+                                        type="text"
+                                        value={director.dateOfBirth || ""}
+                                        readOnly
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">ID Type</label>
+                                      <input
+                                        type="text"
+                                        value={director.idType || ""}
+                                        readOnly
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">Shareholdings</label>
+                                      <input
+                                        type="text"
+                                        value={director.shareholdings || ""}
                                         readOnly
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500"
                                       />

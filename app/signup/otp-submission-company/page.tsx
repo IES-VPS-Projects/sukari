@@ -13,18 +13,23 @@ export default function OTPVerification() {
   
   const { 
     getIPRSData, 
+
     getVerificationData, 
     getAuthenticationData, 
     getUserCreationResponse,
-    isLoading 
+    isLoading,
+    getUserVerificationData,
+    getUserCreationData
+
   } = useSignupData()
   
-  const sendOTPMutation = useSendOTP()
-  
+  const sendOTPMutation = useSendOTP() 
   const iprsData = getIPRSData()
   const verificationData = getVerificationData()
   const authenticationData = getAuthenticationData()
   const userCreationResponse = getUserCreationResponse()
+  const userVerificationData = getUserVerificationData()
+  const userCreationData = getUserCreationData()
 
   useEffect(() => {
     // Wait for data to load before checking
@@ -32,10 +37,11 @@ export default function OTPVerification() {
       return
     }
 
+    console.log('verificationData', verificationData,authenticationData,userCreationResponse);
     // Check if we have the required data from previous steps
     if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
       console.log('Missing required data, redirecting to authentication')
-      router.push("/signup/authentication")
+      // router.push("/signup/authentication")
       return
     }
 
@@ -59,8 +65,9 @@ export default function OTPVerification() {
       return
     }
 
+    console.log('userCreationResponse', userCreationResponse,userCreationData);
     try {
-      const userId = userCreationResponse.data?.id || userCreationResponse?.userId;
+      const userId = (userCreationData as any)?.data?.id|| userCreationResponse.data?.id || userCreationResponse?.userId;
       if (!userId) {
         toast.error('User ID not found. Please try again.');
         return;
@@ -77,7 +84,8 @@ export default function OTPVerification() {
       await sendOTPMutation.mutateAsync(otpData)
 
       // Navigate to OTP submission
-      router.push("/signup/otp-submission")
+      router.push("/signup/otp-submission-company/verification")
+        
     } catch (error) {
       console.error("Error sending OTP:", error)
       // Error is already handled by the mutation hook
@@ -89,22 +97,22 @@ export default function OTPVerification() {
   }
 
   // Show loading state while data is being loaded
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+  //     </div>
+  //   )
+  // }
 
   // Show loading state if data is missing (will redirect after loading)
-  if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-      </div>
-    )
-  }
+  // if (!iprsData || !verificationData || !authenticationData || !userCreationResponse) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -142,7 +150,7 @@ export default function OTPVerification() {
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium text-green-800">    {verificationData.fullName} 
+            <span className="text-sm font-medium text-green-800">    {(verificationData as any)?.companyName} 
             </span>
           </div>
            
@@ -163,7 +171,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">Email</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {authenticationData.email}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {userVerificationData?.email}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
@@ -188,7 +196,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">SMS</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {authenticationData.telephone}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {userVerificationData?.phoneNumber}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
@@ -216,7 +224,7 @@ export default function OTPVerification() {
                 disabled={!selectedMethod || sendOTPMutation.isPending}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {sendOTPMutation.isPending ? "Sending OTP..." : "Send OTP s"}
+                {sendOTPMutation.isPending ? "Sending OTP..." : "Send OTP"}
               </button>
             </div>
           </form>

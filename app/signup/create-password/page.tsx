@@ -71,6 +71,8 @@ export default function CreatePassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    console.log('handleSubmit', formData)
+
     if (!allRequirementsMet()) {
       setError("Please meet all PIN requirements")
       return
@@ -98,7 +100,7 @@ export default function CreatePassword() {
       // Create PIN via API
       await createPINMutation.mutateAsync(pinData);
       
-      // Update signup data with PIN
+      // // Update signup data with PIN
       updateSignupData({ 
         pinData: { 
           pin: formData.pin,
@@ -110,8 +112,8 @@ export default function CreatePassword() {
       toast.success('Account created successfully!')
 
       // Complete signup and clear data
-      clearSignupData()
-      router.push("/login?signup=success")
+      // clearSignupData()
+      router.push("/")
     } catch (error) {
       console.error("Error completing signup:", error)
       // Error is already handled by the mutation hook

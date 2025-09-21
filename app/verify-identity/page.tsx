@@ -74,7 +74,7 @@ export default function VerifyIdentityPage() {
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Verify Your Identity</h2>
           <p className="mt-2 text-gray-600">
-            Enter your National ID number to verify your identity through IPRS
+            Enter your National ID number to verify your identity through IPRS  
           </p>
         </div>
 

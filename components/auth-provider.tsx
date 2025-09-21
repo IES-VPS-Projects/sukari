@@ -4,6 +4,7 @@ import type React from "react"
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { apiService } from "@/lib/axios-service"
 
 interface User {
   id: string
@@ -138,21 +139,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
 
     try {
-      // Make API call to backend
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: identifier,
-          pin: pin
-        }),
+      // Make API call to backend using axios
+      const data = await apiService.post('/api/auth/login', {
+        email: identifier,
+        pin: pin
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         // Create user object from API response
         const userData = {
           id: data.data.user.id,
@@ -175,8 +168,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
         return false;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      // Handle axios error structure
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          'Login failed';
+      console.error('Login failed:', errorMessage);
       setIsLoading(false);
       return false;
     }

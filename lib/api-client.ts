@@ -66,9 +66,110 @@ export interface IPRSData {
   updatedAt: string;
 }
 
+// BRS (Business Registration Service) related types
+export interface BRSData {
+  id: string;
+  search_number: string;
+  registration_number: string;
+  legal_name: string;
+  company_type: string;
+  status: string;
+  country: string;
+  address: string;
+  industry: string;
+  tax_id: string;
+  registration_date: string;
+  phone: string;
+  email: string;
+  state: string;
+  authorized_shared_capital: string;
+  result_text: string;
+  result_code: string;
+  verify_business: string;
+  fiduciary_name: string;
+  fiduciary_type: string;
+  fiduciary_address: string;
+  fiduciary_registration_number: string;
+  fiduciary_status: string;
+  bo1_name: string;
+  bo1_shareholdings: string;
+  bo1_address: string;
+  bo1_gender: string;
+  bo1_nationality: string;
+  bo1_registration_number: string;
+  bo1_shareholder_type: string;
+  bo1_phone_number: string;
+  bo2_name: string;
+  bo2_shareholdings: string;
+  bo2_address: string;
+  bo2_gender: string;
+  bo2_nationality: string;
+  bo2_registration_number: string;
+  bo2_shareholder_type: string;
+  bo2_phone_number: string;
+  dir1_name: string;
+  dir1_shareholdings: string;
+  dir1_id_number: string;
+  dir1_address: string;
+  dir1_occupation: string;
+  dir1_gender: string;
+  dir1_nationality: string;
+  dir1_date_of_birth: string;
+  dir1_id_type: string;
+  dir1_phone_number: string;
+  dir2_name: string;
+  dir2_shareholdings: string;
+  dir2_id_number: string;
+  dir2_address: string;
+  dir2_occupation: string;
+  dir2_gender: string;
+  dir2_nationality: string;
+  dir2_date_of_birth: string;
+  dir2_id_type: string;
+  dir2_phone_number: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Director user creation types
+export interface CreateUserFromDirectorRequest {
+  brsId: string;
+  directorId: string;
+  email: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  role?: string;
+  companyName?: string;
+}
+
+export interface CreateUserFromDirectorResponse {
+  id: string;
+  brsId: string;
+  directorId: string;
+  email: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  companyName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Legacy interface for backward compatibility
+export interface BRSDirector {
+  name: string;
+  idNumber: string;
+  nationality: string;
+  postalAddress: string;
+  phoneNumber: string | null;
+  email: string | null;
+}
+
 // API Client class for different services
 export class ApiClient {
-  private apiService: ApiService;
+  private readonly apiService: ApiService;
 
   constructor(apiService: ApiService) {
     this.apiService = apiService;
@@ -100,6 +201,9 @@ export class ApiClient {
     create: (userData: Partial<User>): Promise<ApiResponse<User>> =>
       this.apiService.post('/api/users', userData),
 
+    createFromDirector: (userData: CreateUserFromDirectorRequest): Promise<ApiResponse<CreateUserFromDirectorResponse>> =>
+      this.apiService.post('/api/users/create-from-director', userData),
+
     update: (id: string, userData: Partial<User>): Promise<ApiResponse<User>> =>
       this.apiService.put(`/api/users/${id}`, userData),
 
@@ -114,6 +218,15 @@ export class ApiClient {
 
     search: (query: string): Promise<ApiResponse<IPRSData[]>> =>
       this.apiService.get(`/api/iprs/search?q=${encodeURIComponent(query)}`),
+  };
+
+  // BRS (Business Registration Service) verification endpoints
+  brs = {
+    verify: (registrationNumber: string): Promise<ApiResponse<BRSData>> =>
+      this.apiService.get(`/api/brs/${registrationNumber}`),
+
+    search: (query: string): Promise<ApiResponse<BRSData[]>> =>
+      this.apiService.get(`/api/brs/search?q=${encodeURIComponent(query)}`),
   };
 
   // Projects endpoints
@@ -217,6 +330,7 @@ export const apiClient = new ApiClient(apiService);
 export const authApi = apiClient.auth;
 export const usersApi = apiClient.users;
 export const iprsApi = apiClient.iprs;
+export const brsApi = apiClient.brs;
 export const projectsApi = apiClient.projects;
 export const messagesApi = apiClient.messages;
 export const conversationsApi = apiClient.conversations;
