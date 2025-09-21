@@ -131,6 +131,42 @@ export interface BRSData {
   updatedAt: string;
 }
 
+// License related types
+export interface License {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+  status: 'active' | 'expired' | 'pending' | 'suspended';
+  issueDate: string;
+  expiryDate: string;
+  licenseNumber: string;
+  holderName: string;
+  holderCompany: string;
+  category: string;
+  capacity?: string;
+  location?: string;
+  documents: string[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLicenseRequest {
+  type: string;
+  name: string;
+  description: string;
+  holderName: string;
+  holderCompany: string;
+  category: string;
+  capacity?: string;
+  location?: string;
+  documents?: string[];
+  notes?: string;
+  expiryDate?: string;
+  licenseNumber?: string;
+}
+
 // Director user creation types
 export interface CreateUserFromDirectorRequest {
   brsId: string;
@@ -227,6 +263,32 @@ export class ApiClient {
 
     search: (query: string): Promise<ApiResponse<BRSData[]>> =>
       this.apiService.get(`/api/brs/search?q=${encodeURIComponent(query)}`),
+  };
+
+  // Licenses endpoints
+  licenses = {
+    getAll: (page = 1, limit = 10, filters?: { status?: string; type?: string; category?: string }): Promise<PaginatedResponse<License>> => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.status && { status: filters.status }),
+        ...(filters?.type && { type: filters.type }),
+        ...(filters?.category && { category: filters.category }),
+      });
+      return this.apiService.get(`/api/licenses?${params.toString()}`);
+    },
+
+    getById: (id: string): Promise<ApiResponse<License>> =>
+      this.apiService.get(`/api/licenses/${id}`),
+
+    create: (licenseData: CreateLicenseRequest): Promise<ApiResponse<License>> =>
+      this.apiService.post('/api/licenses', licenseData),
+
+    update: (id: string, licenseData: Partial<CreateLicenseRequest>): Promise<ApiResponse<License>> =>
+      this.apiService.put(`/api/licenses/${id}`, licenseData),
+
+    delete: (id: string): Promise<ApiResponse> =>
+      this.apiService.delete(`/api/licenses/${id}`),
   };
 
   // Projects endpoints
@@ -331,6 +393,7 @@ export const authApi = apiClient.auth;
 export const usersApi = apiClient.users;
 export const iprsApi = apiClient.iprs;
 export const brsApi = apiClient.brs;
+export const licensesApi = apiClient.licenses;
 export const projectsApi = apiClient.projects;
 export const messagesApi = apiClient.messages;
 export const conversationsApi = apiClient.conversations;

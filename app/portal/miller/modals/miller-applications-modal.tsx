@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Calendar, FileText, Send, CheckCircle, Clock, AlertCircle, Shield, Award, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
+import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
+import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
+import { License } from '@/lib/api-client'
 
 // Application stages for tracking miller applications
 const applicationStages = [
@@ -69,12 +71,14 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const [activeTab, setActiveTab] = useState<'status' | 'licenses'>('status')
   const [selectedStakeholder, setSelectedStakeholder] = useState<string>('')
   const [expandedApplication, setExpandedApplication] = useState<string>('')
-  const [applicationType, setApplicationType] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [isDraftSaved, setIsDraftSaved] = useState(false)
   const [submittedApplications, setSubmittedApplications] = useState<any[]>([])
+  
+  // Fetch licenses data using the custom hook
+  const { data: licensesData, isLoading: licensesLoading, error: licensesError } = useLicenses(1, 100)
+  const licenseStats = useLicenseStats()
   const [formData, setFormData] = useState({
     // Basic fields
     millerLicenseNumber: 'SML-2024-003',
@@ -139,15 +143,6 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     declarationC: 'false'
   })
 
-  const letterPurposes = [
-    'Bank Loan Application',
-    'Equipment Financing',
-    'Working Capital',
-    'Infrastructure Development',
-    'Export Documentation',
-    'Partnership Agreement',
-    'Investment Proposal'
-  ]
 
   const permitTypes = [
     'Air Emission Permit',
@@ -293,45 +288,29 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     ]
   }
 
-  // Mock existing applications data
-  const existingApplications = [
-    {
-      id: 'APP-2024-001',
-      type: 'Letter of Comfort',
-      title: 'Letter of Comfort Application',
-      purpose: 'Bank Loan Application',
-      status: 'Approved',
-      stage: 'Issuance',
-      applicant: 'James Mwangi',
-      company: 'Mumias Sugar Mills Ltd',
-      submitDate: '2024-08-15',
-      completionDate: '2024-08-28',
-      expectedCompletion: null,
-      quantity: 'N/A',
-      notes: 'Letter of comfort issued for bank loan application. All requirements met and documentation complete.',
-      submittedDate: '2024-08-15',
-      approvedDate: '2024-08-28',
-      validUntil: '2025-08-28'
-    },
-    {
-      id: 'APP-2024-003',
-      type: 'License Renewal',
-      title: 'Sugar Manufacturing License Renewal',
-      purpose: 'Sugar Manufacturing License',
-      status: 'Under Review',
-      stage: 'Evaluation',
-      applicant: 'James Mwangi',
-      company: 'Mumias Sugar Mills Ltd',
-      submitDate: '2024-09-05',
-      completionDate: null,
-      expectedCompletion: '2024-09-30',
-      quantity: '50,000 MT/Year',
-      notes: 'Technical evaluation in progress. Production capacity assessment being conducted.',
-      submittedDate: '2024-09-05',
-      approvedDate: null,
-      validUntil: null
-    },
-  ]
+  // Convert licenses data to application format for display
+  const existingApplications = licensesData?.data?.map((license: License) => ({
+    id: license.id,
+    type: license.type,
+    title: license.name,
+    purpose: license.description,
+    status: license.status === 'active' ? 'Approved' : 
+            license.status === 'pending' ? 'Under Review' : 
+            license.status === 'expired' ? 'Expired' : 'Suspended',
+    stage: license.status === 'active' ? 'Issuance' : 
+           license.status === 'pending' ? 'Evaluation' : 
+           license.status === 'expired' ? 'Expired' : 'Suspended',
+    applicant: license.holderName,
+    company: license.holderCompany,
+    submitDate: license.issueDate,
+    completionDate: license.status === 'active' ? license.issueDate : null,
+    expectedCompletion: license.status === 'pending' ? license.expiryDate : null,
+    quantity: license.capacity || 'N/A',
+    notes: license.notes || `${license.type} - ${license.status}`,
+    submittedDate: license.issueDate,
+    approvedDate: license.status === 'active' ? license.issueDate : null,
+    validUntil: license.expiryDate
+  })) || []
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -359,11 +338,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       declarationB: 'false',
       declarationC: 'false'
     }))
-    setApplicationType('')
     setSelectedApplication(null)
     setSelectedStakeholder('')
     setExpandedApplication('')
-    setSelectedCategory('')
     setIsDraftSaved(false)
   }
 
@@ -410,18 +387,6 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <CheckCircle className="h-4 w-4 text-green-600" />
-      case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-600" />
-      case 'in-review':
-        return <AlertCircle className="h-4 w-4 text-blue-600" />
-      default:
-        return <FileText className="h-4 w-4 text-gray-600" />
-    }
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -499,7 +464,22 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         {/* Status Tab */}
         {activeTab === 'status' && (
           <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
-            {selectedApplication ? (
+            {licensesLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-green-600" />
+                  <p className="text-gray-600">Loading licenses...</p>
+                </div>
+              </div>
+            ) : licensesError ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
+                  <p className="text-red-600">Error loading licenses</p>
+                  <p className="text-sm text-gray-500 mt-1">Please try again later</p>
+                </div>
+              </div>
+            ) : selectedApplication ? (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <Button 
@@ -680,7 +660,20 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
               </div>
             ) : (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Status</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">License Status</h3>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      Active: {licenseStats.active}
+                    </Badge>
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                      Pending: {licenseStats.pending}
+                    </Badge>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      Expired: {licenseStats.expired}
+                    </Badge>
+                  </div>
+                </div>
                 <div className="space-y-3">
                   {[...submittedApplications, ...existingApplications].map((app) => (
                     <div key={app.id} className="p-4 border rounded-lg space-y-2">
@@ -737,20 +730,126 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         {/* Licenses Tab */}
         {activeTab === 'licenses' && (
           <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
-            {!selectedStakeholder ? (
+            {licensesLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-green-600" />
+                  <p className="text-gray-600">Loading licenses...</p>
+                </div>
+              </div>
+            ) : licensesError ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
+                  <p className="text-red-600">Error loading licenses</p>
+                  <p className="text-sm text-gray-500 mt-1">Please try again later</p>
+                </div>
+              </div>
+            ) : !selectedStakeholder ? (
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Select Stakeholder Type</h3>
-                <div className="space-y-3">
-                  {Object.keys(stakeholderApplications).map((stakeholder) => (
-                    <div
-                      key={stakeholder}
-                      className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors flex items-center gap-3"
-                      onClick={() => setSelectedStakeholder(stakeholder)}
-                    >
-                      <FileCheck className="h-5 w-5 text-green-600" />
-                      <h4 className="font-semibold">{stakeholder}</h4>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Select Stakeholder Type</h3>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      Total Licenses: {licenseStats.total}
+                    </Badge>
+                  </div>
+                </div>
+                {/* Current Licenses Section */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-700">Current Licenses</h4>
+                  {licensesData?.data && licensesData.data.length > 0 ? (
+                    <div className="space-y-3">
+                      {licensesData.data.map((license: License) => (
+                        <div key={license.id} className="p-4 border rounded-lg space-y-2">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h5 className="font-semibold">{license.name}</h5>
+                              <p className="text-sm text-gray-600">{license.type}</p>
+                              <p className="text-xs text-gray-500">License #: {license.licenseNumber}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={getStatusColor(license.status)}>
+                                {license.status}
+                              </Badge>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setSelectedApplication({
+                                  id: license.id,
+                                  type: license.type,
+                                  title: license.name,
+                                  purpose: license.description,
+                                  status: license.status === 'active' ? 'Approved' : 
+                                          license.status === 'pending' ? 'Under Review' : 
+                                          license.status === 'expired' ? 'Expired' : 'Suspended',
+                                  stage: license.status === 'active' ? 'Issuance' : 
+                                         license.status === 'pending' ? 'Evaluation' : 
+                                         license.status === 'expired' ? 'Expired' : 'Suspended',
+                                  applicant: license.holderName,
+                                  company: license.holderCompany,
+                                  submitDate: license.issueDate,
+                                  completionDate: license.status === 'active' ? license.issueDate : null,
+                                  expectedCompletion: license.status === 'pending' ? license.expiryDate : null,
+                                  quantity: license.capacity || 'N/A',
+                                  notes: license.notes || `${license.type} - ${license.status}`,
+                                  submittedDate: license.issueDate,
+                                  approvedDate: license.status === 'active' ? license.issueDate : null,
+                                  validUntil: license.expiryDate
+                                })}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-600">Issue Date:</span>
+                              <p className="font-medium">{new Date(license.issueDate).toLocaleDateString()}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Expiry Date:</span>
+                              <p className="font-medium">{new Date(license.expiryDate).toLocaleDateString()}</p>
+                            </div>
+                            {license.capacity && (
+                              <div>
+                                <span className="text-gray-600">Capacity:</span>
+                                <p className="font-medium">{license.capacity}</p>
+                              </div>
+                            )}
+                            {license.location && (
+                              <div>
+                                <span className="text-gray-600">Location:</span>
+                                <p className="font-medium">{license.location}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <FileCheck className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                      <p>No licenses found</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Application Types Section */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-700">Apply for New License/Permit</h4>
+                  <div className="space-y-3">
+                    {Object.keys(stakeholderApplications).map((stakeholder) => (
+                      <div
+                        key={stakeholder}
+                        className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors flex items-center gap-3"
+                        onClick={() => setSelectedStakeholder(stakeholder)}
+                      >
+                        <FileCheck className="h-5 w-5 text-green-600" />
+                        <h4 className="font-semibold">{stakeholder}</h4>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
