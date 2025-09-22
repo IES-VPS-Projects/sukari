@@ -15,7 +15,7 @@ const createAxiosInstance = (): AxiosInstance => {
   instance.interceptors.request.use(
     (config) => {
       // Add auth token if available
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('ksb_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -46,7 +46,7 @@ const createAxiosInstance = (): AxiosInstance => {
       // Handle common error cases
       if (error.response?.status === 401) {
         // Unauthorized - clear token and redirect to login
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('ksb_token');
         // Only redirect if not already on login page
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
