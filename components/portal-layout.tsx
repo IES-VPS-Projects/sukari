@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button"
 import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings, Bell } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
-import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ImporterAlertsModal } from "@/app/portal/importer/modals/importer-alerts-modal"

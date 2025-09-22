@@ -8,21 +8,17 @@ import {
   Shield, 
   Settings, 
   BarChart3, 
-  Activity,
   LogOut,
-  Menu,
-  X,
   Home,
-  UserCheck,
   FileCheck,
-  Database,
   Bell,
-  Search
+  HelpCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { BottomNavigation, NavigationItem } from "@/components/ui/bottom-navigation"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface SuperAdminLayoutProps {
   children: React.ReactNode
@@ -56,57 +52,13 @@ const navigationItems: NavigationItem[] = [
   }
 ]
 
-const fullNavigationItems = [
-  {
-    name: "Dashboard",
-    href: "/portal/super-admin",
-    icon: Home,
-    description: "System overview and key metrics"
-  },
-  {
-    name: "User Management",
-    href: "/portal/super-admin/users",
-    icon: Users,
-    description: "Manage all system users and roles"
-  },
-  {
-    name: "License Management",
-    href: "/portal/super-admin/licenses",
-    icon: FileCheck,
-    description: "Oversee all licenses and permits"
-  },
-  {
-    name: "System Settings",
-    href: "/portal/super-admin/settings",
-    icon: Settings,
-    description: "Configure system parameters"
-  },
-  {
-    name: "Audit Logs",
-    href: "/portal/super-admin/audit",
-    icon: Activity,
-    description: "Monitor system activity and changes"
-  },
-  {
-    name: "Reports & Analytics",
-    href: "/portal/super-admin/reports",
-    icon: BarChart3,
-    description: "System performance and usage reports"
-  },
-  {
-    name: "Data Management",
-    href: "/portal/super-admin/data",
-    icon: Database,
-    description: "Manage system data and backups"
-  }
-]
 
 export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
   const { user, logout } = useAuth()
   const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
   const [isVisible, setIsVisible] = useState(true)
+  const [open, setOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   // Check if user has super admin access
   useEffect(() => {
@@ -115,7 +67,6 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
     }
   }, [user, router])
 
-  // Handle scroll visibility for bottom navigation
   useEffect(() => {
     let lastScroll = 0
     const handleScroll = () => {
@@ -150,168 +101,87 @@ export default function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
     )
   }
 
-  const handleLogout = () => {
-    logout()
-    router.push("/login")
-  }
-
-  const filteredNavigation = fullNavigationItems.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setSidebarOpen(false)
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Close sidebar"
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <Shield className="h-8 w-8 text-red-600" />
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">Super Admin</h1>
-              <p className="text-xs text-gray-500">System Administration</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* User info */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-              <UserCheck className="h-5 w-5 text-red-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user.name || user.email}
-              </p>
-              <p className="text-xs text-gray-500 truncate">
-                Super Administrator
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Search */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search navigation..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          {filteredNavigation.map((item) => {
-            const isActive = typeof window !== 'undefined' && window.location.pathname === item.href
-            return (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  isActive
-                    ? 'bg-red-100 text-red-700 border-r-2 border-red-600'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                }`}
-              >
-                <item.icon className={`mr-3 h-5 w-5 ${
-                  isActive ? 'text-red-500' : 'text-gray-400 group-hover:text-gray-500'
-                }`} />
-                <div className="flex-1">
-                  <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
-                </div>
-              </a>
-            )
-          })}
-        </nav>
-
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-200">
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#fbf9f1' }}>
+      <div className={`px-6 ${isMobile ? 'py-2' : 'py-4'}`} style={{ backgroundColor: '#fbf9f1' }}>
+        <header className="bg-white border border-gray-200 rounded-[20px] shadow-lg px-6 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div className="ml-4 lg:ml-0">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {typeof window !== 'undefined' && 
-                    navigationItems.find(item => item.href === window.location.pathname)?.name || 
-                    'Super Admin Portal'
-                  }
-                </h2>
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/images/ISE_Agri_Logo.png" 
+                  alt="ISE Agriculture Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/kenya_vertical_separator.jpg" 
+                  alt="Vertical Separator" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <img 
+                  src="/images/ksb2.png" 
+                  alt="KSB Logo" 
+                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+                />
+                <div className="flex flex-col ml-2">
+                  <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
+                    KENYA SUGAR BOARD
+                  </h1>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
+                    Sugar Industry Management Information System
+                  </p>
+                </div>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                Super Admin
-              </Badge>
-              <Button variant="ghost" size="sm">
-                <Bell className="h-5 w-5" />
-              </Button>
+
+            <div className="flex items-center gap-3">
+              <DropdownMenu open={open} onOpenChange={setOpen}>
+                <DropdownMenuTrigger asChild onMouseEnter={() => setOpen(true)} onClick={() => setOpen((prev) => !prev)}>
+                  <Button variant="ghost" className="p-0 rounded-full hover:bg-transparent">
+                    <div className="relative">
+                     
+                      <Avatar className={`h-10 w-10 cursor-pointer transition-all border-2 border-gray-300 hover:ring-2 hover:ring-green-300`}>
+                        <AvatarImage 
+                          src="/images/KSB_CEO.png"
+                          alt="Profile" 
+                        />
+                        <AvatarFallback className="bg-green-100 text-green-800">
+                          {user?.name
+                            ?.split(" ")
+                            .filter((part, index) => index === 0 || index === 1)
+                            .map((n) => n[0])
+                            .join("") || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {/* Status indicator */}
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full bg-green-500`}></div>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48" onMouseLeave={() => setOpen(false)}>
+                  <DropdownMenuItem onClick={() => {
+                    setOpen(false);
+                  }}>
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notifications
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Support
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="focus:bg-red-100 text-red-600" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-        </div>
-
-        {/* Page content */}
-        <main className="p-4 sm:p-6 lg:p-8 pb-24">
-          {children}
-        </main>
+        </header>
       </div>
-      
-      {/* Bottom Navigation */}
-      <BottomNavigation navigation={navigationItems} isVisible={isVisible} />
+    <main className="flex-1 overflow-auto pb-24">{children}</main>
+    <BottomNavigation navigation={navigationItems} isVisible={isVisible} />
     </div>
   )
 }
