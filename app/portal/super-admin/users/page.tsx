@@ -321,7 +321,7 @@ export default function UserManagement() {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-black">
               {users.filter(u => u.status === 'active').length}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -336,7 +336,7 @@ export default function UserManagement() {
             <UserX className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold text-black">
               {users.filter(u => u.status === 'pending').length}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -351,7 +351,7 @@ export default function UserManagement() {
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-black">
               {users.filter(u => u.status === 'suspended').length}
             </div>
             <p className="text-xs text-muted-foreground">

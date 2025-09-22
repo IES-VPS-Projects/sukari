@@ -12,10 +12,19 @@ export interface Department {
   headOfDepartmentId: string | null
   createdAt: string
   updatedAt: string
+  users: {
+    id: string
+    email: string
+    employeeId: string
+    designation: string
+    phoneNumber: string
+  }[]
   headOfDepartment: {
     id: string
-    name: string
     email: string
+    employeeId: string
+    designation: string
+    phoneNumber: string
   } | null
 }
 
@@ -55,6 +64,16 @@ export interface UpdateDepartmentData {
   maxOfficers?: number
   isActive?: boolean
   headOfDepartmentId?: string | null
+}
+
+export interface AddUserToDepartmentData {
+  departmentId: string
+  userId: string
+}
+
+export interface RemoveUserFromDepartmentData {
+  departmentId: string
+  userId: string
 }
 
 export function useDepartments() {
@@ -111,6 +130,39 @@ export function useDepartments() {
     }
   })
 
+  // Add user to department mutation
+  const addUserToDepartmentMutation = useMutation({
+    mutationFn: async (data: AddUserToDepartmentData): Promise<void> => {
+      const response = await apiService.post<{ success: boolean; message?: string; error?: string }>(`/api/ksb/departments/${data.departmentId}/users`, { userId: data.userId })
+      
+      if (!response.success) {
+        throw new Error(response.error || response.message || 'Failed to add user to department')
+      }
+    },
+    onSuccess: () => {
+      // Invalidate and refetch departments and users
+      queryClient.invalidateQueries({ queryKey: ['departments'] })
+      queryClient.invalidateQueries({ queryKey: ['ksbUsers'] })
+    }
+  })
+
+  // Remove user from department mutation
+  const removeUserFromDepartmentMutation = useMutation({
+    mutationFn: async (data: RemoveUserFromDepartmentData): Promise<void> => {
+      const response = await apiService.delete<{ success: boolean; message?: string; error?: string }>(`/api/ksb/departments/${data.departmentId}/users/${data.userId}`)
+      
+      if (!response.success) {
+        console.log(response, "response");
+        throw new Error(response.error || response.message || 'Failed to remove user from department')
+      }
+    },
+    onSuccess: () => {
+      // Invalidate and refetch departments and users
+      queryClient.invalidateQueries({ queryKey: ['departments'] })
+      queryClient.invalidateQueries({ queryKey: ['ksbUsers'] })
+    }
+  })
+
   return {
     departments: departmentsResponse?.data || [],
     pagination: departmentsResponse?.pagination,
@@ -120,11 +172,17 @@ export function useDepartments() {
     createDepartment: createDepartmentMutation.mutate,
     updateDepartment: updateDepartmentMutation.mutate,
     deleteDepartment: deleteDepartmentMutation.mutate,
+    addUserToDepartment: addUserToDepartmentMutation.mutate,
+    removeUserFromDepartment: removeUserFromDepartmentMutation.mutate,
     isCreating: createDepartmentMutation.isPending,
     isUpdating: updateDepartmentMutation.isPending,
     isDeleting: deleteDepartmentMutation.isPending,
+    isAddingUser: addUserToDepartmentMutation.isPending,
+    isRemovingUser: removeUserFromDepartmentMutation.isPending,
     createError: createDepartmentMutation.error,
     updateError: updateDepartmentMutation.error,
-    deleteError: deleteDepartmentMutation.error
+    deleteError: deleteDepartmentMutation.error,
+    addUserError: addUserToDepartmentMutation.error,
+    removeUserError: removeUserFromDepartmentMutation.error
   }
 }
