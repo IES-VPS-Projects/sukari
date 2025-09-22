@@ -1,7 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { FileCheck } from "lucide-react"
 
 const PermitsCard = () => {
   // Mock permits data
@@ -16,15 +17,16 @@ const PermitsCard = () => {
 
   return (
     <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-[#6B6B6B]">Permits</h3>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-700">Permits</h3>
         </div>
-        <div className="text-2xl font-bold text-[#202020] mb-1">{permitsData.totalPermits}</div>
-        <p className="text-xs text-[#6B6B6B] mb-3">total permits processed</p>
-        <p className="text-xs text-green-600 mb-2">+{permitsData.monthlyGrowth}% from last month</p>
-        <Progress value={permitsData.approvalRate} className="h-2 mb-2" />
-        <div className="text-xs text-[#6B6B6B]">Approval Rate: {permitsData.approvalRate}%</div>
+        <div className="flex items-baseline gap-2 mb-2">
+          <span className="text-2xl font-bold text-gray-800">{permitsData.totalPermits}</span>
+          <span className="text-xs text-green-600">+{permitsData.monthlyGrowth}%</span>
+        </div>
+        <Progress value={permitsData.approvalRate} className="h-1.5 mb-2" />
+        <p className="text-xs text-gray-500">Approval: {permitsData.approvalRate}%</p>
       </CardContent>
     </Card>
   )

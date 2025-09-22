@@ -162,6 +162,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
             setSelectedActionForDetails(null)
           }
         }}
+        selectedActionId={selectedActionForDetails}
       />
     </>
   )

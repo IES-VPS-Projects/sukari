@@ -254,8 +254,8 @@ export function MillerReturnsModal({ open, onOpenChange }: MillerReturnsModalPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[95vh]">
+        <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Returns</DialogTitle>
           <DialogDescription>
             File Daily, Monthly, and Annual returns for your sugar milling operations

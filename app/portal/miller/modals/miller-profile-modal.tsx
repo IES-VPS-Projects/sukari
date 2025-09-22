@@ -21,7 +21,11 @@ import {
   Trash2,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  FileText,
+  Upload,
+  Download,
+  Eye
 } from "lucide-react"
 
 interface MillerProfileModalProps {
@@ -45,12 +49,61 @@ interface MillerProfileModalProps {
 }
 
 export function MillerProfileModal({ open, onOpenChange, profileData }: MillerProfileModalProps) {
-  const [activeTab, setActiveTab] = useState<'company' | 'access'>('company')
+  const [activeTab, setActiveTab] = useState<'company' | 'access' | 'documents'>('company')
   const [isEditing, setIsEditing] = useState(false)
   const [editedData, setEditedData] = useState(profileData)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('')
   const [inviteDepartment, setInviteDepartment] = useState('')
+
+  // Mock company documents data
+  const [companyDocuments, setCompanyDocuments] = useState([
+    {
+      id: '1',
+      name: 'Business License',
+      type: 'License',
+      size: '2.4 MB',
+      uploadDate: '2024-01-15',
+      status: 'Verified',
+      description: 'Official business operating license from County Government'
+    },
+    {
+      id: '2',
+      name: 'Tax Certificate',
+      type: 'Certificate',
+      size: '1.8 MB',
+      uploadDate: '2024-01-20',
+      status: 'Verified',
+      description: 'KRA Tax Compliance Certificate - Valid until Dec 2024'
+    },
+    {
+      id: '3',
+      name: 'Import Permit 2024',
+      type: 'Permit',
+      size: '3.1 MB',
+      uploadDate: '2024-09-10',
+      status: 'Pending Review',
+      description: 'Import permit application for raw sugar - Q4 2024'
+    },
+    {
+      id: '4',
+      name: 'Environmental Compliance',
+      type: 'Certificate',
+      size: '2.7 MB',
+      uploadDate: '2024-08-15',
+      status: 'Verified',
+      description: 'NEMA environmental compliance certificate for mill operations'
+    },
+    {
+      id: '5',
+      name: 'Miller Registration Certificate',
+      type: 'Certificate',
+      size: '1.9 MB',
+      uploadDate: '2024-01-10',
+      status: 'Verified',
+      description: 'KSB Miller registration certificate - License SML-2024-003'
+    }
+  ])
 
   // Mock company users data
   const [companyUsers, setCompanyUsers] = useState([
@@ -184,8 +237,8 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[95vh]">
+        <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Profile</DialogTitle>
           <DialogDescription>
             Manage company information and access control for your miller organization
@@ -196,6 +249,7 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
         <div className="flex space-x-1 border-b border-gray-200 mb-6">
           {[
             { id: 'company', label: 'Company Information', icon: Building2 },
+            { id: 'documents', label: 'Documents', icon: FileText },
             { id: 'access', label: 'Access Management', icon: Users }
           ].map(({ id, label, icon: Icon }) => (
             <button
@@ -341,6 +395,95 @@ export function MillerProfileModal({ open, onOpenChange, profileData }: MillerPr
                 </div>
               </div>
             </div>
+            </div>
+          </div>
+        )}
+
+        {/* Documents Management Tab */}
+        {activeTab === 'documents' && (
+          <div className="h-[60vh] overflow-y-auto">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Document Management</h3>
+                  <p className="text-sm text-gray-500">Manage your company-related documents</p>
+                </div>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Document
+                </Button>
+              </div>
+
+              {/* Documents List */}
+              <div className="space-y-3">
+                {companyDocuments.map((document) => (
+                  <div key={document.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded flex items-center justify-center ${
+                        document.status === 'Verified' ? 'bg-green-100' :
+                        document.status === 'Pending Review' ? 'bg-orange-100' :
+                        'bg-gray-100'
+                      }`}>
+                        <FileText className={`h-4 w-4 ${
+                          document.status === 'Verified' ? 'text-green-600' :
+                          document.status === 'Pending Review' ? 'text-orange-600' :
+                          'text-gray-600'
+                        }`} />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{document.name}</div>
+                        <div className="text-xs text-gray-500">{document.type} • {document.size}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        document.status === 'Verified' ? 'bg-green-50 text-green-700' :
+                        document.status === 'Pending Review' ? 'bg-orange-50 text-orange-700' :
+                        'bg-gray-50 text-gray-700'
+                      }`}>
+                        {document.status}
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Upload Area */}
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600">
+                    Drag and drop files here, or{' '}
+                    <Button variant="link" className="p-0 h-auto text-blue-600">
+                      click to browse
+                    </Button>
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Support for PDF, DOC, DOCX, JPG, PNG files up to 10MB
+                  </p>
+                </div>
+              </div>
+
+              {/* Document Requirements */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-2">Required Documents</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Business License (Current and valid)</li>
+                  <li>• Tax Compliance Certificate (KRA)</li>
+                  <li>• Miller Registration Certificate (KSB)</li>
+                  <li>• Environmental Compliance Certificate (NEMA)</li>
+                  <li>• Import/Export Permits (if applicable)</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}

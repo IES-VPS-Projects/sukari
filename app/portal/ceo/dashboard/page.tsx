@@ -29,6 +29,13 @@ import SucroseContentCard from "./SucroseContentCard"
 import ProductionPulseCard from "./ProductionPulseCard"
 import PermitsCard from "./PermitsCard"
 import VesselTrackingCard from "./VesselTrackingCard"
+import MillersCard from "./MillersCard"
+import TraceabilityCard from "./TraceabilityCard"
+import GISFarmMappingCard from "./GISFarmMappingCard"
+import ComplianceCard from "./ComplianceCard"
+import RevenueCard from "./RevenueCard"
+import StakeholdersCard from "./StakeholdersCard"
+import ReportsCard from "./ReportsCard"
 import { sucroseContentData, productionData as mockProductionData } from "@/lib/mockdata"
 import {
   Chart as ChartJS,
@@ -365,94 +372,48 @@ export default function DashboardPage() {
     switch (activeTab) {
       case "overview":
         return (
-          <>
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <PermitsCard />
-              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
-                  <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
-                  <Progress value={92} className="h-2 mb-2" />
-                  <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
-                </CardContent>
-              </Card>
-              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Stakeholders</h3>
-                    <Users className="h-4 w-4 text-green-500" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
-                  <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
-                  <Progress value={78} className="h-2 mb-2" />
-                  <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
-                </CardContent>
-              </Card>
-              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  </div>
-                  <div className="flex justify-center">
-                    <GaugeMeter value={94} />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Dashboard Metrics Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <ViewPlanCard />
-              <div></div>
-              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">Mumias Sugar Mill</span>
-                      <span className="text-sm font-medium text-green-600">85%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">Nzoia Sugar Mill</span>
-                      <span className="text-sm font-medium text-green-600">80%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '80%'}}></div>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">West Kenya Sugar</span>
-                      <span className="text-sm font-medium text-green-600">75%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* CTU Sucrose Content and Production Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Column 1 */}
+            <div className="space-y-6">
+              {/* Millers Card (Welcome Hero Section) */}
+              <MillersCard />
+              
+              {/* CTU Sucrose Content Card (Weekly Flight Hours) */}
               <SucroseContentCard sucroseData={sucroseContentData} />
-              <ProductionPulseCard productionData={mockProductionData} />
+              
+              {/* Traceability Card (Yield Prediction) */}
+              <TraceabilityCard />
             </div>
-          </>
+
+            {/* Column 2 */}
+            <div className="space-y-6">
+              {/* GIS Farm Mapping Card (Realtime Device Status) */}
+              <GISFarmMappingCard />
+              
+              {/* Production Card (Crop Health Overview) */}
+              <ProductionPulseCard productionData={mockProductionData} />
+              
+              {/* Resource Center Card (Fleet Status) */}
+              <ResourceCenterCard />
+            </div>
+
+            {/* Column 3 */}
+            <div className="space-y-6">
+              {/* 2x2 Grid - Permits, Revenue, Stakeholders, Compliance */}
+              <div className="grid grid-cols-2 gap-4">
+                <PermitsCard />
+                <RevenueCard />
+                <StakeholdersCard />
+                <ComplianceCard />
+              </div>
+              
+              {/* Strategic Plan Card (Wind Rose) */}
+              <ViewPlanCard />
+              
+              {/* Reports Card (Today's Missions) */}
+              <ReportsCard />
+            </div>
+          </div>
         )
 
       case "permits":
@@ -941,14 +902,14 @@ export default function DashboardPage() {
 
   return (
     <PortalLayout pageTitle="Dashboard">
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Navigation Card - Tab Bar Only */}
-        <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-          <CardContent className="p-4">
-            {isMobile ? (
-              // Mobile: Dropdown in Card
+      <div className="p-6 max-w-[1400px] mx-auto space-y-6">
+        {/* Navigation Tabs - Seamless design without border */}
+        <div className="pb-2">
+          {isMobile ? (
+            // Mobile: Dropdown with background color
+            <div className="bg-white rounded-xl p-2 shadow-sm">
               <Select value={activeTab} onValueChange={setActiveTab}>
-                <SelectTrigger className="w-full rounded-xl border-gray-200">
+                <SelectTrigger className="w-full rounded-lg border-gray-200">
                   <SelectValue placeholder="Select a section">
                     {tabs.find(tab => tab.id === activeTab)?.label}
                   </SelectValue>
@@ -961,29 +922,34 @@ export default function DashboardPage() {
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
-              // Desktop: Pill Navigation in Card
-              <div className="flex flex-wrap gap-2">
+            </div>
+          ) : (
+            // Desktop: Center-aligned tab navigation without underline
+            <div className="flex items-center justify-center pb-1">
+              <div className="flex items-center gap-6">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? "bg-green-600 text-white shadow-md"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800"
-                    }`}
+                    className={`
+                      pb-2 text-sm font-medium 
+                      transition-all duration-200 whitespace-nowrap
+                      ${activeTab === tab.id
+                        ? "text-teal-600"
+                        : "text-gray-500 hover:text-gray-700"
+                      }
+                    `}
                   >
                     {tab.label}
                   </button>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </div>
 
         {/* Dynamic Content Based on Active Tab */}
-        <div className="space-y-6">
+        <div>
           {renderTabContent()}
         </div>
 
