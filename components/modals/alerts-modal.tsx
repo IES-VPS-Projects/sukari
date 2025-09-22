@@ -183,30 +183,40 @@ interface AlertsModalProps {
   onOpenChange: (open: boolean) => void
   onTakeAction?: () => void
   setScheduleNewActivityOpen?: (open: boolean) => void
+  alertsData?: any
+  selectedAlertForDetails?: string | null
+  setSelectedAlertForDetails?: (id: string | null) => void
 }
 
 export function AlertsModal({ 
-  open, 
+  open,  
   onOpenChange, 
-  onTakeAction,
-  setScheduleNewActivityOpen
+  alertsData, 
+  selectedAlertForDetails, 
+  setSelectedAlertForDetails,
+  onTakeAction 
 }: AlertsModalProps) {
-  const [selectedAlertForDetails, setSelectedAlertForDetails] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("all")
   
-  // Combine all alert data
-  const alertsData = {
+  // Default alerts data if not provided
+  const defaultAlertsData = {
     alerts: [...alerts, ...warnings, ...notifications]
+  }
+  
+  const currentAlertsData = alertsData || defaultAlertsData
+  
+  // Ensure currentAlertsData.alerts is always an array
+  const safeAlertsData = {
+    alerts: Array.isArray(currentAlertsData?.alerts) ? currentAlertsData.alerts : []
   }
   
   const handleTakeAction = () => {
     if (onTakeAction) {
       onTakeAction()
     }
-    if (setScheduleNewActivityOpen) {
-      setScheduleNewActivityOpen(true)
+    if (setSelectedAlertForDetails) {
+      setSelectedAlertForDetails(null)
     }
-    setSelectedAlertForDetails(null)
     onOpenChange(false)
   }
 
@@ -218,7 +228,7 @@ export function AlertsModal({
         </DialogTitle>
         {(() => {
           if (selectedAlertForDetails) {
-            const alert = alertsData.alerts.find((a: any) => a.id.toString() === selectedAlertForDetails)
+            const alert = safeAlertsData.alerts.find((a: any) => a.id.toString() === selectedAlertForDetails)
             if (alert) {
               return (
                 <div className="flex flex-col h-full">
@@ -227,7 +237,7 @@ export function AlertsModal({
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setSelectedAlertForDetails(null)}
+                        onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(null)}
                         className="shrink-0 h-8 w-8 sm:h-10 sm:w-10"
                       >
                         <ArrowLeft className="h-4 w-4" />
@@ -291,7 +301,7 @@ export function AlertsModal({
                         variant="outline"
                         onClick={() => {
                           console.log('Forward Alert', alert.id)
-                          setSelectedAlertForDetails(null)
+                          if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
                           onOpenChange(false)
                         }}
                       >
@@ -303,7 +313,7 @@ export function AlertsModal({
                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         onClick={() => {
                           console.log('Delete Alert', alert.id)
-                          setSelectedAlertForDetails(null)
+                          if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
                           onOpenChange(false)
                         }}
                       >
@@ -315,7 +325,7 @@ export function AlertsModal({
                         variant="outline"
                         onClick={() => {
                           console.log('Mark as Unread', alert.id)
-                          setSelectedAlertForDetails(null)
+                          if (setSelectedAlertForDetails) setSelectedAlertForDetails(null)
                           onOpenChange(false)
                         }}
                       >
@@ -417,11 +427,11 @@ export function AlertsModal({
                     </h3>
                     
                     <div className="space-y-3">
-                      {[...alerts, ...warnings, ...notifications].map((alert) => (
+                      {safeAlertsData.alerts.map((alert: any) => (
                         <div 
                           key={alert.id} 
                           className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                          onClick={() => setSelectedAlertForDetails(alert.id.toString())}
+                          onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(alert.id.toString())}
                         >
                           <div className={`w-8 h-8 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                             <FiAlertTriangle className={`h-4 w-4 ${alert.iconColor}`} />
@@ -456,11 +466,11 @@ export function AlertsModal({
                     </h3>
                     
                     <div className="space-y-3">
-                      {alerts.filter(alert => alert.priority === 'high').map((alert) => (
+                      {safeAlertsData.alerts.filter((alert: any) => alert.priority === 'high').map((alert: any) => (
                         <div 
                           key={alert.id} 
                           className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                          onClick={() => setSelectedAlertForDetails(alert.id.toString())}
+                          onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(alert.id.toString())}
                         >
                           <div className={`w-8 h-8 ${alert.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                             <FiAlertTriangle className={`h-4 w-4 ${alert.iconColor}`} />
@@ -492,11 +502,11 @@ export function AlertsModal({
                     </h3>
                     
                     <div className="space-y-3">
-                      {warnings.map((warning) => (
+                      {safeAlertsData.alerts.filter((alert: any) => alert.type === 'warning' || (alert.priority === 'medium' && alert.category === 'warning')).map((warning: any) => (
                         <div 
                           key={warning.id} 
                           className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                          onClick={() => setSelectedAlertForDetails(warning.id.toString())}
+                          onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(warning.id.toString())}
                         >
                           <div className={`w-8 h-8 ${warning.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                             <FiAlertTriangle className={`h-4 w-4 ${warning.iconColor}`} />
@@ -530,11 +540,11 @@ export function AlertsModal({
                     </h3>
                     
                     <div className="space-y-3">
-                      {notifications.map((notification) => (
+                      {safeAlertsData.alerts.filter((alert: any) => alert.type === 'notification' || alert.priority === 'low').map((notification: any) => (
                         <div 
                           key={notification.id} 
                           className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
-                          onClick={() => setSelectedAlertForDetails(notification.id.toString())}
+                          onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(notification.id.toString())}
                         >
                           <div className={`w-8 h-8 ${notification.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                             <FiAlertTriangle className={`h-4 w-4 ${notification.iconColor}`} />
