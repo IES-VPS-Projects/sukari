@@ -524,7 +524,7 @@ export default function VerificationStep() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Company Type</label>
                             <input
                               type="text"
-                              value={companyFormData.businessType || ""}
+                              value={companyFormData.company_type || ""}
                               readOnly
                               className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500"
                             />
@@ -542,9 +542,9 @@ export default function VerificationStep() {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Company Email</label>
                             <input
                               type="email"
-                              value={companyFormData.companyEmail || ""}
-                              onChange={(e) => handleCompanyFormChange("companyEmail", e.target.value)}
-                              placeholder="Enter company email"
+                              readOnly
+                              value={companyFormData.email || ""}
+                               placeholder="Enter company email"
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
                           </div>
