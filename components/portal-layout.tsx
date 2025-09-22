@@ -7,14 +7,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button"
 import { Home, MessageSquare, Calendar, FileText, BarChart3, LogOut, User, HelpCircle, Settings, Bell } from "lucide-react"
 import { HiSparkles } from 'react-icons/hi2'
-import Image from "next/image"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ImporterAlertsModal } from "@/app/portal/importer/modals/importer-alerts-modal"
+import { BottomNavigation, NavigationItem } from "@/components/ui/bottom-navigation"
 
-const ceoNavigation = [
+const ceoNavigation: NavigationItem[] = [
   { name: "Today", href: "/portal/ceo/today", icon: Home },
   { name: "AI", href: "/portal/ceo/ai", icon: HiSparkles },
   { name: "Calendar", href: "/portal/ceo/calendar", icon: Calendar },
@@ -23,21 +22,34 @@ const ceoNavigation = [
   { name: "Operations", href: "/portal/ceo", icon: User },
 ]
 
-const importerNavigation = [
+const importerNavigation: NavigationItem[] = [
   { name: "Portal", href: "/portal/importer", icon: Home },
+  { name: "Applications", href: "/portal/importer/applications", icon: FileText },
+  { name: "Reports", href: "/portal/importer/reports", icon: BarChart3 },
+  { name: "Settings", href: "/portal/importer/settings", icon: Settings },
 ]
 
-const fieldCoordinatorNavigation = [
+const fieldCoordinatorNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/portal/field-coordinator", icon: Home },
+  { name: "Visits", href: "/portal/field-coordinator/visits", icon: Calendar },
+  { name: "Farmers", href: "/portal/field-coordinator/farmers", icon: User },
+  { name: "Reports", href: "/portal/field-coordinator/reports", icon: BarChart3 },
 ]
 
-const millerNavigation = [
+const millerNavigation: NavigationItem[] = [
   { name: "Portal", href: "/portal/miller", icon: Home },
+  { name: "Applications", href: "/portal/miller/applications", icon: FileText },
+  { name: "Reports", href: "/portal/miller/reports", icon: BarChart3 },
+  { name: "Settings", href: "/portal/miller/settings", icon: Settings },
 ]
 
-export function PortalLayout({ children, pageTitle }: { children: React.ReactNode, pageTitle: string }) {
+interface PortalLayoutProps {
+  children: React.ReactNode
+  pageTitle: string
+}
+
+export function PortalLayout({ children, pageTitle }: PortalLayoutProps) {
   const { user, logout } = useAuth()
-  const pathname = usePathname()
   const [isVisible, setIsVisible] = useState(true)
   const [open, setOpen] = useState(false)
   const isMobile = useIsMobile()
@@ -174,32 +186,8 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
           </div>
         </header>
       </div>
-    <main className={`flex-1 overflow-auto ${user?.userType === "importer" || user?.userType === "field-coordinator" || user?.userType === "miller" ? "pb-6" : "pb-24"}`}>{children}</main>
-    {(user?.userType !== "importer" && user?.userType !== "field-coordinator" && user?.userType !== "miller") && (
-          <nav className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg transition-transform duration-300 ${isVisible ? "translate-y-0" : "translate-y-full"}`}>
-            <div className="flex items-center justify-center px-1 py-3">
-              <div className="flex items-center justify-around w-full max-w-3xl gap-1">
-                {navigation.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`flex flex-col items-center gap-1 px-1 py-2 rounded-lg transition-all duration-300 ease-in-out min-w-[55px] ${
-                        isActive 
-                          ? "bg-green-100 text-green-700 scale-105"
-                          : "text-gray-600 hover:text-green-600 hover:bg-green-50 hover:scale-105"
-                      }`}
-                    >
-                      <item.icon className="h-5 w-5 transition-transform duration-200" />
-                      <span className="text-xs font-medium transition-colors duration-200">{item.name}</span>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          </nav>
-        )}
+    <main className="flex-1 overflow-auto pb-24">{children}</main>
+    <BottomNavigation navigation={navigation} isVisible={isVisible} />
     </div>
   )
 }

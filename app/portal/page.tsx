@@ -12,12 +12,17 @@ export default function PortalPage() {
 
   useEffect(() => {
     if (!isLoading) {
+      console.log(user, "user");
+      
  
       if (!user) {
         router.push("/login")
       }
       else if (user.role === "USER" && pathname === "/portal") {
         router.push("/portal/miller")
+      }
+      else if (user.role === "ADMIN" && pathname === "/portal") {
+        router.push("/portal/super-admin")
       }
       else if (user.userType === "ceo" && pathname === "/portal") {
         router.push("/portal/ceo/today")
