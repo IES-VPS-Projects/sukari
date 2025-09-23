@@ -14,7 +14,8 @@ import {
   Clock,
   AlertTriangle,
   Download,
-  Upload
+  Upload, 
+  Workflow
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -23,11 +24,14 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { useLicenses, useLicenseStats } from "@/hooks/use-licenses"
 import { License } from "@/lib/api-client"
+import { FormBuilderModal } from "@/components/modals/form-builder-modal"
+import { WorkflowTemplatesModal } from "@/components/modals/workflow-templates-modal"
+import { LicensesModal } from "@/components/modals/licenses-modal"
+import { LicenseFormStatus } from "@/components/license-form-status"
 
 const licenseTypes = [
   { value: "MILLERS", label: "Sugar Millers License" },
@@ -52,8 +56,10 @@ export default function LicenseManagement() {
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedLicense, setSelectedLicense] = useState<License | null>(null)
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [isFormBuilderOpen, setIsFormBuilderOpen] = useState(false)
+  const [isWorkflowTemplatesOpen, setIsWorkflowTemplatesOpen] = useState(false)
+  const [isLicensesModalOpen, setIsLicensesModalOpen] = useState(false)
 
   // Fetch licenses data
   const { data: licensesData, isLoading: licensesLoading, error: licensesError } = useLicenses(1, 100)
@@ -128,8 +134,13 @@ export default function LicenseManagement() {
         break
       case "edit":
         setSelectedLicense(license)
-        // Edit functionality will be implemented in a future update
-        console.log("Edit license:", licenseId)
+        setIsLicensesModalOpen(true)
+        break
+      case "createForm":
+        setIsFormBuilderOpen(true)
+        break
+      case "createWorkflow":
+        setIsWorkflowTemplatesOpen(true)
         break
       case "approve":
         // Handle license approval
@@ -193,99 +204,10 @@ export default function LicenseManagement() {
             <Upload className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create License
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New License</DialogTitle>
-                <DialogDescription>
-                  Create a new license or permit for a stakeholder.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">License Name</Label>
-                    <Input id="name" placeholder="Enter license name" />
-                  </div>
-                  <div>
-                    <Label htmlFor="type">License Type</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select license type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {licenseTypes.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" placeholder="Enter license description" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="category">Category</Label>
-                    <Input id="category" placeholder="e.g., PERMIT_AND_LICENSE" />
-                  </div>
-                  <div>
-                    <Label htmlFor="cost">Cost (KSh)</Label>
-                    <Input id="cost" type="number" placeholder="Enter cost" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="validityPeriod">Validity Period (months)</Label>
-                    <Input id="validityPeriod" type="number" placeholder="Enter validity period" />
-                  </div>
-                  <div>
-                    <Label htmlFor="renewalPeriod">Renewal Period (months)</Label>
-                    <Input id="renewalPeriod" type="number" placeholder="Enter renewal period" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="issuingAuthority">Issuing Authority</Label>
-                  <Input id="issuingAuthority" placeholder="Enter issuing authority" />
-                </div>
-                <div>
-                  <Label htmlFor="processingTime">Processing Time</Label>
-                  <Input id="processingTime" placeholder="e.g., 5-10 business days" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="renewalRequired" defaultChecked />
-                    <Label htmlFor="renewalRequired">Renewal Required</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="isDigital" defaultChecked />
-                    <Label htmlFor="isDigital">Digital License</Label>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" id="onlineApplication" defaultChecked />
-                  <Label htmlFor="onlineApplication">Online Application Available</Label>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => setIsCreateDialogOpen(false)}>
-                    Create License
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => setIsLicensesModalOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create License
+          </Button>
         </div>
       </div>
 
@@ -411,6 +333,7 @@ export default function LicenseManagement() {
                   <TableHead>Cost</TableHead>
                   <TableHead>Issuing Authority</TableHead>
                   <TableHead>Applications</TableHead>
+                  <TableHead>Forms</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -471,6 +394,9 @@ export default function LicenseManagement() {
                         <div className="text-sm text-gray-500">Renewals</div>
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <LicenseFormStatus licenseId={license.id} />
+                    </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -486,6 +412,13 @@ export default function LicenseManagement() {
                           <DropdownMenuItem onClick={() => handleLicenseAction("edit", license.id)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit License
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleLicenseAction("createForm", license.id)}>
+                             Create Form
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleLicenseAction("createWorkflow", license.id)}>
+                            <Workflow className="h-4 w-4 mr-2" />
+                            Create Workflow
                           </DropdownMenuItem>
                           {license.status === "PENDING" && (
                             <DropdownMenuItem onClick={() => handleLicenseAction("approve", license.id)}>
@@ -627,6 +560,25 @@ export default function LicenseManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Form Builder Modal */}
+      <FormBuilderModal 
+        open={isFormBuilderOpen} 
+        onOpenChange={setIsFormBuilderOpen} 
+      />
+      
+      {/* Workflow Templates Modal */}
+      <WorkflowTemplatesModal 
+        open={isWorkflowTemplatesOpen} 
+        onOpenChange={setIsWorkflowTemplatesOpen} 
+      />
+      
+      {/* Licenses Modal */}
+      <LicensesModal 
+        open={isLicensesModalOpen} 
+        onOpenChange={setIsLicensesModalOpen}
+        selectedLicense={selectedLicense}
+      />
     </div>
   )
 }

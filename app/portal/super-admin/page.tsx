@@ -8,7 +8,8 @@ import {
   UserCheck,
   Building2,
   FileText,
-  Workflow
+  Workflow,
+  FileText as Form
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,7 +20,9 @@ import { ClientsModal } from "@/components/modals/clients-modal"
 import { BrsModal } from "@/components/modals/brs-modal"
 import { IprsModal } from "@/components/modals/iprs-modal"
 import { WorkflowTemplatesModal } from "@/components/modals/workflow-templates-modal"
+import { FormBuilderModal } from "@/components/modals/form-builder-modal"
 import { useAuth } from "@/components/auth-provider"
+import { License } from "@/lib/api-client"
 
 
 export default function SuperAdminDashboard() {
@@ -30,8 +33,18 @@ export default function SuperAdminDashboard() {
   const [brsModalOpen, setBrsModalOpen] = useState(false)
   const [iprsModalOpen, setIprsModalOpen] = useState(false)
   const [workflowTemplatesModalOpen, setWorkflowTemplatesModalOpen] = useState(false)
+  const [formBuilderModalOpen, setFormBuilderModalOpen] = useState(false)
+  const [selectedLicenseForEdit, setSelectedLicenseForEdit] = useState<License | null>(null)
 
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
+
+  const handleLicensesModalClose = (isOpen: boolean) => {
+    if (!isOpen) {
+      setSelectedLicenseForEdit(null)
+    }
+    setLicensesModalOpen(isOpen)
+  }
+
   return (
     <PortalLayout pageTitle="Super Admin">
       <div className="p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
@@ -118,6 +131,25 @@ export default function SuperAdminDashboard() {
             </CardContent>
           </Card>
 
+          {/* Form Builder Card */}
+          <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+            onClick={() => setFormBuilderModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Form className="h-5 w-5" />
+                Form Builder
+              </CardTitle>
+              <CardDescription>Create dynamic forms for license applications</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="h-32"></div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Clients Card */}
           <Card 
             className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
@@ -186,7 +218,8 @@ export default function SuperAdminDashboard() {
       />
       <LicensesModal 
         open={licensesModalOpen} 
-        onOpenChange={setLicensesModalOpen}
+        onOpenChange={handleLicensesModalClose}
+        selectedLicense={selectedLicenseForEdit}
       />
       <ClientsModal 
         open={clientsModalOpen} 
@@ -203,6 +236,10 @@ export default function SuperAdminDashboard() {
       <WorkflowTemplatesModal 
         open={workflowTemplatesModalOpen} 
         onOpenChange={setWorkflowTemplatesModalOpen}
+      />
+      <FormBuilderModal 
+        open={formBuilderModalOpen} 
+        onOpenChange={setFormBuilderModalOpen}
       />
     </PortalLayout>
   )

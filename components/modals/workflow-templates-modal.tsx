@@ -47,6 +47,7 @@ type ModalView = 'main' | 'createTemplate' | 'editTemplate' | 'viewTemplate'
 interface WorkflowTemplatesModalProps {
   readonly open: boolean
   readonly onOpenChange: (open: boolean) => void
+  readonly selectedLicenseId?: string | null
 }
 
 const licenseTypes = [
@@ -79,7 +80,7 @@ const assignmentMethods = [
   { value: "AUTO_ASSIGN", label: "Auto Assign" }
 ]
 
-export function WorkflowTemplatesModal({ open, onOpenChange }: WorkflowTemplatesModalProps) {
+export function WorkflowTemplatesModal({ open, onOpenChange, selectedLicenseId }: WorkflowTemplatesModalProps) {
   // State for modal views
   const [currentView, setCurrentView] = useState<ModalView>('main')
   const [isSubmitting, setIsSubmitting] = useState(false)

@@ -93,6 +93,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     applicationType: '',
     letterPurpose: '',
     permitType: '',
+    permitDuration: '',
     licenseType: '',
     bankName: '',
     loanAmount: '',
@@ -775,7 +776,23 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setSelectedApplication({
+                                onClick={() => {
+                                  // If it's a Letter of Comfort, show the form directly
+                                  if (license.category === 'LETTER_OF_COMFORT') {
+                                    setSelectedStakeholder('Sugar Miller');
+                                    setExpandedApplication('letter-of-comfort');
+                                    // Pre-populate form with license data
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      category: license.type === 'MILLERS' ? 'Mill' : 'Jaggery',
+                                      documentNo: `LOC-${license.id}`,
+                                      documentDate: new Date().toISOString().split('T')[0],
+                                      companyName: 'Your Company Name', // This should come from user profile
+                                      licenseExpiryDate: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                                    }));
+                                  } else {
+                                    // For other license types, show the application details
+                                    setSelectedApplication({
                                   id: license.id,
                                   type: license.type,
                                   title: license.name,
@@ -796,7 +813,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                   submittedDate: license.createdAt,
                                   approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
                                   validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
-                                })}
+                                    });
+                                  }
+                                }}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -1223,9 +1242,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                 </Button>
                               </div>
                             </form>
-                          ) : (
-                            // Default form for other applications
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                          ) : application.id === 'permit' ? (
+                            // Custom Permit Application Form
+                            <form onSubmit={handleSubmit} className="space-y-6">
                               <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                   <Label htmlFor="companyName">Company Name</Label>
@@ -1328,6 +1347,11 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                 </Button>
                               </div>
                             </form>
+                          ) : (
+                            // Default form for other applications  
+                            <div className="text-center py-8">
+                              <p className="text-gray-600">Application form not available for this type.</p>
+                            </div>
                           )}
                         </div>
                       )}

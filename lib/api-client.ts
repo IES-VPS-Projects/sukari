@@ -429,6 +429,53 @@ export class ApiClient {
       this.apiService.delete(`/api/workflow/templates/${id}`),
   };
 
+  // License Fields endpoints
+  licenseFields = {
+    getAll: (page = 1, limit = 10, filters?: { licenseId?: string; isActive?: boolean; type?: string }): Promise<PaginatedResponse> => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.licenseId && { licenseId: filters.licenseId }),
+        ...(filters?.isActive !== undefined && { isActive: filters.isActive.toString() }),
+        ...(filters?.type && { type: filters.type }),
+      });
+      return this.apiService.get(`/api/fields?${params.toString()}`);
+    },
+
+    getById: (id: string): Promise<ApiResponse> =>
+      this.apiService.get(`/api/fields/${id}`),
+
+    getByLicenseId: (licenseId: string): Promise<ApiResponse> =>
+      this.apiService.get(`/api/licenses/${licenseId}/fields`),
+
+    getLicenseWithFields: (licenseId: string): Promise<ApiResponse> =>
+      this.apiService.get(`/api/licenses/${licenseId}/with-fields`),
+
+    create: (licenseId: string, fieldData: any): Promise<ApiResponse> =>
+      this.apiService.post(`/api/licenses/${licenseId}/fields`, fieldData),
+
+    update: (id: string, fieldData: any): Promise<ApiResponse> =>
+      this.apiService.put(`/api/fields/${id}`, fieldData),
+
+    delete: (id: string): Promise<ApiResponse> =>
+      this.apiService.delete(`/api/fields/${id}`),
+
+    bulkCreate: (licenseId: string, fieldsData: any): Promise<ApiResponse> =>
+      this.apiService.post(`/api/licenses/${licenseId}/fields/bulk`, fieldsData),
+
+    reorder: (licenseId: string, fieldOrders: any): Promise<ApiResponse> =>
+      this.apiService.put(`/api/licenses/${licenseId}/fields/reorder`, fieldOrders),
+
+    getStatistics: (): Promise<ApiResponse> =>
+      this.apiService.get('/api/fields/statistics'),
+
+    getFieldTypes: (): Promise<ApiResponse> =>
+      this.apiService.get('/api/fields/types'),
+
+    validate: (fieldData: any): Promise<ApiResponse> =>
+      this.apiService.post('/api/fields/validate', fieldData),
+  };
+
   // Projects endpoints
   projects = {
     getAll: (page = 1, limit = 10): Promise<PaginatedResponse> =>
