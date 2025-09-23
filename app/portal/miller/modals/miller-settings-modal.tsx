@@ -169,8 +169,8 @@ export function MillerSettingsModal({ open, onOpenChange }: MillerSettingsModalP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[95vh]">
+        <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Miller Settings</DialogTitle>
           <DialogDescription>
             Manage security settings and notification preferences for your miller account

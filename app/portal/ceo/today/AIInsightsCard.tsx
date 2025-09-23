@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { CheckCircle } from "lucide-react"
 import { allAIInsightsData } from "@/lib/mockdata"
-import { AIInsightsModal } from "@/components/modals/ai-insights-modal"
+import { AIInsightsModal } from "./modals/ai-insights-modal"
 
 interface AIInsightsCardProps {
   triggerNewActivity?: boolean

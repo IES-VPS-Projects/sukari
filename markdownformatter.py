@@ -1,0 +1,134 @@
+"""
+Markdown formatter for Kenya Sugar Board Analysis System
+"""
+
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+import re
+import uuid
+
+class MarkdownFormatter:
+    """Formats analysis responses into professional markdown documents"""
+    
+    @staticmethod
+    def format_response(
+        query: str,
+        answer: str,
+        analysis_type: str = None,
+        agents_used: List[str] = None,
+        data_insights: str = None,
+        research_findings: str = None,
+        source_urls: List[str] = None,
+        metadata: Dict[str, Any] = None
+    ) -> str:
+        """
+        Format the analysis response into professional markdown
+        """
+        
+        # Start with header
+        markdown = f"# 📊 Kenya Sugar Industry Analysis Report\n\n"
+        markdown += f"**Generated on:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}\n"
+        
+        if analysis_type:
+            markdown += f"**Analysis Type:** {analysis_type.title()}\n"
+        
+        markdown += "\n---\n\n"
+        
+        # Query section
+        markdown += f"## 📋 Query\n\n"
+        markdown += f"```\n{query}\n```\n\n"
+        
+        # Main answer section - clean up any duplicate content
+        markdown += f"## 🔍 Analysis Results\n\n"
+        
+        # Clean the answer to remove any embedded markdown headers that might cause duplication
+        cleaned_answer = answer
+        
+        # Remove any duplicate report headers
+        cleaned_answer = re.sub(r'#{1,3}\s*📊.*?Analysis Report.*?\n', '', cleaned_answer)
+        cleaned_answer = re.sub(r'\*\*Generated on:.*?\*\*\n', '', cleaned_answer)
+        cleaned_answer = re.sub(r'\*\*Analysis Type:.*?\*\*\n', '', cleaned_answer)
+        cleaned_answer = re.sub(r'#{1,3}\s*📋\s*Query.*?\n```.*?```\n', '', cleaned_answer, flags=re.DOTALL)
+        
+        # Remove executive summary duplication if it exists
+        if '📌 Executive Summary' in cleaned_answer:
+            # Extract just the summary content
+            summary_match = re.search(r'📌 Executive Summary\s*\n+(.*?)(?=\n#{1,3}|\n\n#{1,3}|$)', cleaned_answer, re.DOTALL)
+            if summary_match:
+                markdown += f"### 📌 Executive Summary\n\n"
+                markdown += f"> {summary_match.group(1).strip()}\n\n"
+                # Remove the executive summary from the main answer
+                cleaned_answer = cleaned_answer.replace(summary_match.group(0), '')
+        
+        # Add the main analysis content
+        markdown += cleaned_answer.strip() + "\n\n"
+        
+        # Add data insights if available and not already in answer
+        if data_insights and data_insights not in answer:
+            markdown += "### 📊 Data Insights\n\n"
+            markdown += f"{data_insights}\n\n"
+        
+        # Add research findings if available and not already in answer
+        if research_findings and research_findings not in answer:
+            markdown += "### 🌐 Web Research Findings\n\n"
+            markdown += f"{research_findings}\n\n"
+        
+        # Add source URLs section if available
+        if source_urls and len(source_urls) > 0:
+            markdown += "### 📚 Information Sources\n\n"
+            for idx, url in enumerate(source_urls, 1):
+                # Make URLs clickable
+                markdown += f"{idx}. [{url}]({url})\n"
+            markdown += "\n"
+        
+        # Add methodology section
+        markdown += "## 🔧 Analysis Methodology\n\n"
+        markdown += "This comprehensive analysis was conducted using the following AI-powered modules:\n\n"
+        
+        if agents_used:
+            agent_descriptions = {
+                'supervisor': '🤖 **Intelligent Query Router** - Analyzed your query and determined the optimal analysis approach',
+                'data_analyst': '📊 **Data Analysis Engine** - Processed production data, factory metrics, and historical trends',
+                'web_researcher': '🌐 **Web Research Module** - Gathered current policies, regulations, and industry insights',
+                'integrator': '🔄 **Integration System** - Combined multiple data sources for comprehensive insights'
+            }
+            
+            for agent in agents_used:
+                if agent in agent_descriptions:
+                    markdown += f"{agent_descriptions[agent]}\n\n"
+        
+        markdown += "---\n\n"
+        
+        # Report metadata
+        markdown += "### 📝 Report Information\n\n"
+        markdown += f"- **Report ID:** KSB-{datetime.now().strftime('%Y%m%d-%H%M%S')}\n"
+        markdown += "- **Data Sources:** Kenya Sugar Board Production Database\n"
+        markdown += "- **Analysis Engine:** AI-Powered Multi-Agent System v2.0\n"
+        markdown += "- **Confidence Level:** High (Based on official data)\n"
+        
+        markdown += "\n---\n\n"
+        
+        # Footer
+        markdown += "*This report was generated by the Kenya Sugar Board Analysis System using advanced AI and data analytics. "
+        markdown += "The analysis is based on the latest available data and should be validated with official sources for critical decision-making.*\n\n"
+        markdown += f"**© {datetime.now().year} Kenya Sugar Board** | *Confidential and Proprietary*\n"
+        
+        return markdown
+    
+    @staticmethod
+    def format_error(error_message: str, query: str = None) -> str:
+        """Format error messages in markdown"""
+        markdown = "# ⚠️ Analysis Error\n\n"
+        
+        if query:
+            markdown += f"**Query:** {query}\n\n"
+        
+        markdown += f"**Error:** {error_message}\n\n"
+        markdown += "Please try again or contact support if the issue persists.\n"
+        
+        return markdown
+    
+    @staticmethod
+    def format_simple_response(content: str) -> str:
+        """Format a simple response without full report structure"""
+        return f"## Response\n\n{content}\n"

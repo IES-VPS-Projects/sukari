@@ -1,0 +1,215 @@
+/**
+ * Markdown formatter for Kenya Sugar Board Analysis System
+ */
+
+export interface MarkdownFormatterOptions {
+  query: string;
+  answer: string;
+  analysis_type?: string;
+  agents_used?: string[];
+  data_insights?: string;
+  research_findings?: string;
+  source_urls?: string[];
+  metadata?: Record<string, any>;
+}
+
+export class MarkdownFormatter {
+  /**
+   * Format the analysis response into professional markdown
+   */
+  static formatResponse(options: MarkdownFormatterOptions): string {
+    const {
+      query,
+      answer,
+      analysis_type,
+      agents_used,
+      data_insights,
+      research_findings,
+      source_urls,
+      metadata
+    } = options;
+
+    // Start with header
+    let markdown = `# 📊 Kenya Sugar Industry Analysis Report\n\n`;
+    markdown += `**Generated on:** ${new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    })}\n`;
+    
+    if (analysis_type) {
+      markdown += `**Analysis Type:** ${analysis_type.charAt(0).toUpperCase() + analysis_type.slice(1)}\n`;
+    }
+    
+    markdown += "\n---\n\n";
+    
+    // Query section
+    markdown += `## 📋 Query\n\n`;
+    markdown += `\`\`\`\n${query}\n\`\`\`\n\n`;
+    
+    // Main answer section - clean up any duplicate content
+    markdown += `## 🔍 Analysis Results\n\n`;
+    
+    // Clean the answer to remove any embedded markdown headers that might cause duplication
+    let cleaned_answer = answer;
+    
+    // Remove any duplicate report headers
+    cleaned_answer = cleaned_answer.replace(/^#{1,3}\s*📊.*?Analysis Report.*?\n/gm, '');
+    cleaned_answer = cleaned_answer.replace(/\*\*Generated on:.*?\*\*\n/g, '');
+    cleaned_answer = cleaned_answer.replace(/\*\*Analysis Type:.*?\*\*\n/g, '');
+    cleaned_answer = cleaned_answer.replace(/^#{1,3}\s*📋\s*Query.*?\n```.*?```\n/gms, '');
+    
+    // Remove executive summary duplication if it exists
+    if (cleaned_answer.includes('📌 Executive Summary')) {
+      // Extract just the summary content
+      const summaryMatch = cleaned_answer.match(/📌 Executive Summary\s*\n+(.*?)(?=\n#{1,3}|\n\n#{1,3}|$)/s);
+      if (summaryMatch) {
+        markdown += `### 📌 Executive Summary\n\n`;
+        markdown += `> ${summaryMatch[1].trim()}\n\n`;
+        // Remove the executive summary from the main answer
+        cleaned_answer = cleaned_answer.replace(summaryMatch[0], '');
+      }
+    }
+    
+    // Add the main analysis content
+    markdown += cleaned_answer.trim() + "\n\n";
+    
+    // Add data insights if available and not already in answer
+    if (data_insights && !answer.includes(data_insights)) {
+      markdown += "### 📊 Data Insights\n\n";
+      markdown += `${data_insights}\n\n`;
+    }
+    
+    // Add research findings if available and not already in answer
+    if (research_findings && !answer.includes(research_findings)) {
+      markdown += "### 🌐 Web Research Findings\n\n";
+      markdown += `${research_findings}\n\n`;
+    }
+    
+    // Add source URLs section if available
+    if (source_urls && source_urls.length > 0) {
+      markdown += "### 📚 Information Sources\n\n";
+      source_urls.forEach((url, idx) => {
+        // Make URLs clickable
+        markdown += `${idx + 1}. [${url}](${url})\n`;
+      });
+      markdown += "\n";
+    }
+    
+    // Add methodology section
+    markdown += "## 🔧 Analysis Methodology\n\n";
+    markdown += "This comprehensive analysis was conducted using the following AI-powered modules:\n\n";
+    
+    if (agents_used) {
+      const agentDescriptions: Record<string, string> = {
+        'supervisor': '🤖 **Intelligent Query Router** - Analyzed your query and determined the optimal analysis approach',
+        'data_analyst': '📊 **Data Analysis Engine** - Processed production data, factory metrics, and historical trends',
+        'web_researcher': '🌐 **Web Research Module** - Gathered current policies, regulations, and industry insights',
+        'integrator': '🔄 **Integration System** - Combined multiple data sources for comprehensive insights'
+      };
+      
+      agents_used.forEach(agent => {
+        if (agentDescriptions[agent]) {
+          markdown += `${agentDescriptions[agent]}\n\n`;
+        }
+      });
+    }
+    
+    markdown += "---\n\n";
+    
+    // Report metadata
+    markdown += "### 📝 Report Information\n\n";
+    const reportId = `KSB-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${new Date().toTimeString().slice(0, 8).replace(/:/g, '')}`;
+    markdown += `- **Report ID:** ${reportId}\n`;
+    markdown += "- **Data Sources:** Kenya Sugar Board Production Database\n";
+    markdown += "- **Analysis Engine:** AI-Powered Multi-Agent System v2.0\n";
+    markdown += "- **Confidence Level:** High (Based on official data)\n";
+    
+    markdown += "\n---\n\n";
+    
+    // Footer
+    markdown += "*This report was generated by the Kenya Sugar Board Analysis System using advanced AI and data analytics. ";
+    markdown += "The analysis is based on the latest available data and should be validated with official sources for critical decision-making.*\n\n";
+    markdown += `**© ${new Date().getFullYear()} Kenya Sugar Board** | *Confidential and Proprietary*\n`;
+    
+    return markdown;
+  }
+  
+  /**
+   * Format error messages in markdown
+   */
+  static formatError(errorMessage: string, query?: string): string {
+    let markdown = "# ⚠️ Analysis Error\n\n";
+    
+    if (query) {
+      markdown += `**Query:** ${query}\n\n`;
+    }
+    
+    markdown += `**Error:** ${errorMessage}\n\n`;
+    markdown += "Please try again or contact support if the issue persists.\n";
+    
+    return markdown;
+  }
+  
+  /**
+   * Format a simple response without full report structure
+   */
+  static formatSimpleResponse(content: string): string {
+    return `## Response\n\n${content}\n`;
+  }
+  
+  /**
+   * Check if the response should be formatted as a full report
+   */
+  static shouldFormatAsReport(answer: string): boolean {
+    // Check if the answer contains analysis keywords that suggest it should be formatted as a report
+    const analysisKeywords = [
+      'analysis', 'report', 'data', 'production', 'factory', 'trends', 
+      'comparison', 'summary', 'insights', 'findings', 'statistics'
+    ];
+    
+    const lowerAnswer = answer.toLowerCase();
+    return analysisKeywords.some(keyword => lowerAnswer.includes(keyword));
+  }
+  
+  /**
+   * Extract metadata from AI response
+   */
+  static extractMetadata(response: any): {
+    analysis_type?: string;
+    agents_used?: string[];
+    source_urls?: string[];
+    data_insights?: string;
+    research_findings?: string;
+  } {
+    const metadata: any = {};
+    
+    if (response.metadata) {
+      metadata.analysis_type = response.metadata.analysis_type;
+      metadata.agents_used = response.metadata.agents_used;
+      metadata.source_urls = response.metadata.source_urls;
+    }
+    
+    // Extract data insights and research findings from the response content
+    const content = response.response || response.answer || '';
+    
+    // Look for data insights section
+    const dataInsightsMatch = content.match(/### 📊 Data Insights\s*\n+(.*?)(?=\n#{1,3}|\n\n#{1,3}|$)/s);
+    if (dataInsightsMatch) {
+      metadata.data_insights = dataInsightsMatch[1].trim();
+    }
+    
+    // Look for research findings section
+    const researchMatch = content.match(/### 🌐 Web Research Findings\s*\n+(.*?)(?=\n#{1,3}|\n\n#{1,3}|$)/s);
+    if (researchMatch) {
+      metadata.research_findings = researchMatch[1].trim();
+    }
+    
+    return metadata;
+  }
+}
+
+

@@ -135,7 +135,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<'All' | 'Permits' | 'Revenue' | 'Stakeholders' | 'Compliance' | 'Strategic-plan' | 'Reports' | 'Production'>('All')
   
   // Use the external alerts data passed from parent (which already includes combined data)
-  const allAlertsForCard = externalAlertsData?.alerts || alertsData.alerts
+  const allAlertsForCard = externalAlertsData?.alerts || alertsData.alerts || []
 
   const priorityCounts = {
     High: allAlertsForCard.filter((a: any) => a.priority === 'high' || a.label?.toUpperCase() === 'HIGH').length,
