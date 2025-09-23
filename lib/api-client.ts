@@ -134,37 +134,88 @@ export interface BRSData {
 // License related types
 export interface License {
   id: string;
-  type: string;
   name: string;
   description: string;
-  status: 'active' | 'expired' | 'pending' | 'suspended';
-  issueDate: string;
-  expiryDate: string;
-  licenseNumber: string;
-  holderName: string;
-  holderCompany: string;
   category: string;
-  capacity?: string;
-  location?: string;
-  documents: string[];
-  notes?: string;
+  type: string;
+  status: 'ACTIVE' | 'EXPIRED' | 'PENDING' | 'SUSPENDED';
+  requirements?: {
+    documents?: string[];
+    qualifications?: string[];
+    minimumCapital?: number;
+  };
+  cost: string | number;
+  validityPeriod: number; // in months
+  renewalPeriod: number; // in months
+  issuingAuthority: string;
+  applicationSteps?: string[];
+  prerequisites?: {
+    businessRegistration?: boolean;
+    taxCompliance?: boolean;
+    environmentalClearance?: boolean;
+    minimumCapital?: number;
+  };
+  documents?: {
+    required?: string[];
+    optional?: string[];
+  };
+  processingTime: string;
+  renewalRequired: boolean;
+  isDigital: boolean;
+  onlineApplication: boolean;
   createdAt: string;
   updatedAt: string;
+  applications?: LicenseApplication[];
+  renewals?: LicenseRenewal[];
+  _count?: {
+    applications: number;
+    renewals: number;
+  };
+}
+
+export interface LicenseApplication {
+  id: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'UNDER_REVIEW';
+  submittedAt: string;
+  userId: string;
+}
+
+export interface LicenseRenewal {
+  id: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'UNDER_REVIEW';
+  submittedAt: string;
+  userId: string;
 }
 
 export interface CreateLicenseRequest {
-  type: string;
   name: string;
   description: string;
-  holderName: string;
-  holderCompany: string;
   category: string;
-  capacity?: string;
-  location?: string;
-  documents?: string[];
-  notes?: string;
-  expiryDate?: string;
-  licenseNumber?: string;
+  type: string;
+  issuingAuthority: string;
+  cost: string | number;
+  validityPeriod: number;
+  renewalPeriod: number;
+  requirements?: {
+    documents?: string[];
+    qualifications?: string[];
+    minimumCapital?: number;
+  };
+  applicationSteps?: string[];
+  prerequisites?: {
+    businessRegistration?: boolean;
+    taxCompliance?: boolean;
+    environmentalClearance?: boolean;
+    minimumCapital?: number;
+  };
+  documents?: {
+    required?: string[];
+    optional?: string[];
+  };
+  processingTime: string;
+  renewalRequired?: boolean;
+  isDigital?: boolean;
+  onlineApplication?: boolean;
 }
 
 // Director user creation types

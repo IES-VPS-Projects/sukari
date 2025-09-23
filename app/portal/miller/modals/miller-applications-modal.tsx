@@ -294,22 +294,22 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     type: license.type,
     title: license.name,
     purpose: license.description,
-    status: license.status === 'active' ? 'Approved' : 
-            license.status === 'pending' ? 'Under Review' : 
-            license.status === 'expired' ? 'Expired' : 'Suspended',
-    stage: license.status === 'active' ? 'Issuance' : 
-           license.status === 'pending' ? 'Evaluation' : 
-           license.status === 'expired' ? 'Expired' : 'Suspended',
-    applicant: license.holderName,
-    company: license.holderCompany,
-    submitDate: license.issueDate,
-    completionDate: license.status === 'active' ? license.issueDate : null,
-    expectedCompletion: license.status === 'pending' ? license.expiryDate : null,
-    quantity: license.capacity || 'N/A',
-    notes: license.notes || `${license.type} - ${license.status}`,
-    submittedDate: license.issueDate,
-    approvedDate: license.status === 'active' ? license.issueDate : null,
-    validUntil: license.expiryDate
+    status: license.status === 'ACTIVE' ? 'Approved' : 
+            license.status === 'PENDING' ? 'Under Review' : 
+            license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+    stage: license.status === 'ACTIVE' ? 'Issuance' : 
+           license.status === 'PENDING' ? 'Evaluation' : 
+           license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+    applicant: 'N/A', // Not available in new structure
+    company: 'N/A', // Not available in new structure
+    submitDate: license.createdAt,
+    completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
+    expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
+    quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`, // Using cost as quantity placeholder
+    notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
+    submittedDate: license.createdAt,
+    approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
+    validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
   })) || []
 
   const handleInputChange = (field: string, value: string) => {
@@ -766,7 +766,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             <div>
                               <h5 className="font-semibold">{license.name}</h5>
                               <p className="text-sm text-gray-600">{license.type}</p>
-                              <p className="text-xs text-gray-500">License #: {license.licenseNumber}</p>
+                              <p className="text-xs text-gray-500">License ID: {license.id}</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge className={getStatusColor(license.status)}>
@@ -780,22 +780,22 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                   type: license.type,
                                   title: license.name,
                                   purpose: license.description,
-                                  status: license.status === 'active' ? 'Approved' : 
-                                          license.status === 'pending' ? 'Under Review' : 
-                                          license.status === 'expired' ? 'Expired' : 'Suspended',
-                                  stage: license.status === 'active' ? 'Issuance' : 
-                                         license.status === 'pending' ? 'Evaluation' : 
-                                         license.status === 'expired' ? 'Expired' : 'Suspended',
-                                  applicant: license.holderName,
-                                  company: license.holderCompany,
-                                  submitDate: license.issueDate,
-                                  completionDate: license.status === 'active' ? license.issueDate : null,
-                                  expectedCompletion: license.status === 'pending' ? license.expiryDate : null,
-                                  quantity: license.capacity || 'N/A',
-                                  notes: license.notes || `${license.type} - ${license.status}`,
-                                  submittedDate: license.issueDate,
-                                  approvedDate: license.status === 'active' ? license.issueDate : null,
-                                  validUntil: license.expiryDate
+                                  status: license.status === 'ACTIVE' ? 'Approved' : 
+                                          license.status === 'PENDING' ? 'Under Review' : 
+                                          license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+                                  stage: license.status === 'ACTIVE' ? 'Issuance' : 
+                                         license.status === 'PENDING' ? 'Evaluation' : 
+                                         license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+                                  applicant: 'N/A', // Not available in new structure
+                                  company: 'N/A', // Not available in new structure
+                                  submitDate: license.createdAt,
+                                  completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
+                                  expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
+                                  quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`, // Using cost as quantity placeholder
+                                  notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
+                                  submittedDate: license.createdAt,
+                                  approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
+                                  validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
                                 })}
                               >
                                 <Eye className="h-4 w-4" />
@@ -804,25 +804,25 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-gray-600">Issue Date:</span>
-                              <p className="font-medium">{new Date(license.issueDate).toLocaleDateString()}</p>
+                              <span className="text-gray-600">Created Date:</span>
+                              <p className="font-medium">{new Date(license.createdAt).toLocaleDateString()}</p>
                             </div>
                             <div>
-                              <span className="text-gray-600">Expiry Date:</span>
-                              <p className="font-medium">{new Date(license.expiryDate).toLocaleDateString()}</p>
+                              <span className="text-gray-600">Validity Period:</span>
+                              <p className="font-medium">{license.validityPeriod} months</p>
                             </div>
-                            {license.capacity && (
-                              <div>
-                                <span className="text-gray-600">Capacity:</span>
-                                <p className="font-medium">{license.capacity}</p>
-                              </div>
-                            )}
-                            {license.location && (
-                              <div>
-                                <span className="text-gray-600">Location:</span>
-                                <p className="font-medium">{license.location}</p>
-                              </div>
-                            )}
+                            <div>
+                              <span className="text-gray-600">Cost:</span>
+                              <p className="font-medium">KSh {typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Processing Time:</span>
+                              <p className="font-medium">{license.processingTime}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Issuing Authority:</span>
+                              <p className="font-medium">{license.issuingAuthority}</p>
+                            </div>
                           </div>
                         </div>
                       ))}

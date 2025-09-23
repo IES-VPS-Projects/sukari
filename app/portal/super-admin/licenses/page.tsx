@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { 
   FileCheck, 
   Search, 
-  Filter, 
   Plus, 
   MoreHorizontal, 
   Edit, 
@@ -14,9 +13,6 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
-  Calendar,
-  Building,
-  MapPin,
   Download,
   Upload
 } from "lucide-react"
@@ -34,19 +30,21 @@ import { useLicenses, useLicenseStats } from "@/hooks/use-licenses"
 import { License } from "@/lib/api-client"
 
 const licenseTypes = [
-  { value: "Sugar Manufacturing License", label: "Sugar Manufacturing License" },
-  { value: "Food Processing License", label: "Food Processing License" },
-  { value: "Industrial License", label: "Industrial License" },
-  { value: "Export License", label: "Export License" },
-  { value: "Warehouse License", label: "Warehouse License" },
-  { value: "Quality Assurance License", label: "Quality Assurance License" }
+  { value: "MILLERS", label: "Sugar Millers License" },
+  { value: "FOOD_PROCESSING", label: "Food Processing License" },
+  { value: "INDUSTRIAL", label: "Industrial License" },
+  { value: "EXPORT", label: "Export License" },
+  { value: "WAREHOUSE", label: "Warehouse License" },
+  { value: "QUALITY_ASSURANCE", label: "Quality Assurance License" },
+  { value: "WHITE_SUGAR", label: "White Sugar Production License" },
+  { value: "PROCESSING", label: "Sugar Processing License" }
 ]
 
 const statusOptions = [
-  { value: "active", label: "Active" },
-  { value: "pending", label: "Pending" },
-  { value: "expired", label: "Expired" },
-  { value: "suspended", label: "Suspended" }
+  { value: "ACTIVE", label: "Active" },
+  { value: "PENDING", label: "Pending" },
+  { value: "EXPIRED", label: "Expired" },
+  { value: "SUSPENDED", label: "Suspended" }
 ]
 
 export default function LicenseManagement() {
@@ -55,7 +53,6 @@ export default function LicenseManagement() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedLicense, setSelectedLicense] = useState<License | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
 
   // Fetch licenses data
@@ -73,9 +70,9 @@ export default function LicenseManagement() {
     if (searchQuery) {
       filtered = filtered.filter(license =>
         license.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        license.licenseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        license.holderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        license.holderCompany.toLowerCase().includes(searchQuery.toLowerCase())
+        license.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        license.issuingAuthority.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        license.type.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
@@ -92,13 +89,13 @@ export default function LicenseManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
+      case "ACTIVE":
         return "bg-green-100 text-green-800"
-      case "pending":
+      case "PENDING":
         return "bg-yellow-100 text-yellow-800"
-      case "expired":
+      case "EXPIRED":
         return "bg-red-100 text-red-800"
-      case "suspended":
+      case "SUSPENDED":
         return "bg-gray-100 text-gray-800"
       default:
         return "bg-gray-100 text-gray-800"
@@ -107,13 +104,13 @@ export default function LicenseManagement() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "active":
+      case "ACTIVE":
         return <CheckCircle className="h-4 w-4 text-green-600" />
-      case "pending":
+      case "PENDING":
         return <Clock className="h-4 w-4 text-yellow-600" />
-      case "expired":
+      case "EXPIRED":
         return <XCircle className="h-4 w-4 text-red-600" />
-      case "suspended":
+      case "SUSPENDED":
         return <AlertTriangle className="h-4 w-4 text-gray-600" />
       default:
         return <FileCheck className="h-4 w-4 text-gray-600" />
@@ -131,7 +128,8 @@ export default function LicenseManagement() {
         break
       case "edit":
         setSelectedLicense(license)
-        setIsEditDialogOpen(true)
+        // Edit functionality will be implemented in a future update
+        console.log("Edit license:", licenseId)
         break
       case "approve":
         // Handle license approval
@@ -153,22 +151,7 @@ export default function LicenseManagement() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-  }
-
-  const isExpiringSoon = (expiryDate: string) => {
-    const expiry = new Date(expiryDate)
-    const now = new Date()
-    const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0
-  }
-
-  const isExpired = (expiryDate: string) => {
-    const expiry = new Date(expiryDate)
-    const now = new Date()
-    return expiry < now
-  }
+  // Helper functions removed as they're no longer needed with the new data structure
 
   if (licensesLoading) {
     return (
@@ -227,6 +210,10 @@ export default function LicenseManagement() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <Label htmlFor="name">License Name</Label>
+                    <Input id="name" placeholder="Enter license name" />
+                  </div>
+                  <div>
                     <Label htmlFor="type">License Type</Label>
                     <Select>
                       <SelectTrigger>
@@ -241,14 +228,6 @@ export default function LicenseManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label htmlFor="licenseNumber">License Number</Label>
-                    <Input id="licenseNumber" placeholder="Enter license number" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="name">License Name</Label>
-                  <Input id="name" placeholder="Enter license name" />
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
@@ -256,23 +235,45 @@ export default function LicenseManagement() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="holderName">Holder Name</Label>
-                    <Input id="holderName" placeholder="Enter holder name" />
+                    <Label htmlFor="category">Category</Label>
+                    <Input id="category" placeholder="e.g., PERMIT_AND_LICENSE" />
                   </div>
                   <div>
-                    <Label htmlFor="holderCompany">Company</Label>
-                    <Input id="holderCompany" placeholder="Enter company name" />
+                    <Label htmlFor="cost">Cost (KSh)</Label>
+                    <Input id="cost" type="number" placeholder="Enter cost" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="issueDate">Issue Date</Label>
-                    <Input id="issueDate" type="date" />
+                    <Label htmlFor="validityPeriod">Validity Period (months)</Label>
+                    <Input id="validityPeriod" type="number" placeholder="Enter validity period" />
                   </div>
                   <div>
-                    <Label htmlFor="expiryDate">Expiry Date</Label>
-                    <Input id="expiryDate" type="date" />
+                    <Label htmlFor="renewalPeriod">Renewal Period (months)</Label>
+                    <Input id="renewalPeriod" type="number" placeholder="Enter renewal period" />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="issuingAuthority">Issuing Authority</Label>
+                  <Input id="issuingAuthority" placeholder="Enter issuing authority" />
+                </div>
+                <div>
+                  <Label htmlFor="processingTime">Processing Time</Label>
+                  <Input id="processingTime" placeholder="e.g., 5-10 business days" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="renewalRequired" defaultChecked />
+                    <Label htmlFor="renewalRequired">Renewal Required</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="isDigital" defaultChecked />
+                    <Label htmlFor="isDigital">Digital License</Label>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" id="onlineApplication" defaultChecked />
+                  <Label htmlFor="onlineApplication">Online Application Available</Label>
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
@@ -407,9 +408,9 @@ export default function LicenseManagement() {
                   <TableHead>License</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Holder</TableHead>
-                  <TableHead>Issue Date</TableHead>
-                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>Cost</TableHead>
+                  <TableHead>Issuing Authority</TableHead>
+                  <TableHead>Applications</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -423,10 +424,8 @@ export default function LicenseManagement() {
                         </div>
                         <div>
                           <div className="font-medium">{license.name}</div>
-                          <div className="text-sm text-gray-500">#{license.licenseNumber}</div>
-                          {license.capacity && (
-                            <div className="text-sm text-gray-500">Capacity: {license.capacity}</div>
-                          )}
+                          <div className="text-sm text-gray-500">{license.description}</div>
+                          <div className="text-sm text-gray-500">Validity: {license.validityPeriod} months</div>
                         </div>
                       </div>
                     </TableCell>
@@ -438,43 +437,38 @@ export default function LicenseManagement() {
                         <Badge className={getStatusColor(license.status)}>
                           {license.status}
                         </Badge>
-                        {isExpiringSoon(license.expiryDate) && (
-                          <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
-                            Expiring Soon
-                          </Badge>
-                        )}
-                        {isExpired(license.expiryDate) && (
-                          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                            Expired
+                        {license.renewalRequired && (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            Renewal Required
                           </Badge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{license.holderName}</div>
-                        <div className="text-sm text-gray-500 flex items-center">
-                          <Building className="h-3 w-3 mr-1" />
-                          {license.holderCompany}
-                        </div>
-                        {license.location && (
-                          <div className="text-sm text-gray-500 flex items-center">
-                            <MapPin className="h-3 w-3 mr-1" />
-                            {license.location}
-                          </div>
+                      <div className="font-medium">KSh {typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}</div>
+                      <div className="text-sm text-gray-500">{license.processingTime}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">{license.issuingAuthority}</div>
+                      <div className="text-sm text-gray-500 flex items-center">
+                        {license.isDigital && (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                            Digital
+                          </Badge>
+                        )}
+                        {license.onlineApplication && (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs ml-1">
+                            Online
+                          </Badge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {formatDate(license.issueDate)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {formatDate(license.expiryDate)}
+                      <div className="text-center">
+                        <div className="font-medium">{license._count?.applications || 0}</div>
+                        <div className="text-sm text-gray-500">Applications</div>
+                        <div className="font-medium text-green-600">{license._count?.renewals || 0}</div>
+                        <div className="text-sm text-gray-500">Renewals</div>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -493,19 +487,19 @@ export default function LicenseManagement() {
                             <Edit className="h-4 w-4 mr-2" />
                             Edit License
                           </DropdownMenuItem>
-                          {license.status === "pending" && (
+                          {license.status === "PENDING" && (
                             <DropdownMenuItem onClick={() => handleLicenseAction("approve", license.id)}>
                               <CheckCircle className="h-4 w-4 mr-2" />
                               Approve License
                             </DropdownMenuItem>
                           )}
-                          {license.status === "active" && (
+                          {license.status === "ACTIVE" && (
                             <DropdownMenuItem onClick={() => handleLicenseAction("suspend", license.id)}>
                               <AlertTriangle className="h-4 w-4 mr-2" />
                               Suspend License
                             </DropdownMenuItem>
                           )}
-                          {(isExpired(license.expiryDate) || isExpiringSoon(license.expiryDate)) && (
+                          {license.renewalRequired && (
                             <DropdownMenuItem onClick={() => handleLicenseAction("renew", license.id)}>
                               <Clock className="h-4 w-4 mr-2" />
                               Renew License
@@ -542,8 +536,8 @@ export default function LicenseManagement() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">License Number</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.licenseNumber}</p>
+                  <Label className="text-sm font-medium">License ID</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.id}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">Status</Label>
@@ -562,42 +556,68 @@ export default function LicenseManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Holder Name</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.holderName}</p>
+                  <Label className="text-sm font-medium">Type</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.type}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Company</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.holderCompany}</p>
+                  <Label className="text-sm font-medium">Category</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.category}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Issue Date</Label>
-                  <p className="text-sm text-gray-600">{formatDate(selectedLicense.issueDate)}</p>
+                  <Label className="text-sm font-medium">Cost</Label>
+                  <p className="text-sm text-gray-600">KSh {typeof selectedLicense.cost === 'string' ? parseInt(selectedLicense.cost).toLocaleString() : selectedLicense.cost.toLocaleString()}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Expiry Date</Label>
-                  <p className="text-sm text-gray-600">{formatDate(selectedLicense.expiryDate)}</p>
+                  <Label className="text-sm font-medium">Processing Time</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.processingTime}</p>
                 </div>
               </div>
-              {selectedLicense.capacity && (
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Capacity</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.capacity}</p>
+                  <Label className="text-sm font-medium">Validity Period</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.validityPeriod} months</p>
                 </div>
-              )}
-              {selectedLicense.location && (
                 <div>
-                  <Label className="text-sm font-medium">Location</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.location}</p>
+                  <Label className="text-sm font-medium">Renewal Period</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense.renewalPeriod} months</p>
                 </div>
-              )}
-              {selectedLicense.notes && (
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Issuing Authority</Label>
+                <p className="text-sm text-gray-600">{selectedLicense.issuingAuthority}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium">Notes</Label>
-                  <p className="text-sm text-gray-600">{selectedLicense.notes}</p>
+                  <Label className="text-sm font-medium">Applications</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense._count?.applications || 0}</p>
                 </div>
-              )}
+                <div>
+                  <Label className="text-sm font-medium">Renewals</Label>
+                  <p className="text-sm text-gray-600">{selectedLicense._count?.renewals || 0}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Label className="text-sm font-medium">Digital:</Label>
+                  <Badge variant={selectedLicense.isDigital ? "default" : "secondary"}>
+                    {selectedLicense.isDigital ? "Yes" : "No"}
+                  </Badge>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Label className="text-sm font-medium">Online Application:</Label>
+                  <Badge variant={selectedLicense.onlineApplication ? "default" : "secondary"}>
+                    {selectedLicense.onlineApplication ? "Yes" : "No"}
+                  </Badge>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Label className="text-sm font-medium">Renewal Required:</Label>
+                  <Badge variant={selectedLicense.renewalRequired ? "default" : "secondary"}>
+                    {selectedLicense.renewalRequired ? "Yes" : "No"}
+                  </Badge>
+                </div>
+              </div>
               <div className="flex justify-end">
                 <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
                   Close

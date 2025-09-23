@@ -101,6 +101,24 @@ export default function SuperAdminDashboard() {
               </div>
             </CardContent>
           </Card>
+              {/* Workflow Engine Card */}
+              <Card 
+            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
+            onClick={() => setWorkflowModalOpen(true)}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Workflow className="h-5 w-5" />
+                Workflow Engine
+              </CardTitle>
+              <CardDescription>Configure and manage workflow processes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="h-32"></div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Clients Card */}
           <Card 
@@ -159,24 +177,7 @@ export default function SuperAdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Workflow Engine Card */}
-          <Card 
-            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => setWorkflowModalOpen(true)}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Workflow className="h-5 w-5" />
-                Workflow Engine
-              </CardTitle>
-              <CardDescription>Configure and manage workflow processes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="h-32"></div>
-              </div>
-            </CardContent>
-          </Card>
+      
         </div>
       </div>
 

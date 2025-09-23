@@ -101,7 +101,7 @@ export function useDeleteLicense() {
 }
 
 // Hook to get licenses by status
-export function useLicensesByStatus(status: 'active' | 'expired' | 'pending' | 'suspended') {
+export function useLicensesByStatus(status: 'ACTIVE' | 'EXPIRED' | 'PENDING' | 'SUSPENDED') {
   return useLicenses(1, 100, { status });
 }
 
@@ -117,10 +117,10 @@ export function useLicensesByCategory(category: string) {
 
 // Utility hook to get license statistics
 export function useLicenseStats() {
-  const { data: activeLicenses } = useLicensesByStatus('active');
-  const { data: expiredLicenses } = useLicensesByStatus('expired');
-  const { data: pendingLicenses } = useLicensesByStatus('pending');
-  const { data: suspendedLicenses } = useLicensesByStatus('suspended');
+  const { data: activeLicenses } = useLicensesByStatus('ACTIVE');
+  const { data: expiredLicenses } = useLicensesByStatus('EXPIRED');
+  const { data: pendingLicenses } = useLicensesByStatus('PENDING');
+  const { data: suspendedLicenses } = useLicensesByStatus('SUSPENDED');
 
   return {
     active: activeLicenses?.pagination.total || 0,
