@@ -218,6 +218,64 @@ export interface CreateLicenseRequest {
   onlineApplication?: boolean;
 }
 
+// Workflow Template types
+export interface WorkflowStep {
+  id: string;
+  name: string;
+  description: string;
+  type: 'REVIEW' | 'APPROVAL' | 'INSPECTION' | 'PAYMENT' | 'NOTIFICATION' | 'DECISION' | 'DOCUMENT_VERIFICATION' | 'FIELD_VISIT' | 'COMPLIANCE_CHECK';
+  assignedDepartment: string;
+  assignmentMethod: 'HEAD_ASSIGNMENT' | 'OFFICER_PICKUP' | 'AUTO_ASSIGN';
+  timeout: string;
+  nextSteps: string[];
+  conditions: {
+    onComplete: string;
+    onReject?: string;
+    onTimeout?: string;
+  };
+  requiredDocuments?: string[];
+  inspectionChecklist?: string[];
+  paymentDetails?: {
+    amount: string;
+    currency: string;
+    paymentMethods: string[];
+  };
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  licenseType: string;
+  licenseCategory: string;
+  licenseid?: string;
+  steps: WorkflowStep[];
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  createdBy: string;
+}
+
+export interface CreateWorkflowTemplateRequest {
+  name: string;
+  description: string;
+  licenseType: string;
+  licenseCategory: string;
+  licenseid?: string;
+  steps: WorkflowStep[];
+  isActive?: boolean;
+}
+
+export interface UpdateWorkflowTemplateRequest {
+  name?: string;
+  description?: string;
+  licenseType?: string;
+  licenseCategory?: string;
+  licenseid?: string;
+  steps?: WorkflowStep[];
+  isActive?: boolean;
+}
+
 // Director user creation types
 export interface CreateUserFromDirectorRequest {
   brsId: string;
@@ -342,6 +400,35 @@ export class ApiClient {
       this.apiService.delete(`/api/licenses/${id}`),
   };
 
+  // Workflow Templates endpoints
+  workflowTemplates = {
+    getAll: (page = 1, limit = 10, filters?: { licenseType?: string; licenseCategory?: string; isActive?: boolean }): Promise<PaginatedResponse<WorkflowTemplate>> => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.licenseType && { licenseType: filters.licenseType }),
+        ...(filters?.licenseCategory && { licenseCategory: filters.licenseCategory }),
+        ...(filters?.isActive !== undefined && { isActive: filters.isActive.toString() }),
+      });
+      return this.apiService.get(`/api/workflow/templates?${params.toString()}`);
+    },
+
+    getById: (id: string): Promise<ApiResponse<WorkflowTemplate>> =>
+      this.apiService.get(`/api/workflow/templates/${id}`),
+
+    getByLicenseType: (licenseType: string): Promise<ApiResponse<WorkflowTemplate[]>> =>
+      this.apiService.get(`/api/workflow/templates/license-type/${licenseType}`),
+
+    create: (templateData: CreateWorkflowTemplateRequest): Promise<ApiResponse<WorkflowTemplate>> =>
+      this.apiService.post('/api/workflow/templates', templateData),
+
+    update: (id: string, templateData: UpdateWorkflowTemplateRequest): Promise<ApiResponse<WorkflowTemplate>> =>
+      this.apiService.put(`/api/workflow/templates/${id}`, templateData),
+
+    delete: (id: string): Promise<ApiResponse> =>
+      this.apiService.delete(`/api/workflow/templates/${id}`),
+  };
+
   // Projects endpoints
   projects = {
     getAll: (page = 1, limit = 10): Promise<PaginatedResponse> =>
@@ -445,6 +532,7 @@ export const usersApi = apiClient.users;
 export const iprsApi = apiClient.iprs;
 export const brsApi = apiClient.brs;
 export const licensesApi = apiClient.licenses;
+export const workflowTemplatesApi = apiClient.workflowTemplates;
 export const projectsApi = apiClient.projects;
 export const messagesApi = apiClient.messages;
 export const conversationsApi = apiClient.conversations;

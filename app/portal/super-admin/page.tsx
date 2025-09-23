@@ -18,7 +18,7 @@ import { LicensesModal } from "@/components/modals/licenses-modal"
 import { ClientsModal } from "@/components/modals/clients-modal"
 import { BrsModal } from "@/components/modals/brs-modal"
 import { IprsModal } from "@/components/modals/iprs-modal"
-import { WorkflowModal } from "@/components/modals/workflow-modal"
+import { WorkflowTemplatesModal } from "@/components/modals/workflow-templates-modal"
 import { useAuth } from "@/components/auth-provider"
 
 
@@ -29,7 +29,7 @@ export default function SuperAdminDashboard() {
   const [clientsModalOpen, setClientsModalOpen] = useState(false)
   const [brsModalOpen, setBrsModalOpen] = useState(false)
   const [iprsModalOpen, setIprsModalOpen] = useState(false)
-  const [workflowModalOpen, setWorkflowModalOpen] = useState(false)
+  const [workflowTemplatesModalOpen, setWorkflowTemplatesModalOpen] = useState(false)
 
   const { user, logout } = useAuth()
   return (
@@ -104,14 +104,14 @@ export default function SuperAdminDashboard() {
               {/* Workflow Engine Card */}
               <Card 
             className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => setWorkflowModalOpen(true)}
+            onClick={() => setWorkflowTemplatesModalOpen(true)}
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Workflow className="h-5 w-5" />
                 Workflow Engine
               </CardTitle>
-              <CardDescription>Configure and manage workflow processes</CardDescription>
+              <CardDescription>Create and manage workflow templates for license applications</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -202,9 +202,9 @@ export default function SuperAdminDashboard() {
         open={iprsModalOpen} 
         onOpenChange={setIprsModalOpen}
       />
-      <WorkflowModal 
-        open={workflowModalOpen} 
-        onOpenChange={setWorkflowModalOpen}
+      <WorkflowTemplatesModal 
+        open={workflowTemplatesModalOpen} 
+        onOpenChange={setWorkflowTemplatesModalOpen}
       />
     </PortalLayout>
   )
