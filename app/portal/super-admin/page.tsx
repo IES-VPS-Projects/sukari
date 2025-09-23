@@ -48,9 +48,7 @@ export default function SuperAdminDashboard() {
               <p className="text-gray-600 font-bold mt-1">
                 {user?.name}
               </p>
-              <p className="text-gray-600 mt-1">
-                {user?.email}
-              </p>
+               
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">System Status</p>
