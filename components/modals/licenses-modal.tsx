@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { 
   FileCheck, Download, Eye, CheckCircle, Clock, XCircle, AlertTriangle, Plus, ArrowLeft, Loader2, Edit, Trash2, MoreHorizontal, FileText as Form, Workflow,
   ArrowUp, ArrowDown, X, Type, Mail, Phone, Hash, FileText, Calendar, Upload, CheckSquare, List, Radio, GripVertical, Settings, Save, RefreshCw,
-  Building
+  Building, Copy
 } from "lucide-react"
 import { useLicenses, useLicenseStats, useCreateLicense, useUpdateLicense, useDeleteLicense } from "@/hooks/use-licenses"
 import { useBulkCreateLicenseFields, useLicenseFieldsByLicense } from "@/hooks/use-license-fields"
@@ -34,7 +34,7 @@ import {
 import { LicenseFormStatus } from "@/components/license-form-status"
 
 // Define view types for the modal
-type ModalView = 'main' | 'createLicense' | 'editLicense' | 'formBuilder' | 'workflowTemplates' | 'workflowManagement'
+type ModalView = 'main' | 'createLicense' | 'editLicense' | 'formBuilder' | 'workflowTemplates' | 'workflowManagement' | 'viewTemplate' | 'editTemplate' | 'createTemplate'
 
 interface LicensesModalProps {
   readonly open: boolean
@@ -174,8 +174,8 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [selectedLicenseForForm, setSelectedLicenseForForm] = useState<string | null>(null)
-  const [selectedLicenseForWorkflow, setSelectedLicenseForWorkflow] = useState<License | null>(null)
-  const [editingWorkflow, setEditingWorkflow] = useState<any>(null)
+  const [viewingTemplate, setViewingTemplate] = useState<any>(null)
+  const [editingTemplate, setEditingTemplate] = useState<any>(null)
   
   // Form builder state
   const [formFields, setFormFields] = useState<any[]>([])
@@ -194,14 +194,6 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
   
   // Workflow templates state
   const [workflowSteps, setWorkflowSteps] = useState<any[]>([])
-  const [workflowFormData, setWorkflowFormData] = useState({
-    name: '',
-    description: '',
-    licenseType: 'MILLERS',
-    licenseCategory: 'PERMIT_AND_LICENSE',
-    licenseid: '',
-    isActive: true
-  })
   const [isCreatingStep, setIsCreatingStep] = useState(false)
   const [editingStep, setEditingStep] = useState<any>(null)
   const [stepFormData, setStepFormData] = useState({
@@ -241,6 +233,27 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
     onlineApplication: true
   })
 
+  // Workflow template form data
+  const [workflowFormData, setWorkflowFormData] = useState({
+    name: '',
+    description: '',
+    licenseType: 'MILLERS',
+    licenseCategory: 'PERMIT_AND_LICENSE',
+    licenseid: '',
+    isActive: true
+  })
+
+  // Workflow template form data for editing
+  const [workflowTemplateFormData, setWorkflowTemplateFormData] = useState({
+    name: '',
+    description: '',
+    licenseType: 'MILLERS',
+    licenseCategory: 'PERMIT_AND_LICENSE',
+    licenseid: '',
+    steps: [] as any[],
+    isActive: true
+  })
+
   // Fetch licenses data
   const { data: licensesData, isLoading: licensesLoading, error: licensesError } = useLicenses(1, 10)
   const licenseStats = useLicenseStats()
@@ -256,7 +269,7 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
   const createWorkflowTemplateMutation = useCreateWorkflowTemplate()
   const updateWorkflowTemplateMutation = useUpdateWorkflowTemplate()
   const deleteWorkflowTemplateMutation = useDeleteWorkflowTemplate()
-  const { data: templatesData, isLoading: templatesLoading } = useWorkflowTemplates(1, 100)
+  const { data: templatesData, isLoading: templatesLoading, error: templatesError } = useWorkflowTemplates(1, 100)
   const { departments, isLoading: departmentsLoading } = useDepartments()
 
   const handleInputChange = (field: keyof CreateLicenseRequest, value: any) => {
@@ -428,15 +441,35 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
       }
     })
     
-    setWorkflowFormData({
+    setWorkflowTemplateFormData({
       name: predefined.name,
       description: predefined.description,
       licenseType: predefined.licenseType,
       licenseCategory: predefined.licenseCategory,
-      licenseid: predefined.licenseid || '',
+      licenseid: selectedLicenseForForm || predefined.licenseid || '',
+      steps: mappedSteps,
       isActive: true
     })
     setWorkflowSteps(mappedSteps)
+    setCurrentView('createTemplate')
+  }
+
+  // Handle deleting a template
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (!confirm('Are you sure you want to delete this workflow template? This action cannot be undone.')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      await deleteWorkflowTemplateMutation.mutateAsync(templateId)
+      alert('Workflow template deleted successfully')
+    } catch (error) {
+      console.error('Error deleting workflow template:', error)
+      alert('Error deleting workflow template')
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   // Handle starting to edit a license
@@ -485,7 +518,7 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
 
   const handleCreateWorkflow = (licenseId: string) => {
     setSelectedLicenseForForm(licenseId)
-    setCurrentView('workflowTemplates')
+    setCurrentView('workflowManagement')
   }
 
   // Form field management functions
@@ -632,6 +665,56 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
       alert('Error updating license')
     } finally {
       setIsSubmittingEdit(false)
+    }
+  }
+
+  // Handle editing a workflow template
+  const handleEditTemplateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!editingTemplate) return
+    
+    if (!workflowTemplateFormData.name || !workflowTemplateFormData.description) {
+      alert('Template name and description are required')
+      return
+    }
+
+    setIsSubmittingEdit(true)
+    try {
+      await updateWorkflowTemplateMutation.mutateAsync({
+        id: editingTemplate.id,
+        data: workflowTemplateFormData
+      })
+      alert('Workflow template updated successfully')
+      setCurrentView('workflowManagement')
+      setEditingTemplate(null)
+    } catch (error) {
+      console.error('Error updating workflow template:', error)
+      alert('Error updating workflow template')
+    } finally {
+      setIsSubmittingEdit(false)
+    }
+  }
+
+  // Handle creating a workflow template
+  const handleCreateTemplateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!workflowTemplateFormData.name || !workflowTemplateFormData.description) {
+      alert('Template name and description are required')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await createWorkflowTemplateMutation.mutateAsync(workflowTemplateFormData)
+      alert('Workflow template created successfully')
+      setCurrentView('workflowManagement')
+    } catch (error) {
+      console.error('Error creating workflow template:', error)
+      alert('Error creating workflow template')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -2351,6 +2434,476 @@ export function LicensesModal({ open, onOpenChange, selectedLicense }: LicensesM
                   )}
                 </Button>
               </div>
+            </div>
+          </div>
+        ) : currentView === 'workflowManagement' ? (
+          // Workflow Management View
+          <div className="space-y-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBackToMain}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Licenses
+            </Button>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Workflow Management</h3>
+                <p className="text-sm text-gray-600">Manage existing workflows and create new ones for {licensesData?.data?.find(l => l.id === selectedLicenseForForm)?.name || 'License'}</p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => {
+                  // Set the license context for new workflow creation
+                  setWorkflowTemplateFormData(prev => ({
+                    ...prev,
+                    licenseid: selectedLicenseForForm || '',
+                    licenseType: licensesData?.data?.find(l => l.id === selectedLicenseForForm)?.type || 'MILLERS'
+                  }));
+                  setCurrentView('workflowTemplates');
+                }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New Workflow
+                </Button>
+                {(() => {
+                  const selectedLicense = licensesData?.data?.find(l => l.id === selectedLicenseForForm);
+                  const licenseType = selectedLicense?.type;
+                  
+                  return (
+                    <>
+                      {licenseType === 'MILLERS' && (
+                        <Button variant="outline" onClick={() => handleUsePredefinedTemplate('millers')}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Use Millers Template
+                        </Button>
+                      )}
+                      {licenseType === 'WHITE_SUGAR' && (
+                        <Button variant="outline" onClick={() => handleUsePredefinedTemplate('whiteSugar')}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Use White Sugar Template
+                        </Button>
+                      )}
+                      {(licenseType === 'MILLERS' || licenseType === 'WHITE_SUGAR' || !licenseType) && (
+                        <Button variant="outline" onClick={() => handleUsePredefinedTemplate('registration')}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Use Registration Template
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* Existing Workflows */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Existing Workflow Templates</CardTitle>
+                  <CardDescription>
+                    View, edit, or manage existing workflow templates
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {templatesLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin" />
+                      <span className="ml-2">Loading workflows...</span>
+                    </div>
+                  ) : templatesError ? (
+                    <div className="text-center py-8">
+                      <p className="text-red-600">Error loading workflows: {templatesError.message}</p>
+                      <Button onClick={() => window.location.reload()} className="mt-4">
+                        Retry
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Template Name</TableHead>
+                            <TableHead>License Type</TableHead>
+                            <TableHead>Steps</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Created</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {templatesData?.data?.filter(template => {
+                            // Filter workflows based on the selected license
+                            if (!selectedLicenseForForm) return true;
+                            
+                            const selectedLicense = licensesData?.data?.find(l => l.id === selectedLicenseForForm);
+                            if (!selectedLicense) return true;
+                            
+                            // Show workflows that match the license type or are specifically assigned to this license
+                            return template.licenseType === selectedLicense.type || 
+                                   template.licenseid === selectedLicenseForForm ||
+                                   !template.licenseid; // Show general workflows without specific license assignment
+                          }).map((template) => (
+                            <TableRow key={template.id}>
+                              <TableCell>
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <Workflow className="h-4 w-4 text-blue-600" />
+                                  </div>
+                                  <div>
+                                    <div className="font-medium">{template.name}</div>
+                                    <div className="text-sm text-gray-500">{template.description}</div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{template.licenseType}</Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-center">
+                                  <div className="font-medium">{template.steps.length}</div>
+                                  <div className="text-sm text-gray-500">Steps</div>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className={template.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                                  {template.isActive ? "Active" : "Inactive"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm">
+                                  {new Date(template.createdAt).toLocaleDateString()}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => {
+                                      setViewingTemplate(template)
+                                      setCurrentView('viewTemplate')
+                                    }}>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View Details
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                      setEditingTemplate(template)
+                                      setWorkflowTemplateFormData({
+                                        name: template.name,
+                                        description: template.description,
+                                        licenseType: template.licenseType,
+                                        licenseCategory: template.licenseCategory,
+                                        licenseid: template.licenseid || '',
+                                        steps: template.steps,
+                                        isActive: template.isActive
+                                      })
+                                      setCurrentView('editTemplate')
+                                    }}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit Template
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                      setWorkflowTemplateFormData({
+                                        name: `${template.name} (Copy)`,
+                                        description: template.description,
+                                        licenseType: template.licenseType,
+                                        licenseCategory: template.licenseCategory,
+                                        licenseid: template.licenseid || '',
+                                        steps: template.steps,
+                                        isActive: true
+                                      })
+                                      setCurrentView('createTemplate')
+                                    }}>
+                                      <Copy className="h-4 w-4 mr-2" />
+                                      Duplicate
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => {
+                                        if (confirm('Are you sure you want to delete this workflow template?')) {
+                                          handleDeleteTemplate(template.id)
+                                        }
+                                      }}
+                                      className="text-red-600"
+                                      disabled={isDeleting || deleteWorkflowTemplateMutation.isPending}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      {deleteWorkflowTemplateMutation.isPending ? 'Deleting...' : 'Delete'}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                  {(!templatesData?.data || templatesData.data.filter(template => {
+                    if (!selectedLicenseForForm) return true;
+                    const selectedLicense = licensesData?.data?.find(l => l.id === selectedLicenseForForm);
+                    if (!selectedLicense) return true;
+                    return template.licenseType === selectedLicense.type || 
+                           template.licenseid === selectedLicenseForForm ||
+                           !template.licenseid;
+                  }).length === 0) && !templatesLoading && (
+                    <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                      <Workflow className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 mb-3">No workflow templates found for this license</p>
+                      <p className="text-xs text-gray-400">
+                        Create your first workflow template for {licensesData?.data?.find(l => l.id === selectedLicenseForForm)?.name || 'this license'} to get started
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        ) : currentView === 'viewTemplate' ? (
+          // View Template View
+          <div className="space-y-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentView('workflowManagement')}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Workflow Management
+            </Button>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">{viewingTemplate?.name}</h3>
+                <p className="text-sm text-gray-600">{viewingTemplate?.description}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>License Type</Label>
+                  <div className="mt-1">
+                    <Badge variant="outline">{viewingTemplate?.licenseType}</Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <div className="mt-1">
+                    <Badge className={viewingTemplate?.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                      {viewingTemplate?.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              
+              {viewingTemplate?.licenseid && (
+                <div>
+                  <Label>License</Label>
+                  <div className="mt-1">
+                    <Badge variant="outline">
+                      {licensesData?.data?.find(license => license.id === viewingTemplate.licenseid)?.name || viewingTemplate.licenseid}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <Label>Workflow Steps ({viewingTemplate?.steps.length})</Label>
+                <div className="mt-2 space-y-2">
+                  {viewingTemplate?.steps.map((step: any, index: number) => (
+                    <Card key={step.id} className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium">{index + 1}. {step.name}</div>
+                          <div className="text-sm text-gray-500">{step.description}</div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">{step.type}</Badge>
+                            <Badge variant="outline" className="text-xs">{step.assignedDepartment}</Badge>
+                            <Badge variant="outline" className="text-xs">{step.timeout}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : currentView === 'editTemplate' ? (
+          // Edit Template View
+          <div className="space-y-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentView('workflowManagement')}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Workflow Management
+            </Button>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Edit Workflow Template</h3>
+                <p className="text-sm text-gray-600">Update workflow template information</p>
+              </div>
+              
+              <form onSubmit={handleEditTemplateSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-name">Template Name</Label>
+                    <Input
+                      id="edit-name"
+                      value={workflowTemplateFormData.name}
+                      onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter template name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-licenseType">License Type</Label>
+                    <Select value={workflowTemplateFormData.licenseType} onValueChange={(value) => setWorkflowTemplateFormData(prev => ({ ...prev, licenseType: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select license type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {licenseTypes.map(type => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-description">Description</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={workflowTemplateFormData.description}
+                    onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Enter template description"
+                    required
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="edit-isActive"
+                    checked={workflowTemplateFormData.isActive}
+                    onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  />
+                  <Label htmlFor="edit-isActive">Active Template</Label>
+                </div>
+                
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setCurrentView('workflowManagement')}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmittingEdit || updateWorkflowTemplateMutation.isPending}>
+                    {isSubmittingEdit || updateWorkflowTemplateMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Template'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : currentView === 'createTemplate' ? (
+          // Create Template View
+          <div className="space-y-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentView('workflowManagement')}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Workflow Management
+            </Button>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">Create New Workflow Template</h3>
+                <p className="text-sm text-gray-600">Create a new workflow template for license applications</p>
+              </div>
+              
+              <form onSubmit={handleCreateTemplateSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Template Name</Label>
+                    <Input
+                      id="name"
+                      value={workflowTemplateFormData.name}
+                      onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter template name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="licenseType">License Type</Label>
+                    <Select value={workflowTemplateFormData.licenseType} onValueChange={(value) => setWorkflowTemplateFormData(prev => ({ ...prev, licenseType: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select license type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {licenseTypes.map(type => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={workflowTemplateFormData.description}
+                    onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Enter template description"
+                    required
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={workflowTemplateFormData.isActive}
+                    onChange={(e) => setWorkflowTemplateFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  />
+                  <Label htmlFor="isActive">Active Template</Label>
+                </div>
+                
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setCurrentView('workflowManagement')}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting || createWorkflowTemplateMutation.isPending}>
+                    {isSubmitting || createWorkflowTemplateMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      'Create Template'
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         ) : null}
