@@ -86,8 +86,8 @@ export function MillerProductionModal({ open, onOpenChange }: MillerProductionMo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-6xl max-h-[95vh]">
+        <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Production</DialogTitle>
           <DialogDescription>
             Comprehensive production metrics and operational insights for Mumias Sugar Mills

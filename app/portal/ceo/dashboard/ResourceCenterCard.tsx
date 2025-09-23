@@ -79,16 +79,12 @@ const ResourceCenterCard = () => {
     <>
       <Card 
         className="rounded-[20px] shadow-lg border-0 bg-white cursor-pointer hover:shadow-xl transition-shadow duration-200"
+        style={{ height: "360px" }}
         onClick={() => setModalOpen(true)}
       >
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-[#202020]">
-              Resource Center
-            </CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-              {resourceStats.unread} new
-            </Badge>
+            <CardTitle className="text-lg font-semibold text-gray-800">Resource Center</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
