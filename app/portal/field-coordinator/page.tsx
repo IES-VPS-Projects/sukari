@@ -86,7 +86,18 @@ export default function FieldCoordinatorDashboard() {
             </div>
             <div className="text-right">
               <p className="text-gray-700">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} <span className="font-bold">{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                {(() => {
+                  const d = new Date()
+                  const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+                  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"]
+                  const dateStr = `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+                  const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                  return (
+                    <>
+                      {dateStr} <span className="font-bold">{timeStr}</span>
+                    </>
+                  )
+                })()}
               </p>
             </div>
           </div>

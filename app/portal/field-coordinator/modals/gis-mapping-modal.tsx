@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { MappingAssignment, mappingAssignments } from "../data/gis-mapping-data"
 import { MapPin, Calendar, Clock, CheckCircle, AlertCircle, MapIcon } from "lucide-react"
 
@@ -20,6 +21,7 @@ interface GisMappingModalProps {
 
 export function GisMappingModal({ open, onOpenChange }: GisMappingModalProps) {
   const [selectedAssignment, setSelectedAssignment] = useState<MappingAssignment | null>(null)
+    const [activeStatus, setActiveStatus] = useState<string>("all")
 
   const handleAssignmentClick = (assignment: MappingAssignment) => {
     setSelectedAssignment(assignment)
@@ -43,10 +45,40 @@ export function GisMappingModal({ open, onOpenChange }: GisMappingModalProps) {
     }
   }
 
+  const filteredAssignments = activeStatus === "all" 
+    ? mappingAssignments 
+    : mappingAssignments.filter(a => a.status === activeStatus)
+
+  const getUnderlineClass = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'data-[state=active]:border-yellow-500'
+      case 'in-progress':
+        return 'data-[state=active]:border-blue-500'
+      case 'completed':
+        return 'data-[state=active]:border-green-500'
+      default:
+        return 'data-[state=active]:border-gray-900'
+    }
+  }
+
+  const getStatusHoverBg = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'hover:bg-yellow-50'
+      case 'in-progress':
+        return 'hover:bg-blue-50'
+      case 'completed':
+        return 'hover:bg-green-50'
+      default:
+        return 'hover:bg-gray-50'
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className="bg-gray-50 -mx-6 -mt-6 px-6 py-4 border-y border-gray-200">
           <DialogTitle>GIS Field Mapping Assignments</DialogTitle>
           <DialogDescription>
             View and manage your field mapping assignments.
@@ -117,36 +149,51 @@ export function GisMappingModal({ open, onOpenChange }: GisMappingModalProps) {
             </div>
           </div>
         ) : (
-          // List of assignments view
-          <div className="mt-4 space-y-4">
-            {mappingAssignments.map((assignment) => (
-              <div 
-                key={assignment.id} 
-                className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => handleAssignmentClick(assignment)}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium">{assignment.farmerName}</h3>
-                    <p className="text-sm text-gray-500">{assignment.location}</p>
+          // List of assignments with status tabs
+          <div className="mt-4">
+            <Tabs defaultValue="all" value={activeStatus} onValueChange={setActiveStatus}>
+              <TabsList className="w-full justify-start mb-4 border-b border-gray-200">
+                <TabsTrigger value="all" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass('all')}`}>All</TabsTrigger>
+                <TabsTrigger value="pending" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass('pending')}`}>Pending</TabsTrigger>
+                <TabsTrigger value="in-progress" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass('in-progress')}`}>In Progress</TabsTrigger>
+                <TabsTrigger value="completed" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass('completed')}`}>Completed</TabsTrigger>
+              </TabsList>
+              <TabsContent value={activeStatus} className="mt-0 space-y-4 min-h-[420px]">
+                {filteredAssignments.map((assignment) => (
+                  <div 
+                    key={assignment.id} 
+                    className={`rounded-xl p-4 bg-white cursor-pointer transition-all hover:shadow-sm hover:-translate-y-0.5 ${getStatusHoverBg(assignment.status)}`}
+                    onClick={() => handleAssignmentClick(assignment)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">{assignment.farmerName}</h3>
+                        <p className="text-sm text-gray-500">{assignment.location}</p>
+                      </div>
+                      <div>
+                        {renderStatusBadge(assignment.status)}
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 flex items-center text-sm text-gray-500 gap-4">
+                      <div className="flex items-center gap-1">
+                        <MapIcon className="h-4 w-4" />
+                        <span>{assignment.size}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    {renderStatusBadge(assignment.status)}
+                ))}
+                {filteredAssignments.length === 0 && (
+                  <div className="py-8 text-center text-gray-500">
+                    No mapping assignments found for this status.
                   </div>
-                </div>
-                
-                <div className="mt-3 flex items-center text-sm text-gray-500 gap-4">
-                  <div className="flex items-center gap-1">
-                    <MapIcon className="h-4 w-4" />
-                    <span>{assignment.size}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </DialogContent>

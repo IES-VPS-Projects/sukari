@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InspectionAssignment, inspectionAssignments } from "../data/inspections-data"
 import { MapPin, Calendar, User, Phone, ClipboardCheck, ArrowRight } from "lucide-react"
@@ -22,10 +23,31 @@ interface InspectionsModalProps {
 export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) {
   const [selectedAssignment, setSelectedAssignment] = useState<InspectionAssignment | null>(null)
   const [activeTab, setActiveTab] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   
-  const filteredAssignments = activeTab === "all" 
+  const baseAssignments = activeTab === "all" 
     ? inspectionAssignments 
     : inspectionAssignments.filter(assignment => assignment.type === activeTab)
+  const filteredAssignments = statusFilter === "all" 
+    ? baseAssignments 
+    : baseAssignments.filter(assignment => assignment.status === statusFilter)
+
+  // Map statuses to header background colors
+  const getStatusHeaderBg = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-50"
+      case "in-progress":
+        return "bg-blue-50"
+      case "completed":
+        return "bg-green-50"
+      default:
+        return "bg-gray-50"
+    }
+  }
+
+  // In details view always gray; in list view we may theme by selected status option if present
+  const headerBgClass = selectedAssignment ? "bg-gray-50" : getStatusHeaderBg(statusFilter)
 
   const handleAssignmentClick = (assignment: InspectionAssignment) => {
     setSelectedAssignment(assignment)
@@ -49,10 +71,36 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
     }
   }
 
+  const getUnderlineClass = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'data-[state=active]:border-yellow-500'
+      case 'in-progress':
+        return 'data-[state=active]:border-blue-500'
+      case 'completed':
+        return 'data-[state=active]:border-green-500'
+      default:
+        return 'data-[state=active]:border-gray-900'
+    }
+  }
+
+  const getStatusHoverBg = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'hover:bg-yellow-50'
+      case 'in-progress':
+        return 'hover:bg-blue-50'
+      case 'completed':
+        return 'hover:bg-green-50'
+      default:
+        return 'hover:bg-gray-50'
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+        <DialogHeader className={`${headerBgClass} -mx-6 -mt-6 px-6 py-4 border-y border-gray-200`}>
           <DialogTitle>Inspections</DialogTitle>
           <DialogDescription>
             View and manage your mill and importer inspection assignments.
@@ -151,18 +199,34 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
           // List of inspections with tabs
           <div className="mt-4">
             <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="w-full justify-start mb-4">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="letterOfComfort">Letter of Comfort</TabsTrigger>
-                <TabsTrigger value="mill">Mill</TabsTrigger>
-                <TabsTrigger value="import">Import</TabsTrigger>
-              </TabsList>
+              <div className="flex items-center justify-between mb-4 gap-2">
+                <TabsList className="w-auto justify-start border-b border-gray-200">
+                  <TabsTrigger value="all" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>All</TabsTrigger>
+                  <TabsTrigger value="letterOfComfort" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Letter of Comfort</TabsTrigger>
+                  <TabsTrigger value="mill" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Mill</TabsTrigger>
+                  <TabsTrigger value="import" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Import</TabsTrigger>
+                </TabsList>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Status:</span>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-8 w-[160px]">
+                      <SelectValue placeholder="All statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               
-              <TabsContent value={activeTab} className="mt-0 space-y-4">
+              <TabsContent value={activeTab} className="mt-0 space-y-4 min-h-[420px]">
                 {filteredAssignments.map((assignment) => (
                   <div 
                     key={assignment.id} 
-                    className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                    className={`rounded-xl p-4 bg-white cursor-pointer transition-all hover:shadow-sm hover:-translate-y-0.5 ${getStatusHoverBg(assignment.status)}`}
                     onClick={() => handleAssignmentClick(assignment)}
                   >
                     <div className="flex justify-between items-start">
