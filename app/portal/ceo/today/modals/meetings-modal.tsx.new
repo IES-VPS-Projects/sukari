@@ -1,0 +1,100 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Calendar, X } from "lucide-react"
+import { GoInfo } from 'react-icons/go'
+import { meetingsData } from "../data/meetings-data"
+
+interface MeetingsModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onMeetingClick: (meetingId: string) => void
+}
+
+export function MeetingsModal({ 
+  open, 
+  onOpenChange, 
+  onMeetingClick 
+}: MeetingsModalProps) {
+
+  const handleClose = () => {
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 [&>button]:hidden">
+        <DialogTitle className="sr-only">Meetings</DialogTitle>
+        
+        <div className="flex flex-col h-full min-h-0">
+          <div className="p-6 border-b bg-gray-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
+                <p className="text-sm text-gray-500 mt-1">{meetingsData.length} upcoming meetings</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="group relative">
+                  <GoInfo className="h-5 w-5 text-gray-400 cursor-help" />
+                  <div className="absolute right-0 top-6 bg-black text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                    Scheduled meetings and events
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="shrink-0 h-8 w-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 overflow-y-auto">
+            <div className="space-y-3">
+              {meetingsData.map((meeting) => (
+                <div 
+                  key={meeting.id} 
+                  className={`flex gap-4 p-4 rounded-lg border border-gray-100 cursor-pointer transition-colors ${meeting.hoverBg}`}
+                  onClick={() => onMeetingClick(meeting.id)}
+                >
+                  <div className={`w-12 h-12 ${meeting.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <Calendar className={`h-6 w-6 ${meeting.iconColor}`} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 className="font-medium text-gray-900">{meeting.title}</h3>
+                      <Badge className={meeting.typeColor}>{meeting.type}</Badge>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">{meeting.description}</p>
+                    <div className="flex items-center text-xs text-gray-500 gap-3">
+                      <span className="flex items-center">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {meeting.timestamp}
+                      </span>
+                      <span>{meeting.location}</span>
+                      <span>{meeting.attendees} attendees</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="p-4 border-t flex justify-between bg-gray-50">
+            <Button variant="outline">
+              Past Meetings
+            </Button>
+            <Button>
+              Schedule New Meeting
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
