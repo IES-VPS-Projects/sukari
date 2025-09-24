@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
 import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
-import { useSubmitApplication, useUserApplications } from '@/hooks/use-applications'
+import { useSubmitApplication, useUserApplications, Application } from '@/hooks/use-applications'
 import { License } from '@/lib/api-client'
 import { DynamicFormRenderer, LicenseWithFields } from '@/components/dynamic-form-renderer'
 import { useAuth } from '@/components/auth-provider'
@@ -75,7 +75,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const [selectedStakeholder, setSelectedStakeholder] = useState<string>('')
   const [expandedApplication, setExpandedApplication] = useState<string>('')
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [selectedApplication, setSelectedApplication] = useState<any>(null)
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
   const [isDraftSaved, setIsDraftSaved] = useState(false)
   const [submittedApplications, setSubmittedApplications] = useState<any[]>([])
   const [selectedLicense, setSelectedLicense] = useState<LicenseWithFields | null>(null)
@@ -327,13 +327,13 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
   // Use user applications data from the API
   // Handle the new nested structure: data.applications
-  const existingApplications = (userApplicationsData?.data as any)?.applications || []
+  const existingApplications = userApplicationsData?.data?.applications || []
   
   // Calculate license stats from user applications
   const applicationStats = {
-    active: existingApplications.filter((app: any) => app.status === 'APPROVED').length,
-    pending: existingApplications.filter((app: any) => app.status === 'PENDING').length,
-    rejected: existingApplications.filter((app: any) => app.status === 'REJECTED').length
+    active: existingApplications.filter((app: Application) => app.status === 'APPROVED').length,
+    pending: existingApplications.filter((app: Application) => app.status === 'PENDING').length,
+    rejected: existingApplications.filter((app: Application) => app.status === 'REJECTED').length
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -652,36 +652,75 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                     <div className="bg-white border rounded-lg p-4 space-y-3">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Applicant:</span>
-                        <span className="font-medium">{selectedApplication.applicant}</span>
+                        <span className="font-medium">
+                          {userApplicationsData?.data?.user?.iprs ? 
+                            `${userApplicationsData.data.user.iprs.first_name} ${userApplicationsData.data.user.iprs.last_name}` : 
+                            userApplicationsData?.data?.user?.email || 'N/A'
+                          }
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Company:</span>
-                        <span className="font-medium">{selectedApplication.company}</span>
+                        <span className="font-medium">
+                          {userApplicationsData?.data?.user?.entity?.businessId?.legal_name || 
+                           userApplicationsData?.data?.entity?.companyName || 
+                           'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Submission Date:</span>
-                        <span className="font-medium">{selectedApplication.submitDate}</span>
+                        <span className="font-medium">
+                          {selectedApplication?.submittedAt ? 
+                            new Date(selectedApplication.submittedAt).toLocaleDateString() : 
+                            'N/A'
+                          }
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Current Stage:</span>
-                        <span className="font-medium">{selectedApplication.stage}</span>
+                        <span className="font-medium">
+                          {selectedApplication?.status === 'PENDING' ? 'Under Review' :
+                           selectedApplication?.status === 'APPROVED' ? 'Approved' :
+                           selectedApplication?.status === 'REJECTED' ? 'Rejected' :
+                           selectedApplication?.status || 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Quantity:</span>
-                        <span className="font-medium">{selectedApplication.quantity}</span>
+                        <span className="font-medium">
+                          {selectedApplication?.applicationData?.['Capacity (TCD)'] ? 
+                            `${selectedApplication.applicationData['Capacity (TCD)']} TCD` :
+                            selectedApplication?.applicationData?.['Plot Number'] ? 
+                            `Plot: ${selectedApplication.applicationData['Plot Number']}` :
+                            'N/A'
+                          }
+                        </span>
                       </div>
                       
-                      {selectedApplication.completionDate && (
+                      {selectedApplication?.approvedAt && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Completion Date:</span>
-                          <span className="font-medium">{selectedApplication.completionDate}</span>
+                          <span className="text-gray-600">Approval Date:</span>
+                          <span className="font-medium">
+                            {new Date(selectedApplication.approvedAt).toLocaleDateString()}
+                          </span>
                         </div>
                       )}
                       
-                      {selectedApplication.expectedCompletion && !selectedApplication.completionDate && (
+                      {selectedApplication?.rejectedAt && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Expected Completion:</span>
-                          <span className="font-medium">{selectedApplication.expectedCompletion}</span>
+                          <span className="text-gray-600">Rejection Date:</span>
+                          <span className="font-medium">
+                            {new Date(selectedApplication.rejectedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+
+                      {selectedApplication?.paymentStatus && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Payment Status:</span>
+                          <span className="font-medium">
+                            {selectedApplication.paymentStatus}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -691,7 +730,23 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                     <h4 className="font-semibold text-gray-700">Additional Information</h4>
                     <div className="bg-white border rounded-lg p-4">
                       <h5 className="font-medium mb-2">Notes</h5>
-                      <p className="text-gray-700">{selectedApplication.notes}</p>
+                      <p className="text-gray-700">
+                        {selectedApplication?.notes || 
+                         selectedApplication?.rejectionReason || 
+                         'No additional notes available.'}
+                      </p>
+                    </div>
+                    
+                    <div className="bg-white border rounded-lg p-4">
+                      <h5 className="font-medium mb-2">Application Data</h5>
+                      <div className="space-y-2">
+                        {selectedApplication?.applicationData && Object.entries(selectedApplication.applicationData).map(([key, value]) => (
+                          <div key={key} className="flex justify-between text-sm">
+                            <span className="text-gray-600">{key}:</span>
+                            <span className="font-medium">{String(value)}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     
                     <div className="bg-white border rounded-lg p-4">
@@ -699,24 +754,32 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
                           <FileText className="h-4 w-4 text-blue-600" />
-                          <span>Application Form {selectedApplication.id}.pdf</span>
+                          <span>Application Form {selectedApplication?.id || 'N/A'}.pdf</span>
                         </div>
-                        {selectedApplication.status === "Under Review" && (
+                        {selectedApplication?.status === "PENDING" && (
                           <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
                             <FileText className="h-4 w-4 text-blue-600" />
                             <span>Supporting Documents.pdf</span>
                           </div>
                         )}
-                        {selectedApplication.status === "Approved" && (
+                        {selectedApplication?.status === "APPROVED" && (
                           <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
                             <FileText className="h-4 w-4 text-green-600" />
                             <span>Approval Certificate.pdf</span>
                           </div>
                         )}
+                        {selectedApplication?.documents && selectedApplication.documents.length > 0 && (
+                          selectedApplication.documents.map((doc: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                              <FileText className="h-4 w-4 text-blue-600" />
+                              <span>{doc.name || `Document ${index + 1}.pdf`}</span>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                     
-                    {selectedApplication.status === "Under Review" && (
+                    {selectedApplication?.status === "PENDING" && (
                       <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                         <div className="flex items-start gap-2">
                           <Clock className="h-5 w-5 text-blue-600 mt-0.5" />

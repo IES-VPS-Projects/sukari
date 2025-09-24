@@ -593,7 +593,7 @@ export class ApiClient {
     submit: (applicationData: any): Promise<ApiResponse> =>
       this.apiService.post('/api/applications/submit', applicationData),
 
-    getUserApplications: (userId: string, page = 1, limit = 10, filters?: { status?: string }): Promise<PaginatedResponse> => {
+    getUserApplications: (userId: string, page = 1, limit = 10, filters?: { status?: string }): Promise<ApiResponse> => {
       const params = new URLSearchParams({
         userId,
         page: page.toString(),
@@ -620,6 +620,15 @@ export class ApiClient {
       return this.apiService.get(`/api/applications?${params.toString()}`);
     },
   };
+
+  // Cache endpoints
+  cache = {
+    warmUsers: (): Promise<ApiResponse> =>
+      this.apiService.post('/api/cache/users/warm'),
+    
+    warmEntities: (): Promise<ApiResponse> =>
+      this.apiService.post('/api/cache/entities/warm'),
+  };
 }
 
 // Export default API client instance
@@ -639,3 +648,4 @@ export const aiApi = apiClient.ai;
 export const uploadApi = apiClient.upload;
 export const entitiesApi = apiClient.entities;
 export const applicationsApi = apiClient.applications;
+export const cacheApi = apiClient.cache;

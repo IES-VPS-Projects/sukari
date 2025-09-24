@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { 
   Users, 
   Search, 
-  Filter, 
   Plus, 
   MoreHorizontal, 
   Edit, 
@@ -15,7 +14,6 @@ import {
   Mail,
   Phone,
   Calendar,
-  Building,
   MapPin
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -27,7 +25,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 
 // Mock user data
 const mockUsers = [
@@ -124,9 +121,7 @@ export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
-  const [selectedUser, setSelectedUser] = useState<any>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   // Filter users based on search and filters
   useEffect(() => {
@@ -189,8 +184,8 @@ export default function UserManagement() {
 
     switch (action) {
       case "edit":
-        setSelectedUser(user)
-        setIsEditDialogOpen(true)
+        // Edit functionality would be implemented here
+        console.log("Edit user:", user)
         break
       case "suspend":
         setUsers(prev => prev.map(u => 

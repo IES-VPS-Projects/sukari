@@ -9,7 +9,8 @@ import {
   Building2,
   FileText,
   Workflow,
-  FileText as Form
+  FileText as Form,
+  Zap
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,6 +24,8 @@ import { WorkflowTemplatesModal } from "@/components/modals/workflow-templates-m
 import { FormBuilderModal } from "@/components/modals/form-builder-modal"
 import { useAuth } from "@/components/auth-provider"
 import { License } from "@/lib/api-client"
+import { useCacheWarm, useCacheWarmEntities } from "@/hooks/use-cache"
+import { Button } from "@/components/ui/button"
 
 
 export default function SuperAdminDashboard() {
@@ -37,6 +40,10 @@ export default function SuperAdminDashboard() {
   const [selectedLicenseForEdit, setSelectedLicenseForEdit] = useState<License | null>(null)
 
   const { user } = useAuth()
+  
+  // Cache warming hooks
+  const cacheWarmMutation = useCacheWarm()
+  const cacheWarmEntitiesMutation = useCacheWarmEntities()
 
   const handleLicensesModalClose = (isOpen: boolean) => {
     if (!isOpen) {
@@ -203,6 +210,40 @@ export default function SuperAdminDashboard() {
             <CardContent>
               <div className="space-y-3">
                 <div className="h-32"></div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Cache Management Card */}
+          <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Zap className="h-5 w-5" />
+                Cache Management
+              </CardTitle>
+              <CardDescription>Manage system cache and performance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  onClick={() => cacheWarmMutation.mutate()}
+                  disabled={cacheWarmMutation.isPending}
+                  className="w-full"
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  {cacheWarmMutation.isPending ? "Warming Cache..." : "Warm User Cache"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => cacheWarmEntitiesMutation.mutate()}
+                  disabled={cacheWarmEntitiesMutation.isPending}
+                  className="w-full"
+                >
+                  <Building2 className="h-4 w-4 mr-2" />
+                  {cacheWarmEntitiesMutation.isPending ? "Warming Cache..." : "Warm Entities Cache"}
+                </Button>
+                <div className="h-8"></div>
               </div>
             </CardContent>
           </Card>
