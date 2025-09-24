@@ -24,7 +24,7 @@ export default function PortalPage() {
       else if (user.role === "ADMIN" && pathname === "/portal") {
         router.push("/portal/super-admin")
       }
-      else if (user.userType === "ceo" && pathname === "/portal") {
+      else if (user.userType === "ceo"|| user.role === "KSB_COMPLIANCE" && pathname === "/portal") {
         router.push("/portal/ceo/today")
       } else if (user.userType === "importer" && pathname === "/portal") {
         router.push("/portal/importer")

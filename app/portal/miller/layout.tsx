@@ -19,9 +19,9 @@ export default function MillerLayoutWrapper({
     if (!isLoading && !user) {
       router.push("/login")
       
-    } else if (!isLoading && user && user.role !== "miller" && user.role !== "COMPANY" && user.role !== "USER" ) {
+    } else if (!isLoading && user && user.role !== "miller" && user.role !== "COMPANY" && user.role !== "USER" && user.role === "KSB_COMPLIANCE") {
       // Redirect to appropriate portal based on user type
-      if (user.userType === "ceo") {
+      if (user.userType === "ceo" || user.role === "KSB_COMPLIANCE") {
         router.push("/portal/ceo")
       } else if (user.userType === "importer") {
         router.push("/portal/importer")
@@ -32,6 +32,11 @@ export default function MillerLayoutWrapper({
       } 
       console.log('user', user,user.role);
       
+    }
+    else{
+      console.log('====================================');
+      console.log("others");
+      console.log('====================================');
     }
   }, [user, isLoading, router])
 
