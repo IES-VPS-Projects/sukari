@@ -131,6 +131,24 @@ export interface BRSData {
   updatedAt: string;
 }
 
+// License field interface
+export interface LicenseField {
+  id: string;
+  licenseId: string;
+  name: string;
+  type: 'TEXT' | 'NUMBER' | 'EMAIL' | 'DATE' | 'SELECT' | 'TEXTAREA' | 'CHECKBOX' | 'COMPANY';
+  label: string;
+  required: boolean;
+  placeholder: string;
+  description?: string;
+  options: string[];
+  validation?: any;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // License related types
 export interface License {
   id: string;
@@ -167,6 +185,7 @@ export interface License {
   updatedAt: string;
   applications?: LicenseApplication[];
   renewals?: LicenseRenewal[];
+  fields?: LicenseField[];
   _count?: {
     applications: number;
     renewals: number;

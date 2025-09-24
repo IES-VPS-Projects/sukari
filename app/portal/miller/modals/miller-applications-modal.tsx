@@ -12,6 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
 import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
 import { License } from '@/lib/api-client'
+import { DynamicFormRenderer, LicenseWithFields } from '@/components/dynamic-form-renderer'
+import { useAuth } from '@/components/auth-provider'
 
 // Application stages for tracking miller applications
 const applicationStages = [
@@ -75,10 +77,36 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
   const [isDraftSaved, setIsDraftSaved] = useState(false)
   const [submittedApplications, setSubmittedApplications] = useState<any[]>([])
+  const [selectedLicense, setSelectedLicense] = useState<LicenseWithFields | null>(null)
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false)
+  const [isDraftSaving, setIsDraftSaving] = useState(false)
   
   // Fetch licenses data using the custom hook
   const { data: licensesData, isLoading: licensesLoading, error: licensesError } = useLicenses(1, 100)
   const licenseStats = useLicenseStats()
+  const { user } = useAuth()
+  
+  // Create user profile data for company field population
+  const userProfile = {
+    companyName: 'Mumias Sugar Mills Ltd', // This could come from user.entityData or a separate company profile
+    lrNumber: 'LR/12345/2020',
+    postalAddress: 'P.O. Box 12345',
+    postalCode: '50100',
+    companyRegNumber: 'C.123456',
+    pinNumber: 'P051234567A',
+    phoneNumber: user?.entityData?.phoneNumber || '+254 700 333 456',
+    emailAddress: user?.email || 'info@mumiasmills.co.ke',
+    county: 'Kakamega',
+    subcounty: 'Mumias East',
+    ward: 'Mumias Central',
+    location: 'Mumias Township',
+    buildingName: 'Mumias Sugar Complex',
+    streetName: 'Mumias Road',
+    town: 'Mumias',
+    establishmentDate: '1980-01-15',
+    legalStatus: 'Limited Company'
+  }
+  
   const [formData, setFormData] = useState({
     // Basic fields
     millerLicenseNumber: 'SML-2024-003',
@@ -343,6 +371,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     setSelectedStakeholder('')
     setExpandedApplication('')
     setIsDraftSaved(false)
+    setSelectedLicense(null)
+    setIsSubmittingForm(false)
+    setIsDraftSaving(false)
   }
 
   // Auto-generate document details when category is selected
@@ -429,6 +460,117 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     setTimeout(() => {
       setIsDraftSaved(false)
     }, 2000)
+  }
+
+  // Handle license form submission
+  const handleLicenseFormSubmit = async (formData: Record<string, any>) => {
+    setIsSubmittingForm(true)
+    
+    try {
+      // In a real app, this would submit to the backend
+      console.log('Submitting license application:', {
+        licenseId: selectedLicense?.id,
+        licenseName: selectedLicense?.name,
+        formData
+      })
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Create new application entry
+      const newApplication = {
+        id: `APP-${Date.now()}`,
+        type: selectedLicense?.name || 'License Application',
+        title: selectedLicense?.name || 'License Application',
+        purpose: selectedLicense?.description || 'License Application',
+        status: 'Under Review',
+        stage: 'submission',
+        applicant: 'Your Company Name', // This should come from user profile
+        company: 'Your Company Name',
+        submitDate: new Date().toISOString().split('T')[0],
+        completionDate: null,
+        expectedCompletion: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        quantity: `KSh ${typeof selectedLicense?.cost === 'string' ? parseInt(selectedLicense.cost).toLocaleString() : selectedLicense?.cost?.toLocaleString()}`,
+        notes: `Application for ${selectedLicense?.name} submitted successfully.`,
+        submittedDate: new Date().toISOString().split('T')[0],
+        approvedDate: null,
+        validUntil: null
+      }
+      
+      // Add to submitted applications
+      setSubmittedApplications(prev => [newApplication, ...prev])
+      
+      // Reset form and close
+      setSelectedLicense(null)
+      setIsSubmitted(true)
+      setTimeout(() => {
+        setIsSubmitted(false)
+      }, 2000)
+      
+    } catch (error) {
+      console.error('Error submitting license application:', error)
+    } finally {
+      setIsSubmittingForm(false)
+    }
+  }
+
+  // Handle license form draft save
+  const handleLicenseFormDraftSave = async (formData: Record<string, any>) => {
+    setIsDraftSaving(true)
+    
+    try {
+      // In a real app, this would save to localStorage or backend
+      console.log('Saving license application draft:', {
+        licenseId: selectedLicense?.id,
+        formData
+      })
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+    } catch (error) {
+      console.error('Error saving draft:', error)
+    } finally {
+      setIsDraftSaving(false)
+    }
+  }
+
+  // Handle license click - show form if it has fields
+  const handleLicenseClick = (license: License) => {
+    // Convert License to LicenseWithFields format
+    const licenseWithFields: LicenseWithFields = {
+      ...license,
+      fields: license.fields || [] // Add fields from the API response
+    }
+    
+    // If license has fields, show the form
+    if (licenseWithFields.fields && licenseWithFields.fields.length > 0) {
+      setSelectedLicense(licenseWithFields)
+    } else {
+      // If no fields, show application details as before
+      setSelectedApplication({
+        id: license.id,
+        type: license.type,
+        title: license.name,
+        purpose: license.description,
+        status: license.status === 'ACTIVE' ? 'Approved' : 
+                license.status === 'PENDING' ? 'Under Review' : 
+                license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+        stage: license.status === 'ACTIVE' ? 'Issuance' : 
+               license.status === 'PENDING' ? 'Evaluation' : 
+               license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
+        applicant: 'N/A',
+        company: 'N/A',
+        submitDate: license.createdAt,
+        completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
+        expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
+        quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`,
+        notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
+        submittedDate: license.createdAt,
+        approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
+        validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
+      })
+    }
   }
 
   return (
@@ -746,6 +888,29 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   <p className="text-sm text-gray-500 mt-1">Please try again later</p>
                 </div>
               </div>
+            ) : selectedLicense ? (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedLicense(null)}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Licenses
+                  </Button>
+                </div>
+                
+                <DynamicFormRenderer
+                  license={selectedLicense}
+                  onSubmit={handleLicenseFormSubmit}
+                  onCancel={() => setSelectedLicense(null)}
+                  onSaveDraft={handleLicenseFormDraftSave}
+                  isSubmitting={isSubmittingForm}
+                  isDraftSaving={isDraftSaving}
+                  userProfile={userProfile}
+                />
+              </div>
             ) : !selectedStakeholder ? (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -776,46 +941,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => {
-                                  // If it's a Letter of Comfort, show the form directly
-                                  if (license.category === 'LETTER_OF_COMFORT') {
-                                    setSelectedStakeholder('Sugar Miller');
-                                    setExpandedApplication('letter-of-comfort');
-                                    // Pre-populate form with license data
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      category: license.type === 'MILLERS' ? 'Mill' : 'Jaggery',
-                                      documentNo: `LOC-${license.id}`,
-                                      documentDate: new Date().toISOString().split('T')[0],
-                                      companyName: 'Your Company Name', // This should come from user profile
-                                      licenseExpiryDate: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                                    }));
-                                  } else {
-                                    // For other license types, show the application details
-                                    setSelectedApplication({
-                                  id: license.id,
-                                  type: license.type,
-                                  title: license.name,
-                                  purpose: license.description,
-                                  status: license.status === 'ACTIVE' ? 'Approved' : 
-                                          license.status === 'PENDING' ? 'Under Review' : 
-                                          license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-                                  stage: license.status === 'ACTIVE' ? 'Issuance' : 
-                                         license.status === 'PENDING' ? 'Evaluation' : 
-                                         license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-                                  applicant: 'N/A', // Not available in new structure
-                                  company: 'N/A', // Not available in new structure
-                                  submitDate: license.createdAt,
-                                  completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
-                                  expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-                                  quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`, // Using cost as quantity placeholder
-                                  notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
-                                  submittedDate: license.createdAt,
-                                  approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
-                                  validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
-                                    });
-                                  }
-                                }}
+                                onClick={() => handleLicenseClick(license)}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
