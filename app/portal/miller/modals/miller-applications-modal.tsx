@@ -395,20 +395,23 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'APPROVED':
       case 'Approved':
+      case 'approved':
         return 'bg-green-100 text-green-800'
+      case 'PENDING':
       case 'Under Review':
-        return 'bg-yellow-100 text-yellow-800'
       case 'Pending':
-        return 'bg-blue-100 text-blue-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'REJECTED':
       case 'Rejected':
         return 'bg-red-100 text-red-800'
-      case 'approved':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'SUBMITTED':
+        return 'bg-blue-100 text-blue-800'
+      case 'UNDER_REVIEW':
       case 'in-review':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-orange-100 text-orange-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -548,25 +551,52 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       // If no fields, show application details as before
       setSelectedApplication({
         id: license.id,
-        type: license.type,
-        title: license.name,
-        purpose: license.description,
-        status: license.status === 'ACTIVE' ? 'Approved' : 
-                license.status === 'PENDING' ? 'Under Review' : 
-                license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-        stage: license.status === 'ACTIVE' ? 'Issuance' : 
-               license.status === 'PENDING' ? 'Evaluation' : 
-               license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-        applicant: 'N/A',
-        company: 'N/A',
-        submitDate: license.createdAt,
-        completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
-        expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-        quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`,
+        licenseId: license.id,
+        entityId: user?.entityData?.id || '',
+        userId: user?.id || '',
+        status: license.status === 'ACTIVE' ? 'APPROVED' : 
+                license.status === 'PENDING' ? 'PENDING' : 
+                license.status === 'EXPIRED' ? 'REJECTED' : 'PENDING',
+        applicationData: {
+          'License Type': license.type,
+          'License Name': license.name,
+          'Cost': license.cost,
+          'Issuing Authority': license.issuingAuthority
+        },
+        submittedAt: license.createdAt,
+        reviewedAt: null,
+        approvedAt: license.status === 'ACTIVE' ? license.createdAt : null,
+        rejectedAt: license.status === 'EXPIRED' ? license.createdAt : null,
+        rejectionReason: null,
+        assignedTo: null,
         notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
-        submittedDate: license.createdAt,
-        approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
-        validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
+        documents: null,
+        paymentStatus: 'PENDING',
+        paymentReference: null,
+        createdAt: license.createdAt,
+        updatedAt: license.updatedAt,
+        license: {
+          id: license.id,
+          name: license.name,
+          description: license.description,
+          category: license.category,
+          type: license.type,
+          status: license.status,
+          requirements: {},
+          validityPeriod: license.validityPeriod,
+          cost: String(license.cost),
+          issuingAuthority: license.issuingAuthority,
+          applicationSteps: null,
+          prerequisites: null,
+          documents: null,
+          processingTime: license.processingTime || '5-10 business days',
+          renewalRequired: license.renewalRequired || false,
+          renewalPeriod: license.renewalPeriod || 12,
+          isDigital: license.isDigital || true,
+          onlineApplication: license.onlineApplication || true,
+          createdAt: license.createdAt,
+          updatedAt: license.updatedAt
+        }
       })
     }
   }
@@ -633,16 +663,21 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   </Button>
                   
                   <Badge className={getStatusColor(selectedApplication.status)}>
-                    {selectedApplication.status}
+                    {selectedApplication.status === 'PENDING' ? 'Under Review' :
+                     selectedApplication.status === 'APPROVED' ? 'Approved' :
+                     selectedApplication.status === 'REJECTED' ? 'Rejected' :
+                     selectedApplication.status}
                   </Badge>
                 </div>
                 
                 <div className="bg-green-50 p-6 rounded-lg">
-                  <h3 className="text-xl font-semibold text-green-800 mb-2">{selectedApplication.title}</h3>
+                  <h3 className="text-xl font-semibold text-green-800 mb-2">
+                    {selectedApplication.license?.name || 'Application'}
+                  </h3>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-green-700">
                     <span>ID: {selectedApplication.id}</span>
                     <span className="hidden sm:inline">•</span>
-                      <span>Type: {selectedApplication.license?.name || selectedApplication.type}</span>
+                    <span>Type: {selectedApplication.license?.name || 'Application'}</span>
                   </div>
                 </div>
                 
@@ -813,11 +848,11 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                         // Mock stage status based on application status
                         const getStageStatus = (stageId: string) => {
                           const stageOrder = ["submission", "review", "inspection", "evaluation", "approval", "issuance"]
-                          const currentStage = selectedApplication.stage?.toLowerCase() || "submission"
+                          const currentStage = "submission" // Default stage since Application doesn't have stage property
                           const currentIndex = stageOrder.indexOf(currentStage)
                           const stageIndex = stageOrder.indexOf(stageId)
                           
-                          if (selectedApplication.status === "Approved") {
+                          if (selectedApplication.status === "APPROVED") {
                             return "completed"
                           } else if (stageIndex < currentIndex) {
                             return "completed"
@@ -893,7 +928,10 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge className={getStatusColor(app.status)}>
-                            {app.status}
+                            {app.status === 'PENDING' ? 'Under Review' :
+                             app.status === 'APPROVED' ? 'Approved' :
+                             app.status === 'REJECTED' ? 'Rejected' :
+                             app.status}
                           </Badge>
                           <Button
                             size="sm"
@@ -1060,7 +1098,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                 </div>
 
                 {/* Application Types Section */}
-                <div className="space-y-4">
+                {/* <div className="space-y-4">
                   <h4 className="font-semibold text-gray-700">Apply for New License/Permit</h4>
                   <div className="space-y-3">
                     {Object.keys(stakeholderApplications).map((stakeholder) => (
@@ -1074,7 +1112,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
               </div>
             ) : (
               <div className="space-y-4">
