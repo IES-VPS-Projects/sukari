@@ -912,13 +912,10 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="KSB_FIELD_OFFICER">Field Officer</SelectItem>
-                      <SelectItem value="KSB_MILLER">Miller</SelectItem>
-                      <SelectItem value="KSB_CEO">CEO</SelectItem>
-                      <SelectItem value="KSB_FIELD_COORDINATOR">Field Coordinator</SelectItem>
-                      <SelectItem value="KSB_IMPORTER">Importer</SelectItem>
-                      <SelectItem value="KSB_SUPER_ADMIN">Super Admin</SelectItem>
+                      <SelectItem value="KSB_FIELD_OFFICER">Field Officer</SelectItem> 
+                      <SelectItem value="KSB_FIELD_COORDINATOR">Field Coordinator</SelectItem> 
                       <SelectItem value="KSB_FINANCE">Finance</SelectItem> 
+                      <SelectItem value="KSB_COMPLIANCE">Compliance</SelectItem> 
                     </SelectContent>
                   </Select>
                 </div>
