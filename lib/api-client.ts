@@ -628,6 +628,9 @@ export class ApiClient {
     
     warmEntities: (): Promise<ApiResponse> =>
       this.apiService.post('/api/cache/entities/warm'),
+    
+    warmDepartments: (): Promise<ApiResponse> =>
+      this.apiService.post('/api/cache/departments/warm'),
   };
 }
 

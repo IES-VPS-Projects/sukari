@@ -45,3 +45,25 @@ export const useCacheWarmEntities = () => {
     },
   });
 };
+
+// Custom hook for departments cache warming
+export const useCacheWarmDepartments = () => {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: () => cacheApi.warmDepartments(),
+    onSuccess: (data) => {
+      toast({
+        title: "Cache Warming Successful",
+        description: data.message || "Departments cache has been warmed successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cache Warming Failed",
+        description: error.response?.data?.message || "Failed to warm departments cache. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+};

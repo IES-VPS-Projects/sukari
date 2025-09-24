@@ -24,7 +24,7 @@ import { WorkflowTemplatesModal } from "@/components/modals/workflow-templates-m
 import { FormBuilderModal } from "@/components/modals/form-builder-modal"
 import { useAuth } from "@/components/auth-provider"
 import { License } from "@/lib/api-client"
-import { useCacheWarm, useCacheWarmEntities } from "@/hooks/use-cache"
+import { useCacheWarm, useCacheWarmEntities, useCacheWarmDepartments } from "@/hooks/use-cache"
 import { Button } from "@/components/ui/button"
 
 
@@ -44,6 +44,7 @@ export default function SuperAdminDashboard() {
   // Cache warming hooks
   const cacheWarmMutation = useCacheWarm()
   const cacheWarmEntitiesMutation = useCacheWarmEntities()
+  const cacheWarmDepartmentsMutation = useCacheWarmDepartments()
 
   const handleLicensesModalClose = (isOpen: boolean) => {
     if (!isOpen) {
@@ -242,6 +243,15 @@ export default function SuperAdminDashboard() {
                 >
                   <Building2 className="h-4 w-4 mr-2" />
                   {cacheWarmEntitiesMutation.isPending ? "Warming Cache..." : "Warm Entities Cache"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => cacheWarmDepartmentsMutation.mutate()}
+                  disabled={cacheWarmDepartmentsMutation.isPending}
+                  className="w-full"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  {cacheWarmDepartmentsMutation.isPending ? "Warming Cache..." : "Warm Departments Cache"}
                 </Button>
                 <div className="h-8"></div>
               </div>
