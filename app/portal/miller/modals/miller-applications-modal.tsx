@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
 import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
+import { useSubmitApplication, useUserApplications } from '@/hooks/use-applications'
 import { License } from '@/lib/api-client'
 import { DynamicFormRenderer, LicenseWithFields } from '@/components/dynamic-form-renderer'
 import { useAuth } from '@/components/auth-provider'
@@ -85,6 +86,13 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const { data: licensesData, isLoading: licensesLoading, error: licensesError } = useLicenses(1, 100)
   const licenseStats = useLicenseStats()
   const { user } = useAuth()
+  
+  // Fetch user applications using the new API endpoint
+  const { data: userApplicationsData, isLoading: userApplicationsLoading, error: userApplicationsError } = useUserApplications(
+    user?.id || '', 
+    1, 
+    100
+  )
   
   // Create user profile data for company field population
   const userProfile = {
@@ -317,29 +325,16 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     ]
   }
 
-  // Convert licenses data to application format for display
-  const existingApplications = licensesData?.data?.map((license: License) => ({
-    id: license.id,
-    type: license.type,
-    title: license.name,
-    purpose: license.description,
-    status: license.status === 'ACTIVE' ? 'Approved' : 
-            license.status === 'PENDING' ? 'Under Review' : 
-            license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-    stage: license.status === 'ACTIVE' ? 'Issuance' : 
-           license.status === 'PENDING' ? 'Evaluation' : 
-           license.status === 'EXPIRED' ? 'Expired' : 'Suspended',
-    applicant: 'N/A', // Not available in new structure
-    company: 'N/A', // Not available in new structure
-    submitDate: license.createdAt,
-    completionDate: license.status === 'ACTIVE' ? license.createdAt : null,
-    expectedCompletion: license.status === 'PENDING' ? new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString() : null,
-    quantity: `KSh ${typeof license.cost === 'string' ? parseInt(license.cost).toLocaleString() : license.cost.toLocaleString()}`, // Using cost as quantity placeholder
-    notes: `${license.type} - ${license.status} - ${license.issuingAuthority}`,
-    submittedDate: license.createdAt,
-    approvedDate: license.status === 'ACTIVE' ? license.createdAt : null,
-    validUntil: new Date(Date.now() + license.validityPeriod * 30 * 24 * 60 * 60 * 1000).toISOString()
-  })) || []
+  // Use user applications data from the API
+  // Handle the new nested structure: data.applications
+  const existingApplications = (userApplicationsData?.data as any)?.applications || []
+  
+  // Calculate license stats from user applications
+  const applicationStats = {
+    active: existingApplications.filter((app: any) => app.status === 'APPROVED').length,
+    pending: existingApplications.filter((app: any) => app.status === 'PENDING').length,
+    rejected: existingApplications.filter((app: any) => app.status === 'REJECTED').length
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -462,39 +457,44 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     }, 2000)
   }
 
+  const auth = useAuth()
+  const submitApplicationMutation = useSubmitApplication()
+  
   // Handle license form submission
   const handleLicenseFormSubmit = async (formData: Record<string, any>) => {
-    setIsSubmittingForm(true)
+    if (!selectedLicense?.id || !auth.user?.entityData?.id || !auth.user?.id) {
+      console.error('Missing required data for application submission')
+      return
+    }
+
+    console.log('Submitting license application:', {
+      licenseId: selectedLicense?.id,
+      entityId: auth.user?.entityData?.id,
+      userId: auth.user?.id,
+      licenseName: selectedLicense?.name,
+      
+      formData
+    })
     
     try {
-      // In a real app, this would submit to the backend
-      console.log('Submitting license application:', {
-        licenseId: selectedLicense?.id,
+      const response = await submitApplicationMutation.mutateAsync({
+        licenseId: selectedLicense.id,
+        entityId: auth.user.entityData.id,
+        userId: auth.user.id,
         licenseName: selectedLicense?.name,
-        formData
+        formData: formData
       })
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log('Application submitted successfully:', response)
       
-      // Create new application entry
+      // Create new application entry for local state
       const newApplication = {
-        id: `APP-${Date.now()}`,
-        type: selectedLicense?.name || 'License Application',
-        title: selectedLicense?.name || 'License Application',
-        purpose: selectedLicense?.description || 'License Application',
-        status: 'Under Review',
-        stage: 'submission',
-        applicant: 'Your Company Name', // This should come from user profile
-        company: 'Your Company Name',
-        submitDate: new Date().toISOString().split('T')[0],
-        completionDate: null,
-        expectedCompletion: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        quantity: `KSh ${typeof selectedLicense?.cost === 'string' ? parseInt(selectedLicense.cost).toLocaleString() : selectedLicense?.cost?.toLocaleString()}`,
-        notes: `Application for ${selectedLicense?.name} submitted successfully.`,
-        submittedDate: new Date().toISOString().split('T')[0],
-        approvedDate: null,
-        validUntil: null
+        id: response.data.id,
+        entityId: auth.user.entityData.id,
+        licenseId: selectedLicense.id,
+        formData: formData,
+        status: response.data.status,
+        submittedAt: response.data.submittedAt
       }
       
       // Add to submitted applications
@@ -509,8 +509,6 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       
     } catch (error) {
       console.error('Error submitting license application:', error)
-    } finally {
-      setIsSubmittingForm(false)
     }
   }
 
@@ -644,7 +642,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-green-700">
                     <span>ID: {selectedApplication.id}</span>
                     <span className="hidden sm:inline">•</span>
-                    <span>Type: {selectedApplication.type}</span>
+                      <span>Type: {selectedApplication.license?.name || selectedApplication.type}</span>
                   </div>
                 </div>
                 
@@ -807,22 +805,27 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   <h3 className="text-lg font-semibold">License Status</h3>
                   <div className="flex gap-2">
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      Active: {licenseStats.active}
+                      Active: {applicationStats.active}
                     </Badge>
                     <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                      Pending: {licenseStats.pending}
+                      Pending: {applicationStats.pending}
                     </Badge>
                     <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                      Expired: {licenseStats.expired}
+                      Rejected: {applicationStats.rejected}
                     </Badge>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  {[...submittedApplications, ...existingApplications].map((app) => (
+                  {userApplicationsLoading ? (
+                    <div className="flex items-center justify-center p-8">
+                      <div className="text-gray-500">Loading applications...</div>
+                    </div>
+                  ) : (
+                    [...submittedApplications, ...existingApplications].map((app) => (
                     <div key={app.id} className="p-4 border rounded-lg space-y-2">
                       <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold">{app.type}</h4>
+                        <div> 
+                           <h4 className="font-semibold">{app.license?.name || app.type || 'Unknown License'}</h4>
                           <p className="text-sm text-gray-600">ID: {app.id}</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -841,7 +844,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">Submit Date:</span>
-                          <p className="font-medium">{app.submitDate ? new Date(app.submitDate).toLocaleDateString() : 'N/A'}</p>
+                           <p className="font-medium">{app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'N/A'}</p>
                         </div>
                         {app.completionDate && (
                           <div>
@@ -849,21 +852,34 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             <p className="font-medium">{new Date(app.completionDate).toLocaleDateString()}</p>
                           </div>
                         )}
-                        {app.quantity && (
+                        {app.quantity && app.quantity !== 'N/A' && (
                           <div>
-                            <span className="text-gray-600">Quantity:</span>
-                            <p className="font-medium">{app.quantity}</p>
+                            <span className="text-gray-600">Capacity:</span>
+                            <p className="font-medium">{app.quantity} TCD</p>
                           </div>
                         )}
-                        {app.company && (
+                        {app.paymentStatus && (
                           <div>
-                            <span className="text-gray-600">Company:</span>
-                            <p className="font-medium">{app.company}</p>
+                            <span className="text-gray-600">Payment:</span>
+                            <p className="font-medium">{app.paymentStatus}</p>
+                          </div>
+                        )}
+                        {app.assignedTo && (
+                          <div>
+                            <span className="text-gray-600">Assigned To:</span>
+                            <p className="font-medium">{app.assignedTo}</p>
+                          </div>
+                        )}
+                        {app.notes && (
+                          <div className="col-span-2">
+                            <span className="text-gray-600">Notes:</span>
+                            <p className="font-medium">{app.notes}</p>
                           </div>
                         )}
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -906,7 +922,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                   onSubmit={handleLicenseFormSubmit}
                   onCancel={() => setSelectedLicense(null)}
                   onSaveDraft={handleLicenseFormDraftSave}
-                  isSubmitting={isSubmittingForm}
+                  isSubmitting={submitApplicationMutation.isPending}
                   isDraftSaving={isDraftSaving}
                   userProfile={userProfile}
                 />

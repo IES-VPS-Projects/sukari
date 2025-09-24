@@ -587,6 +587,39 @@ export class ApiClient {
     delete: (id: string): Promise<ApiResponse> =>
       this.apiService.delete(`/api/entities/${id}`),
   };
+
+  // Applications endpoints
+  applications = {
+    submit: (applicationData: any): Promise<ApiResponse> =>
+      this.apiService.post('/api/applications/submit', applicationData),
+
+    getUserApplications: (userId: string, page = 1, limit = 10, filters?: { status?: string }): Promise<PaginatedResponse> => {
+      const params = new URLSearchParams({
+        userId,
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.status && { status: filters.status }),
+      });
+      return this.apiService.get(`/api/applications/user?${params.toString()}`);
+    },
+
+    getById: (id: string): Promise<ApiResponse> =>
+      this.apiService.get(`/api/applications/${id}`),
+
+    updateStatus: (id: string, status: string): Promise<ApiResponse> =>
+      this.apiService.patch(`/api/applications/${id}/status`, { status }),
+
+    getAll: (page = 1, limit = 10, filters?: { status?: string; entityId?: string; licenseId?: string }): Promise<PaginatedResponse> => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.status && { status: filters.status }),
+        ...(filters?.entityId && { entityId: filters.entityId }),
+        ...(filters?.licenseId && { licenseId: filters.licenseId }),
+      });
+      return this.apiService.get(`/api/applications?${params.toString()}`);
+    },
+  };
 }
 
 // Export default API client instance
@@ -605,3 +638,4 @@ export const conversationsApi = apiClient.conversations;
 export const aiApi = apiClient.ai;
 export const uploadApi = apiClient.upload;
 export const entitiesApi = apiClient.entities;
+export const applicationsApi = apiClient.applications;

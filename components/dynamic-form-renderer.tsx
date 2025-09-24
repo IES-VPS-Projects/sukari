@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Send, CheckCircle, Save, ArrowLeft } from "lucide-react"
-import { CompanyFieldPopulator } from "@/components/company-field-populator"
 import CompanyForm from "./forms/company"
 
 // License field interface based on the API response
@@ -57,31 +56,31 @@ export interface LicenseWithFields {
 }
 
 interface DynamicFormRendererProps {
-  license: LicenseWithFields
-  onSubmit: (formData: Record<string, any>) => void
-  onCancel: () => void
-  onSaveDraft?: (formData: Record<string, any>) => void
-  initialData?: Record<string, any>
-  isSubmitting?: boolean
-  isDraftSaving?: boolean
-  userProfile?: {
-    companyName?: string
-    lrNumber?: string
-    postalAddress?: string
-    postalCode?: string
-    companyRegNumber?: string
-    pinNumber?: string
-    phoneNumber?: string
-    emailAddress?: string
-    county?: string
-    subcounty?: string
-    ward?: string
-    location?: string
-    buildingName?: string
-    streetName?: string
-    town?: string
-    establishmentDate?: string
-    legalStatus?: string
+  readonly license: LicenseWithFields
+  readonly onSubmit: (formData: Record<string, any>) => void
+  readonly onCancel: () => void
+  readonly onSaveDraft?: (formData: Record<string, any>) => void
+  readonly initialData?: Record<string, any>
+  readonly isSubmitting?: boolean
+  readonly isDraftSaving?: boolean
+  readonly userProfile?: {
+    readonly companyName?: string
+    readonly lrNumber?: string
+    readonly postalAddress?: string
+    readonly postalCode?: string
+    readonly companyRegNumber?: string
+    readonly pinNumber?: string
+    readonly phoneNumber?: string
+    readonly emailAddress?: string
+    readonly county?: string
+    readonly subcounty?: string
+    readonly ward?: string
+    readonly location?: string
+    readonly buildingName?: string
+    readonly streetName?: string
+    readonly town?: string
+    readonly establishmentDate?: string
+    readonly legalStatus?: string
   }
 }
 
@@ -101,7 +100,22 @@ export function DynamicFormRenderer({
   // Sort fields by order
   const sortedFields = [...license.fields].sort((a, b) => a.order - b.order)
 
+  // Helper function for status badge styling
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-800'
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'EXPIRED':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
   const handleInputChange = (fieldName: string, value: any) => {
+    console.log(fieldName, value, "fieldName, value")
     setFormData(prev => ({ ...prev, [fieldName]: value }))
 
     // Clear error when user starts typing
@@ -110,11 +124,37 @@ export function DynamicFormRenderer({
     }
   }
 
+  const handleCompanyDataChange = (companyData: Record<string, any>) => {
+    setFormData(prev => ({ ...prev, ...companyData }))
+    
+    // Clear company field errors when data changes
+    const companyFields = [
+      'companyName', 'lrNumber', 'postalAddress', 'postalCode', 'companyRegNumber', 
+      'pinNumber', 'phoneNumber', 'emailAddress', 'county', 'subcounty', 
+      'ward', 'location', 'buildingName', 'streetName', 'town', 
+      'establishmentDate', 'legalStatus'
+    ]
+    
+    const clearedErrors = { ...errors }
+    companyFields.forEach(field => {
+      if (clearedErrors[field]) {
+        delete clearedErrors[field]
+      }
+    })
+    setErrors(clearedErrors)
+  }
+
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
     sortedFields.forEach(field => {
+      // Skip validation for company fields
+      if (field.type === 'COMPANY') {
+        return
+      }
+   
+      // Regular field validation
       if (field.required && (!formData[field.name] || formData[field.name] === '')) {
         newErrors[field.name] = `${field.label} is required`
       }
@@ -140,9 +180,19 @@ export function DynamicFormRenderer({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
+    
     if (validateForm()) {
-      onSubmit(formData)
+      // Prepare the final form data using the state-based formData
+      const finalFormData = {
+        ...formData,
+        licenseId: license.id,
+        submittedAt: new Date().toISOString()
+      }
+      
+      console.log('Submitting form data:', finalFormData)
+      onSubmit(finalFormData)
+    } else {
+      console.log('Form validation failed:', errors)
     }
   }
 
@@ -330,13 +380,15 @@ export function DynamicFormRenderer({
         )
 
       case 'COMPANY':
-        // Special handling for company fields using the CompanyFieldPopulator component
+        // Special handling for company fields using the CompanyForm component
         return (
           <CompanyForm
+            key={field.id}
             initialData={formData}
-            onSubmit={(data) => setFormData(prev => ({ ...prev, ...data }))}
+            onChange={handleCompanyDataChange}
             onCancel={() => setFormData(prev => ({ ...prev, ...userProfile }))}
             isSubmitting={isSubmitting}
+            errors={errors}
           />
         )
 
@@ -376,12 +428,7 @@ export function DynamicFormRenderer({
             <p className="text-sm text-gray-600 mt-1">{license.description}</p>
           </div>
           <Badge
-            className={
-              license.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                license.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                  license.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-            }
+            className={getStatusBadgeClass(license.status)}
           >
             {license.status}
           </Badge>
