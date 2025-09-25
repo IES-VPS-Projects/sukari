@@ -60,13 +60,10 @@ export default function SelectUserType() {
       <SignupHeader />
       <ProgressBar currentStep={1} totalSteps={6} />
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full space-y-6">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Account Type</h2>
-            <p className="mt-2 text-gray-600">
-              Please select whether you're signing up as an individual or representing a company
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">

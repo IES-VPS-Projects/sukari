@@ -92,9 +92,9 @@ export default function UserVerificationStep() {
       }
       localStorage.setItem("signupData", JSON.stringify(updatedData))
       
-      // Navigate to OTP submission
+      // Navigate to OTP verification (skip OTP submission for company flow)
       setTimeout(() => {
-        router.push("/signup/otp-submission")
+        router.push("/signup/otp-verification")
       }, 1000)
     } catch (error) {
       setError("Failed to send OTP. Please try again.")
@@ -114,16 +114,10 @@ export default function UserVerificationStep() {
       <SignupHeader />
       <ProgressBar currentStep={3} totalSteps={5} />
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full space-y-6">
           <div className="text-center">
-            <div className="inline-flex p-3 rounded-full bg-green-100 mb-4">
-              <User className="h-8 w-8 text-green-600" />
-            </div>
             <h2 className="text-3xl font-bold text-gray-900">Verify Your Identity</h2>
-            <p className="mt-2 text-gray-600">
-              Enter your National ID number to verify your identity through IPRS
-            </p>
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-8">
@@ -217,13 +211,15 @@ export default function UserVerificationStep() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Designation <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
                         <select
                           value={userFormData.designation || ""}
                           onChange={(e) => handleFormChange("designation", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                            !userFormData.designation?.trim() 
+                              ? 'border-red-500' 
+                              : 'border-gray-300'
+                          }`}
                           required
                         >
                           <option value="">Select Designation</option>
@@ -235,15 +231,17 @@ export default function UserVerificationStep() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Phone Number <span className="text-red-500">*</span>
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
                           type="tel"
                           value={userFormData.phoneNumber || ""}
                           onChange={(e) => handleFormChange("phoneNumber", e.target.value)}
                           placeholder="Enter your phone number"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                            !userFormData.phoneNumber?.trim() 
+                              ? 'border-red-500' 
+                              : 'border-gray-300'
+                          }`}
                           required
                         />
                       </div>

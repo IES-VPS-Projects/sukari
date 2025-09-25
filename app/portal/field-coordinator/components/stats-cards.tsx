@@ -39,15 +39,13 @@ const stats = [
   },
 ]
 
-interface StatsCardsProps {
-  onAnalyticsClick: () => void
-}
+interface StatsCardsProps {}
 
-export function StatsCards({ onAnalyticsClick }: StatsCardsProps) {
+export function StatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <Card key={stat.title} className="overflow-hidden border border-muted rounded-[24px] shadow-lg hover:shadow-xl transition-all cursor-pointer" onClick={onAnalyticsClick}>
+        <Card key={stat.title} className="overflow-hidden border border-muted rounded-[24px] shadow-sm transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-muted/20">
             <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
             <div className={`p-2 rounded-full ${

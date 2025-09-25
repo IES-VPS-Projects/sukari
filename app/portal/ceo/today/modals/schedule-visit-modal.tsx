@@ -13,6 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
+import { schedulerData } from "../data/scheduler-data"
 
 interface ScheduleVisitModalProps {
   open: boolean
@@ -28,15 +29,32 @@ export function ScheduleVisitModal({ open, onOpenChange, defaultLocation }: Sche
     time: "",
     duration: "2",
     attendees: "",
+    customAttendees: "",
     purpose: "",
     notes: "",
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Prepare visit data
+    const visitData = {
+      id: `visit-${Date.now()}`,
+      type: 'visit' as const,
+      title: formData.title,
+      location: formData.location,
+      date: date,
+      time: formData.time,
+      duration: formData.duration,
+      attendees: formData.attendees === 'custom' ? formData.customAttendees : formData.attendees,
+      purpose: formData.purpose,
+      notes: formData.notes,
+    }
+    
     // Handle form submission - integrate with calendar
-    console.log("Scheduling visit:", { ...formData, date })
+    console.log("Scheduling visit:", visitData)
     onOpenChange(false)
+    
     // Reset form
     setFormData({
       title: "",
@@ -44,6 +62,7 @@ export function ScheduleVisitModal({ open, onOpenChange, defaultLocation }: Sche
       time: "",
       duration: "2",
       attendees: "",
+      customAttendees: "",
       purpose: "",
       notes: "",
     })
@@ -80,12 +99,10 @@ export function ScheduleVisitModal({ open, onOpenChange, defaultLocation }: Sche
                 <SelectTrigger>
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mumias">Mumias Sugar Mill</SelectItem>
-                  <SelectItem value="chemelil">Chemelil Sugar Mill</SelectItem>
-                  <SelectItem value="nzoia">Nzoia Sugar Mill</SelectItem>
-                  <SelectItem value="muhoroni">Muhoroni Sugar Mill</SelectItem>
-                  <SelectItem value="sony">Sony Sugar Mill</SelectItem>
+                <SelectContent className="max-h-[200px] overflow-y-auto">
+                  {schedulerData.suggestedVisitLocations.map((location) => (
+                    <SelectItem key={location} value={location}>{location}</SelectItem>
+                  ))}
                   <SelectItem value="other">Other Location</SelectItem>
                 </SelectContent>
               </Select>
@@ -141,12 +158,27 @@ export function ScheduleVisitModal({ open, onOpenChange, defaultLocation }: Sche
 
           <div className="space-y-2">
             <Label htmlFor="attendees">Attendees</Label>
-            <Input
-              id="attendees"
-              placeholder="Enter email addresses separated by commas"
+            <Select
               value={formData.attendees}
-              onChange={(e) => setFormData({ ...formData, attendees: e.target.value })}
-            />
+              onValueChange={(value) => setFormData({ ...formData, attendees: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select attendees" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px] overflow-y-auto">
+                {schedulerData.suggestedAttendees.map((attendee) => (
+                  <SelectItem key={attendee} value={attendee}>{attendee}</SelectItem>
+                ))}
+                <SelectItem value="custom">Custom Attendees</SelectItem>
+              </SelectContent>
+            </Select>
+            {formData.attendees === 'custom' && (
+              <Input
+                className="mt-2"
+                placeholder="Enter email addresses separated by commas"
+                onChange={(e) => setFormData({ ...formData, customAttendees: e.target.value })}
+              />
+            )}
           </div>
 
           <div className="space-y-2">
@@ -155,12 +187,10 @@ export function ScheduleVisitModal({ open, onOpenChange, defaultLocation }: Sche
               <SelectTrigger>
                 <SelectValue placeholder="Select purpose" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="inspection">Routine Inspection</SelectItem>
-                <SelectItem value="compliance">Compliance Review</SelectItem>
-                <SelectItem value="maintenance">Maintenance Check</SelectItem>
-                <SelectItem value="meeting">Stakeholder Meeting</SelectItem>
-                <SelectItem value="audit">Audit</SelectItem>
+              <SelectContent className="max-h-[200px] overflow-y-auto">
+                {schedulerData.suggestedPurposes.map((purpose) => (
+                  <SelectItem key={purpose} value={purpose}>{purpose}</SelectItem>
+                ))}
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
