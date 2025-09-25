@@ -17,6 +17,7 @@ export default function CreatePassword() {
   const [showConfirmPin, setShowConfirmPin] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [currentStep, setCurrentStep] = useState(5)
   const router = useRouter()
 
   useEffect(() => {
@@ -24,7 +25,11 @@ export default function CreatePassword() {
     const signupData = localStorage.getItem("signupData")
     if (!signupData) {
       router.push("/signup/user-type")
+      return
     }
+    
+    const parsedData = JSON.parse(signupData)
+    setCurrentStep(parsedData.currentStep || 5)
   }, [router])
 
   const pinRequirements = [
@@ -101,15 +106,12 @@ export default function CreatePassword() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SignupHeader />
-      <ProgressBar currentStep={5} totalSteps={5} />
+      <ProgressBar currentStep={currentStep} totalSteps={6} />
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Create PIN</h2>
-            <p className="mt-2 text-gray-600">
-              Create a 4-digit PIN to secure your account.
-            </p>
           </div>
 
           {/* PIN Requirements */}

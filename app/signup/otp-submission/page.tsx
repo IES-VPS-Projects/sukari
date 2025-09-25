@@ -15,6 +15,7 @@ export default function OTPSubmission() {
   const [resendTimer, setResendTimer] = useState(27)
   const [signupData, setSignupData] = useState<any>({})
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [currentStep, setCurrentStep] = useState(4)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const router = useRouter()
 
@@ -25,7 +26,9 @@ export default function OTPSubmission() {
       router.push("/signup/user-type")
       return
     }
-    setSignupData(JSON.parse(data))
+    const parsedData = JSON.parse(data)
+    setSignupData(parsedData)
+    setCurrentStep(parsedData.currentStep || 4)
 
     // Focus first input on mount
     if (inputRefs.current[0]) {
@@ -89,6 +92,13 @@ export default function OTPSubmission() {
       // Show success message briefly
       setShowSuccessMessage(true)
       
+      // Update signup data with progress to Create Password step
+      const updatedSignupData = {
+        ...signupData,
+        currentStep: 6 // Move to Create Password step
+      }
+      localStorage.setItem("signupData", JSON.stringify(updatedSignupData))
+      
       setTimeout(() => {
         router.push("/signup/create-password")
       }, 1500)
@@ -148,7 +158,7 @@ export default function OTPSubmission() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SignupHeader />
-      <ProgressBar currentStep={4} totalSteps={5} />
+      <ProgressBar currentStep={currentStep} totalSteps={5} />
 
       {/* Success Message */}
       {showSuccessMessage && (
@@ -158,10 +168,10 @@ export default function OTPSubmission() {
         </div>
       )}
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">OTP Submission</h2>
+            <h2 className="text-3xl font-bold text-gray-900">OTP Verification</h2>
             <p className="mt-2 text-gray-600">Enter OTP sent to {getContactInfo()}</p>
           </div>
 

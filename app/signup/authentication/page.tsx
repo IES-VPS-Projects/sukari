@@ -112,8 +112,8 @@ export default function SignupAuthentication() {
       <SignupHeader />
       <ProgressBar currentStep={3} totalSteps={5} />
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">Authentication</h2>
             <p className="mt-2 text-gray-600">Enter your contact information for verification</p>
@@ -176,7 +176,7 @@ export default function SignupAuthentication() {
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !formData.phone.trim() || !formData.email.trim() || Object.keys(errors).length > 0}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Processing..." : "Submit"}

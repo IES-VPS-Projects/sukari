@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FileText, Send, CheckCircle, ArrowLeft, ChevronRight, Factory, Ship, ExternalLink, Store, Droplet, Clock, AlertCircle, ClipboardList, CheckCircle2, Circle, Eye } from "lucide-react"
+import { CollapsibleSection } from "@/components/ui/collapsible-section"
 
 // Application stages for tracking miller applications
 const applicationStages = [
@@ -92,7 +93,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [selectedTab, setSelectedTab] = useState<string>('details')
+  const [selectedTab, setSelectedTab] = useState<string>('companyDocs')
   const [isDraftSaved, setIsDraftSaved] = useState(false)
   const [submittedApplications, setSubmittedApplications] = useState<any[]>([])
   const [formData, setFormData] = useState({
@@ -152,6 +153,25 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     
     // Projected Capacity
     capacityTCD: '',
+
+    // Investment Financing Plan
+    foreignEquity: '',
+    localEquity: '',
+    foreignLoan: '',
+    localLoan: '',
+
+    // Project Objectives
+    projectObjectives: '',
+
+    // Investment Breakdown
+    preExpenses: '',
+    landBuildings: '',
+    plantEquipment: '',
+    vehicles: '',
+    furnitureFittings: '',
+    workingCapital: '',
+    others: '',
+    total: '',
     
     // Declaration checkboxes
     declarationA: 'false',
@@ -189,15 +209,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     'Sugar Miller': [
       {
         id: 'letter-of-comfort',
-        name: 'Letter of Comfort',
-        description: 'Apply for letter of comfort required to begin your sugar miller journey',
+        name: 'Application for Registration',
+        description: 'Apply to register a Mill or Jaggery operation',
         fields: [] // Will be handled with custom form
-      },
-      {
-        id: 'permit',
-        name: 'Permit Application',
-        description: 'Apply for permit required for sugar milling operations',
-        fields: [] // Will be handled with custom form like letter of comfort
       },
       {
         id: 'license',
@@ -312,8 +326,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
   const existingApplications = [
     {
       id: 'APP-2024-001',
-      type: 'Letter of Comfort',
-      title: 'Letter of Comfort Application',
+      type: 'Application for Registration',
+      title: 'Application for Registration',
       purpose: 'Bank Loan Application',
       status: 'Approved',
       stage: 'Issuance',
@@ -323,7 +337,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       completionDate: '2024-08-28',
       expectedCompletion: null,
       quantity: 'N/A',
-      notes: 'Letter of comfort issued for bank loan application. All requirements met and documentation complete.',
+      notes: 'Registration application approved. All requirements met and documentation complete.',
       submittedDate: '2024-08-15',
       approvedDate: '2024-08-28',
       validUntil: '2025-08-28'
@@ -370,6 +384,26 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       documentDate: '',
       licenseExpiryDate: '',
       capacityTCD: '',
+
+      // Investment Financing Plan
+      foreignEquity: '',
+      localEquity: '',
+      foreignLoan: '',
+      localLoan: '',
+
+      // Project Objectives
+      projectObjectives: '',
+
+      // Investment Breakdown
+      preExpenses: '',
+      landBuildings: '',
+      plantEquipment: '',
+      vehicles: '',
+      furnitureFittings: '',
+      workingCapital: '',
+      others: '',
+      total: '',
+
       declarationA: 'false',
       declarationB: 'false',
       declarationC: 'false',
@@ -445,9 +479,9 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     // Create new application entry
     const newApplication = {
       id: `APP-2024-${String(Date.now()).slice(-3).padStart(3, '0')}`,
-      type: expandedApplication === 'letter-of-comfort' ? 'Letter of Comfort' : 'General Application',
-      title: expandedApplication === 'letter-of-comfort' ? `Letter of Comfort - ${formData.category}` : 'Application',
-      purpose: expandedApplication === 'letter-of-comfort' ? 'Letter of Comfort' : 'General Purpose',
+      type: expandedApplication === 'letter-of-comfort' ? 'Application for Registration' : 'General Application',
+      title: expandedApplication === 'letter-of-comfort' ? `Application for Registration - ${formData.category}` : 'Application',
+      purpose: expandedApplication === 'letter-of-comfort' ? 'Application for Registration' : 'General Purpose',
       status: 'Under Review',
       stage: 'submission',
       applicant: formData.companyName,
@@ -456,7 +490,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       completionDate: null,
       expectedCompletion: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
       quantity: expandedApplication === 'letter-of-comfort' ? formData.capacityTCD + ' TCD' : 'N/A',
-      notes: expandedApplication === 'letter-of-comfort' ? `Letter of comfort application for ${formData.category} submitted. All required documentation provided.` : 'Application submitted for review.',
+      notes: expandedApplication === 'letter-of-comfort' ? `Registration application for ${formData.category} submitted. All required documentation provided.` : 'Application submitted for review.',
       submittedDate: new Date().toISOString().split('T')[0],
       approvedDate: null,
       validUntil: null
@@ -487,7 +521,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Applications</DialogTitle>
           <DialogDescription>
-            Apply for Letters of Comfort, Permits, and License Applications & Renewals
+            Apply for Registration and License Applications & Renewals
           </DialogDescription>
         </DialogHeader>
 
@@ -781,11 +815,10 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
                   {expandedApplication === application.id && (
                     <div className="border-t p-4 bg-gray-50">
-                      {application.id === 'letter-of-comfort' || application.id === 'permit' ? (
-                        // Custom Form for Letter of Comfort and Permit Application
+                      {application.id === 'letter-of-comfort' ? (
+                        // Custom Form for Application for Registration
                         <form onSubmit={handleSubmit} className="space-y-6">
                           {/* Application Type */}
-                          {application.id === 'letter-of-comfort' ? (
                           <div>
                             <Label htmlFor="category" className="text-lg font-semibold">Choose Category <span className="text-red-500">*</span></Label>
                             <Select 
@@ -800,86 +833,29 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                 <SelectItem value="Jaggery">Jaggery</SelectItem>
                               </SelectContent>
                             </Select>
-                          </div>
-                          ) : (
-                            <div>
-                              <Label htmlFor="category" className="text-lg font-semibold">Choose Category <span className="text-red-500">*</span></Label>
-                              <Select 
-                                value={formData.category} 
-                                onValueChange={(value) => {
-                                  generateDocumentDetails(value);
-                                  // Auto-populate from letter of comfort if available
-                                  const letterOfComfortApp = submittedApplications.find(app => app.type === 'Letter of Comfort' && app.status === 'Approved');
-                                  if (letterOfComfortApp) {
-                                    // In a real app, you would fetch the data from the database
-                                    // For now, we'll use the mock data
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className="mt-3">
-                                  <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Mill">Mill</SelectItem>
-                                  <SelectItem value="Jaggery">Jaggery</SelectItem>
-                                </SelectContent>
-                              </Select>
                             </div>
-                          )}
-
                           {formData.category ? (
                             <>
                               {application.id === 'letter-of-comfort' && (<>
                               {/* Document Details - Auto-generated */}
-                              <div>
-                                <h3 className="text-lg font-semibold mb-4">Document Details</h3>
+                              <CollapsibleSection title="Document Details">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                   <div>
                                     <Label htmlFor="documentNo">Document No</Label>
                                     <Input
-                                      id="documentNo"
-                                      value={formData.documentNo}
-                                      disabled
-                                      className="bg-gray-100"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="documentDate">Document Date</Label>
-                                    <Input
-                                      id="documentDate"
-                                      type="date"
-                                      value={formData.documentDate}
-                                      disabled
-                                      className="bg-gray-100"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="companyName">Company Name</Label>
-                                    <Input
-                                      id="companyName"
-                                      value={formData.companyName}
-                                      disabled
-                                      className="bg-gray-100"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="licenseExpiryDate">License Expiry Date</Label>
-                                    <Input
-                                      id="licenseExpiryDate"
-                                      type="date"
                                       value={formData.licenseExpiryDate}
                                       disabled
                                       className="bg-gray-100"
                                     />
                                   </div>
                                 </div>
-                              </div>
+                              </CollapsibleSection>
 
                               {/* Company Info */}
-                              <div>
-                                <h3 className="text-lg font-semibold mb-4">Company Info</h3>
+                              <CollapsibleSection title="Company Info">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                   <div>
+{/* Company info fields will go here */}
                                     <Label htmlFor="lrNumber">L.R No/Plot No</Label>
                                     <Input
                                       id="lrNumber"
@@ -1024,23 +1000,245 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                     />
                                   </div>
                                 </div>
-                              </div>
+                              </CollapsibleSection>
 
-                              {/* Projected Capacity */}
-                              <div>
-                                <h3 className="text-lg font-semibold mb-4">Projected Capacity (TCD)</h3>
+                              {/* Investment Financing Plan */}
+                              <CollapsibleSection title="Investment Financing Plan (US$/Kshs)">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                   <div>
-                                    <Label htmlFor="capacityTCD">Capacity (TCD) <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="foreignEquity">Foreign Equity</Label>
                                     <Input
-                                      id="capacityTCD"
+                                      id="foreignEquity"
                                       type="number"
-                                      value={formData.capacityTCD}
-                                      onChange={(e) => handleInputChange('capacityTCD', e.target.value)}
-                                      required
+                                      value={formData.foreignEquity}
+                                      onChange={(e) => handleInputChange('foreignEquity', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="localEquity">Local Equity</Label>
+                                    <Input
+                                      id="localEquity"
+                                      type="number"
+                                      value={formData.localEquity}
+                                      onChange={(e) => handleInputChange('localEquity', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="foreignLoan">Foreign Loan</Label>
+                                    <Input
+                                      id="foreignLoan"
+                                      type="number"
+                                      value={formData.foreignLoan}
+                                      onChange={(e) => handleInputChange('foreignLoan', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="localLoan">Local Loan</Label>
+                                    <Input
+                                      id="localLoan"
+                                      type="number"
+                                      value={formData.localLoan}
+                                      onChange={(e) => handleInputChange('localLoan', e.target.value)}
                                     />
                                   </div>
                                 </div>
+                              </CollapsibleSection>
+
+                              {/* Project Objectives */}
+                              <CollapsibleSection title="Project Objectives">
+                                <Textarea
+                                  id="projectObjectives"
+                                  value={formData.projectObjectives}
+                                  onChange={(e) => handleInputChange('projectObjectives', e.target.value)}
+                                  placeholder="Describe the objectives of the project..."
+                                />
+                              </CollapsibleSection>
+
+                              {/* Projected Capacity */}
+                              {/* Projected Capacity */}
+                                <CollapsibleSection title="Projected Capacity (TCD)">
+                                  <div className="grid gap-4 sm:grid-cols-2">
+                                    <div>
+                                      <Label htmlFor="capacityTCD">Capacity (TCD) <span className="text-red-500">*</span></Label>
+                                      <Input
+                                        id="capacityTCD"
+                                        type="number"
+                                        value={formData.capacityTCD}
+                                        onChange={(e) => handleInputChange('capacityTCD', e.target.value)}
+                                        required
+                                      />
+                                    </div>
+                                  </div>
+                                </CollapsibleSection>
+
+                              {/* Investment Breakdown (US$/Kshs) */}
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Investment Breakdown (US$/Kshs)</h3>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                  <div>
+                                    <Label htmlFor="preExpenses">Pre-expenses</Label>
+                                    <Input
+                                      id="preExpenses"
+                                      type="number"
+                                      value={formData.preExpenses}
+                                      onChange={(e) => handleInputChange('preExpenses', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="landBuildings">Land/Buildings</Label>
+                                    <Input
+                                      id="landBuildings"
+                                      type="number"
+                                      value={formData.landBuildings}
+                                      onChange={(e) => handleInputChange('landBuildings', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="plantEquipment">Plant and equipment</Label>
+                                    <Input
+                                      id="plantEquipment"
+                                      type="number"
+                                      value={formData.plantEquipment}
+                                      onChange={(e) => handleInputChange('plantEquipment', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="vehicles">Vehicles</Label>
+                                    <Input
+                                      id="vehicles"
+                                      type="number"
+                                      value={formData.vehicles}
+                                      onChange={(e) => handleInputChange('vehicles', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="furnitureFittings">Furniture & Fittings</Label>
+                                    <Input
+                                      id="furnitureFittings"
+                                      type="number"
+                                      value={formData.furnitureFittings}
+                                      onChange={(e) => handleInputChange('furnitureFittings', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="workingCapital">Working Capital</Label>
+                                    <Input
+                                      id="workingCapital"
+                                      type="number"
+                                      value={formData.workingCapital}
+                                      onChange={(e) => handleInputChange('workingCapital', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="others">Others</Label>
+                                    <Input
+                                      id="others"
+                                      type="number"
+                                      value={formData.others}
+                                      onChange={(e) => handleInputChange('others', e.target.value)}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="total">TOTAL</Label>
+                                    <Input
+                                      id="total"
+                                      type="number"
+                                      value={formData.total}
+                                      onChange={(e) => handleInputChange('total', e.target.value)}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Documents Uploads */}
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Documents Uploads</h3>
+                                <div className="flex space-x-2 border-b border-gray-200 mb-4">
+                                  {[
+                                    { id: 'companyDocs', label: 'Company' },
+                                    { id: 'directorDocs', label: 'Board of Directors' },
+                                  ].map((tab) => (
+                                    <button
+                                      key={tab.id}
+                                      type="button"
+                                      onClick={() => setSelectedTab(tab.id)}
+                                      className={`px-3 py-2 text-sm font-medium ${selectedTab === tab.id ? 'border-b-2 border-green-600 text-green-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >
+                                      {tab.label}
+                                    </button>
+                                  ))}
+                                </div>
+
+                                {selectedTab === 'companyDocs' && (
+                                  <div className="space-y-4">
+                                    <div>
+                                      <Label>Recommendation from the respective County Government</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Sugar Crop Development Plan</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Feasibility Study Report</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Financial Reports</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Mill Design and Technology</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Milling Capacity</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Certificate of Incorporation/Registration</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Details of ownership including title deed, lease agreement etc</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Long term progressive plan on value addition</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Profiles of the investor(s), directors and principal officers</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Memorandum and Articles of Association</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Evidence of land ownership for the project</Label>
+                                      <Input type="file" />
+                                    </div>
+                                  </div>
+                                )}
+
+                                {selectedTab === 'directorDocs' && (
+                                  <div className="space-y-4">
+                                    <div>
+                                      <Label>ID/Passport</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>KRA PIN Certificate</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <div>
+                                      <Label>Certificate of Good Conduct</Label>
+                                      <Input type="file" />
+                                    </div>
+                                    <p className="text-xs text-gray-500">Repeat the uploads for each director.</p>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Applicant Declaration */}
@@ -1084,7 +1282,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                 </div>
                               </div>
                               </>)}
-                              {application.id === 'permit' && (
+                              {String(application.id) === 'permit' && (
                               <>
                                 {/* Mill/Jaggery Info - Auto-populated from letter of comfort */}
                                 <div>
@@ -1403,7 +1601,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             <Button 
                               type="submit" 
                               className="bg-green-600 hover:bg-green-700"
-                              disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true' || (application.id === 'permit' && formData.agreeTerms !== 'true')}
+                              disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true' || (String(application.id) === 'permit' && formData.agreeTerms !== 'true')}
                             >
                               {isSubmitted ? (
                                 <>

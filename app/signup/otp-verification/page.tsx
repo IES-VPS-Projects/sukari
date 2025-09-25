@@ -42,13 +42,14 @@ export default function OTPVerification() {
       const updatedData = {
         ...signupData,
         otpMethod: selectedMethod,
+        currentStep: 5 // Move to OTP Verification step
       }
       localStorage.setItem("signupData", JSON.stringify(updatedData))
 
       // Simulate OTP sending
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Navigate to OTP submission
+      // Navigate to OTP submission (which is actually the verification step)
       router.push("/signup/otp-submission")
     } catch (error) {
       console.error("Error:", error)
@@ -58,7 +59,12 @@ export default function OTPVerification() {
   }
 
   const handleBack = () => {
-    router.push("/signup/authentication")
+    const signupData = JSON.parse(localStorage.getItem("signupData") || "{}")
+    if (signupData.userType === "company") {
+      router.push("/signup/user-verification")
+    } else {
+      router.push("/signup/authentication")
+    }
   }
 
   return (
@@ -66,10 +72,10 @@ export default function OTPVerification() {
       <SignupHeader />
       <ProgressBar currentStep={4} totalSteps={5} />
 
-      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+      <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">OTP Verification</h2>
+            <h2 className="text-3xl font-bold text-gray-900">OTP Submission</h2>
             <p className="mt-2 text-gray-600">Choose how you'd like to receive your verification code</p>
           </div>
 
@@ -87,7 +93,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">Email</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {signupData.email}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {signupData.verificationData?.companyEmail || signupData.email || 'your email'}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
@@ -112,7 +118,7 @@ export default function OTPVerification() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium text-gray-900">SMS</h3>
-                  <p className="text-sm text-gray-600">Send OTP to {signupData.phone}</p>
+                  <p className="text-sm text-gray-600">Send OTP to {signupData.userVerificationData?.phoneNumber || signupData.otpPhone || signupData.phone || 'your phone'}</p>
                 </div>
                 <div
                   className={`w-4 h-4 rounded-full border-2 ${
