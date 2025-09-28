@@ -187,7 +187,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const user = data.data.user;
         
         // Generate name based on available data
-        let name = user.email; // fallback to email
+        let name = (user as any).name + ' ' + (user as any).surname || user.email; // fallback to email
         if (user.iprs) {
           name = `${user.iprs.first_name} ${user.iprs.middle_name || ''} ${user.iprs.last_name}`.trim();
         } else if (user.entity?.designation) {

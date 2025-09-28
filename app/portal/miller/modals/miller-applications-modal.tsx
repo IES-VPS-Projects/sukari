@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
+import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight, Factory, Ship, ExternalLink, Store, Droplet } from "lucide-react"
 import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
 import { useSubmitApplication, useUserApplications, Application } from '@/hooks/use-applications'
 import { License } from '@/lib/api-client'
@@ -197,7 +197,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     // Declaration checkboxes
     declarationA: 'false',
     declarationB: 'false',
-    declarationC: 'false'
+    declarationC: 'false',
+    agreeTerms: 'false'
   })
 
 
@@ -1006,8 +1007,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
           </div>
         )}
 
-        {/* Licenses Tab */}
-        {activeTab === 'licenses' && (
+        {/* Miller Tab */}
+        {activeTab === 'miller' && (
           <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
             {licensesLoading ? (
               <div className="flex items-center justify-center h-64">
@@ -1449,8 +1450,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                   </p>
                                 </div>
                               </div>
-                              </>)}
-                              {application.id === 'permit' && (
+                              </>
+                              ) : application.id === 'permit' ? (
                               <>
                                 {/* Mill/Jaggery Info - Auto-populated from letter of comfort */}
                                 <div>
@@ -1742,9 +1743,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                   </div>
                                 </div>
                               </>
-                            )}
-                            </>
-                          ) : null}
+                            ) : null}
                           
                           <div className="flex justify-end gap-3 pt-4">
                             <Button 
@@ -1769,7 +1768,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             <Button 
                               type="submit" 
                               className="bg-green-600 hover:bg-green-700"
-                              disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true' || (application.id === 'permit' && formData.agreeTerms !== 'true')}
+                              disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true' || (expandedApplication === 'permit' && formData.agreeTerms !== 'true')}
                             >
                               {isSubmitted ? (
                                 <>
@@ -1785,7 +1784,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             </Button>
                           </div>
                         </form>
-                      ) : application.id === 'permit' ? (
+                      ) : application.id === 'license' ? (
                         // Custom Permit Application Form
                         <form onSubmit={handleSubmit} className="space-y-6">
                           <div className="grid gap-4 sm:grid-cols-2">
@@ -1887,6 +1886,10 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                             </Button>
                           </div>
                         </form>
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Application form not available for this type.</p>
+                        </div>
                       )}
                     </div>
                   )}
@@ -2015,11 +2018,10 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                         </div>
                       </form>
                     </div>
-                          ) : (
-                            // Default form for other applications  
-                            <div className="text-center py-8">
-                              <p className="text-gray-600">Application form not available for this type.</p>
-                            </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600">Application form not available for this type.</p>
+                    </div>
                   )}
                 </div>
               ))}

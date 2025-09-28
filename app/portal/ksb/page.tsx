@@ -8,8 +8,8 @@ export default function CEOPage() {
 
   useEffect(() => {
     // Redirect to the operations page since that's now the default operations/profile page
-    router.replace("/portal/ceo/operations")
+    router.replace("/portal/ksb/operations")
   }, [router])
 
-  return <>oage</>
+  return <></>
 }
