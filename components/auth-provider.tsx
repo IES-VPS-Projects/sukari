@@ -2,8 +2,40 @@
 
 import type React from "react"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { apiService } from "@/lib/axios-service"
+
+interface ApiResponse {
+  success: boolean
+  data: {
+    user: {
+      id: string
+      email: string
+      role: string
+      iprs?: {
+        id: string
+        id_no: string
+        first_name: string
+        middle_name?: string
+        last_name: string
+        gender: string
+        date_of_birth: string
+        nationality: string
+      } | null
+      entity?: {
+        id: string
+        userType: string
+        designation: string
+        phoneNumber: string
+        email?: string
+      } | null
+    }
+    token: string
+  }
+  message?: string
+  error?: string
+}
 
 interface User {
   id: string
@@ -19,16 +51,16 @@ interface User {
     gender: string
     date_of_birth: string
     nationality: string
-  }
+  } | null
   entityData?: {
     id: string
     userType: string
     designation: string
     phoneNumber: string
     email?: string
-  }
+  } | null
   token?: string
-  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller'
+  userType: 'ceo' | 'importer' | 'field-coordinator' | 'miller' | 'COMPANY' | 'COMPANY-ADMIN' | 'USER' | 'ADMIN'
 }
 
 interface AuthContextType {
@@ -104,7 +136,11 @@ const DEFAULT_CREDENTIALS = [
   },
 ]
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+interface AuthProviderProps {
+  readonly children: React.ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -115,8 +151,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser)
-        // Check if the user data has the new structure (with iprsData)
-        if (parsedUser.iprsData && parsedUser.entityData) {
+        // Check if the user data has the required fields (id, email, name, role, userType)
+        if (parsedUser.id && parsedUser.email && parsedUser.name && parsedUser.role && parsedUser.userType) {
           setUser(parsedUser)
         } else {
           // Clear old user data structure
@@ -138,33 +174,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
 
     try {
-      // Make API call to backend
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: identifier,
-          pin: pin
-        }),
+      // Make API call to backend using axios
+      const response = await apiService.post('/api/auth/login', {
+        email: identifier,
+        pin: pin
       });
+      
+      const data = response as ApiResponse;
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (data.success) {
         // Create user object from API response
-        const userData = {
-          id: data.data.user.id,
-          email: data.data.user.email,
-          name: `${data.data.user.iprs.first_name} ${data.data.user.iprs.middle_name || ''} ${data.data.user.iprs.last_name}`.trim(),
-          role: data.data.user.role,
-          iprsData: data.data.user.iprs,
-          entityData: data.data.user.entity,
-          token: data.data.token
+        const user = data.data.user;
+        
+        // Generate name based on available data
+        let name = user.email; // fallback to email
+        if (user.iprs) {
+          name = `${user.iprs.first_name} ${user.iprs.middle_name || ''} ${user.iprs.last_name}`.trim();
+        } else if (user.entity?.designation) {
+          name = user.entity.designation;
+        }
+
+        // Determine user type based on role and entity
+        let userType: User['userType'] = 'USER';
+        if (user.role === 'ADMIN') {
+          userType = 'ADMIN';
+        } else if (user.entity?.userType === 'COMPANY') {
+          userType = user.role === 'ADMIN' ? 'COMPANY-ADMIN' : 'COMPANY';
+        }
+
+        const userData: User = {
+          id: user.id,
+          email: user.email,
+          name: name,
+          role: user.role,
+          iprsData: user.iprs,
+          entityData: user.entity,
+          token: data.data.token,
+          userType: userType
         };
 
-        setUser(userData as any);
+        setUser(userData);
         localStorage.setItem("ksb_user", JSON.stringify(userData));
         localStorage.setItem("ksb_token", data.data.token);
         setIsLoading(false);
@@ -175,8 +224,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
         return false;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      // Handle axios error structure
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          'Login failed';
+      console.error('Login failed:', errorMessage);
       setIsLoading(false);
       return false;
     }
@@ -189,7 +244,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login")
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, isLoading }}>{children}</AuthContext.Provider>
+  const contextValue = useMemo(() => ({
+    user,
+    login,
+    logout,
+    isLoading
+  }), [user, isLoading])
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

@@ -216,7 +216,7 @@ export default function OTPVerification() {
                 disabled={!selectedMethod || sendOTPMutation.isPending}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {sendOTPMutation.isPending ? "Sending OTP..." : "Send OTP"}
+                {sendOTPMutation.isPending ? "Sending OTP..." : "Send OTP s"}
               </button>
             </div>
           </form>

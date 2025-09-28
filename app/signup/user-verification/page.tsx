@@ -6,16 +6,28 @@ import { useRouter } from "next/navigation"
 import { Search, User, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react"
 import SignupHeader from "@/components/signup/SignupHeader"
 import ProgressBar from "@/components/signup/ProgressBar"
+import { useIPRSVerification, formatIPRSData } from "@/hooks/use-iprs"
+import { useCreateUserFromDirector } from "@/hooks/use-create-user-from-director"
 
 export default function UserVerificationStep() {
   const [searchValue, setSearchValue] = useState("")
-  const [searchLoading, setSearchLoading] = useState(false)
   const [otpLoading, setOtpLoading] = useState(false)
-  const [verificationResult, setVerificationResult] = useState<any>(null)
   const [error, setError] = useState("")
   const [userFormData, setUserFormData] = useState<any>({})
   const [otpSent, setOtpSent] = useState(false)
+  const [shouldVerify, setShouldVerify] = useState(false)
   const router = useRouter()
+
+  // Use IPRS verification hook
+  const { 
+    data: iprsResponse, 
+    isLoading: searchLoading, 
+    error: iprsError,
+    refetch 
+  } = useIPRSVerification(searchValue, shouldVerify)
+
+  // Use create user from director hook
+  const createUserMutation = useCreateUserFromDirector()
 
   useEffect(() => {
     // Check if user has completed company verification
@@ -31,40 +43,38 @@ export default function UserVerificationStep() {
     }
   }, [router])
 
+  // Handle IPRS verification response
+  useEffect(() => {
+    if (iprsResponse?.success) {
+      const formattedData = formatIPRSData(iprsResponse)
+      setUserFormData({
+        idNumber: formattedData.idNumber,
+        fullName: formattedData.fullName,
+        gender: formattedData.gender,
+        dateOfBirth: formattedData.dateOfBirth,
+        designation: "",
+        phoneNumber: ""
+      })
+      setError("")
+    } else if (iprsError) {
+      setError(iprsError.message || "Verification failed. Please try again.")
+    }
+  }, [iprsResponse, iprsError])
+
   const handleSearch = async () => {
     if (!searchValue.trim()) return
 
-    setSearchLoading(true)
-    setError("")
-    setVerificationResult(null)
-
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // Simulate IPRS verification
-      if (searchValue.length >= 8) {
-        const userData = {
-          idNumber: searchValue,
-          fullName: "Jonah Kariuki",
-          gender: "Male",
-          dateOfBirth: "1985-03-15",
-          designation: "",
-          phoneNumber: ""
-        }
-        setVerificationResult({
-          verified: true,
-          data: userData
-        })
-        setUserFormData(userData)
-      } else {
-        setError("Please enter a valid National ID number")
-      }
-    } catch (err) {
-      setError("Verification failed. Please try again.")
-    } finally {
-      setSearchLoading(false)
+    // Validate ID number format
+    if (searchValue.length !== 8) {
+      setError("Please enter a valid 8-digit National ID number")
+      return
     }
+
+    setError("")
+    setShouldVerify(true)
+    
+    // Trigger the IPRS verification
+    refetch()
   }
 
   const handleFormChange = (field: string, value: string) => {
@@ -76,11 +86,50 @@ export default function UserVerificationStep() {
 
   const handleSendOtp = async () => {
     if (!isFormValid) return
+    
+    let brsData = localStorage.getItem("brsData")
+    if (!brsData) {
+      router.push("/signup/verification")
+      return
+    }
 
-    setOtpLoading(true)
     try {
-      // Simulate sending OTP
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      setOtpLoading(true)
+      setError("")
+
+      // Parse BRS data
+      const parsedBrsData = JSON.parse(brsData)
+      const brsId = parsedBrsData.id
+      
+      console.log('Creating user from director with data:', {
+        brsId,
+        userFormData,
+        parsedBrsData
+      })
+
+      // Extract director information from BRS data
+      // Assuming the director data is in the BRS response
+      const directorId = parsedBrsData.dir1_id_number || parsedBrsData.dir2_id_number || userFormData.idNumber
+      const companyName = parsedBrsData.legal_name || 'Unknown Company'
+console.log('userFormData', userFormData,iprsResponse);
+
+      // Prepare user data for creation
+      const userData = {
+        brsId: brsId,
+        directorId: directorId,
+        email: userFormData.email,
+        phoneNumber: userFormData.phoneNumber,
+        firstName: userFormData.fullName?.split(' ')[0] || '',
+        lastName: userFormData.fullName?.split(' ').slice(1).join(' ') || '',
+        role: userFormData.designation || 'director',
+        companyName: companyName,
+        iprsID: iprsResponse.data.id || ""
+      }
+
+      // Create user from director using the hook
+      const result = await createUserMutation.mutateAsync(userData)
+      
+      console.log('User created successfully:', result)
       setOtpSent(true)
       
       // Update signup data with user verification results
@@ -88,16 +137,20 @@ export default function UserVerificationStep() {
       const updatedData = {
         ...existingData,
         userVerificationData: userFormData,
-        otpPhone: userFormData.phoneNumber
+        userCreationData: result,
+        otpPhone: userFormData.phoneNumber,
+        brsId: brsId
       }
       localStorage.setItem("signupData", JSON.stringify(updatedData))
       
       // Navigate to OTP submission
       setTimeout(() => {
-        router.push("/signup/otp-submission")
+        router.push("/signup/otp-submission-company")
       }, 1000)
+      
     } catch (error) {
-      setError("Failed to send OTP. Please try again.")
+      console.error("Failed to create user from director:", error)
+      setError(`${error}`)
     } finally {
       setOtpLoading(false)
     }
@@ -107,7 +160,7 @@ export default function UserVerificationStep() {
     router.push("/signup/verification")
   }
 
-  const isFormValid = verificationResult?.verified && userFormData.designation && userFormData.phoneNumber
+  const isFormValid = iprsResponse?.success && userFormData.designation && userFormData.phoneNumber
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -166,7 +219,7 @@ export default function UserVerificationStep() {
               )}
 
               {/* Verification Result and Form */}
-              {verificationResult && (
+              {iprsResponse?.success && (
                 <div className="space-y-6">
                   <div className="flex items-center space-x-2 text-green-600 bg-green-50 p-3 rounded-lg">
                     <CheckCircle className="h-5 w-5" />
@@ -178,8 +231,9 @@ export default function UserVerificationStep() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                         <input
+                          id="fullName"
                           type="text"
                           value={userFormData.fullName || ""}
                           readOnly
@@ -187,8 +241,9 @@ export default function UserVerificationStep() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">ID Number</label>
+                        <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 mb-1">ID Number</label>
                         <input
+                          id="idNumber"
                           type="text"
                           value={userFormData.idNumber || ""}
                           readOnly
@@ -196,8 +251,9 @@ export default function UserVerificationStep() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                        <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                         <input
+                          id="gender"
                           type="text"
                           value={userFormData.gender || ""}
                           readOnly
@@ -205,8 +261,9 @@ export default function UserVerificationStep() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                         <input
+                          id="dateOfBirth"
                           type="text"
                           value={userFormData.dateOfBirth || ""}
                           readOnly
@@ -217,10 +274,11 @@ export default function UserVerificationStep() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="designation" className="block text-sm font-medium text-gray-700 mb-1">
                           Designation <span className="text-red-500">*</span>
                         </label>
                         <select
+                          id="designation"
                           value={userFormData.designation || ""}
                           onChange={(e) => handleFormChange("designation", e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -235,10 +293,11 @@ export default function UserVerificationStep() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
                           Phone Number <span className="text-red-500">*</span>
                         </label>
                         <input
+                          id="phoneNumber"
                           type="tel"
                           value={userFormData.phoneNumber || ""}
                           onChange={(e) => handleFormChange("phoneNumber", e.target.value)}
@@ -247,11 +306,56 @@ export default function UserVerificationStep() {
                           required
                         />
                       </div>
+                    </div> 
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4 my-4">
+                    <div>
+                        <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          id="email"
+                          type="email"
+                          value={userFormData.email || ""}
+                          onChange={(e) => handleFormChange("email", e.target.value)}
+                          placeholder="Enter your email"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          required
+                        />
+                      </div>
+                      
                     </div>
                   </div>
                 </div>
               )}
             </div>
+
+            {/* Error Display */}
+            {(error || createUserMutation.isError) && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                <div className="flex">
+                  <AlertCircle className="h-5 w-5 text-red-400" />
+                  <div className="ml-3">
+                    <p className="text-sm text-red-600">
+                      {error || createUserMutation.error?.message || 'An error occurred'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Success Display */}
+            {createUserMutation.isSuccess && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex">
+                  <CheckCircle className="h-5 w-5 text-green-400" />
+                  <div className="ml-3">
+                    <p className="text-sm text-green-600">
+                      User account created successfully! Redirecting...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex space-x-4 mt-8">
@@ -265,10 +369,14 @@ export default function UserVerificationStep() {
               </button>
               <button
                 onClick={handleSendOtp}
-                disabled={!isFormValid || otpLoading || otpSent}
+                disabled={!isFormValid || otpLoading || createUserMutation.isPending || otpSent}
                 className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {otpLoading ? "Sending OTP..." : otpSent ? "OTP Sent!" : "Send OTP"}
+                {(() => {
+                  if (otpLoading || createUserMutation.isPending) return "Creating Account..." 
+                  if (otpSent) return "Account Created!"
+                  return "Next"
+                })()}
               </button>
             </div>
           </div>

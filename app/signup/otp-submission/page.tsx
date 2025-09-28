@@ -18,7 +18,7 @@ export default function OTPSubmission() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const router = useRouter()
   
-  const { getIPRSData, getVerificationData, getAuthenticationData, getUserCreationResponse, isLoading } = useSignupData()
+  const { getIPRSData, getVerificationData, getAuthenticationData, getUserCreationResponse, isLoading, getUserCreationData } = useSignupData()
   const verifyOTPMutation = useVerifyOTP()
   const resendOTPMutation = useResendOTP()
   
@@ -26,6 +26,7 @@ export default function OTPSubmission() {
   const verificationData = getVerificationData()
   const authenticationData = getAuthenticationData()
   const userCreationResponse = getUserCreationResponse()
+  const userCreationData = getUserCreationData()
 
   useEffect(() => {
     if (isLoading) {

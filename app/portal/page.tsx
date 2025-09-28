@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/components/auth-provider"
+import { log } from "console"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect } from "react"
 
@@ -11,15 +12,30 @@ export default function PortalPage() {
 
   useEffect(() => {
     if (!isLoading) {
+      console.log(user, "user");
+      
+ 
       if (!user) {
         router.push("/login")
-      } else if (user.userType === "ceo" && pathname === "/portal") {
+      }
+      else if (user.role === "USER" && pathname === "/portal") {
+        router.push("/portal/miller")
+      }
+      else if (user.role === "ADMIN" && pathname === "/portal") {
+        router.push("/portal/super-admin")
+      }
+      else if (user.userType === "ceo"|| user.role === "KSB_COMPLIANCE" && pathname === "/portal") {
         router.push("/portal/ceo/today")
       } else if (user.userType === "importer" && pathname === "/portal") {
         router.push("/portal/importer")
       } else if (user.userType === "field-coordinator" && pathname === "/portal") {
         router.push("/portal/field-coordinator")
       } else if (user.userType === "miller" && pathname === "/portal") {
+        router.push("/portal/miller")
+      } else if (
+        user.role === "COMPANY" ||
+        user.userType.toLowerCase() === "COMPANY-ADMIN"
+        && pathname === "/portal") {
         router.push("/portal/miller")
       }
     }

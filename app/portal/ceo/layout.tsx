@@ -18,7 +18,7 @@ export default function CEOLayoutWrapper({
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login")
-    } else if (!isLoading && user && user.userType !== "ceo") {
+    } else if (!isLoading && user && user.userType !== "ceo" && user.role !== "KSB_COMPLIANCE") {
       // Redirect to appropriate portal based on user type
       if (user.userType === "importer") {
         router.push("/portal/importer")

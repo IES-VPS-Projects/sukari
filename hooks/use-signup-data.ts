@@ -45,6 +45,7 @@ export interface SignupData {
     userType: string
   }
   userCreationData?: {
+    id?: string
     iprsID: string
     phoneNumber: string
     email: string
@@ -94,6 +95,8 @@ export const useSignupData = () => {
   const getEntityResponse = () => signupData.entityResponse
   const getAuthenticationData = () => signupData.authenticationData
   const getUserCreationResponse = () => signupData.userCreationResponse
+  const getUserCreationData = () => signupData.userCreationData
+  const getUserVerificationData = () => signupData.userVerificationData
 
   return {
     signupData,
@@ -105,6 +108,8 @@ export const useSignupData = () => {
     getEntityData,
     getEntityResponse,
     getAuthenticationData,
-    getUserCreationResponse
+    getUserCreationResponse,
+    getUserCreationData,
+    getUserVerificationData
   }
 }

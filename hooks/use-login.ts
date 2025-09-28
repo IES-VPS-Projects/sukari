@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import toast from 'react-hot-toast';
+import { apiService } from '@/lib/axios-service';
 
 export interface LoginRequest {
   email: string;
@@ -7,23 +8,18 @@ export interface LoginRequest {
 }
 
 const login = async (data: LoginRequest) => {
-  const response = await fetch('http://localhost:3001/api/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-  console.log(response.ok, "response");
-  
-  if (!response.ok) {
-    console.log(response, "response");
-    throw new Error(responseData.error || responseData.message || 'Login failed');
+  try {
+    const responseData = await apiService.post('/api/auth/login', data);
+    console.log(responseData, "response");
+    return responseData;
+  } catch (error: any) {
+    console.log(error, "error");
+    const errorMessage = error.response?.data?.error || 
+                        error.response?.data?.message || 
+                        error.message || 
+                        'Login failed';
+    throw new Error(errorMessage);
   }
-  
-  return responseData;
 };
 
 export const useLogin = () => {

@@ -6,7 +6,8 @@ export interface ContinueData {
   userType: string
   designation: string
   phoneNumber: string
-  iprs_id: string
+  iprs_id?: string  // For individual verification
+  brs_id?: string   // For company verification
 }
 
 // API function to submit continue data using axios service
