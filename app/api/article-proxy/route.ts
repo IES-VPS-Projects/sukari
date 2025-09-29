@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { load } from 'cheerio'
+
+// Ensure this runs in Node.js runtime, not Edge runtime
+export const runtime = 'nodejs'
+
+// Dynamic import for cheerio to avoid build-time issues
+const loadCheerio = async () => {
+  const cheerio = await import('cheerio')
+  return cheerio.load
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -46,6 +54,7 @@ export async function GET(request: NextRequest) {
     }
 
     const html = await response.text()
+    const load = await loadCheerio()
     const $ = load(html)
 
     // Extract main content using common selectors
@@ -80,7 +89,7 @@ export async function GET(request: NextRequest) {
         
         if (isRagusSite) {
           // Special handling for ragus.co.uk - extract all text content and ignore images
-          element.find('p, div, span, h1, h2, h3, h4, h5, h6').each((_, elem) => {
+          element.find('p, div, span, h1, h2, h3, h4, h5, h6').each((_: number, elem: any) => {
             const text = $(elem).text().trim()
             if (text.length > 20) { // Only include substantial text
               extractedContent += text + '\n\n'
@@ -102,7 +111,7 @@ export async function GET(request: NextRequest) {
           // Extract text from all meaningful elements
           const meaningfulElements = element.find('p, div:not(.sidebar):not(.widget), article, section, .content, .text')
           
-          meaningfulElements.each((_, elem) => {
+          meaningfulElements.each((_: number, elem: any) => {
             const text = $(elem).text().trim()
             if (text.length > 30 && !text.match(/^(image|photo|click|download|share)/i)) {
               extractedContent += text + '\n\n'

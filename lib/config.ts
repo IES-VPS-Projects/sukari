@@ -1,6 +1,6 @@
 export const config = {
   backend: {
-    url: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5005"
+    url: process.env.NEXT_PUBLIC_BACKEND_URL || "https://ksb-impl-be.intelligentso.com"
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || "AIzaSyBwM-8qWcUoYY5TjQZYunatHsF3RGspoJo",
