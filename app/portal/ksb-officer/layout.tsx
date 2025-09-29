@@ -18,7 +18,7 @@ export default function CEOLayoutWrapper({
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login")
-    } else if (!isLoading && user && user.userType !== "ceo" &&  user.role !== "KSB_DEPARTMENT_HEAD") {
+    } else if (!isLoading && user && user.userType !== "ceo" && user.role !== "KSB_USER" && user.role !== "KSB_DEPARTMENT_HEAD") {
       // Redirect to appropriate portal based on user type
       if (user.userType === "importer") {
         router.push("/portal/importer")
@@ -40,7 +40,7 @@ export default function CEOLayoutWrapper({
     )
   }
 
-  if (!user || user.role !== "KSB_DEPARTMENT_HEAD") {
+  if (!user || user.role !== "KSB_USER" && user.role !== "KSB_DEPARTMENT_HEAD") {
     return <>null</>
   }
 

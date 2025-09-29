@@ -79,8 +79,8 @@ export function useAssignTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, assignedTo }: { id: string; assignedTo: string }) =>
-      workflowTasksApi.assignTask(id, assignedTo),
+    mutationFn: ({ id, assignedTo, assignedBy, notes }: { id: string; assignedTo: string; assignedBy?: string; notes?: string }) =>
+      workflowTasksApi.assignTask(id, assignedTo, assignedBy, notes),
     onSuccess: (updatedTask, variables) => {
       // Update the specific task in cache
       queryClient.setQueryData(

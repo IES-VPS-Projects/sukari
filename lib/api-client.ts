@@ -762,16 +762,27 @@ export class ApiClient {
       this.apiService.get(`/api/workflow/tasks/${id}`),
 
     updateStatus: (id: string, status: string, notes?: string): Promise<ApiResponse<WorkflowTask>> =>
-      this.apiService.patch(`/api/workflow/tasks/${id}/status`, { status, notes }),
+      this.apiService.post(`/api/workflow/tasks/${id}/status`, { status, notes }),
 
-    assignTask: (id: string, assignedTo: string): Promise<ApiResponse<WorkflowTask>> =>
-      this.apiService.patch(`/api/workflow/tasks/${id}/assign`, { assignedTo }),
+    assignTask: (
+      id: string,
+      assignedTo: string,
+      assignedBy?: string,
+      notes?: string
+    ): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.post(`/api/workflow/tasks/${id}/assign`, { assignedTo, assignedBy, notes }),
 
     completeTask: (id: string, notes?: string, documents?: any[]): Promise<ApiResponse<WorkflowTask>> =>
-      this.apiService.patch(`/api/workflow/tasks/${id}/complete`, { notes, documents }),
+      this.apiService.post(`/api/workflow/tasks/${id}/complete`, { notes, documents }),
 
     rejectTask: (id: string, reason: string): Promise<ApiResponse<WorkflowTask>> =>
       this.apiService.patch(`/api/workflow/tasks/${id}/reject`, { reason }),
+  };
+
+  // KSB Departments endpoints
+  ksbDepartments = {
+    getUsers: (departmentId: string): Promise<ApiResponse> =>
+      this.apiService.get(`/api/ksb/departments/${departmentId}/users`),
   };
 
   // Cache endpoints

@@ -3,6 +3,119 @@ import { entitiesApi } from "@/lib/api-client";
 import { useToast } from "./use-toast";
 
 // Types for entity data
+export interface EntityDirector {
+  id: string;
+  name: string;
+  idNumber: string;
+  nationality: string;
+  postalAddress: string | null;
+  phoneNumber: string | null;
+  email: string | null;
+}
+
+export interface EntityUserIPRS {
+  id: string;
+  id_no: string;
+  passport_no: string | null;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  nationality: string;
+  gender: string | null;
+  county_of_birth: string | null;
+  district_of_birth: string | null;
+  division_of_birth: string | null;
+  location_of_birth: string | null;
+  date_of_birth: string | null;
+  email_address: string | null;
+  phone_no: string | null;
+  current_county: string | null;
+  current_sub_county: string | null;
+  mug_shot: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EntityBRS {
+  id: string;
+  search_number: string;
+  registration_number: string;
+  legal_name: string;
+  company_type: string;
+  status: string;
+  country: string;
+  address: string;
+  industry: string;
+  tax_id: string;
+  registration_date: string;
+  phone: string;
+  email: string;
+  state: string;
+  authorized_shared_capital: string;
+  result_text: string;
+  result_code: string;
+  verify_business: string;
+  fiduciary_name: string;
+  fiduciary_type: string;
+  fiduciary_address: string;
+  fiduciary_registration_number: string;
+  fiduciary_status: string;
+  bo1_name: string;
+  bo1_shareholdings: string;
+  bo1_address: string;
+  bo1_gender: string;
+  bo1_nationality: string;
+  bo1_registration_number: string;
+  bo1_shareholder_type: string;
+  bo1_phone_number: string;
+  bo2_name: string;
+  bo2_shareholdings: string;
+  bo2_address: string;
+  bo2_gender: string;
+  bo2_nationality: string;
+  bo2_registration_number: string;
+  bo2_shareholder_type: string;
+  bo2_phone_number: string;
+  dir1_name: string;
+  dir1_shareholdings: string;
+  dir1_id_number: string;
+  dir1_address: string;
+  dir1_occupation: string;
+  dir1_gender: string;
+  dir1_nationality: string;
+  dir1_date_of_birth: string;
+  dir1_id_type: string;
+  dir1_phone_number: string;
+  dir2_name: string;
+  dir2_shareholdings: string;
+  dir2_id_number: string;
+  dir2_address: string;
+  dir2_occupation: string;
+  dir2_gender: string;
+  dir2_nationality: string;
+  dir2_date_of_birth: string;
+  dir2_id_type: string;
+  dir2_phone_number: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EntityUser {
+  id: string;
+  email: string;
+  // Optional fields since backend no longer guarantees these
+  role?: string;
+  isActive?: boolean;
+  employeeId?: string | null;
+  departmentId?: string | null;
+  designation?: string | null;
+  phoneNumber?: string | null;
+  officeLocation?: string | null;
+  isKSBUser?: boolean;
+  isDepartmentHead?: boolean;
+  iprs?: EntityUserIPRS | null;
+}
+
 export interface Entity {
   id: string;
   userType: string;
@@ -28,22 +141,16 @@ export interface Entity {
   subCounty: string | null;
   location: string | null;
   ward: string | null;
-  iprs: any | null;
-  user: {
-    id: string;
-    email: string;
-    role: string;
-    isActive: boolean;
-    employeeId: string | null;
-    departmentId: string | null;
-    designation: string | null;
-    phoneNumber: string | null;
-    officeLocation: string | null;
-    isKSBUser: boolean;
-    isDepartmentHead: boolean;
-  };
   createdAt: string;
   updatedAt: string;
+  // Newly added/realigned fields
+  iprsId?: string | null;
+  userId?: string | null;
+  businessVerificationId?: string | null;
+  iprs?: null; // top-level iprs is null per new payload
+  businessId?: EntityBRS | null;
+  user?: EntityUser | null;
+  directors?: EntityDirector[];
 }
 
 export interface EntityResponse {

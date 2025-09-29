@@ -14,9 +14,12 @@ import {
   Download 
 } from "lucide-react"
 import { BsBuildings } from "react-icons/bs"
-import { useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { useUpdateTaskStatus, useCompleteTask, useRejectTask } from "@/hooks/use-workflow-tasks"
+import { useUpdateTaskStatus, useCompleteTask, useRejectTask, useAssignTask } from "@/hooks/use-workflow-tasks"
+import { useDepartmentUsers } from "@/hooks/use-ksb-users"
+import { useCurrentUser } from "@/hooks/use-auth"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { TaskHistory } from "@/components/task-history"
 import LicenseApplicationData from "./license-application-data"
@@ -46,12 +49,28 @@ interface ActionDetailsModalProps {
 export function ActionDetailsModal({ action, onClose, onActionDecision }: ActionDetailsModalProps) {
   const [actionActiveTab, setActionActiveTab] = useState("overview")
   const [comment, setComment] = useState("")
+  const [selectedAssignee, setSelectedAssignee] = useState("")
   const isMobile = useIsMobile()
   const { toast } = useToast()
   
   const updateStatusMutation = useUpdateTaskStatus()
   const completeTaskMutation = useCompleteTask()
   const rejectTaskMutation = useRejectTask()
+  const assignTaskMutation = useAssignTask()
+  const currentUserQuery = useCurrentUser()
+
+  // Derive workflow task and department for HOD assignment
+  const originalTask: any | null = useMemo(() => ('originalTask' in action ? (action as any).originalTask : null), [action])
+  const departmentId: string | undefined = useMemo(() => originalTask?.departmentId || originalTask?.task?.departmentId, [originalTask])
+  const { data: deptUsers, isLoading: deptUsersLoading } = useDepartmentUsers(departmentId)
+
+  // Pre-fill assignee with current task assignee when present
+  const currentAssigneeId: string | undefined = useMemo(() => originalTask?.task?.assignedTo, [originalTask])
+  useEffect(() => {
+    if (currentAssigneeId) {
+      setSelectedAssignee(currentAssigneeId)
+    }
+  }, [currentAssigneeId])
 
   const handleActionDecision = (decision: string, actionId: string) => {
     onActionDecision(decision, actionId)
@@ -320,7 +339,11 @@ export function ActionDetailsModal({ action, onClose, onActionDecision }: Action
                           </div>
                         </div>
                       </div>
-                      <LicenseApplicationData licenseApplicationId={originalTask.task.step.instance.licenseApplicationId} />
+                      <LicenseApplicationData 
+                        licenseApplicationId={originalTask.task.step.instance.licenseApplicationId}
+                        conditions={originalTask.task.step.data.conditions}
+                      />
+ 
                        
                     </div>
                   )
@@ -625,16 +648,69 @@ export function ActionDetailsModal({ action, onClose, onActionDecision }: Action
                   // Show buttons based on actual task status
                   if (taskStatus === 'PENDING') {
                     return (
-                      <>
-                        <Button 
-                          variant="outline"
-                          className={`text-blue-600 border-blue-200 hover:bg-blue-50 ${isMobile ? 'w-full' : ''}`}
-                          onClick={() => handleActionDecision('start', action.id)}
-                          disabled={updateStatusMutation.isPending}
+                      <div className={`flex ${isMobile ? 'flex-col gap-2 w-full' : 'items-center gap-3'}`}>
+                        <div className={`${isMobile ? 'w-full' : 'w-72'}`}>
+                         
+                          <Select
+                            value={selectedAssignee}
+                            onValueChange={setSelectedAssignee}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select user to assign" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {deptUsersLoading && (
+                                <div className="px-2 py-1 text-sm text-gray-500">Loading...</div>
+                              )}
+                              {Array.isArray(deptUsers) && deptUsers.map((u: any) => (
+                                <SelectItem key={u.id} value={u.id}>
+                                  {(u.name || u.surname) ? `${u.name ?? ''} ${u.surname ?? ''}`.trim() : (u.email || u.employeeId || u.id)}
+                                  {u.email ? ` (${u.email})` : ''}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        {(() => {
+                          if (!currentAssigneeId) return null
+                          const assigneeUser = Array.isArray(deptUsers) ? deptUsers.find((u: any) => u.id === currentAssigneeId) : undefined
+                          const displayName = assigneeUser ? ((assigneeUser.name || assigneeUser.surname) ? `${assigneeUser.name ?? ''} ${assigneeUser.surname ?? ''}`.trim() : (assigneeUser.email || assigneeUser.employeeId || assigneeUser.id)) : currentAssigneeId
+                          return (
+                            <div className="text-xs text-gray-500">
+                              Currently assigned to: <span className="font-medium text-gray-700">{displayName}</span>
+                            </div>
+                          )
+                        })()}
+
+                        {/* {
+                          JSON.stringify(originalTask.task)
+                        } */}
+                     
+                        <Button
+                          className={`${isMobile ? 'w-full' : ''}`}
+                          onClick={async () => {
+                            try {
+                              const assignedBy = (currentUserQuery.data as any)?.data?.id
+                              if (!selectedAssignee) {
+                                toast({ title: 'Select a user', description: 'Please choose a user to assign.', variant: 'destructive' })
+                                return
+                              }
+                              if (currentAssigneeId && selectedAssignee === currentAssigneeId) {
+                                toast({ title: 'No change', description: 'Task is already assigned to this user.' })
+                                return
+                              }
+                              await assignTaskMutation.mutateAsync({ id: originalTask.task.id, assignedTo: selectedAssignee, assignedBy, notes: comment })
+                              toast({ title: 'Task Assigned', description: 'The task has been assigned successfully.' })
+                              onClose()
+                            } catch (e) {
+                              toast({ title: 'Assignment failed', description: 'Could not assign task.', variant: 'destructive' })
+                            }
+                          }}
+                          disabled={assignTaskMutation.isPending || !selectedAssignee}
                         >
-                          Start Task
+                          Assign
                         </Button>
-                      </>
+                      </div>
                     )
                   } else if (taskStatus === 'IN_PROGRESS') {
                     return (

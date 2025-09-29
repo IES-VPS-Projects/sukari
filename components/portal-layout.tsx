@@ -20,11 +20,18 @@ const ceoNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
   { name: "Operations", href: "/portal/ceo", icon: User },
 ]
-const ksbUserNavigation: NavigationItem[] = [
+const ksbUserAdminNavigation: NavigationItem[] = [
   { name: "Today", href: "/portal/ksb/today", icon: Home }, 
   { name: "Calendar", href: "/portal/ksb/calendar", icon: Calendar },
   { name: "Chat", href: "/portal/ksb/chat", icon: MessageSquare },
   { name: "Dashboard", href: "/portal/ksb/dashboard", icon: BarChart3 },
+  { name: "Operations", href: "/portal/ceo", icon: User },
+]
+const ksbUserNavigation: NavigationItem[] = [
+  { name: "Today", href: "/portal/ksb-officer/today", icon: Home }, 
+  { name: "Calendar", href: "/portal/ksb-officer/calendar", icon: Calendar },
+  { name: "Chat", href: "/portal/ksb-officer/chat", icon: MessageSquare },
+  { name: "Dashboard", href: "/portal/ksb-officer/dashboard", icon: BarChart3 },
   { name: "Operations", href: "/portal/ceo", icon: User },
 ]
 
@@ -66,8 +73,9 @@ export function PortalLayout({ children, pageTitle }: PortalLayoutProps) {
  
 
   useEffect(() => {
-    
+
     setnavigation(
+      user?.role === "KSB_DEPARTMENT_HEAD" ? ksbUserAdminNavigation :
       user?.role === "KSB_USER" ? ksbUserNavigation :
       user?.userType === "importer" ? importerNavigation : 
       user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 

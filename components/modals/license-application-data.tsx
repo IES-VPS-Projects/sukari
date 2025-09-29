@@ -1,13 +1,22 @@
 import { useApplication } from '@/hooks/use-applications';
+import { useEntity } from '@/hooks/use-entities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Calendar, User, FileText, Building, CreditCard } from 'lucide-react';
 import EntityData from '@/app/portal/ksb/today/components/entity-data';
+import { Button } from '@/components/ui/button';
 
-const LicenseApplicationData = ({ licenseApplicationId }: { licenseApplicationId: string }) => {
+interface LicenseApplicationDataProps {
+  licenseApplicationId: string
+  conditions?: any
+}
+
+const LicenseApplicationData = ({ licenseApplicationId, conditions }: LicenseApplicationDataProps) => {
   const { data: applicationResponse, isLoading, error } = useApplication(licenseApplicationId);
+  const application = applicationResponse?.data;
+  const { data: entityResponse } = useEntity(application?.entityId || '');
 
   if (isLoading) {
     return (
@@ -42,7 +51,9 @@ const LicenseApplicationData = ({ licenseApplicationId }: { licenseApplicationId
     );
   }
 
-  const application = applicationResponse.data;
+  const entity = entityResponse?.data;
+  const brs = entity?.businessId;
+  const directors = Array.isArray(entity?.directors) ? entity?.directors : [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -84,7 +95,7 @@ const LicenseApplicationData = ({ licenseApplicationId }: { licenseApplicationId
 
       <div className="grid gap-6">
         {/* Application Overview */}
-        <Card>
+        <Card className='border-none'>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -92,7 +103,90 @@ const LicenseApplicationData = ({ licenseApplicationId }: { licenseApplicationId
             </CardTitle>
           </CardHeader>
           <EntityData entityId={application.entityId} />
+
+        
           <CardContent className="space-y-4">
+            {/* Step Conditions */}
+            {(() => {
+              if (conditions) {
+                const cond = Array.isArray(conditions) ? (conditions[0] || {}) : conditions
+                const buttons = [
+                  cond?.onComplete && { label: cond.onComplete, variant: 'default' },
+                  cond?.onReject && { label: cond.onReject, variant: 'destructive' },
+                  cond?.onTimeout && { label: cond.onTimeout, variant: 'secondary' },
+                ].filter(Boolean) as Array<{ label: string; variant: 'default' | 'secondary' | 'destructive' }>
+                if (buttons.length === 0) return null
+                return (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500">Step Conditions</label>
+                    <div className="flex flex-wrap gap-2">
+                      {buttons.map((btn, i) => (
+                        <Button key={i} variant={btn.variant} size="sm">
+                          {btn.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+              if (Array.isArray(application.license.applicationSteps) && application.license.applicationSteps.length > 0) {
+                return (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-500">Step Conditions</label>
+                    <div className="space-y-2">
+                      {application.license.applicationSteps.map((step: any, idx: number) => {
+                        const stepConditions = step?.conditions || {};
+                        const buttons = [
+                          stepConditions.onComplete && { label: stepConditions.onComplete, variant: 'default' },
+                          stepConditions.onReject && { label: stepConditions.onReject, variant: 'destructive' },
+                          stepConditions.onTimeout && { label: stepConditions.onTimeout, variant: 'secondary' },
+                        ].filter(Boolean) as Array<{ label: string; variant: 'default' | 'secondary' | 'destructive' }>;
+                        if (buttons.length === 0) return null;
+                        return (
+                          <div key={idx} className="flex flex-wrap gap-2">
+                            {buttons.map((btn, i) => (
+                              <Button key={i} variant={btn.variant} size="sm">
+                                {btn.label}
+                              </Button>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )
+              }
+              return null
+            })()}
+            {/* Business Summary (from entity) */}
+            {entity && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Company</label>
+                  <p className="text-sm font-medium">{brs?.legal_name || entity.companyName || '—'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Registration No.</label>
+                  <p className="text-sm">{brs?.registration_number || entity.registrationNumber || '—'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Tax ID</label>
+                  <p className="text-sm">{brs?.tax_id || entity.taxId || '—'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Directors</label>
+                  <p className="text-sm">{directors.length}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Contact Email</label>
+                  <p className="text-sm">{entity.email || brs?.email || '—'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Contact Phone</label>
+                  <p className="text-sm">{entity.phoneNumber || brs?.phone || '—'}</p>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-500">Entity ID</label>

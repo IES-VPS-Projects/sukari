@@ -3,6 +3,8 @@ import { apiService } from '@/lib/axios-service'
 
 export interface KsbUser {
   id: string
+  name?: string
+  surname?: string
   email: string
   role: string
   employeeId: string
@@ -129,4 +131,19 @@ export function useKsbUsers() {
     updateError: updateKsbUserMutation.error,
     deleteError: deleteKsbUserMutation.error
   }
+}
+
+// Fetch users within a specific KSB department (HOD use-case)
+export function useDepartmentUsers(departmentId?: string) {
+  return useQuery({
+    queryKey: ['ksb-department-users', departmentId],
+    queryFn: async (): Promise<KsbUser[]> => {
+      if (!departmentId) throw new Error('departmentId is required')
+      const resp = await apiService.get<{ success: boolean; data: { users: KsbUser[] } }>(`/api/ksb/departments/${departmentId}/users`)
+      return resp.data.users || []
+    },
+    enabled: !!departmentId,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  })
 }
