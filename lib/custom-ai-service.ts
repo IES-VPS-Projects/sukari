@@ -45,7 +45,7 @@ export class CustomAIService {
   private backendUrl: string;
 
   constructor() {
-    this.apiUrl = "/api/ai-chat";
+    this.apiUrl = "http://34.42.252.158:7402/api/analyze";
     this.backendUrl = "http://34.42.252.158:7402";
   }
 
@@ -146,7 +146,7 @@ export class CustomAIService {
   // Projects
   async getProjects(): Promise<Project[]> {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch(`${this.backendUrl}/api/projects`);
       if (!response.ok) throw new Error('Failed to fetch projects');
       return await response.json();
     } catch (error) {
@@ -157,7 +157,7 @@ export class CustomAIService {
 
   async createProject(name: string, description: string): Promise<Project | null> {
     try {
-      const response = await fetch('/api/projects', {
+      const response = await fetch(`${this.backendUrl}/api/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description })
@@ -172,7 +172,7 @@ export class CustomAIService {
 
   async updateProject(projectId: string, name: string, description: string): Promise<Project | null> {
     try {
-      const response = await fetch(`/api/projects/${projectId}`, {
+      const response = await fetch(`${this.backendUrl}/api/projects/${projectId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description })
@@ -187,7 +187,7 @@ export class CustomAIService {
 
   async deleteProject(projectId: string): Promise<boolean> {
     try {
-      const response = await fetch(`/api/projects/${projectId}`, {
+      const response = await fetch(`${this.backendUrl}/api/projects/${projectId}`, {
         method: 'DELETE'
       });
       return response.ok;
@@ -201,8 +201,8 @@ export class CustomAIService {
   async getConversations(projectId?: string): Promise<Conversation[]> {
     try {
       const url = projectId 
-        ? `/api/conversations?project_id=${projectId}`
-        : `/api/conversations`;
+        ? `${this.backendUrl}/api/conversations?project_id=${projectId}`
+        : `${this.backendUrl}/api/conversations`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch conversations');
       return await response.json();
@@ -223,7 +223,7 @@ export class CustomAIService {
         body.is_standalone = false;
       }
       
-      const response = await fetch('/api/conversations', {
+      const response = await fetch(`${this.backendUrl}/api/conversations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -241,7 +241,7 @@ export class CustomAIService {
       const body: any = { title };
       if (summary) body.summary = summary;
       
-      const response = await fetch(`/api/conversations/${conversationId}`, {
+      const response = await fetch(`${this.backendUrl}/api/conversations/${conversationId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -256,7 +256,7 @@ export class CustomAIService {
 
   async deleteConversation(conversationId: string): Promise<boolean> {
     try {
-      const response = await fetch(`/api/conversations/${conversationId}`, {
+      const response = await fetch(`${this.backendUrl}/api/conversations/${conversationId}`, {
         method: 'DELETE'
       });
       return response.ok;
@@ -269,7 +269,7 @@ export class CustomAIService {
   // Messages
   async getMessages(conversationId: string): Promise<ChatMessage[]> {
     try {
-      const response = await fetch(`/api/conversations/${conversationId}/messages`);
+      const response = await fetch(`${this.backendUrl}/api/conversations/${conversationId}/messages`);
       if (!response.ok) throw new Error('Failed to fetch messages');
       const messages = await response.json();
       return messages.map((msg: any) => ({
@@ -306,7 +306,7 @@ export class CustomAIService {
           conversationBody.is_standalone = false;
         }
         
-        const conversationResponse = await fetch(`/api/conversations?_t=${Date.now()}`, {
+        const conversationResponse = await fetch(`${this.backendUrl}/api/conversations?_t=${Date.now()}`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ export class CustomAIService {
 
   async deleteMessage(conversationId: string, messageId: string): Promise<boolean> {
     try {
-      const response = await fetch(`/api/messages/${messageId}`, {
+      const response = await fetch(`${this.backendUrl}/api/messages/${messageId}`, {
         method: 'DELETE'
       });
       return response.ok;
@@ -388,7 +388,7 @@ export class CustomAIService {
       if (conversationId) requestBody.conversation_id = conversationId;
       if (options) requestBody.options = options;
 
-      const response = await fetch('/api/ai-chat', {
+      const response = await fetch(`${this.backendUrl}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight } from "lucide-react"
+import { FileText, Send, CheckCircle, Clock, AlertCircle, FileCheck, ArrowLeft, ClipboardList, Eye, CheckCircle2, Circle, ChevronRight, Factory, Ship, ExternalLink, Store, Droplet } from "lucide-react"
 import { useLicenses, useLicenseStats } from '@/hooks/use-licenses'
 import { useSubmitApplication, useUserApplications, Application } from '@/hooks/use-applications'
 import { License } from '@/lib/api-client'
@@ -70,12 +70,32 @@ interface MillerApplicationsModalProps {
   onOpenChange: (open: boolean) => void
 }
 
+interface SubmittedApplication {
+  id: string
+  type: string
+  title: string
+  purpose: string
+  status: string
+  stage: string
+  applicant: string
+  company: string
+  submitDate: string
+  completionDate: string | null
+  expectedCompletion: string
+  quantity: string
+  notes: string
+  submittedDate: string
+  approvedDate: string | null
+  validUntil: string | null
+}
+
 export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicationsModalProps) {
-  const [activeTab, setActiveTab] = useState<'status' | 'licenses'>('status')
+  const [activeTab, setActiveTab] = useState<'status' | 'miller' | 'importer' | 'exporter' | 'sugarDealer' | 'molassesDealer'>('status')
   const [selectedStakeholder, setSelectedStakeholder] = useState<string>('')
   const [expandedApplication, setExpandedApplication] = useState<string>('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null)
+  const [selectedTab, setSelectedTab] = useState<string>('details')
   const [isDraftSaved, setIsDraftSaved] = useState(false)
   const [submittedApplications, setSubmittedApplications] = useState<any[]>([])
   const [selectedLicense, setSelectedLicense] = useState<LicenseWithFields | null>(null)
@@ -177,7 +197,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
     // Declaration checkboxes
     declarationA: 'false',
     declarationB: 'false',
-    declarationC: 'false'
+    declarationC: 'false',
+    agreeTerms: 'false'
   })
 
 
@@ -201,20 +222,14 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       {
         id: 'letter-of-comfort',
         name: 'Letter of Comfort',
-        description: 'Request for letter of comfort for bank loans and financial arrangements',
+        description: 'Apply for letter of comfort required to begin your sugar miller journey',
         fields: [] // Will be handled with custom form
       },
       {
         id: 'permit',
         name: 'Permit Application',
-        description: 'Apply for various permits required for sugar milling operations',
-        fields: [
-          { name: 'permitType', label: 'Permit Type', type: 'select', options: permitTypes, required: true },
-          { name: 'facilityLocation', label: 'Facility Location', type: 'text', required: true },
-          { name: 'productionCapacity', label: 'Production Capacity (MT/Year)', type: 'number', required: true },
-          { name: 'equipmentDetails', label: 'Equipment Details', type: 'textarea', required: true },
-          { name: 'narrative', label: 'Additional Information', type: 'textarea', required: true }
-        ]
+        description: 'Apply for permit required for sugar milling operations',
+        fields: [] // Will be handled with custom form like letter of comfort
       },
       {
         id: 'license',
@@ -360,7 +375,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
       capacityTCD: '',
       declarationA: 'false',
       declarationB: 'false',
-      declarationC: 'false'
+      declarationC: 'false',
+      agreeTerms: 'false'
     }))
     setSelectedApplication(null)
     setSelectedStakeholder('')
@@ -603,8 +619,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[95vh]">
+        <DialogHeader className="bg-gray-50 -m-6 mb-0 p-6 rounded-t-lg">
           <DialogTitle className="text-2xl font-bold">Applications</DialogTitle>
           <DialogDescription>
             Apply for Letters of Comfort, Permits, and License Applications & Renewals
@@ -615,7 +631,11 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         <div className="flex space-x-1 border-b border-gray-200 mb-6">
           {[
             { id: 'status', label: 'Status', icon: FileText },
-            { id: 'licenses', label: 'Licenses', icon: FileCheck }
+            { id: 'miller', label: 'Miller', icon: Factory },
+            { id: 'importer', label: 'Importer', icon: Ship },
+            { id: 'exporter', label: 'Exporter', icon: ExternalLink },
+            { id: 'sugarDealer', label: 'Sugar Dealer', icon: Store },
+            { id: 'molassesDealer', label: 'Molasses Dealer', icon: Droplet }
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -634,7 +654,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
 
         {/* Status Tab */}
         {activeTab === 'status' && (
-          <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
             {licensesLoading ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
@@ -987,8 +1007,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
           </div>
         )}
 
-        {/* Licenses Tab */}
-        {activeTab === 'licenses' && (
+        {/* Miller Tab */}
+        {activeTab === 'miller' && (
           <div className="min-h-[500px] max-h-[500px] overflow-y-auto">
             {licensesLoading ? (
               <div className="flex items-center justify-center h-64">
@@ -1222,389 +1242,1137 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                                     </div>
                                   </div>
 
-                                  {/* Company Info - Auto-populated */}
+                              {/* Company Info */}
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Company Info</h3>
+                                <div className="grid gap-4 sm:grid-cols-2">
                                   <div>
-                                    <h3 className="text-lg font-semibold mb-4">Company Info</h3>
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                      <div>
-                                        <Label htmlFor="lrNumber">L.R No/Plot No <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="lrNumber"
-                                          value={formData.lrNumber}
-                                          onChange={(e) => handleInputChange('lrNumber', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="postalAddress">Postal Address <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="postalAddress"
-                                          value={formData.postalAddress}
-                                          onChange={(e) => handleInputChange('postalAddress', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="postalCode">Postal Code <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="postalCode"
-                                          value={formData.postalCode}
-                                          onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="companyRegNumber">Company Registration Number <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="companyRegNumber"
-                                          value={formData.companyRegNumber}
-                                          onChange={(e) => handleInputChange('companyRegNumber', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="pinNumber">PIN Number <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="pinNumber"
-                                          value={formData.pinNumber}
-                                          onChange={(e) => handleInputChange('pinNumber', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="phoneNumber">Phone Number <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="phoneNumber"
-                                          value={formData.phoneNumber}
-                                          onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="emailAddress">Email Address <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="emailAddress"
-                                          type="email"
-                                          value={formData.emailAddress}
-                                          onChange={(e) => handleInputChange('emailAddress', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="county">County <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="county"
-                                          value={formData.county}
-                                          onChange={(e) => handleInputChange('county', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="subcounty">Sub-County <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="subcounty"
-                                          value={formData.subcounty}
-                                          onChange={(e) => handleInputChange('subcounty', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="ward">Ward <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="ward"
-                                          value={formData.ward}
-                                          onChange={(e) => handleInputChange('ward', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="location">Location <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="location"
-                                          value={formData.location}
-                                          onChange={(e) => handleInputChange('location', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="buildingName">Building Name <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="buildingName"
-                                          value={formData.buildingName}
-                                          onChange={(e) => handleInputChange('buildingName', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="streetName">Street Name <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="streetName"
-                                          value={formData.streetName}
-                                          onChange={(e) => handleInputChange('streetName', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="town">Town <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="town"
-                                          value={formData.town}
-                                          onChange={(e) => handleInputChange('town', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="establishmentDate">Establishment Date <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="establishmentDate"
-                                          type="date"
-                                          value={formData.establishmentDate}
-                                          onChange={(e) => handleInputChange('establishmentDate', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="legalStatus">Legal Status <span className="text-red-500">*</span></Label>
-                                        <Input
-                                          id="legalStatus"
-                                          value={formData.legalStatus}
-                                          onChange={(e) => handleInputChange('legalStatus', e.target.value)}
-                                          required
-                                        />
-                                      </div>
-                                    </div>
+                                    <Label htmlFor="lrNumber">L.R No/Plot No</Label>
+                                    <Input
+                                      id="lrNumber"
+                                      value={formData.lrNumber}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
                                   </div>
-
-                                  {/* Projected Capacity */}
                                   <div>
-                                    <h3 className="text-lg font-semibold mb-4">Projected Capacity (TCD)</h3>
+                                    <Label htmlFor="postalAddress">Postal Address</Label>
+                                    <Input
+                                      id="postalAddress"
+                                      value={formData.postalAddress}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="postalCode">Postal Code</Label>
+                                    <Input
+                                      id="postalCode"
+                                      value={formData.postalCode}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="companyRegNumber">Company Registration Number</Label>
+                                    <Input
+                                      id="companyRegNumber"
+                                      value={formData.companyRegNumber}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="pinNumber">Pin Number</Label>
+                                    <Input
+                                      id="pinNumber"
+                                      value={formData.pinNumber}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="phoneNumber">Phone Number</Label>
+                                    <Input
+                                      id="phoneNumber"
+                                      value={formData.phoneNumber}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="emailAddress">Email Address</Label>
+                                    <Input
+                                      id="emailAddress"
+                                      value={formData.emailAddress}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="county">County</Label>
+                                    <Input
+                                      id="county"
+                                      value={formData.county}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="subcounty">Subcounty</Label>
+                                    <Input
+                                      id="subcounty"
+                                      value={formData.subcounty}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="ward">Ward</Label>
+                                    <Input
+                                      id="ward"
+                                      value={formData.ward}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="location">Location</Label>
+                                    <Input
+                                      id="location"
+                                      value={formData.location}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="buildingName">Building Name</Label>
+                                    <Input
+                                      id="buildingName"
+                                      value={formData.buildingName}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="streetName">Street Name</Label>
+                                    <Input
+                                      id="streetName"
+                                      value={formData.streetName}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="town">Town</Label>
+                                    <Input
+                                      id="town"
+                                      value={formData.town}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="establishmentDate">Establishment Date</Label>
+                                    <Input
+                                      id="establishmentDate"
+                                      value={formData.establishmentDate}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="legalStatus">Legal Status</Label>
+                                    <Input
+                                      id="legalStatus"
+                                      value={formData.legalStatus}
+                                      disabled
+                                      className="bg-gray-100"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Projected Capacity */}
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Projected Capacity (TCD)</h3>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                  <div>
+                                    <Label htmlFor="capacityTCD">Capacity (TCD) <span className="text-red-500">*</span></Label>
+                                    <Input
+                                      id="capacityTCD"
+                                      type="number"
+                                      value={formData.capacityTCD}
+                                      onChange={(e) => handleInputChange('capacityTCD', e.target.value)}
+                                      required
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Applicant Declaration */}
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Applicant Declaration</h3>
+                                <div className="space-y-4 border rounded-lg p-4 bg-gray-50">
+                                  <p className="text-gray-700">I hereby declare that:</p>
+                                  <div className="flex items-start space-x-2">
+                                    <Checkbox 
+                                      id="declarationA" 
+                                      checked={formData.declarationA === 'true'}
+                                      onCheckedChange={(checked) => handleInputChange('declarationA', checked ? 'true' : 'false')}
+                                    />
+                                    <Label htmlFor="declarationA" className="text-sm">
+                                      (a) All the statements and supporting Documents are complete and true
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-start space-x-2">
+                                    <Checkbox 
+                                      id="declarationB" 
+                                      checked={formData.declarationB === 'true'}
+                                      onCheckedChange={(checked) => handleInputChange('declarationB', checked ? 'true' : 'false')}
+                                    />
+                                    <Label htmlFor="declarationB" className="text-sm">
+                                      (b) I have authorized the Authority to make further inquiries and receive information in connection with this application to the extent permitted by the law
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-start space-x-2">
+                                    <Checkbox 
+                                      id="declarationC" 
+                                      checked={formData.declarationC === 'true'}
+                                      onCheckedChange={(checked) => handleInputChange('declarationC', checked ? 'true' : 'false')}
+                                    />
+                                    <Label htmlFor="declarationC" className="text-sm">
+                                      (c) We have complied with the requirements of the Environmental Management and Co-ordination Act 1999
+                                    </Label>
+                                  </div>
+                                  <p className="text-xs text-gray-500 mt-4">
+                                    NOTE: All information regarding this application shall be treated as confidential but the Authority reserves the right to share the information with other approving agencies of the Kenya Government to the extent required by law or by the policy of the Government.
+                                  </p>
+                                </div>
+                              </div>
+                              </>
+                              ) : application.id === 'permit' ? (
+                              <>
+                                {/* Mill/Jaggery Info - Auto-populated from letter of comfort */}
+                                <div>
+                                  <h3 className="text-lg font-semibold mb-4">Mill/Jaggery Info</h3>
+                                  <div className="grid gap-4 sm:grid-cols-2">
                                     <div>
-                                      <Label htmlFor="capacityTCD">Capacity (TCD) <span className="text-red-500">*</span></Label>
+                                      <Label htmlFor="documentNo">Document Number</Label>
                                       <Input
-                                        id="capacityTCD"
-                                        type="number"
-                                        value={formData.capacityTCD}
-                                        onChange={(e) => handleInputChange('capacityTCD', e.target.value)}
-                                        placeholder="Enter capacity in Tonnes Cane per Day"
-                                        required
+                                        id="documentNo"
+                                        value={`KSB/SD/MJREG/${formData.category === 'Mill' ? 'M' : 'J'}${new Date().getFullYear()}`}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="documentDate">Document Date</Label>
+                                      <Input
+                                        id="documentDate"
+                                        type="date"
+                                        value={formData.documentDate}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="companyName">Name of Applicant</Label>
+                                      <Input
+                                        id="companyName"
+                                        value={formData.companyName}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="year">Year</Label>
+                                      <Input
+                                        id="year"
+                                        value={new Date().getFullYear().toString()}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="refLetterOfComfort">Ref Letter of Comfort</Label>
+                                      <Input
+                                        id="refLetterOfComfort"
+                                        value={formData.documentNo}
+                                        disabled
+                                        className="bg-gray-100"
                                       />
                                     </div>
                                   </div>
+                                </div>
 
-                                  {/* Applicant Declaration */}
-                                  <div>
-                                    <h3 className="text-lg font-semibold mb-4">Applicant Declaration</h3>
-                                    <div className="space-y-4 p-4 bg-white border rounded-lg">
-                                      <p className="text-sm font-medium">I hereby declare that:</p>
-                                      
-                                      <div className="flex items-start space-x-3">
-                                        <Checkbox 
-                                          id="declarationA"
-                                          checked={formData.declarationA === 'true'}
-                                          onCheckedChange={(checked) => handleInputChange('declarationA', checked ? 'true' : 'false')}
-                                          required
-                                        />
-                                        <Label htmlFor="declarationA" className="text-sm leading-relaxed">
-                                          (a) All the statements and supporting Documents are complete and true
-                                        </Label>
-                                      </div>
-                                      
-                                      <div className="flex items-start space-x-3">
-                                        <Checkbox 
-                                          id="declarationB"
-                                          checked={formData.declarationB === 'true'}
-                                          onCheckedChange={(checked) => handleInputChange('declarationB', checked ? 'true' : 'false')}
-                                          required
-                                        />
-                                        <Label htmlFor="declarationB" className="text-sm leading-relaxed">
-                                          (b) I have authorized the Authority to make further inquiries and receive information in connection with this application to the extent permitted by the law
-                                        </Label>
-                                      </div>
-                                      
-                                      <div className="flex items-start space-x-3">
-                                        <Checkbox 
-                                          id="declarationC"
-                                          checked={formData.declarationC === 'true'}
-                                          onCheckedChange={(checked) => handleInputChange('declarationC', checked ? 'true' : 'false')}
-                                          required
-                                        />
-                                        <Label htmlFor="declarationC" className="text-sm leading-relaxed">
-                                          (c) We have complied with the requirements of the Environmental Management and Co-ordination Act 1999
-                                        </Label>
-                                      </div>
-                                      
-                                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                                        <p className="text-xs text-blue-800">
-                                          <strong>NOTE:</strong> All information regarding this application shall be treated as confidential but the Authority reserves the right to share the information with other approving agencies of the Kenya Government to the extent required by law or by the policy of the Government.
-                                        </p>
-                                      </div>
+                                {/* Company Location Information - Auto-populated */}
+                                <div>
+                                  <h3 className="text-lg font-semibold mb-4">Company Location Information</h3>
+                                  <div className="grid gap-4 sm:grid-cols-2">
+                                    <div>
+                                      <Label htmlFor="lrNumber">L.R No/Plot No</Label>
+                                      <Input
+                                        id="lrNumber"
+                                        value={formData.lrNumber}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="postalAddress">Postal Address</Label>
+                                      <Input
+                                        id="postalAddress"
+                                        value={formData.postalAddress}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="postalCode">Postal Code</Label>
+                                      <Input
+                                        id="postalCode"
+                                        value={formData.postalCode}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="companyRegNumber">Company Reg No</Label>
+                                      <Input
+                                        id="companyRegNumber"
+                                        value={formData.companyRegNumber}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="pinNumber">PIN/VAT</Label>
+                                      <Input
+                                        id="pinNumber"
+                                        value={formData.pinNumber}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="phoneNumber">Phone</Label>
+                                      <Input
+                                        id="phoneNumber"
+                                        value={formData.phoneNumber}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="emailAddress">Email Address</Label>
+                                      <Input
+                                        id="emailAddress"
+                                        value={formData.emailAddress}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="county">County</Label>
+                                      <Input
+                                        id="county"
+                                        value={formData.county}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="subcounty">Sub-County</Label>
+                                      <Input
+                                        id="subcounty"
+                                        value={formData.subcounty}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="ward">Ward</Label>
+                                      <Input
+                                        id="ward"
+                                        value={formData.ward}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="location">Location</Label>
+                                      <Input
+                                        id="location"
+                                        value={formData.location}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="buildingName">Building Name</Label>
+                                      <Input
+                                        id="buildingName"
+                                        value={formData.buildingName}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="streetName">Street Name</Label>
+                                      <Input
+                                        id="streetName"
+                                        value={formData.streetName}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="town">Town</Label>
+                                      <Input
+                                        id="town"
+                                        value={formData.town}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="establishmentDate">Establishment Date</Label>
+                                      <Input
+                                        id="establishmentDate"
+                                        value={formData.establishmentDate}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="legalStatus">Legal Status</Label>
+                                      <Input
+                                        id="legalStatus"
+                                        value={formData.legalStatus}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label htmlFor="capacityTCD">Capacity (TCD)</Label>
+                                      <Input
+                                        id="capacityTCD"
+                                        value={formData.capacityTCD}
+                                        disabled
+                                        className="bg-gray-100"
+                                      />
                                     </div>
                                   </div>
+                                </div>
+
+                                {/* Company Tabs */}
+                                <div>
+                                  <h3 className="text-lg font-semibold mb-4">Company Tabs</h3>
+                                  <div className="flex space-x-2 border-b border-gray-200 mb-4">
+                                    {[
+                                      { id: 'details', label: 'Company Details' },
+                                      { id: 'location', label: 'Location Information' },
+                                      { id: 'attachments', label: 'Attachments' },
+                                      { id: 'directors', label: 'Directors Information' },
+                                      { id: 'approval', label: 'Approval Remarks' },
+                                    ].map((tab) => (
+                                      <button
+                                        key={tab.id}
+                                        onClick={() => setSelectedTab(tab.id)}
+                                        className={`px-3 py-2 text-sm font-medium ${selectedTab === tab.id ? 'border-b-2 border-green-600 text-green-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                      >
+                                        {tab.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                  <div className="p-4 border rounded-lg bg-white">
+                                    {/* Tab content would go here */}
+                                    <p className="text-gray-500 text-center py-4">Tab content for {selectedTab} would be displayed here</p>
+                                  </div>
+                                </div>
+
+                                {/* Applicant Declaration */}
+                                <div>
+                                  <h3 className="text-lg font-semibold mb-4">Applicant Declaration</h3>
+                                  <div className="space-y-4 border rounded-lg p-4 bg-gray-50">
+                                    <p className="text-gray-700">I hereby declare that:</p>
+                                    <div className="flex items-start space-x-2">
+                                      <Checkbox 
+                                        id="declarationA" 
+                                        checked={formData.declarationA === 'true'}
+                                        onCheckedChange={(checked) => handleInputChange('declarationA', checked ? 'true' : 'false')}
+                                      />
+                                      <Label htmlFor="declarationA" className="text-sm">
+                                        (a) All the statements and supporting Documents are complete and true
+                                      </Label>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                      <Checkbox 
+                                        id="declarationB" 
+                                        checked={formData.declarationB === 'true'}
+                                        onCheckedChange={(checked) => handleInputChange('declarationB', checked ? 'true' : 'false')}
+                                      />
+                                      <Label htmlFor="declarationB" className="text-sm">
+                                        (b) I have authorized the Authority to make further inquiries and receive information in connection with this application to the extent permitted by the law
+                                      </Label>
+                                    </div>
+                                    <div className="flex items-start space-x-2">
+                                      <Checkbox 
+                                        id="declarationC" 
+                                        checked={formData.declarationC === 'true'}
+                                        onCheckedChange={(checked) => handleInputChange('declarationC', checked ? 'true' : 'false')}
+                                      />
+                                      <Label htmlFor="declarationC" className="text-sm">
+                                        (c) We have complied with the requirements of the Environmental Management and Co-ordination Act 1999
+                                      </Label>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-4">
+                                      NOTE: All information regarding this application shall be treated as confidential but the Authority reserves the right to share the information with other approving agencies of the Kenya Government to the extent required by law or by the policy of the Government.
+                                    </p>
+                                    <div className="flex items-start space-x-2 mt-4">
+                                      <Checkbox 
+                                        id="agreeTerms" 
+                                        checked={formData.agreeTerms === 'true'}
+                                        onCheckedChange={(checked) => handleInputChange('agreeTerms', checked ? 'true' : 'false')}
+                                      />
+                                      <Label htmlFor="agreeTerms" className="text-sm font-medium">
+                                        I Agree to the Terms & Conditions
+                                      </Label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                            ) : null}
+                          
+                          <div className="flex justify-end gap-3 pt-4">
+                            <Button 
+                              type="button" 
+                              variant="outline"
+                              onClick={handleSaveDraft}
+                              disabled={!formData.category}
+                              className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                            >
+                              {isDraftSaved ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Draft Saved
+                                </>
+                              ) : (
+                                <>
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Save Draft
                                 </>
                               )}
-                              
-                              <div className="flex justify-end gap-3 pt-4">
-                                <Button type="button" variant="outline" onClick={() => setExpandedApplication('')}>
-                                  Cancel
-                                </Button>
-                                <Button 
-                                  type="button" 
-                                  variant="outline"
-                                  onClick={handleSaveDraft}
-                                  disabled={!formData.category}
-                                  className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                                >
-                                  {isDraftSaved ? (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Draft Saved
-                                    </>
-                                  ) : (
-                                    <>
-                                      <FileText className="h-4 w-4 mr-2" />
-                                      Save Draft
-                                    </>
-                                  )}
-                                </Button>
-                                <Button 
-                                  type="submit" 
-                                  className="bg-green-600 hover:bg-green-700"
-                                  disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true'}
-                                >
-                                  {isSubmitted ? (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Submitted
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Send className="h-4 w-4 mr-2" />
-                                      Submit Application
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-                            </form>
-                          ) : application.id === 'permit' ? (
-                            // Custom Permit Application Form
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                              <div className="grid gap-4 sm:grid-cols-2">
-                                <div>
-                                  <Label htmlFor="companyName">Company Name</Label>
-                                  <Input
-                                    id="companyName"
-                                    value={formData.companyName}
-                                    onChange={(e) => handleInputChange('companyName', e.target.value)}
-                                    required
-                                  />
-                                </div>
-                                <div>
-                                  <Label htmlFor="millerLicenseNumber">License Number</Label>
-                                  <Input
-                                    id="millerLicenseNumber"
-                                    value={formData.millerLicenseNumber}
-                                    onChange={(e) => handleInputChange('millerLicenseNumber', e.target.value)}
-                                    required
-                                  />
-                                </div>
-                              </div>
-                              
-                              {application.fields.map((field) => (
-                                <div key={field.name}>
-                                  <Label htmlFor={field.name}>
-                                    {field.label}
-                                    {field.required && <span className="text-red-500 ml-1">*</span>}
-                                  </Label>
-                                  {field.type === 'select' ? (
-                                    <Select 
-                                      value={formData[field.name as keyof typeof formData] || ''} 
-                                      onValueChange={(value) => handleInputChange(field.name, value)}
-                                    >
-                                      <SelectTrigger>
-                                        <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {field.options?.map((option: string) => (
-                                          <SelectItem key={option} value={option}>
-                                            {option}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  ) : field.type === 'textarea' ? (
-                                    <Textarea
-                                      id={field.name}
-                                      value={formData[field.name as keyof typeof formData] || ''}
-                                      onChange={(e) => handleInputChange(field.name, e.target.value)}
-                                      placeholder={`Enter ${field.label.toLowerCase()}`}
-                                      className="min-h-[100px]"
-                                      required={field.required}
-                                    />
-                                  ) : (
-                                    <Input
-                                      id={field.name}
-                                      type={field.type}
-                                      value={formData[field.name as keyof typeof formData] || ''}
-                                      onChange={(e) => handleInputChange(field.name, e.target.value)}
-                                      placeholder={`Enter ${field.label.toLowerCase()}`}
-                                      required={field.required}
-                                    />
-                                  )}
-                                </div>
-                              ))}
-                              
-                              <div className="flex justify-end gap-3 pt-4">
-                                <Button type="button" variant="outline" onClick={() => setExpandedApplication('')}>
-                                  Cancel
-                                </Button>
-                                <Button 
-                                  type="button" 
-                                  variant="outline"
-                                  onClick={handleSaveDraft}
-                                  className="border-blue-500 text-blue-600 hover:bg-blue-50"
-                                >
-                                  {isDraftSaved ? (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Draft Saved
-                                    </>
-                                  ) : (
-                                    <>
-                                      <FileText className="h-4 w-4 mr-2" />
-                                      Save Draft
-                                    </>
-                                  )}
-                                </Button>
-                                <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                                  {isSubmitted ? (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Submitted
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Send className="h-4 w-4 mr-2" />
-                                      Submit Application
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-                            </form>
-                          ) : (
-                            // Default form for other applications  
-                            <div className="text-center py-8">
-                              <p className="text-gray-600">Application form not available for this type.</p>
+                            </Button>
+                            <Button 
+                              type="submit" 
+                              className="bg-green-600 hover:bg-green-700"
+                              disabled={!formData.category || formData.declarationA !== 'true' || formData.declarationB !== 'true' || formData.declarationC !== 'true' || (expandedApplication === 'permit' && formData.agreeTerms !== 'true')}
+                            >
+                              {isSubmitted ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Submitted
+                                </>
+                              ) : (
+                                <>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Submit Application
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </form>
+                      ) : application.id === 'license' ? (
+                        // Custom Permit Application Form
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                              <Label htmlFor="companyName">Company Name</Label>
+                              <Input
+                                id="companyName"
+                                value={formData.companyName}
+                                onChange={(e) => handleInputChange('companyName', e.target.value)}
+                                required
+                              />
                             </div>
-                          )}
+                            <div>
+                              <Label htmlFor="millerLicenseNumber">License Number</Label>
+                              <Input
+                                id="millerLicenseNumber"
+                                value={formData.millerLicenseNumber}
+                                onChange={(e) => handleInputChange('millerLicenseNumber', e.target.value)}
+                                required
+                              />
+                            </div>
+                          </div>
+                          
+                          {application.fields.map((field) => (
+                            <div key={field.name}>
+                              <Label htmlFor={field.name}>
+                                {field.label}
+                                {field.required && <span className="text-red-500 ml-1">*</span>}
+                              </Label>
+                              {field.type === 'select' ? (
+                                <Select 
+                                  value={formData[field.name as keyof typeof formData] || ''} 
+                                  onValueChange={(value) => handleInputChange(field.name, value)}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {field.options?.map((option: string) => (
+                                      <SelectItem key={option} value={option}>
+                                        {option}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : field.type === 'textarea' ? (
+                                <Textarea
+                                  id={field.name}
+                                  value={formData[field.name as keyof typeof formData] || ''}
+                                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                  placeholder={`Enter ${field.label.toLowerCase()}`}
+                                  className="min-h-[100px]"
+                                  required={field.required}
+                                />
+                              ) : (
+                                <Input
+                                  id={field.name}
+                                  type={field.type}
+                                  value={formData[field.name as keyof typeof formData] || ''}
+                                  onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                  placeholder={`Enter ${field.label.toLowerCase()}`}
+                                  required={field.required}
+                                />
+                              )}
+                            </div>
+                          ))}
+                          
+                          <div className="flex justify-end gap-3 pt-4">
+                            <Button 
+                              type="button" 
+                              variant="outline"
+                              onClick={handleSaveDraft}
+                              className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                            >
+                              {isDraftSaved ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Draft Saved
+                                </>
+                              ) : (
+                                <>
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Save Draft
+                                </>
+                              )}
+                            </Button>
+                            <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                              {isSubmitted ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Submitted
+                                </>
+                              ) : (
+                                <>
+                                  <Send className="h-4 w-4 mr-2" />
+                                  Submit Application
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Application form not available for this type.</p>
                         </div>
                       )}
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
+              
+        {/* Importer Tab */}
+        {activeTab === 'importer' && (
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            <div className="space-y-4">
+              {stakeholderApplications['Sugar Importer']?.map((application) => (
+                <div key={application.id} className="border rounded-lg">
+                  <div 
+                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedApplication(expandedApplication === application.id ? '' : application.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold">{application.name}</h4>
+                        <p className="text-sm text-gray-600">{application.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            expandedApplication === application.id ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {expandedApplication === application.id && (
+                    <div className="border-t p-4 bg-gray-50">
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div>
+                            <Label htmlFor="companyName">Company Name</Label>
+                            <Input
+                              id="companyName"
+                              value={formData.companyName}
+                              onChange={(e) => handleInputChange('companyName', e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+                        
+                        {application.fields.map((field) => (
+                          <div key={field.name}>
+                            <Label htmlFor={field.name}>
+                              {field.label}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            {field.type === 'select' ? (
+                              <Select 
+                                value={formData[field.name as keyof typeof formData] || ''} 
+                                onValueChange={(value) => handleInputChange(field.name, value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : field.type === 'textarea' ? (
+                              <Textarea
+                                id={field.name}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                className="min-h-[100px]"
+                                required={field.required}
+                              />
+                            ) : (
+                              <Input
+                                id={field.name}
+                                type={field.type}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                required={field.required}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        
+                        <div className="flex justify-end gap-3 pt-4">
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            {isDraftSaved ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Draft Saved
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Save Draft
+                              </>
+                            )}
+                          </Button>
+                          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            {isSubmitted ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Submitted
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4 mr-2" />
+                                Submit Application
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600">Application form not available for this type.</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+              
+        {/* Exporter Tab */}
+        {activeTab === 'exporter' && (
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            <div className="space-y-4">
+              {stakeholderApplications['Sugar Exporter']?.map((application) => (
+                <div key={application.id} className="border rounded-lg">
+                  <div 
+                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedApplication(expandedApplication === application.id ? '' : application.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold">{application.name}</h4>
+                        <p className="text-sm text-gray-600">{application.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            expandedApplication === application.id ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {expandedApplication === application.id && (
+                    <div className="border-t p-4 bg-gray-50">
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        {application.fields.map((field) => (
+                          <div key={field.name}>
+                            <Label htmlFor={field.name}>
+                              {field.label}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            {field.type === 'select' ? (
+                              <Select 
+                                value={formData[field.name as keyof typeof formData] || ''} 
+                                onValueChange={(value) => handleInputChange(field.name, value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : field.type === 'textarea' ? (
+                              <Textarea
+                                id={field.name}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                className="min-h-[100px]"
+                                required={field.required}
+                              />
+                            ) : (
+                              <Input
+                                id={field.name}
+                                type={field.type}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                required={field.required}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        
+                        <div className="flex justify-end gap-3 pt-4">
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            {isDraftSaved ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Draft Saved
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Save Draft
+                              </>
+                            )}
+                          </Button>
+                          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            {isSubmitted ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Submitted
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4 mr-2" />
+                                Submit Application
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+              
+        {/* Sugar Dealer Tab */}
+        {activeTab === 'sugarDealer' && (
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            <div className="space-y-4">
+              {stakeholderApplications['Sugar Dealer']?.map((application) => (
+                <div key={application.id} className="border rounded-lg">
+                  <div 
+                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedApplication(expandedApplication === application.id ? '' : application.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold">{application.name}</h4>
+                        <p className="text-sm text-gray-600">{application.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            expandedApplication === application.id ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {expandedApplication === application.id && (
+                    <div className="border-t p-4 bg-gray-50">
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        {application.fields.map((field) => (
+                          <div key={field.name}>
+                            <Label htmlFor={field.name}>
+                              {field.label}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            {field.type === 'select' ? (
+                              <Select 
+                                value={formData[field.name as keyof typeof formData] || ''} 
+                                onValueChange={(value) => handleInputChange(field.name, value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : field.type === 'textarea' ? (
+                              <Textarea
+                                id={field.name}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                className="min-h-[100px]"
+                                required={field.required}
+                              />
+                            ) : (
+                              <Input
+                                id={field.name}
+                                type={field.type}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                required={field.required}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        
+                        <div className="flex justify-end gap-3 pt-4">
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            {isDraftSaved ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Draft Saved
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Save Draft
+                              </>
+                            )}
+                          </Button>
+                          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            {isSubmitted ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Submitted
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4 mr-2" />
+                                Submit Application
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+              
+        {/* Molasses Dealer Tab */}
+        {activeTab === 'molassesDealer' && (
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            <div className="space-y-4">
+              {stakeholderApplications['Molasses Dealer']?.map((application) => (
+                <div key={application.id} className="border rounded-lg">
+                  <div 
+                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setExpandedApplication(expandedApplication === application.id ? '' : application.id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold">{application.name}</h4>
+                        <p className="text-sm text-gray-600">{application.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            expandedApplication === application.id ? 'rotate-90' : ''
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {expandedApplication === application.id && (
+                    <div className="border-t p-4 bg-gray-50">
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        {application.fields.map((field) => (
+                          <div key={field.name}>
+                            <Label htmlFor={field.name}>
+                              {field.label}
+                              {field.required && <span className="text-red-500 ml-1">*</span>}
+                            </Label>
+                            {field.type === 'select' ? (
+                              <Select 
+                                value={formData[field.name as keyof typeof formData] || ''} 
+                                onValueChange={(value) => handleInputChange(field.name, value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : field.type === 'textarea' ? (
+                              <Textarea
+                                id={field.name}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                className="min-h-[100px]"
+                                required={field.required}
+                              />
+                            ) : (
+                              <Input
+                                id={field.name}
+                                type={field.type}
+                                value={formData[field.name as keyof typeof formData] || ''}
+                                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                                required={field.required}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        
+                        <div className="flex justify-end gap-3 pt-4">
+                          <Button 
+                            type="button" 
+                            variant="outline"
+                            onClick={handleSaveDraft}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                          >
+                            {isDraftSaved ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Draft Saved
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-2" />
+                                Save Draft
+                              </>
+                            )}
+                          </Button>
+                          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            {isSubmitted ? (
+                              <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Submitted
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4 mr-2" />
+                                Submit Application
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
+
       </DialogContent>
     </Dialog>
   )

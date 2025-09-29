@@ -34,6 +34,7 @@ export function BottomNavigation({
         className
       )}
     >
+      
       {/* Safe area for devices with home indicator */}
       <div className="pb-safe-area-inset-bottom">
         <div className="flex items-center justify-center px-2 py-3">

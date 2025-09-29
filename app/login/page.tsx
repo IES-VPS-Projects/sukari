@@ -174,14 +174,14 @@ export default function LoginPage() {
 
       {/* Right Column - Sign In Form */}
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-6 lg:p-12 lg:pl-0">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md lg:max-w-lg">
           <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
-            {/* Logo above Sign In */}
+            {/* Logo inside Sign In form */}
             <div className="text-center mb-6 lg:mb-8">
-              <div className="flex items-center justify-center space-x-2 lg:space-x-4">
-                <Image src="/images/ISE_Agri_Logo.png" alt="ISE Agriculture" width={80} height={60} className="lg:w-[100px] lg:h-[60px]" />
+              <div className="flex items-center justify-center space-x-2 lg:space-x-3">
+                <Image src="/images/ISE_Agri_Logo.png" alt="ISE Agriculture" width={90} height={60} className="lg:w-[110px] lg:h-[70px] flex-shrink-0" />
                 <div className="h-8 lg:h-12 w-px bg-gray-300"></div>
-                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={110} height={60} className="lg:w-[140px] lg:h-[60px]" />
+                <Image src="/images/ksb-logo.jpg" alt="Kenya Sugar Board" width={180} height={60} className="lg:w-[280px] lg:h-[70px] flex-shrink-0" />
               </div>
             </div>
 

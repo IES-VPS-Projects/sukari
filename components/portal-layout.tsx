@@ -20,6 +20,13 @@ const ceoNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/portal/ceo/dashboard", icon: BarChart3 },
   { name: "Operations", href: "/portal/ceo", icon: User },
 ]
+const ksbUserNavigation: NavigationItem[] = [
+  { name: "Today", href: "/portal/ksb/today", icon: Home }, 
+  { name: "Calendar", href: "/portal/ksb/calendar", icon: Calendar },
+  { name: "Chat", href: "/portal/ksb/chat", icon: MessageSquare },
+  { name: "Dashboard", href: "/portal/ksb/dashboard", icon: BarChart3 },
+  { name: "Operations", href: "/portal/ceo", icon: User },
+]
 
 const importerNavigation: NavigationItem[] = [
   { name: "Portal", href: "/portal/importer", icon: Home },
@@ -55,13 +62,18 @@ export function PortalLayout({ children, pageTitle }: PortalLayoutProps) {
   const [alertsModalOpen, setAlertsModalOpen] = useState(false)
 
   // Get appropriate navigation based on user type
-  const navigation = 
-    user?.userType === "importer" ? importerNavigation : 
-    user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 
-    user?.userType === "miller" ? millerNavigation :
-    ceoNavigation
+  const [navigation, setnavigation] = useState(ceoNavigation)
+ 
 
   useEffect(() => {
+    
+    setnavigation(
+      user?.role === "KSB_USER" ? ksbUserNavigation :
+      user?.userType === "importer" ? importerNavigation : 
+      user?.userType === "field-coordinator" ? fieldCoordinatorNavigation : 
+      user?.userType === "miller" ? millerNavigation :
+      ceoNavigation
+    )
     let lastScroll = 0
     const handleScroll = () => {
       const currentScroll = window.scrollY

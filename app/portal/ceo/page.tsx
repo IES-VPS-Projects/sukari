@@ -11,5 +11,5 @@ export default function CEOPage() {
     router.replace("/portal/ceo/operations")
   }, [router])
 
-  return null
+  return <>oage</>
 }

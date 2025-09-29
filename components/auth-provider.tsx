@@ -42,6 +42,9 @@ interface User {
   email: string
   name: string
   role: string
+  designation: string
+  department: string 
+  employeeId: string
   iprsData?: {
     id: string
     id_no: string
@@ -187,7 +190,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const user = data.data.user;
         
         // Generate name based on available data
-        let name = user.email; // fallback to email
+        let name = (user as any)?.name + ' ' + (user as any)?.surname || user.email; // fallback to email
         if (user.iprs) {
           name = `${user.iprs.first_name} ${user.iprs.middle_name || ''} ${user.iprs.last_name}`.trim();
         } else if (user.entity?.designation) {
@@ -210,7 +213,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           iprsData: user.iprs,
           entityData: user.entity,
           token: data.data.token,
-          userType: userType
+          userType: userType,
+          designation: (user as any)?.designation,
+          department: (user as any)?.department?.name,
+          employeeId: (user as any)?.employeeId,
         };
 
         setUser(userData);

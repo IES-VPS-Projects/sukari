@@ -331,8 +331,7 @@ export default function TodayPage() {
       <AlertsModal
         open={viewAllAlertsOpen}
         onOpenChange={setViewAllAlertsOpen}
-        alerts={combinedAlertsData.alerts}
-        notifications={combinedAlertsData.notifications}
+        alertsData={combinedAlertsData}
         selectedAlertForDetails={selectedAlertForDetails}
         setSelectedAlertForDetails={setSelectedAlertForDetails}
         onTakeAction={() => setTriggerNewActivity(true)}
