@@ -7,6 +7,7 @@ import { HiEllipsisHorizontal } from 'react-icons/hi2'
 import { allActionsData } from "@/lib/mockdata"
 import { ActionsModal } from "./modals/actions-modal"
 import React from "react"
+import { useMyDepartmentTasks } from "@/hooks/use-workflow-tasks"
 
 interface ActionsCardProps {
   selectedItemId: string | null
@@ -17,10 +18,31 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
   const [viewAllActionsOpen, setViewAllActionsOpen] = useState(false)
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
 
-  // Use all actions data for scrollable content (no need for inline actions since they're duplicates)
-  const allActionsForCard = allActionsData.map((action, index) => ({
+  // Fetch workflow tasks for the department
+  const { data: workflowTasksData, isLoading: tasksLoading, error: tasksError } = useMyDepartmentTasks(1, 10)
+
+  // Transform workflow tasks to match the expected format for display
+  const workflowTasksForCard = workflowTasksData?.data?.map((task) => ({
+    id: task.id,
+    title: task.task.name,
+    description: task.task.description,
+    type: task.task.type === 'REVIEW' ? 'approval' : 'committee',
+    timestamp: new Date(task.createdAt).toLocaleDateString(),
+    iconBg: task.task.type === 'REVIEW' ? 'bg-blue-100' : 'bg-green-100',
+    iconColor: task.task.type === 'REVIEW' ? 'text-blue-600' : 'text-green-600',
+    hoverBg: task.task.type === 'REVIEW' ? 'hover:bg-blue-50' : 'hover:bg-green-50',
+    priority: task.priority,
+    status: task.status,
+    dueDate: task.task.dueDate,
+    departmentName: task.task.data.departmentName
+  })) || []
+
+  // Use workflow tasks if available, otherwise fall back to mock data
+  const allActionsForCard = workflowTasksForCard.length > 0 ? workflowTasksForCard : allActionsData.map((action, index) => ({
     ...action,
-    hoverBg: action.type === 'approval' ? 'hover:bg-blue-50' : 'hover:bg-green-50'
+    hoverBg: action.type === 'approval' ? 'hover:bg-blue-50' : 'hover:bg-green-50',
+    priority: undefined,
+    dueDate: undefined
   }))
 
   const handleItemAction = (action: string, itemId: string) => {
@@ -48,11 +70,31 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-2">
+          {/* Loading State */}
+          {tasksLoading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-sm text-gray-600">Loading tasks...</span>
+            </div>
+          )}
+
+          {/* Error State */}
+          {tasksError && (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <AlertTriangle className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                <p className="text-sm text-red-600">Failed to load tasks</p>
+                <p className="text-xs text-gray-500 mt-1">Using sample data</p>
+              </div>
+            </div>
+          )}
+
           {/* Actions Content - Show all items with hidden horizontal scrollbar */}
-          <div 
-            className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover group"
-            style={{ maxHeight: '200px' }}
-          >
+          {!tasksLoading && (
+            <div 
+              className="space-y-3 overflow-y-auto overflow-x-hidden scrollbar-hover group"
+              style={{ maxHeight: '200px' }}
+            >
             {allActionsForCard.map((item) => (
               <div 
                 key={item.id} 
@@ -78,9 +120,30 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-[#202020] mb-1">{item.title}</h4>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-medium text-[#202020]">{item.title}</h4>
+                        {'priority' in item && item.priority && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            item.priority === 'HIGH' || item.priority === 'URGENT' 
+                              ? 'bg-red-100 text-red-700' 
+                              : item.priority === 'MEDIUM'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {item.priority}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-[#6B6B6B] mb-1">{item.description}</p>
-                      <p className="text-xs text-[#9CA3AF]">{item.timestamp}</p>
+                      <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
+                        <span>{item.timestamp}</span>
+                        {'dueDate' in item && item.dueDate && (
+                          <>
+                            <span>•</span>
+                            <span>Due: {new Date(item.dueDate).toLocaleDateString()}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Options Menu */}
@@ -149,7 +212,8 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -163,6 +227,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
           }
         }}
         selectedActionId={selectedActionForDetails}
+        workflowTasks={workflowTasksData?.data}
       />
     </>
   )

@@ -53,15 +53,16 @@ export default function OperationsPage() {
             <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
               <AvatarImage src="/images/KSB_CEO.png" alt="Profile" />
               <AvatarFallback className="text-lg sm:text-xl bg-green-100 text-green-800">
-                {profileData.firstName[0]}{profileData.lastName[0]}
+
+                {user?.name} 
                 {user?.iprsData?.first_name[0]}{user?.iprsData?.last_name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <h2 className="text-xl sm:text-2xl font-bold">
-                {profileData.firstName} {profileData.lastName}
+                {user?.name} 
               </h2>
-              <p className="text-gray-600 mt-1">{profileData.role}</p>
+              <p className="text-gray-600 mt-1">{user?.department} <span className="text-gray-600 text-sm italic mt-1">({user?.designation})</span></p>
               <div className="flex flex-wrap gap-2 mt-2">
                 <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs sm:text-sm">
                   {profileData.organization}
@@ -73,7 +74,7 @@ export default function OperationsPage() {
             </div>
             <div className="text-left sm:text-right w-full sm:w-auto">
               <p className="text-xs sm:text-sm text-gray-600">Employee ID</p>
-              <p className="font-semibold text-sm sm:text-base">{profileData.employeeId}</p>
+              <p className="font-semibold text-sm sm:text-base">{user?.employeeId}</p>
             </div>
           </div>
         </Card>

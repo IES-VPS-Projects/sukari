@@ -120,6 +120,36 @@
     background: #a8a8a8;
   }
   
+  /* Thin scrollbar that's always visible */
+  .scrollbar-thin {
+    -ms-overflow-style: auto;  /* Internet Explorer 10+ */
+    scrollbar-width: thin;  /* Firefox */
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  .scrollbar-thin::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+  }
+  
+  /* Smooth scrolling for modal content */
+  .modal-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

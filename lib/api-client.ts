@@ -295,6 +295,130 @@ export interface UpdateWorkflowTemplateRequest {
   isActive?: boolean;
 }
 
+// Workflow Task types
+export interface WorkflowTask {
+  id: string;
+  departmentId: string;
+  taskId: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  status: 'AVAILABLE' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED' | 'OVERDUE';
+  assignedAt: string | null;
+  pickedUpAt: string | null;
+  pickedUpBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  task: {
+    id: string;
+    instanceId: string;
+    stepId: string;
+    name: string;
+    description: string;
+    type: 'REVIEW' | 'APPROVAL' | 'INSPECTION' | 'PAYMENT' | 'NOTIFICATION' | 'DECISION' | 'DOCUMENT_VERIFICATION' | 'FIELD_VISIT' | 'COMPLIANCE_CHECK';
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+    status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED' | 'OVERDUE';
+    assignedTo: string | null;
+    assignedBy: string | null;
+    departmentId: string;
+    dueDate: string;
+    startedAt: string | null;
+    completedAt: string | null;
+    data: {
+      assignmentMethod: string;
+      departmentName: string;
+      stepData: {
+        description: string;
+        timeout: string;
+        nextSteps: any[];
+        conditions: {
+          onComplete: string;
+          onReject: string;
+          onTimeout: string;
+        };
+      };
+    };
+    notes: string | null;
+    createdAt: string;
+    updatedAt: string;
+    step: {
+      id: string;
+      instanceId: string;
+      stepName: string;
+      stepType: string;
+      status: string;
+      assignedTo: string | null;
+      assignedRole: string | null;
+      assignedDepartment: string;
+      startedAt: string;
+      completedAt: string | null;
+      data: {
+        description: string;
+        timeout: string;
+        nextSteps: any[];
+        conditions: {
+          onComplete: string;
+          onReject: string;
+          onTimeout: string;
+        };
+      };
+      notes: string | null;
+      createdAt: string;
+      updatedAt: string;
+      instance: {
+        id: string;
+        templateId: string;
+        licenseApplicationId: string;
+        licenseId: string;
+        currentStep: string;
+        status: string;
+        startedAt: string;
+        completedAt: string | null;
+        data: {
+          userId?: string;
+          entityId?: string;
+          applicationData: {
+            [key: string]: any;
+          };
+          submittedAt: string;
+        };
+        createdAt: string;
+        updatedAt: string;
+        template: {
+          id: string;
+          name: string;
+          description: string;
+          licenseType: string;
+          licenseCategory: string;
+          steps: Array<{
+            id: string;
+            name: string;
+            description: string;
+            type: string;
+            assignedDepartment: string;
+            assignmentMethod: string;
+            timeout: string;
+            nextSteps: any[];
+            conditions: {
+              onComplete: string;
+              onReject: string;
+              onTimeout: string;
+            };
+            paymentDetails?: {
+              amount: string;
+              currency: string;
+              paymentMethods: any[];
+            };
+          }>;
+          licenseid: string;
+          isActive: boolean;
+          version: number;
+          createdAt: string;
+          updatedAt: string;
+        };
+      };
+    };
+  };
+}
+
 // Director user creation types
 export interface CreateUserFromDirectorRequest {
   brsId: string;
@@ -621,6 +745,35 @@ export class ApiClient {
     },
   };
 
+  // Workflow Tasks endpoints
+  workflowTasks = {
+    getMyDepartmentTasks: (page = 1, limit = 10, filters?: { status?: string; priority?: string; assignedTo?: string }): Promise<PaginatedResponse<WorkflowTask>> => {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filters?.status && { status: filters.status }),
+        ...(filters?.priority && { priority: filters.priority }),
+        ...(filters?.assignedTo && { assignedTo: filters.assignedTo }),
+      });
+      return this.apiService.get(`/api/workflow/tasks/my-department?${params.toString()}`);
+    },
+
+    getById: (id: string): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.get(`/api/workflow/tasks/${id}`),
+
+    updateStatus: (id: string, status: string, notes?: string): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.patch(`/api/workflow/tasks/${id}/status`, { status, notes }),
+
+    assignTask: (id: string, assignedTo: string): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.patch(`/api/workflow/tasks/${id}/assign`, { assignedTo }),
+
+    completeTask: (id: string, notes?: string, documents?: any[]): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.patch(`/api/workflow/tasks/${id}/complete`, { notes, documents }),
+
+    rejectTask: (id: string, reason: string): Promise<ApiResponse<WorkflowTask>> =>
+      this.apiService.patch(`/api/workflow/tasks/${id}/reject`, { reason }),
+  };
+
   // Cache endpoints
   cache = {
     warmUsers: (): Promise<ApiResponse> =>
@@ -644,6 +797,7 @@ export const iprsApi = apiClient.iprs;
 export const brsApi = apiClient.brs;
 export const licensesApi = apiClient.licenses;
 export const workflowTemplatesApi = apiClient.workflowTemplates;
+export const workflowTasksApi = apiClient.workflowTasks;
 export const projectsApi = apiClient.projects;
 export const messagesApi = apiClient.messages;
 export const conversationsApi = apiClient.conversations;

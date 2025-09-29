@@ -3,67 +3,315 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { 
-  ArrowLeft, 
-  CheckCircle, 
-  Users, 
-  Star, 
-  Share, 
-  MoreHorizontal, 
-  FileText, 
-  Download 
-} from "lucide-react"
-import { BsBuildings } from "react-icons/bs"
 import { GoInfo } from "react-icons/go"
 import { X } from "lucide-react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { allActionsData } from "@/lib/mockdata"
+import { useMyDepartmentTasks, useUpdateTaskStatus, useCompleteTask, useRejectTask } from "@/hooks/use-workflow-tasks"
+import { WorkflowTask } from "@/lib/api-client"
+import { useToast } from "@/hooks/use-toast"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Search, Filter, SortAsc, SortDesc, CheckSquare, Square, CheckCircle, Users } from "lucide-react"
+import { TaskHistory } from "@/components/task-history"
+import { ActionDetailsModal } from "@/components/modals/action-details-modal"
 
 interface Action {
   id: string
   title: string
   description: string
-  type: 'approval' | 'vote'
+  type: 'approval' | 'vote' | string
   timestamp: string
   iconColor: string
   iconBg: string
   hoverBg: string
   priority?: string
   status?: string
+  dueDate?: string
+  departmentName?: string
+  originalTask?: any
 }
 
 interface ActionsModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   selectedActionId?: string | null
+  workflowTasks?: WorkflowTask[]
 }
 
-export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsModalProps) {
+export function ActionsModal({ open, onOpenChange, selectedActionId, workflowTasks }: ActionsModalProps) {
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(selectedActionId || null)
-  const [actionActiveTab, setActionActiveTab] = useState("overview")
-  const [comment, setComment] = useState("")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [priorityFilter, setPriorityFilter] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<string>("createdAt")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
+  const [showBulkActions, setShowBulkActions] = useState(false)
   const isMobile = useIsMobile()
+  const { toast } = useToast()
   
-  const handleActionDecision = (decision: string, actionId: string) => {
-    console.log(`${decision} action ${actionId} with comment: ${comment}`)
-    // Handle the decision logic here
-    onOpenChange(false)
+  // Fetch workflow tasks if not provided
+  const { data: tasksData, isLoading: tasksLoading } = useMyDepartmentTasks(1, 50)
+  const updateStatusMutation = useUpdateTaskStatus()
+  const completeTaskMutation = useCompleteTask()
+  const rejectTaskMutation = useRejectTask()
+  
+  // Use provided tasks or fetch from API
+  const tasks = workflowTasks || tasksData?.data || []
+  
+  // Transform workflow tasks to display format
+  const transformedTasks = tasks.map((task) => ({
+    id: task.id,
+    title: task.task.name,
+    description: task.task.description,
+    type: task.task.type === 'REVIEW' ? 'approval' : 'vote',
+    timestamp: new Date(task.createdAt).toLocaleDateString(),
+    iconColor: task.task.type === 'REVIEW' ? 'text-blue-600' : 'text-green-600',
+    iconBg: task.task.type === 'REVIEW' ? 'bg-blue-100' : 'bg-green-100',
+    hoverBg: task.task.type === 'REVIEW' ? 'hover:bg-blue-50' : 'hover:bg-green-50',
+    priority: task.priority,
+    status: task.status,
+    dueDate: task.task.dueDate,
+    departmentName: task.task.data.departmentName,
+    // Store original task data for actions
+    originalTask: task
+  }))
+  
+  // Use transformed tasks if available, otherwise fall back to mock data
+  const baseTasks = transformedTasks.length > 0 ? transformedTasks : allActionsData
+  
+  // Filter and sort tasks
+  const displayTasks = useMemo(() => {
+    let filtered = baseTasks.filter(task => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase()
+        if (!task.title.toLowerCase().includes(query) && 
+            !task.description.toLowerCase().includes(query)) {
+          return false
+        }
+      }
+      
+      // Status filter
+      if (statusFilter !== "all") {
+        if ('originalTask' in task && task.originalTask) {
+          if (task.originalTask.task.status !== statusFilter) {
+            return false
+          }
+        } else {
+          // For mock data, skip status filtering
+          return true
+        }
+      }
+      
+      // Priority filter
+      if (priorityFilter !== "all") {
+        if ('priority' in task && task.priority) {
+          if (task.priority !== priorityFilter) {
+            return false
+          }
+        } else {
+          // For mock data, skip priority filtering
+          return true
+        }
+      }
+      
+      return true
+    })
+    
+    // Sort tasks
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any
+      
+      switch (sortBy) {
+        case "title":
+          aValue = a.title
+          bValue = b.title
+          break
+        case "priority":
+          aValue = ('priority' in a && a.priority) ? a.priority : "LOW"
+          bValue = ('priority' in b && b.priority) ? b.priority : "LOW"
+          // Custom priority order
+          const priorityOrder = { "URGENT": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1 }
+          aValue = priorityOrder[aValue as keyof typeof priorityOrder] || 0
+          bValue = priorityOrder[bValue as keyof typeof priorityOrder] || 0
+          break
+        case "dueDate":
+          aValue = ('dueDate' in a && a.dueDate) ? new Date(a.dueDate) : new Date()
+          bValue = ('dueDate' in b && b.dueDate) ? new Date(b.dueDate) : new Date()
+          break
+        case "createdAt":
+        default:
+          aValue = ('originalTask' in a && a.originalTask) ? new Date(a.originalTask.createdAt) : new Date(a.timestamp)
+          bValue = ('originalTask' in b && b.originalTask) ? new Date(b.originalTask.createdAt) : new Date(b.timestamp)
+          break
+      }
+      
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+    
+    return filtered
+  }, [baseTasks, searchQuery, statusFilter, priorityFilter, sortBy, sortOrder])
+  
+  const handleActionDecision = async (decision: string, actionId: string) => {
+    try {
+      // Find the original task data
+      const displayTask = displayTasks.find(t => t.id === actionId)
+      const originalTask = displayTask && 'originalTask' in displayTask ? displayTask.originalTask : null
+      
+      if (originalTask) {
+        // Handle real workflow task actions
+        switch (decision) {
+          case 'approve':
+            await completeTaskMutation.mutateAsync({ 
+              id: originalTask.id, 
+              notes: 'Task approved' 
+            })
+            toast({
+              title: "Task Completed",
+              description: `Task "${displayTask?.title || 'Unknown'}" has been completed successfully.`,
+              variant: "default",
+            })
+            break
+          case 'reject':
+            await rejectTaskMutation.mutateAsync({ 
+              id: originalTask.id, 
+              reason: 'Task rejected' 
+            })
+            toast({
+              title: "Task Rejected",
+              description: `Task "${displayTask?.title || 'Unknown'}" has been rejected.`,
+              variant: "destructive",
+            })
+            break
+          case 'start':
+            await updateStatusMutation.mutateAsync({ 
+              id: originalTask.id, 
+              status: 'IN_PROGRESS',
+              notes: 'Task started' 
+            })
+            toast({
+              title: "Task Started",
+              description: `Task "${displayTask?.title || 'Unknown'}" has been started.`,
+              variant: "default",
+            })
+            break
+        }
+      } else {
+        // Handle mock data actions (fallback)
+        console.log(`${decision} action ${actionId}`)
+        toast({
+          title: "Action Performed",
+          description: `${decision} action completed for task.`,
+          variant: "default",
+        })
+      }
+      
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Error performing task action:', error)
+      toast({
+        title: "Error",
+        description: "Failed to perform task action. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+  
+  // Bulk action handlers
+  const handleSelectTask = (taskId: string, checked: boolean) => {
+    const newSelected = new Set(selectedTasks)
+    if (checked) {
+      newSelected.add(taskId)
+    } else {
+      newSelected.delete(taskId)
+    }
+    setSelectedTasks(newSelected)
+    setShowBulkActions(newSelected.size > 0)
+  }
+  
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allTaskIds = new Set(displayTasks.map(task => task.id))
+      setSelectedTasks(allTaskIds)
+      setShowBulkActions(true)
+    } else {
+      setSelectedTasks(new Set())
+      setShowBulkActions(false)
+    }
+  }
+  
+  const handleBulkAction = async (action: string) => {
+    if (selectedTasks.size === 0) return
+    
+    try {
+      const selectedTaskIds = Array.from(selectedTasks)
+      const tasksToProcess = displayTasks.filter(task => selectedTaskIds.includes(task.id))
+      
+      for (const task of tasksToProcess) {
+        const originalTask = 'originalTask' in task ? task.originalTask : null
+        if (originalTask) {
+          switch (action) {
+            case 'start':
+              await updateStatusMutation.mutateAsync({ 
+                id: originalTask.id, 
+                status: 'IN_PROGRESS',
+                notes: 'Bulk action: Task started' 
+              })
+              break
+            case 'complete':
+              await completeTaskMutation.mutateAsync({ 
+                id: originalTask.id, 
+                notes: 'Bulk action: Task completed' 
+              })
+              break
+            case 'reject':
+              await rejectTaskMutation.mutateAsync({ 
+                id: originalTask.id, 
+                reason: 'Bulk action: Task rejected' 
+              })
+              break
+          }
+        }
+      }
+      
+      toast({
+        title: "Bulk Action Completed",
+        description: `${action} action performed on ${selectedTasks.size} tasks.`,
+        variant: "default",
+      })
+      
+      setSelectedTasks(new Set())
+      setShowBulkActions(false)
+    } catch (error) {
+      console.error('Error performing bulk action:', error)
+      toast({
+        title: "Error",
+        description: "Failed to perform bulk action. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
   
   if (!selectedActionForDetails) {
     // List view
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} p-0 [&>button]:hidden`}>
+        <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-scroll' : 'max-w-4xl max-h-[90vh]'} overflow-y-scroll p-0 [&>button]:hidden scrollbar-thin modal-scroll`}>
           <DialogTitle className="sr-only">Actions</DialogTitle>
           <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
             <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} bg-gray-50`}>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}>Actions</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+                  <p className="text-sm text-gray-500 mt-1">{displayTasks.length} actions requiring attention</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="group relative">
@@ -82,16 +330,143 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                   </Button>
                 </div>
               </div>
+              
+              {/* Filters and Search */}
+              <div className={`space-y-3 ${isMobile ? '' : 'flex items-center gap-4'}`}>
+                {/* Search */}
+                <div className={`relative ${isMobile ? 'w-full' : 'flex-1'}`}>
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`pl-10 ${isMobile ? 'w-full' : ''}`}
+                  />
             </div>
             
-            <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
+                {/* Filters */}
+                <div className={`flex items-center gap-2 ${isMobile ? 'flex-wrap' : ''}`}>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className={`w-[140px] ${isMobile ? 'flex-1' : ''}`}>
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="PENDING">Pending</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
+                      <SelectItem value="REJECTED">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                    <SelectTrigger className={`w-[140px] ${isMobile ? 'flex-1' : ''}`}>
+                      <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Priority</SelectItem>
+                      <SelectItem value="URGENT">Urgent</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="LOW">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className={`w-[140px] ${isMobile ? 'flex-1' : ''}`}>
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="createdAt">Created Date</SelectItem>
+                      <SelectItem value="dueDate">Due Date</SelectItem>
+                      <SelectItem value="priority">Priority</SelectItem>
+                      <SelectItem value="title">Title</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                    className="shrink-0"
+                  >
+                    {sortOrder === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Bulk Actions Bar */}
+              {showBulkActions && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-blue-900">
+                        {selectedTasks.size} task{selectedTasks.size !== 1 ? 's' : ''} selected
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleBulkAction('start')}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        Start All
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleBulkAction('complete')}
+                        disabled={completeTaskMutation.isPending}
+                      >
+                        Complete All
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleBulkAction('reject')}
+                        disabled={rejectTaskMutation.isPending}
+                      >
+                        Reject All
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setSelectedTasks(new Set())
+                          setShowBulkActions(false)
+                        }}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'} scrollbar-thin modal-scroll`}>
+              {tasksLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="ml-2 text-sm text-gray-600">Loading tasks...</span>
+                </div>
+              ) : (
               <div className="space-y-3">
-                {allActionsData.map((action) => (
+                 
+                  {displayTasks.map((action) => (
                   <div 
                     key={action.id}
-                    className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                    className="flex items-start gap-3 p-3 rounded-lg transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                  >
+                    {/* Checkbox */}
+                   
+                    {/* Task Content */}
+                    <div 
+                      className="flex-1 cursor-pointer"
                     onClick={() => setSelectedActionForDetails(action.id)}
                   >
+                      <div className="flex items-start gap-3">
                     {/* Icon */}
                     <div className={`w-8 h-8 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
                       {action.type === 'approval' ? (
@@ -113,15 +488,37 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                             }`}>
                               {action.type === 'approval' ? 'Approval' : 'Vote'}
                             </div>
+                                {'priority' in action && action.priority && (
+                                  <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    action.priority === 'HIGH' || action.priority === 'URGENT' 
+                                      ? 'bg-red-100 text-red-700' 
+                                      : action.priority === 'MEDIUM'
+                                      ? 'bg-yellow-100 text-yellow-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  }`}>
+                                    {action.priority}
+                                  </div>
+                                )}
                           </div>
                           <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
-                          <p className="text-xs text-[#9CA3AF]">{action.timestamp}</p>
+                              <div className="flex items-center gap-2 text-xs text-[#9CA3AF]">
+                                <span>{action.timestamp}</span>
+                                {'dueDate' in action && action.dueDate && (
+                                  <>
+                                    <span>•</span>
+                                    <span>Due: {new Date(action.dueDate).toLocaleDateString()}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </div>
         </DialogContent>
@@ -130,660 +527,19 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   }
 
   // Details view - Get action details
-  const action = allActionsData.find(a => a.id === selectedActionForDetails)
+  const action = displayTasks.find(a => a.id === selectedActionForDetails)
   
   if (!action) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} p-0 [&>button]:hidden`}>
+      <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} overflow-y-scroll p-0 [&>button]:hidden scrollbar-thin modal-scroll`}>
         <DialogTitle className="sr-only">Action Details</DialogTitle>
-        <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
-          {/* Header */}
-          <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} bg-gray-50`}>
-            <div className="flex items-center gap-3 mb-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedActionForDetails(null)}
-                className="shrink-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} ${action.iconBg} rounded-lg flex items-center justify-center`}>
-                  {action.type === 'approval' ? (
-                    <CheckCircle className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
-                  ) : (
-                    <Users className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 truncate`}>{action.title}</h1>
-                    <Badge className="bg-red-500/10 text-red-700 border border-red-200/30 backdrop-blur-sm shrink-0">
-                      High
-                    </Badge>
-                  </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <BsBuildings className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{action.type === 'vote' ? 'Kenya Sugar Board - Policy Committee' : 'Sugar Industry Regulatory Division'}</span>
-                  </div>
-                </div>
-                {!isMobile && (
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Star className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Share className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <div className={`${isMobile ? 'mt-4' : 'mt-6'}`}>
-              <div className="flex border-b border-gray-200 overflow-x-auto">
-                <button
-                  onClick={() => setActionActiveTab("overview")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "overview"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => setActionActiveTab("documents")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "documents"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  Documents
-                </button>
-                <button
-                  onClick={() => setActionActiveTab("activities")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "activities"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  History
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className={`flex-1 ${isMobile ? 'overflow-hidden flex flex-col min-h-0' : 'overflow-hidden flex flex-col'}`}>
-            {actionActiveTab === "overview" && (
-              <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
-                <div className="space-y-6">
-                  {/* Summary */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">Summary</h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      {action.description} {action.type === 'vote' 
-                        ? 'This board committee vote requires your participation to establish the new sugar industry framework. Your vote will contribute to determining the policy structure for the upcoming implementation period.'
-                        : 'This proposal requires your review and approval to proceed with the sugar industry regulation. The approval will enhance sector oversight and ensure adequate regulatory coverage for the region during the upcoming operational period.'
-                      }
-                    </p>
-                  </div>
-
-                  {/* Key Details - Different for votes vs approvals */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">Key Details</h3>
-                    {action.type === 'vote' ? (
-                      <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Meeting Date:</span>
-                            <span className="text-sm font-medium">February 15, 2025</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Meeting Duration:</span>
-                            <span className="text-sm font-medium">2.5 hours</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Meeting Type:</span>
-                            <span className="text-sm font-medium">Board Committee Vote</span>
-                          </div>
-                        </div>
-                        {!isMobile && (
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Members Present:</span>
-                              <span className="text-sm font-medium">9 of 12</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Members Absent:</span>
-                              <span className="text-sm font-medium">3</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Quorum Status:</span>
-                              <span className="text-sm font-medium text-green-600">Met</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-4'}`}>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Sugar Volume Requested:</span>
-                            <span className="text-sm font-medium">50,000 MT</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Allocated Volume:</span>
-                            <span className="text-sm font-medium">45,000 MT</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-500">Beneficiary Company:</span>
-                            <span className="text-sm font-medium">Mumias Sugar Co.</span>
-                          </div>
-                        </div>
-                        {!isMobile && (
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Allocation Period:</span>
-                              <span className="text-sm font-medium">6 months</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Mill Status:</span>
-                              <span className="text-sm font-medium">Operational</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-500">Compliance Status:</span>
-                              <span className="text-sm font-medium text-green-600">Good Standing</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Status Information */}
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                    <div className={`flex ${isMobile ? 'flex-col gap-4' : 'items-center justify-between'}`}>
-                      <div className="text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">CREATE DATE</div>
-                        <div className="text-sm font-medium text-gray-900 mt-1">20 Feb, 2025</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">DUE DATE</div>
-                        <div className="text-sm font-medium text-gray-900 mt-1">05 Mar, 2025</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">PRIORITY</div>
-                        <div className="mt-1">
-                          <Badge className="bg-red-500 text-white">High</Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {actionActiveTab === "documents" && (
-              <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium text-gray-900">Resources</h3>
-                  
-                  {/* Documents List - Different for votes vs approvals */}
-                  <div className="space-y-3">
-                    {action.type === 'vote' ? (
-                      <>
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Cane Pricing Committee Minutes</div>
-                              <div className="text-xs text-gray-500">DOC File • 1.8MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-red-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Sugar Act 2022</div>
-                              <div className="text-xs text-gray-500">PDF File • 3.5MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Market Impact Assessment</div>
-                              <div className="text-xs text-gray-500">XLSX File • 950KB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-purple-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-purple-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Pricing Framework Proposal</div>
-                              <div className="text-xs text-gray-500">PDF File • 2.2MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-red-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Import Allocation Request</div>
-                              <div className="text-xs text-gray-500">PDF File • 2.8MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Supply Chain Assessment</div>
-                              <div className="text-xs text-gray-500">XLS File • 1.2MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-orange-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Financial Impact Analysis</div>
-                              <div className="text-xs text-gray-500">ZIP File • 6.1MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Regulatory Compliance Report</div>
-                              <div className="text-xs text-gray-500">DOC File • 1.9MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-green-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Import Quota Calculations</div>
-                              <div className="text-xs text-gray-500">CSV File • 234KB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-orange-600" />
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium">Market Intelligence Brief</div>
-                              <div className="text-xs text-gray-500">PDF File • 4.1MB</div>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {actionActiveTab === "activities" && (
-              <div className={`${isMobile ? 'flex-1 overflow-y-auto overflow-x-hidden px-4 py-4' : 'h-[350px] overflow-y-auto scrollbar-hide p-6'}`}>
-                <div className="space-y-8">
-                  {action.type === 'vote' ? (
-                    // Voting History for Sugar Industry
-                    <>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Board Activities</h3>
-                        
-                        {/* Previous Vote Sessions */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3 mb-4">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Previous Cane Pricing Review</span>
-                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Approved</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">
-                                Board committee reviewed regional cane pricing framework. Proposal approved with 8 out of 9 votes.
-                              </p>
-                              
-                              {/* Voting Results */}
-                              <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                                <div className="text-xs font-medium text-gray-700 mb-2">Vote Results:</div>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                  <div className="flex justify-between">
-                                    <span>Approve:</span>
-                                    <span className="text-green-600 font-medium">8 votes</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Reject:</span>
-                                    <span className="text-red-600 font-medium">1 vote</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <span className="text-xs text-gray-500">January 18, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Committee Formation */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Pricing Committee Formed</span>
-                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Active</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                Policy Committee officially established with 9 senior officials from KSB departments.
-                              </p>
-                              
-                              {/* Committee Members */}
-                              <div className="flex items-center gap-2 mb-3">
-                                <span className="text-xs text-gray-500">Committee Members:</span>
-                                <div className="flex items-center">
-                                  <div className="flex -space-x-2">
-                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      JM
-                                    </div>
-                                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      SK
-                                    </div>
-                                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      PW
-                                    </div>
-                                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      EM
-                                    </div>
-                                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      +5
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <span className="text-xs text-gray-500">December 10, 2024</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Strategic Framework */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Policy Framework Review</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                Comprehensive review of current sugar industry policies initiated. Strategic updates proposed for market regulation.
-                              </p>
-                              <div className="text-xs text-gray-500 space-y-1">
-                                <div>Review Period: Nov - Dec 2024</div>
-                                <div>Stakeholder Consultations: 12</div>
-                                <div>Industry Impact Assessment: Completed</div>
-                              </div>
-                              <span className="text-xs text-gray-500">November 22, 2024</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    // Approval History for Sugar Industry
-                    <>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Q1 - 2025</h3>
-                        
-                        {/* Import Committee Meeting */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3 mb-4">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Import Allocation Committee</span>
-                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Completed</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">
-                                Board reviewed Mumias Sugar Company's import request for 50,000 MT allocation. 
-                                Discussion covered market demand, local production capacity, and regulatory compliance.
-                              </p>
-                              
-                              {/* Meeting Attendees */}
-                              <div className="flex items-center gap-2 mb-3">
-                                <span className="text-xs text-gray-500">Meeting Attendees:</span>
-                                <div className="flex items-center">
-                                  <div className="flex -space-x-2">
-                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      JM
-                                    </div>
-                                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      SK
-                                    </div>
-                                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      PW
-                                    </div>
-                                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      EM
-                                    </div>
-                                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white">
-                                      +4
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              {/* Board Decision */}
-                              <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                                <div className="text-xs font-medium text-gray-700 mb-2">Board Decision:</div>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                  <div className="flex justify-between">
-                                    <span>Approve:</span>
-                                    <span className="text-green-600 font-medium">7 votes</span>
-                                  </div>
-                                  <div className="flex justify-between">
-                                    <span>Defer:</span>
-                                    <span className="text-orange-600 font-medium">1 vote</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <span className="text-xs text-gray-500">February 8, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Previous Import Request */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Import Request Submitted</span>
-                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">New</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                Mumias Sugar Company submitted import allocation request for Q1 2025 operations.
-                              </p>
-                              <div className="text-xs text-gray-500 space-y-1">
-                                <div>Requested Volume: 50,000 MT</div>
-                                <div>Supply Period: 6 months</div>
-                                <div>Estimated Value: KES 4.2B</div>
-                              </div>
-                              <span className="text-xs text-gray-500">February 1, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Compliance Assessment */}
-                        <div className="mb-6">
-                          <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-gray-900">Company Compliance Review</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                Previous compliance assessment (Q4 2024) showed 95% regulatory adherence. Good standing maintained.
-                              </p>
-                              <div className="text-xs text-gray-500 space-y-1">
-                                <div>Compliance Score: 95%</div>
-                                <div>License Status: Valid</div>
-                                <div>Last Inspection: December 2024</div>
-                              </div>
-                              <span className="text-xs text-gray-500">January 15, 2025</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Comments Section & Action Buttons */}
-            <div className={`border-t bg-gray-50 flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-900 mb-2 block">
-                    Leave a Comment
-                  </label>
-                  <Textarea
-                    placeholder="Enter your decision rationale..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={3}
-                    className={`w-full ${isMobile ? 'text-sm' : ''}`}
-                  />
-                </div>
-                
-                <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-end'} gap-3`}>
-                  {action.type === 'vote' ? (
-                    // Board vote buttons
-                    <>
-                      <Button 
-                        variant="outline"
-                        className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('reject', action.id)}
-                      >
-                        Vote No
-                      </Button>
-                      <Button 
-                        className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('approve', action.id)}
-                      >
-                        Vote Yes
-                      </Button>
-                    </>
-                  ) : (
-                    // Approval buttons
-                    <>
-                      <Button 
-                        variant="outline"
-                        className={`text-yellow-600 border-yellow-200 hover:bg-yellow-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('defer', action.id)}
-                      >
-                        Defer
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('reject', action.id)}
-                      >
-                        Reject
-                      </Button>
-                      <Button 
-                        className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('approve', action.id)}
-                      >
-                        Approve
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ActionDetailsModal 
+          action={action}
+          onClose={() => setSelectedActionForDetails(null)}
+          onActionDecision={handleActionDecision}
+        />
       </DialogContent>
     </Dialog>
   )
