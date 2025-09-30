@@ -71,7 +71,19 @@ export function AIInsightsModal({
         {selectedInsight ? (
           // Details view
           <div className="flex flex-col h-full">
-            <div className="p-6 border-b bg-gray-50">
+            <div className={`p-6 border-b ${
+              selectedInsight.id === 'insight-1' || selectedInsight.title === 'Productivity' ? 'bg-blue-50' :
+              selectedInsight.id === 'insight-2' || selectedInsight.title === 'Compliance' ? 'bg-yellow-50' :
+              selectedInsight.id === 'insight-3' || selectedInsight.title === 'Weather' ? 'bg-green-50' :
+              selectedInsight.title === 'Predictive Risk Forecast' ? 'bg-purple-50' :
+              selectedInsight.title === 'Opportunity Alert' ? 'bg-blue-100' :
+              selectedInsight.title === 'Financial Insight' ? 'bg-orange-50' :
+              selectedInsight.title === 'Traceability Gap Detection' ? 'bg-red-50' :
+              selectedInsight.title === 'Stakeholder Engagement Update' ? 'bg-teal-50' :
+              selectedInsight.title === 'Sustainability Metric' ? 'bg-green-100' :
+              selectedInsight.title === 'Market Trend Analysis' ? 'bg-indigo-50' :
+              'bg-gray-50'
+            }`}>
               <div className="flex items-center gap-3">
                 <Button
                   variant="ghost"
@@ -82,8 +94,8 @@ export function AIInsightsModal({
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  <div className={`w-10 h-10 ${getInsightColor(selectedInsight.id, selectedInsight.title).replace('bg-', 'bg-').replace('-500', '-100').replace('-400', '-100').replace('-800', '-100')} rounded-lg flex items-center justify-center`}>
+                    <CheckCircle className={`h-5 w-5 ${getInsightColor(selectedInsight.id, selectedInsight.title).replace('bg-', 'text-')}`} />
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">
@@ -252,7 +264,7 @@ export function AIInsightsModal({
                               insight.confidence === 'medium' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
                               'bg-blue-50/80 text-blue-700 border-gray-300'
                             }`}>
-                              {insight.confidence} confidence
+                              {insight.confidence}
                             </div>
                           </div>
                           <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>

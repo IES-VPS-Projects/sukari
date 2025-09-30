@@ -327,6 +327,10 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         open={activityDetailsOpen}
         onOpenChange={setActivityDetailsOpen}
         activityId={selectedActivityId}
+        onBackToList={() => {
+          setActivityDetailsOpen(false)
+          setViewAllActivitiesOpen(true)
+        }}
       />
     </>
   )

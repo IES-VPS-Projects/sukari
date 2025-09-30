@@ -16,7 +16,8 @@ import {
   Paperclip,
   Plus,
   Send,
-  Search
+  Search,
+  ArrowLeft
 } from "lucide-react"
 import { BiCategory } from "react-icons/bi"
 import { useState } from "react"
@@ -26,9 +27,10 @@ interface ActivityDetailProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   activityId: string | null
+  onBackToList?: () => void
 }
 
-export function ActivityDetailsModal({ open, onOpenChange, activityId }: ActivityDetailProps) {
+export function ActivityDetailsModal({ open, onOpenChange, activityId, onBackToList }: ActivityDetailProps) {
   const activity = activitiesData.find(a => a.id === activityId)
 
   if (!activity) return null
@@ -205,13 +207,36 @@ export function ActivityDetailsModal({ open, onOpenChange, activityId }: Activit
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0">
-        {/* Header with pale gray background */}
-        <div className="bg-gray-50 p-6 pb-2 border-b border-gray-200 shadow-sm">
+        {/* Header with colored background based on activity type */}
+        <div className={`p-6 pb-2 border-b border-gray-200 shadow-sm ${
+          activity.type === 'compliance' ? 'bg-orange-50' :
+          activity.type === 'visit' ? 'bg-blue-50' :
+          activity.type === 'renewal' ? 'bg-purple-50' :
+          activity.type === 'maintenance' ? 'bg-green-50' :
+          activity.type === 'meeting' ? 'bg-blue-50' :
+          'bg-gray-50'
+        }`}>
           <DialogHeader className="pb-2">
             <div className="flex items-center justify-between mb-4">
-              <DialogTitle className="text-xl font-semibold text-gray-900">
-                Activity Details
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (onBackToList) {
+                      onBackToList()
+                    } else {
+                      onOpenChange(false)
+                    }
+                  }}
+                  className="shrink-0"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <DialogTitle className="text-xl font-semibold text-gray-900">
+                  Activity Details
+                </DialogTitle>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-medium text-gray-900">

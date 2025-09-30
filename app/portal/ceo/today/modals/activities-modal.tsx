@@ -64,7 +64,7 @@ export function ActivitiesModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 [&>button]:hidden">
+      <DialogContent className="w-[95vw] max-w-2xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0 [&>button]:hidden">
         <DialogTitle className="sr-only">Activities</DialogTitle>
 
         <div className="flex flex-col h-full min-h-0">
