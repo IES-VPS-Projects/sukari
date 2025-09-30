@@ -94,6 +94,15 @@ export function DynamicFormRenderer({
   isDraftSaving = false,
   userProfile
 }: DynamicFormRendererProps) {
+  // Guard: If license is null or undefined, show a fallback UI
+  if (!license || !license.fields) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        License data is not available.
+      </div>
+    )
+  }
+
   const [formData, setFormData] = useState<Record<string, any>>(initialData)
   const [errors, setErrors] = useState<Record<string, string>>({})
 

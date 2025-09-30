@@ -630,8 +630,8 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         <div className="flex space-x-1 border-b border-gray-200 mb-6">
           {[
             { id: 'status', label: 'Status', icon: FileText },
-            { id: 'miller', label: 'Miller', icon: Factory },
-            { id: 'importer', label: 'Importer', icon: Ship },
+            { id: 'miller', label: 'Miller', icon: Factory, keys: "MILLERS" },
+            { id: 'importer', label: 'Importer', icon: Ship, keys: "WHITE_SUGAR" },
             { id: 'exporter', label: 'Exporter', icon: ExternalLink },
             { id: 'sugarDealer', label: 'Sugar Dealer', icon: Store },
             { id: 'molassesDealer', label: 'Molasses Dealer', icon: Droplet }
@@ -651,304 +651,302 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
         </div>
 
         {String(activeTab) === 'status' && (
-            <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
-              {licensesLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="text-center">
-                    <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-green-600" />
-                    <p className="text-gray-600">Loading licenses...</p>
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            {licensesLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <Clock className="h-8 w-8 animate-spin mx-auto mb-2 text-green-600" />
+                  <p className="text-gray-600">Loading licenses...</p>
+                </div>
+              </div>
+            ) : licensesError ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
+                  <p className="text-red-600">Error loading licenses</p>
+                  <p className="text-sm text-gray-500 mt-1">Please try again later</p>
+                </div>
+              </div>
+            ) : selectedApplication ? (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedApplication(null)}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Applications
+                  </Button>
+
+                  <Badge className={getStatusColor(selectedApplication.status)}>
+                    {selectedApplication.status === 'PENDING' ? 'Under Review' :
+                      selectedApplication.status === 'APPROVED' ? 'Approved' :
+                        selectedApplication.status === 'REJECTED' ? 'Rejected' :
+                          selectedApplication.status}
+                  </Badge>
+                </div>
+
+                <div className="bg-green-50 p-6 rounded-lg">
+                  <h3 className="text-xl font-semibold text-green-800 mb-2">
+                    {selectedApplication.license?.name || 'Application'}
+                  </h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-green-700">
+                    <span>ID: {selectedApplication.id}</span>
+                    <span className="hidden sm:inline">•</span>
+                    <span>Type: {selectedApplication.license?.name || 'Application'}</span>
                   </div>
                 </div>
-              ) : licensesError ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="text-center">
-                    <AlertCircle className="h-8 w-8 mx-auto mb-2 text-red-600" />
-                    <p className="text-red-600">Error loading licenses</p>
-                    <p className="text-sm text-gray-500 mt-1">Please try again later</p>
-                  </div>
-                </div>
-              ) :selectedApplication ? (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSelectedApplication(null)}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Back to Applications
-                    </Button>
-                    
-                    <Badge className={getStatusColor(selectedApplication.status)}>
-                      {selectedApplication.status === 'PENDING' ? 'Under Review' :
-                       selectedApplication.status === 'APPROVED' ? 'Approved' :
-                       selectedApplication.status === 'REJECTED' ? 'Rejected' :
-                       selectedApplication.status}
-                    </Badge>
-                  </div>
-                  
-                  <div className="bg-green-50 p-6 rounded-lg">
-                    <h3 className="text-xl font-semibold text-green-800 mb-2">
-                      {selectedApplication.license?.name || 'Application'}
-                    </h3>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-green-700">
-                      <span>ID: {selectedApplication.id}</span>
-                      <span className="hidden sm:inline">•</span>
-                      <span>Type: {selectedApplication.license?.name || 'Application'}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-gray-700">Application Details</h4>
-                      <div className="bg-white border rounded-lg p-4 space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Applicant:</span>
-                          <span className="font-medium">
-                            {userApplicationsData?.data?.user?.iprs ? 
-                              `${userApplicationsData.data.user.iprs.first_name} ${userApplicationsData.data.user.iprs.last_name}` : 
-                              userApplicationsData?.data?.user?.email || 'N/A'
-                            }
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Company:</span>
-                          <span className="font-medium">
-                            {userApplicationsData?.data?.user?.entity?.businessId?.legal_name || 
-                             userApplicationsData?.data?.entity?.companyName || 
-                             'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Submission Date:</span>
-                          <span className="font-medium">
-                            {selectedApplication?.submittedAt ? 
-                              new Date(selectedApplication.submittedAt).toLocaleDateString() : 
-                              'N/A'
-                            }
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Current Stage:</span>
-                          <span className="font-medium">
-                            {selectedApplication?.status === 'PENDING' ? 'Under Review' :
-                             selectedApplication?.status === 'APPROVED' ? 'Approved' :
-                             selectedApplication?.status === 'REJECTED' ? 'Rejected' :
-                             selectedApplication?.status || 'N/A'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Quantity:</span>
-                          <span className="font-medium">
-                            {selectedApplication?.applicationData?.['Capacity (TCD)'] ? 
-                              `${selectedApplication.applicationData['Capacity (TCD)']} TCD` :
-                              selectedApplication?.applicationData?.['Plot Number'] ? 
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-700">Application Details</h4>
+                    <div className="bg-white border rounded-lg p-4 space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Applicant:</span>
+                        <span className="font-medium">
+                          {userApplicationsData?.data?.user?.iprs ?
+                            `${userApplicationsData.data.user.iprs.first_name} ${userApplicationsData.data.user.iprs.last_name}` :
+                            userApplicationsData?.data?.user?.email || 'N/A'
+                          }
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Company:</span>
+                        <span className="font-medium">
+                          {userApplicationsData?.data?.user?.entity?.businessId?.legal_name ||
+                            userApplicationsData?.data?.entity?.companyName ||
+                            'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Submission Date:</span>
+                        <span className="font-medium">
+                          {selectedApplication?.submittedAt ?
+                            new Date(selectedApplication.submittedAt).toLocaleDateString() :
+                            'N/A'
+                          }
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Current Stage:</span>
+                        <span className="font-medium">
+                          {selectedApplication?.status === 'PENDING' ? 'Under Review' :
+                            selectedApplication?.status === 'APPROVED' ? 'Approved' :
+                              selectedApplication?.status === 'REJECTED' ? 'Rejected' :
+                                selectedApplication?.status || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Quantity:</span>
+                        <span className="font-medium">
+                          {selectedApplication?.applicationData?.['Capacity (TCD)'] ?
+                            `${selectedApplication.applicationData['Capacity (TCD)']} TCD` :
+                            selectedApplication?.applicationData?.['Plot Number'] ?
                               `Plot: ${selectedApplication.applicationData['Plot Number']}` :
                               'N/A'
-                            }
+                          }
+                        </span>
+                      </div>
+
+                      {selectedApplication?.approvedAt && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Approval Date:</span>
+                          <span className="font-medium">
+                            {new Date(selectedApplication.approvedAt).toLocaleDateString()}
                           </span>
                         </div>
-                        
-                        {selectedApplication?.approvedAt && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Approval Date:</span>
-                            <span className="font-medium">
-                              {new Date(selectedApplication.approvedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {selectedApplication?.rejectedAt && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Rejection Date:</span>
-                            <span className="font-medium">
-                              {new Date(selectedApplication.rejectedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        )}
-        
-                        {selectedApplication?.paymentStatus && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Payment Status:</span>
-                            <span className="font-medium">
-                              {selectedApplication.paymentStatus}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-gray-700">Additional Information</h4>
-                      <div className="bg-white border rounded-lg p-4">
-                        <h5 className="font-medium mb-2">Notes</h5>
-                        <p className="text-gray-700">
-                          {selectedApplication?.notes || 
-                           selectedApplication?.rejectionReason || 
-                           'No additional notes available.'}
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white border rounded-lg p-4">
-                        <h5 className="font-medium mb-2">Application Data</h5>
-                        <div className="space-y-2">
-                          {selectedApplication?.applicationData && Object.entries(selectedApplication.applicationData).map(([key, value]) => (
-                            <div key={key} className="flex justify-between text-sm">
-                              <span className="text-gray-600">{key}:</span>
-                              <span className="font-medium">{String(value)}</span>
-                            </div>
-                          ))}
+                      )}
+
+                      {selectedApplication?.rejectedAt && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Rejection Date:</span>
+                          <span className="font-medium">
+                            {new Date(selectedApplication.rejectedAt).toLocaleDateString()}
+                          </span>
                         </div>
-                      </div>
-                      
-                      <div className="bg-white border rounded-lg p-4">
-                        <h5 className="font-medium mb-2">Documents</h5>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                            <FileText className="h-4 w-4 text-blue-600" />
-                            <span>Application Form {selectedApplication?.id || 'N/A'}.pdf</span>
-                          </div>
-                          {selectedApplication?.status === "PENDING" && (
-                            <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                              <FileText className="h-4 w-4 text-blue-600" />
-                              <span>Supporting Documents.pdf</span>
-                            </div>
-                          )}
-                          {selectedApplication?.status === "APPROVED" && (
-                            <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                              <FileText className="h-4 w-4 text-green-600" />
-                              <span>Approval Certificate.pdf</span>
-                            </div>
-                          )}
-                          {selectedApplication?.documents && selectedApplication.documents.length > 0 && (
-                            selectedApplication.documents.map((doc: any, index: number) => (
-                              <div key={index} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                                <FileText className="h-4 w-4 text-blue-600" />
-                                <span>{doc.name || `Document ${index + 1}.pdf`}</span>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                      
-                      {selectedApplication?.status === "PENDING" && (
-                        <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                          <div className="flex items-start gap-2">
-                            <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
-                            <div>
-                              <p className="font-medium text-blue-800">Under Review</p>
-                              <p className="text-sm text-blue-700">
-                                Your application is being reviewed. You will be notified once the review is complete.
-                              </p>
-                            </div>
-                          </div>
+                      )}
+
+                      {selectedApplication?.paymentStatus && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Payment Status:</span>
+                          <span className="font-medium">
+                            {selectedApplication.paymentStatus}
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
-        
-                  {/* Application Progress Tracking */}
-                  <div className="space-y-6">
-                    <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
-                      <ClipboardList className="h-5 w-5" />
-                      Application Progress Tracker
-                    </h4>
-                    
-                    {/* Progress Timeline */}
-                    <div className="relative bg-white border rounded-lg p-6">
-                      {/* Progress Line */}
-                      <div className="absolute top-12 left-8 right-8 h-0.5 bg-gray-200"></div>
-                      
-                      {/* Stages */}
-                      <div className="relative flex justify-between">
-                        {applicationStages.map((stage, index) => {
-                          // Mock stage status based on application status
-                          const getStageStatus = (stageId: string) => {
-                            const stageOrder = ["submission", "review", "inspection", "evaluation", "approval", "issuance"]
-                            const currentStage = "submission" // Default stage since Application doesn't have stage property
-                            const currentIndex = stageOrder.indexOf(currentStage)
-                            const stageIndex = stageOrder.indexOf(stageId)
-                            
-                            if (selectedApplication.status === "APPROVED") {
-                              return "completed"
-                            } else if (stageIndex < currentIndex) {
-                              return "completed"
-                            } else if (stageIndex === currentIndex) {
-                              return "current"
-                            } else {
-                              return "pending"
-                            }
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-700">Additional Information</h4>
+                    <div className="bg-white border rounded-lg p-4">
+                      <h5 className="font-medium mb-2">Notes</h5>
+                      <p className="text-gray-700">
+                        {selectedApplication?.notes ||
+                          selectedApplication?.rejectionReason ||
+                          'No additional notes available.'}
+                      </p>
+                    </div>
+
+                    <div className="bg-white border rounded-lg p-4">
+                      <h5 className="font-medium mb-2">Application Data</h5>
+                      <div className="space-y-2">
+                        {selectedApplication?.applicationData && Object.entries(selectedApplication.applicationData).map(([key, value]) => (
+                          <div key={key} className="flex justify-between text-sm">
+                            <span className="text-gray-600">{key}:</span>
+                            <span className="font-medium">{String(value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white border rounded-lg p-4">
+                      <h5 className="font-medium mb-2">Documents</h5>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                          <FileText className="h-4 w-4 text-blue-600" />
+                          <span>Application Form {selectedApplication?.id || 'N/A'}.pdf</span>
+                        </div>
+                        {selectedApplication?.status === "PENDING" && (
+                          <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                            <FileText className="h-4 w-4 text-blue-600" />
+                            <span>Supporting Documents.pdf</span>
+                          </div>
+                        )}
+                        {selectedApplication?.status === "APPROVED" && (
+                          <div className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                            <FileText className="h-4 w-4 text-green-600" />
+                            <span>Approval Certificate.pdf</span>
+                          </div>
+                        )}
+                        {selectedApplication?.documents && selectedApplication.documents.length > 0 && (
+                          selectedApplication.documents.map((doc: any, index: number) => (
+                            <div key={index} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                              <FileText className="h-4 w-4 text-blue-600" />
+                              <span>{doc.name || `Document ${index + 1}.pdf`}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {selectedApplication?.status === "PENDING" && (
+                      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-blue-800">Under Review</p>
+                            <p className="text-sm text-blue-700">
+                              Your application is being reviewed. You will be notified once the review is complete.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Application Progress Tracking */}
+                <div className="space-y-6">
+                  <h4 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                    <ClipboardList className="h-5 w-5" />
+                    Application Progress Tracker
+                  </h4>
+
+                  {/* Progress Timeline */}
+                  <div className="relative bg-white border rounded-lg p-6">
+                    {/* Progress Line */}
+                    <div className="absolute top-12 left-8 right-8 h-0.5 bg-gray-200"></div>
+
+                    {/* Stages */}
+                    <div className="relative flex justify-between">
+                      {applicationStages.map((stage, index) => {
+                        // Mock stage status based on application status
+                        const getStageStatus = (stageId: string) => {
+                          const stageOrder = ["submission", "review", "inspection", "evaluation", "approval", "issuance"]
+                          const currentStage = "submission" // Default stage since Application doesn't have stage property
+                          const currentIndex = stageOrder.indexOf(currentStage)
+                          const stageIndex = stageOrder.indexOf(stageId)
+
+                          if (selectedApplication.status === "APPROVED") {
+                            return "completed"
+                          } else if (stageIndex < currentIndex) {
+                            return "completed"
+                          } else if (stageIndex === currentIndex) {
+                            return "current"
+                          } else {
+                            return "pending"
                           }
-                          
-                          const status = getStageStatus(stage.id)
-                          
-                          return (
-                            <div key={stage.id} className="flex flex-col items-center text-center w-1/6">
-                              <div className={`z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                                status === "completed" ? "bg-green-500 border-green-500" :
-                                status === "current" ? "bg-blue-500 border-blue-500" :
+                        }
+
+                        const status = getStageStatus(stage.id)
+
+                        return (
+                          <div key={stage.id} className="flex flex-col items-center text-center w-1/6">
+                            <div className={`z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 ${status === "completed" ? "bg-green-500 border-green-500" :
+                              status === "current" ? "bg-blue-500 border-blue-500" :
                                 "bg-white border-gray-300"
                               }`}>
-                                {status === "completed" ? (
-                                  <CheckCircle2 className="h-5 w-5 text-white" />
-                                ) : status === "current" ? (
-                                  <Circle className="h-5 w-5 text-white fill-current" />
-                                ) : (
-                                  <Circle className="h-5 w-5 text-gray-300" />
-                                )}
-                              </div>
-                              <div className="mt-2 space-y-1">
-                                <p className={`text-xs font-medium ${
-                                  status === "completed" ? "text-green-700" :
-                                  status === "current" ? "text-blue-700" :
+                              {status === "completed" ? (
+                                <CheckCircle2 className="h-5 w-5 text-white" />
+                              ) : status === "current" ? (
+                                <Circle className="h-5 w-5 text-white fill-current" />
+                              ) : (
+                                <Circle className="h-5 w-5 text-gray-300" />
+                              )}
+                            </div>
+                            <div className="mt-2 space-y-1">
+                              <p className={`text-xs font-medium ${status === "completed" ? "text-green-700" :
+                                status === "current" ? "text-blue-700" :
                                   "text-gray-500"
                                 }`}>
-                                  {stage.name}
-                                </p>
-                                <p className="text-xs text-gray-500 hidden md:block">{stage.description}</p>
-                              </div>
+                                {stage.name}
+                              </p>
+                              <p className="text-xs text-gray-500 hidden md:block">{stage.description}</p>
                             </div>
-                          )
-                        })}
-                      </div>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
-              ) :   (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">License Status</h3>
-                    <div className="flex gap-2">
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Active: {applicationStats.active}
-                      </Badge>
-                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                        Pending: {applicationStats.pending}
-                      </Badge>
-                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                        Rejected: {applicationStats.rejected}
-                      </Badge>
-                    </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">License Status</h3>
+                  <div className="flex gap-2">
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      Active: {applicationStats.active}
+                    </Badge>
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                      Pending: {applicationStats.pending}
+                    </Badge>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      Rejected: {applicationStats.rejected}
+                    </Badge>
                   </div>
-                  <div className="space-y-3">
-                    {userApplicationsLoading ? (
-                      <div className="flex items-center justify-center p-8">
-                        <div className="text-gray-500">Loading applications...</div>
-                      </div>
-                    ) : (
-                      [...submittedApplications, ...existingApplications].map((app) => (
+                </div>
+                <div className="space-y-3">
+                  {userApplicationsLoading ? (
+                    <div className="flex items-center justify-center p-8">
+                      <div className="text-gray-500">Loading applications...</div>
+                    </div>
+                  ) : (
+                    [...submittedApplications, ...existingApplications].map((app) => (
                       <div key={app.id} className="p-4 border rounded-lg space-y-2">
                         <div className="flex justify-between items-start">
-                          <div> 
-                             <h4 className="font-semibold">{app.license?.name || app.type || 'Unknown License'}</h4>
+                          <div>
+                            <h4 className="font-semibold">{app.license?.name || app.type || 'Unknown License'}</h4>
                             <p className="text-sm text-gray-600">ID: {app.id}</p>
                           </div>
                           <div className="flex items-center gap-2">
                             <Badge className={getStatusColor(app.status)}>
                               {app.status === 'PENDING' ? 'Under Review' :
-                               app.status === 'APPROVED' ? 'Approved' :
-                               app.status === 'REJECTED' ? 'Rejected' :
-                               app.status}
+                                app.status === 'APPROVED' ? 'Approved' :
+                                  app.status === 'REJECTED' ? 'Rejected' :
+                                    app.status}
                             </Badge>
                             <Button
                               size="sm"
@@ -962,7 +960,7 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="text-gray-600">Submit Date:</span>
-                             <p className="font-medium">{app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'N/A'}</p>
+                            <p className="font-medium">{app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'N/A'}</p>
                           </div>
                           {app.completionDate && (
                             <div>
@@ -996,22 +994,39 @@ export function MillerApplicationsModal({ open, onOpenChange }: MillerApplicatio
                           )}
                         </div>
                       </div>
-                      ))
-                    )}
-                  </div>
+                    ))
+                  )}
                 </div>
-              )}
-            </div>
-          )}
-         <DynamicFormRenderer
-            license={selectedLicense as any}
-            onSubmit={handleLicenseFormSubmit}
-            onCancel={() => setSelectedLicense(null)}
-            onSaveDraft={handleLicenseFormDraftSave}
-            isSubmitting={submitApplicationMutation.isPending}
-            isDraftSaving={isDraftSaving}
-            userProfile={userProfile}
-          />
+              </div>
+            )}
+          </div>
+        )}
+
+
+
+        {String(activeTab) === 'miller' && (
+          <div className="min-h-[575px] max-h-[575px] overflow-y-auto">
+            {(() => {
+              const millerLicense = licensesData?.data.find(e => e.type?.toLowerCase().includes("miller"));
+              if (!millerLicense) return null;
+              return (
+                <DynamicFormRenderer license={{ ...millerLicense, fields: millerLicense.fields ?? [] }}
+
+                  onSubmit={handleLicenseFormSubmit}
+                  onCancel={() => setSelectedLicense(null)}
+                  onSaveDraft={handleLicenseFormDraftSave}
+                  isSubmitting={submitApplicationMutation.isPending}
+                  isDraftSaving={isDraftSaving}
+                  userProfile={userProfile}
+                // You may want to add onCancel, isSubmitting, isDraftSaving, userProfile as needed
+                />
+              );
+            })()}
+          </div>
+        )}
+
+
+   
       </DialogContent>
 
     </Dialog>

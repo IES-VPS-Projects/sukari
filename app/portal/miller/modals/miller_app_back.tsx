@@ -888,7 +888,7 @@
         ))}
       </div>
     </div>
-  )}
+  </div>)}
         
   {/* Importer Tab */}
   {String(activeTab) === 'importer' && (
