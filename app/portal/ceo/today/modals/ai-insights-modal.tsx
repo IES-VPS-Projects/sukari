@@ -198,11 +198,11 @@ export function AIInsightsModal({
         ) : (
           // List view
           <div className="flex flex-col h-full min-h-0">
-            <div className="p-6 border-b bg-white flex-shrink-0">
+            <div className="p-6 bg-gray-50 relative flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
-                  <p className="text-sm text-gray-500 mt-1">{aiInsightsData.length} insights available</p>
+                  <p className="text-sm text-gray-500 mt-1">{aiInsightsData.length} insights requiring attention</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="group relative">
@@ -224,27 +224,39 @@ export function AIInsightsModal({
                   </Button>
                 </div>
               </div>
+              {/* Horizontal divider line at bottom edge of header */}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-300"></div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 bg-gray-50 min-h-0">
+            <div className="flex-1 overflow-y-auto p-6 min-h-0">
               <div className="space-y-3">
                 {aiInsightsData.map((insight) => (
                   <div
                     key={insight.id}
-                    className={`flex items-start gap-3 p-4 bg-white rounded-lg border shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-pointer ${getHoverBg(insight.id, insight.title)}`}
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${getHoverBg(insight.id, insight.title)}`}
                     onClick={() => setSelectedAIInsightForDetails(insight.id)}
                   >
-                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getInsightColor(insight.id, insight.title)}`}></div>
+                    {/* Icon */}
+                    <div className={`w-8 h-8 ${getInsightColor(insight.id, insight.title).replace('bg-', 'bg-').replace('-500', '-100').replace('-400', '-100').replace('-800', '-100')} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                      <CheckCircle className={`h-4 w-4 ${getInsightColor(insight.id, insight.title).replace('bg-', 'text-')}`} />
+                    </div>
+
+                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-sm font-medium text-[#202020] truncate">{insight.title}</h4>
+                            <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                              insight.confidence === 'high' ? 'bg-green-50/80 text-green-700 border-gray-300' :
+                              insight.confidence === 'medium' ? 'bg-yellow-50/80 text-yellow-700 border-gray-300' :
+                              'bg-blue-50/80 text-blue-700 border-gray-300'
+                            }`}>
+                              {insight.confidence} confidence
+                            </div>
                           </div>
                           <p className="text-xs text-[#6B6B6B] mb-1">{insight.description}</p>
-                          <div className="flex items-center gap-4">
-                            <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
-                          </div>
+                          <p className="text-xs text-[#9CA3AF]">{insight.timestamp}</p>
                         </div>
                       </div>
                     </div>
