@@ -776,7 +776,7 @@ export class ApiClient {
       this.apiService.post(`/api/workflow/tasks/${id}/complete`, { notes, documents }),
 
     rejectTask: (id: string, reason: string): Promise<ApiResponse<WorkflowTask>> =>
-      this.apiService.patch(`/api/workflow/tasks/${id}/reject`, { reason }),
+      this.apiService.post(`/api/workflow/tasks/${id}/reject`, { reason }),
   };
 
   // KSB Departments endpoints

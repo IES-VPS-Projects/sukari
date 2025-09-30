@@ -161,6 +161,8 @@ export function ActionsModal({ open, onOpenChange, selectedActionId, workflowTas
   }, [baseTasks, searchQuery, statusFilter, priorityFilter, sortBy, sortOrder])
   
   const handleActionDecision = async (decision: string, actionId: string) => {
+    
+
     try {
       // Find the original task data
       const displayTask = displayTasks.find(t => t.id === actionId)
@@ -169,7 +171,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId, workflowTas
       if (originalTask) {
         // Handle real workflow task actions
         switch (decision) {
-          case 'approve':
+          case 'onComplete':
             await completeTaskMutation.mutateAsync({ 
               id: originalTask.id, 
               notes: 'Task approved' 
@@ -180,7 +182,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId, workflowTas
               variant: "default",
             })
             break
-          case 'reject':
+          case 'onReject':
             await rejectTaskMutation.mutateAsync({ 
               id: originalTask.id, 
               reason: 'Task rejected' 
