@@ -32,21 +32,17 @@ import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
 import { AlertsModal } from "@/components/modals/alerts-modal"
 import { IndustryNewsModal } from "@/components/modals/industry-news-modal"
-import AlertsCard from "./AlertsCard"
-import IndustryNewsCard from "./IndustryNewsCard"
-import MarketInsightsCard from "./MarketInsightsCard"
-import { 
-  allActionsData, 
-  allAIInsightsData, 
-  allAlertsData 
-} from "@/lib/mockdata"
+import AlertsCard from "./components/AlertsCard"
+import IndustryNewsCard from "./components/IndustryNewsCard"
+import MarketInsightsCard from "./components/MarketInsightsCard"
+import { alertsData as importedAlertsData } from "./data/alerts-data"
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
-import BriefingCard from "./BriefingCard"
-import ActionsCard from "./ActionsCard"
-import MeetingsCard from "./MeetingsCard"
-import ActivitiesCard from "./ActivitiesCard"
-import AIInsightsCard from "./AIInsightsCard"
+import BriefingCard from "./components/BriefingCard"
+import ActionsCard from "./components/ActionsCard"
+import MeetingsCard from "./components/MeetingsCard"
+import ActivitiesCard from "./components/ActivitiesCard"
+import AIInsightsCard from "./components/AIInsightsCard"
 
 
 
@@ -235,7 +231,7 @@ export default function TodayPage() {
         ...alert,
         category: alert.category || 'General'
       })),
-      ...allAlertsData.map((alert, index) => ({
+      ...importedAlertsData.map((alert, index) => ({
         id: `additional-alert-${index}`,
         title: alert.title,
         label: alert.label,

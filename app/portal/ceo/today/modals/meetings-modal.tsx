@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, X } from "lucide-react"
 import { GoInfo } from 'react-icons/go'
-import { allMeetingsData } from "@/lib/mockdata"
+import { meetingsData } from "../data/meetings-data"
 
 interface MeetingsModalProps {
   open: boolean
@@ -33,7 +33,7 @@ export function MeetingsModal({
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
-                <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                <p className="text-sm text-gray-500 mt-1">{meetingsData.length} upcoming meetings</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="group relative">
@@ -56,7 +56,7 @@ export function MeetingsModal({
           
           <div className="flex-1 overflow-y-auto p-6 bg-white min-h-0">
             <div className="space-y-3">
-              {allMeetingsData.map((meeting) => {
+              {meetingsData.map((meeting) => {
                 const getHoverBg = (iconColor: string) => {
                   if (iconColor.includes('blue')) return 'hover:bg-blue-50'
                   if (iconColor.includes('green')) return 'hover:bg-green-50'

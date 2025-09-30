@@ -14,15 +14,15 @@ import {
 } from "lucide-react"
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
-import { allMeetingsData } from "@/lib/mockdata"
-import { MeetingsModal } from "@/components/modals/meetings-modal"
-import { ScheduleMeetingModal, MeetingDetailsModal } from "@/components/modals/schedule-meeting-modal"
+import { meetingsData } from "../data/meetings-data"
+import { MeetingsModal } from "../modals/meetings-modal"
+import { ScheduleMeetingModal, MeetingDetailsModal } from "../modals/schedule-meeting-modal"
 
 interface MeetingsCardProps {
   className?: string
 }
 
-// Function to convert allMeetingsData format to Meeting format
+// Function to convert meetingsData format to Meeting format
 const convertToMeeting = (meetingData: any) => {
   const typeMapping: Record<string, "tactical-briefing" | "strategic-planning" | "mission-debrief" | "training-exercise" | "intelligence-briefing"> = {
     "Board Meeting": "strategic-planning",
@@ -53,7 +53,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null)
 
   const handleMeetingClick = (meetingId: string) => {
-    const meeting = allMeetingsData.find(m => m.id === meetingId)
+    const meeting = meetingsData.find(m => m.id === meetingId)
     if (meeting) {
       setSelectedMeeting(convertToMeeting(meeting))
       setMeetingDetailsOpen(true)
@@ -82,7 +82,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
         <CardContent className="px-3 py-2">
           {/* Scrollable meetings list - showing 3 meetings */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allMeetingsData.map((meeting) => {
+            {meetingsData.map((meeting) => {
               // Get color based on meeting type or status
               const getIndicatorColor = (type: string) => {
                 switch (type) {

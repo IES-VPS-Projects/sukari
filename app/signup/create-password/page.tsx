@@ -5,8 +5,8 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Check } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import SignupHeader from "@/app/signup/components/SignupHeader"
+import ProgressBar from "@/app/signup/components/ProgressBar"
 
 export default function CreatePassword() {
   const [formData, setFormData] = useState({
@@ -106,7 +106,7 @@ export default function CreatePassword() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SignupHeader />
-      <ProgressBar currentStep={currentStep} totalSteps={6} />
+      <ProgressBar currentStep={currentStep} />
 
       <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-6">

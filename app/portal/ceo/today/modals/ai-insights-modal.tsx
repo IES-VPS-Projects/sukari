@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { allAIInsightsData } from "@/lib/mockdata"
+import { aiInsightsData } from "../data/ai-insights-data"
 import { 
   BarChart4, 
   TrendingUp, 
@@ -66,11 +66,11 @@ export function AIInsightsModal({
 }: AIInsightsModalProps) {
   // Get selected insight data
   const selectedInsight = selectedAIInsightForDetails 
-    ? allAIInsightsData.find(insight => insight.id === selectedAIInsightForDetails) 
+    ? aiInsightsData.find(insight => insight.id === selectedAIInsightForDetails) 
     : null;
 
   // Cast AIInsightItems to ExtendedAIInsightItem to access the extended properties
-  const extendedInsights = allAIInsightsData as unknown as ExtendedAIInsightItem[];
+  const extendedInsights = aiInsightsData as unknown as ExtendedAIInsightItem[];
   const extendedSelectedInsight = selectedInsight as unknown as ExtendedAIInsightItem | null;
 
   // Helper function to safely capitalize the first letter of a string
@@ -489,7 +489,7 @@ export function AIInsightsModal({
                   <TabsTrigger value="all" className="flex gap-2 py-3 px-4 border-0 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none">
                     <span>All Insights</span>
                     <Badge className="ml-1 bg-gray-100 text-gray-700 hover:bg-gray-200">
-                      {allAIInsightsData.length}
+                      {aiInsightsData.length}
                     </Badge>
                   </TabsTrigger>
                   <TabsTrigger value="performance" className="flex gap-2 py-3 px-4 border-0 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:shadow-none">

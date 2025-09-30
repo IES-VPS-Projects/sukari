@@ -4,8 +4,8 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle } from "lucide-react"
-import { allAIInsightsData } from "@/lib/mockdata"
-import { AIInsightsModal } from "./modals/ai-insights-modal"
+import { aiInsightsData } from "../data/ai-insights-data"
+import { AIInsightsModal } from "../modals/ai-insights-modal"
 
 interface AIInsightsCardProps {
   triggerNewActivity?: boolean
@@ -63,7 +63,7 @@ export default function AIInsightsCard({
         <CardContent className="px-4 py-4 overflow-hidden">
           {/* Scrollable insights list - showing all insights */}
           <div className="space-y-3 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hover pr-1">
-            {allAIInsightsData.map((insight) => (
+            {aiInsightsData.map((insight) => (
               <div 
                 key={insight.id}
                 className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md transform-gpu ${getHoverBg(insight.id, insight.title)}`}

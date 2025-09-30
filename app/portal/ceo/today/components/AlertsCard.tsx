@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertTriangle, ChevronDown } from "lucide-react"
-import { allAlertsData } from "@/lib/mockdata"
+import { alertsData as importedAlertsData } from "../data/alerts-data"
 
 // KSB Alerts data customized for sugar industry operations
 const alertsData = {
@@ -83,7 +83,7 @@ const alertsData = {
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600'
     },
-    ...allAlertsData.map((alert, index) => ({
+    ...importedAlertsData.map((alert, index) => ({
       id: `alert-${index + 7}`,
       title: alert.title,
       label: alert.label,

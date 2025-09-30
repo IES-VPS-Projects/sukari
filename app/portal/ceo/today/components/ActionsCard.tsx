@@ -4,8 +4,8 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Users, AlertTriangle, FileText } from "lucide-react"
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
-import { allActionsData } from "@/lib/mockdata"
-import { ActionsModal } from "./modals/actions-modal"
+import { actionsData } from "../data/actions-data"
+import { ActionsModal } from "../modals/actions-modal"
 import React from "react"
 
 interface ActionsCardProps {
@@ -17,11 +17,8 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
   const [viewAllActionsOpen, setViewAllActionsOpen] = useState(false)
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
 
-  // Use all actions data for scrollable content (no need for inline actions since they're duplicates)
-  const allActionsForCard = allActionsData.map((action, index) => ({
-    ...action,
-    hoverBg: action.type === 'approval' ? 'hover:bg-blue-50' : 'hover:bg-green-50'
-  }))
+  // Use all actions from mock data
+  const allActionsForCard = actionsData
 
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)

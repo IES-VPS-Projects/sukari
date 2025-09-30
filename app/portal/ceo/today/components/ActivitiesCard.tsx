@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ActivitiesModal } from "./modals/activities-modal"
+import { ActivitiesModal } from "../modals/activities-modal"
 import {
   AlertTriangle,
   Calendar,
@@ -23,8 +23,8 @@ import {
   Award
 } from "lucide-react"
 import { LuSquarePen } from 'react-icons/lu'
-import { allActivitiesData } from "@/lib/mockdata"
-import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
+import { activitiesData } from "../data/activities-data"
+import { ActivityDetailsModal } from "../modals/activity-details-modal"
 
 interface ActivitiesCardProps {
   className?: string
@@ -40,7 +40,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
 
   const handleActivityClick = (activityId: string) => {
-    const activity = allActivitiesData.find(a => a.id === activityId)
+    const activity = activitiesData.find(a => a.id === activityId)
     if (activity) {
       setSelectedActivity(activity)
       setActivityDetailsOpen(true)
@@ -103,7 +103,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardContent className="px-3 py-2">
           {/* Scrollable activities list - showing 3 activities */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allActivitiesData.map((activity) => {
+            {activitiesData.map((activity) => {
               // Get icon component and styling based on activity type
               const getActivityIconAndStyle = (type: string) => {
                 switch (type) {

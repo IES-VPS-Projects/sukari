@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { MapPin, Calendar, Check, X, Users, Clock, ArrowRight, RefreshCw } from "lucide-react"
 import { GoInfo } from 'react-icons/go'
-import { allActivitiesData } from "@/lib/mockdata"
+import { activitiesData } from "../data/activities-data"
 
 // Define extended interface for ActivityItem with missing properties
 interface ExtendedActivityItem {
@@ -50,7 +50,7 @@ export function ActivitiesModal({
   }
 
   // Cast to extended type
-  const extendedActivities = allActivitiesData as unknown as ExtendedActivityItem[];
+  const extendedActivities = activitiesData as unknown as ExtendedActivityItem[];
 
   // Function to format date strings in a more readable format
   const formatDate = (dateString: string) => {
