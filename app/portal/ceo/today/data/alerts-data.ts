@@ -157,5 +157,39 @@ export const detailedAlertsData: AlertItem[] = [
     type: 'system',
     status: 'active',
     affectedFarms: ['Central Processing']
+  },
+  {
+    id: 'alert-7',
+    title: 'Locust Infestation',
+    message: 'Minor pest activity detected in western region',
+    description: 'Minor pest activity detected in western region. Monitoring teams are assessing the situation and implementing standard control measures.',
+    timestamp: '9:30 AM • Butali',
+    label: 'LOW',
+    labelColor: 'bg-green-500',
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-100',
+    area: 'Disaster',
+    priority: 'low',
+    type: 'pest',
+    status: 'active',
+    affectedFarms: ['Western Region Farms', 'Butali Outgrowers'],
+    category: 'Production'
+  },
+  {
+    id: 'alert-8',
+    title: 'Equipment Maintenance Required',
+    message: 'Routine maintenance scheduled for sugar mill equipment',
+    description: 'Routine maintenance scheduled for sugar mill equipment at Chemelil factory. Operations team should coordinate downtime to minimize production impact.',
+    timestamp: '8:15 AM • Chemelil',
+    label: 'MEDIUM',
+    labelColor: 'bg-orange-500',
+    iconColor: 'text-orange-600',
+    iconBg: 'bg-orange-100',
+    area: 'Performance',
+    priority: 'medium',
+    type: 'maintenance',
+    status: 'active',
+    affectedFarms: ['Chemelil Factory'],
+    category: 'Production'
   }
 ];

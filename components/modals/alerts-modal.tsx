@@ -12,7 +12,7 @@ import { useState } from "react"
 
 // Using static timestamps in specific format instead of dynamic ones
 
-const alerts = [
+const allAlertsArray = [
   {
     id: 1,
     title: "Weather Alert",
@@ -83,9 +83,6 @@ const alerts = [
     iconColor: "text-green-600",
     iconBg: "bg-green-100"
   },
-]
-
-const warnings = [
   {
     id: 10,
     title: "Quality Control Notice",
@@ -155,10 +152,7 @@ const warnings = [
     label: "MEDIUM",
     iconColor: "text-orange-600",
     iconBg: "bg-orange-100"
-  }
-]
-
-const notifications = [
+  },
   {
     id: 7,
     title: "New Farmer Registration",
@@ -249,12 +243,12 @@ export function AlertsModal({
   onTakeAction 
 }: AlertsModalProps) {
   const [activeTab, setActiveTab] = useState("all")
-  
+
   // Default alerts data if not provided
   const defaultAlertsData = {
-    alerts: [...alerts, ...warnings, ...notifications]
+    alerts: allAlertsArray
   }
-  
+
   const currentAlertsData = alertsData || defaultAlertsData
   
   // Ensure currentAlertsData.alerts is always an array and has required properties
@@ -299,7 +293,7 @@ export function AlertsModal({
               return (
                 <div className="flex flex-col h-full">
                   <div className="p-4 sm:p-6 flex-shrink-0 bg-gray-50">
-                    <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -308,18 +302,50 @@ export function AlertsModal({
                       >
                         <ArrowLeft className="h-4 w-4" />
                       </Button>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center`}>
                           <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
                         </div>
-                        <div>
-                          <h2 className="text-xl font-semibold text-gray-900">{alert.title}</h2>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h2 className="text-xl font-semibold text-gray-900 truncate">{alert.title}</h2>
+                            <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                              alert.label === 'HIGH' ? 'bg-red-50/80 text-red-700 border-red-200/30' :
+                              alert.label === 'MEDIUM' ? 'bg-orange-50/80 text-orange-700 border-orange-200/30' :
+                              alert.label === 'LOW' ? 'bg-green-50/80 text-green-700 border-green-200/30' :
+                              alert.label === 'INFO' ? 'bg-blue-50/80 text-blue-700 border-blue-200/30' :
+                              'bg-gray-50/80 text-gray-700 border-gray-300'
+                            }`}>
+                              {alert.label}
+                            </div>
+                          </div>
                           <p className="text-sm text-gray-500">{formatTimestamp(alert.timestamp)}</p>
                         </div>
                       </div>
                     </div>
+
+                    {/* Tabs - kept in header section */}
+                    <div className="mt-2">
+                      <div className="flex border-b border-gray-200 overflow-x-auto">
+                        <button
+                          className="px-4 py-2 text-sm font-medium border-b-2 text-blue-600 border-blue-600 transition-colors whitespace-nowrap"
+                        >
+                          Overview
+                        </button>
+                        <button
+                          className="px-4 py-2 text-sm font-medium border-b-2 text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 transition-colors whitespace-nowrap"
+                        >
+                          Documents
+                        </button>
+                        <button
+                          className="px-4 py-2 text-sm font-medium border-b-2 text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 transition-colors whitespace-nowrap"
+                        >
+                          History
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  
+
                   <div className="flex-1 overflow-y-auto p-6">
                     <div className="space-y-6">
                       <div>

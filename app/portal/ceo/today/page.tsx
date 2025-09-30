@@ -30,12 +30,12 @@ import { FaAngleDown } from 'react-icons/fa'
 import { BiSend, BiPlus, BiMicrophone } from 'react-icons/bi'
 import { HiSparkles } from 'react-icons/hi2'
 import { ScheduleVisitModal } from "@/components/modals/schedule-visit-modal"
-import { AlertsModal } from "@/components/modals/alerts-modal"
+import { AlertsModal } from "./modals/alerts-modal"
 import { IndustryNewsModal } from "@/components/modals/industry-news-modal"
 import AlertsCard from "./components/AlertsCard"
 import IndustryNewsCard from "./components/IndustryNewsCard"
 import MarketInsightsCard from "./components/MarketInsightsCard"
-import { alertsData as importedAlertsData } from "./data/alerts-data"
+import { detailedAlertsData } from "./data/alerts-data"
 import { useAuth } from "@/components/auth-provider"
 import { PortalLayout } from "@/components/portal-layout"
 import BriefingCard from "./components/BriefingCard"
@@ -222,38 +222,34 @@ export default function TodayPage() {
     setScheduleVisitOpen(true)
   }
 
-  // Combine static alerts with dynamic production alerts and additional data
+  // Combine dynamic production alerts with detailed alerts data (no duplicates)
   const combinedAlertsData = {
-    ...updatesData,
+    notifications: updatesData.notifications || [],
     alerts: [
-      ...dynamicAlerts, 
-      ...updatesData.alerts.map(alert => ({
+      ...dynamicAlerts,
+      ...detailedAlertsData.map(alert => ({
         ...alert,
-        category: alert.category || 'General'
-      })),
-      ...importedAlertsData.map((alert, index) => ({
-        id: `additional-alert-${index}`,
+        id: alert.id,
         title: alert.title,
         label: alert.label,
         description: alert.description,
+        message: alert.message || alert.description,
         timestamp: alert.timestamp,
-        category: alert.title === 'Locust Infestation' ? 'Production' :
-                  alert.title === 'Weather Alert' ? 'Production' :
-                  alert.title === 'Weather' ? 'Production' :
-                  alert.title === 'Disbursement Approval' ? 'Revenue' :
-                  alert.title === 'Equipment Maintenance' ? 'Stakeholders' :
-                  alert.title === 'Quality Control Notice' ? 'Stakeholders' :
-                  alert.title === 'System Performance Alert' ? 'Stakeholders' :
+        category: alert.area === 'Performance' ? 'Production' :
+                  alert.area === 'Compliance' ? 'Compliance' :
+                  alert.area === 'Payments' ? 'Revenue' :
+                  alert.area === 'Weather' ? 'Production' :
+                  alert.area === 'Disaster' ? 'Production' :
                   alert.area === 'Equipment' ? 'Production' :
                   alert.area === 'Quality' ? 'Production' :
                   alert.area === 'Operations' ? 'Production' :
                   alert.area === 'Safety' ? 'Compliance' :
-                  alert.area === 'Payments' ? 'Revenue' :
-                  alert.area === 'Performance' ? 'Reports' :
-                  alert.area === 'Weather' ? 'Production' :
-                  alert.area === 'Disaster' ? 'Compliance' :
-                  alert.area === 'General' ? 'Reports' : 'Reports',
-        priority: alert.label === 'HIGH' ? 'high' : alert.label === 'MEDIUM' ? 'medium' : 'low',
+                  alert.area === 'General' ? 'Reports' :
+                  alert.category || 'Reports',
+        priority: alert.priority || (alert.label === 'HIGH' ? 'high' : alert.label === 'MEDIUM' ? 'medium' : 'low'),
+        type: alert.type,
+        status: alert.status,
+        affectedFarms: alert.affectedFarms,
         labelColor: alert.labelColor,
         iconBg: alert.iconBg,
         iconColor: alert.iconColor
