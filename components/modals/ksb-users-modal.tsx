@@ -65,6 +65,8 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [newUser, setNewUser] = useState<CreateKsbUserData>({
+    name:'',
+    surname: '',
     email: '',
     pin: '',
     role: 'KSB_FIELD_OFFICER',
@@ -189,6 +191,8 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
     if (isSubmittingUser && !isCreatingUser && !createUserError) {
       // User was created successfully
       setNewUser({
+        name:'',  
+        surname: '',
         email: '',
         pin: '',
         role: 'KSB_FIELD_OFFICER',
@@ -335,6 +339,8 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
       headOfDepartmentId: undefined
     })
     setNewUser({
+      name:'',
+      surname: '',
       email: '',
       pin: '',
       role: 'KSB_FIELD_OFFICER',
@@ -433,6 +439,8 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
         headOfDepartmentId: undefined
       })
       setNewUser({
+        name:'',
+        surname: '',
         email: '',
         pin: '',
         role: 'KSB_FIELD_OFFICER',
@@ -864,6 +872,31 @@ export function KsbUsersModal({ open, onOpenChange }: KsbUsersModalProps) {
 
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* add name and surname fields here */}
+
+                <div className="space-y-2">
+                  <Label htmlFor="name">FUll Name *</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={newUser.name}
+                    onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    placeholder="Mary"
+                    required
+                  />
+                </div>
+
+                 <div className="space-y-2">
+                  <Label htmlFor="surname">Surname *</Label>
+                  <Input
+                    id="surname"
+                    type="text"
+                    value={newUser.surname}
+                    onChange={(e) => setNewUser({ ...newUser, surname: e.target.value })}
+                    placeholder="K"
+                    required
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="userEmail">Email *</Label>
                   <Input

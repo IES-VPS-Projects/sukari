@@ -36,6 +36,8 @@ export interface KsbUsersResponse {
 }
 
 export interface CreateKsbUserData {
+  name: string
+  surname: string
   email: string
   pin: string
   role: string
