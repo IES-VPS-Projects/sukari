@@ -37,14 +37,11 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [newActivityOpen, setNewActivityOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
   const [activityDetailsOpen, setActivityDetailsOpen] = useState(false)
-  const [selectedActivity, setSelectedActivity] = useState<any>(null)
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null)
 
   const handleActivityClick = (activityId: string) => {
-    const activity = activitiesData.find(a => a.id === activityId)
-    if (activity) {
-      setSelectedActivity(activity)
-      setActivityDetailsOpen(true)
-    }
+    setSelectedActivityId(activityId)
+    setActivityDetailsOpen(true)
   }
 
   // Form state
@@ -319,16 +316,17 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
       </Dialog>
 
       {/* Activities Modal */}
-      <ActivitiesModal 
+      <ActivitiesModal
         open={viewAllActivitiesOpen}
         onOpenChange={setViewAllActivitiesOpen}
+        onActivityClick={handleActivityClick}
       />
 
       {/* Activity Details Modal */}
-      <ActivityDetailsModal 
-        open={activityDetailsOpen} 
-        onOpenChange={setActivityDetailsOpen} 
-        activity={selectedActivity} 
+      <ActivityDetailsModal
+        open={activityDetailsOpen}
+        onOpenChange={setActivityDetailsOpen}
+        activityId={selectedActivityId}
       />
     </>
   )
