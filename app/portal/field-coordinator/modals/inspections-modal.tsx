@@ -112,7 +112,7 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className={`${headerBgClass} -mx-6 -mt-6 px-6 py-4 border-y border-gray-200`}>
           <DialogTitle>Inspections</DialogTitle>
           <DialogDescription>
@@ -180,95 +180,74 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {selectedAssignment.companyInfo.registrationNo && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Registration No:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.registrationNo}</p>
+                          <span className="font-medium text-blue-800">Registration No:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.registrationNo}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.pinNumber && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">PIN Number:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.pinNumber}</p>
+                          <span className="font-medium text-blue-800">PIN Number:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.pinNumber}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.postalAddress && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Postal Address:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.postalAddress}</p>
+                          <span className="font-medium text-blue-800">Postal Address:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.postalAddress}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.county && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">County:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.county}, {selectedAssignment.companyInfo.subcounty}</p>
+                          <span className="font-medium text-blue-800">County:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.county}, {selectedAssignment.companyInfo.subcounty}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.email && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Email:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.email}</p>
+                          <span className="font-medium text-blue-800">Email:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.email}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.establishmentDate && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Established:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.establishmentDate}</p>
+                          <span className="font-medium text-blue-800">Established:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.establishmentDate}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.productionCapacity && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Production Capacity:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.productionCapacity}</p>
+                          <span className="font-medium text-blue-800">Production Capacity:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.productionCapacity}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.facilitySize && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Facility Size:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.facilitySize}</p>
+                          <span className="font-medium text-blue-800">Facility Size:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.facilitySize}</p>
                         </div>
                       )}
                       {selectedAssignment.companyInfo.employeeCount && (
                         <div>
-                          <span className="text-sm font-medium text-blue-800">Employee Count:</span>
-                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.employeeCount}</p>
+                          <span className="font-medium text-blue-800">Employee Count:</span>
+                          <p className="text-blue-700">{selectedAssignment.companyInfo.employeeCount}</p>
                         </div>
                       )}
                     </div>
                   </div>
                 )}
 
-                {selectedAssignment.checklist && selectedAssignment.checklist.length > 0 && (
-                  <div className="flex items-start gap-3">
-                    <ClipboardCheck className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Inspection Checklist</p>
-                      <ul className="mt-2 space-y-2">
-                        {selectedAssignment.checklist.map((item, index) => (
-                          <li key={index} className="flex items-center gap-2 text-gray-600">
-                            <div className="h-5 w-5 rounded-full border border-gray-300 flex items-center justify-center">
-                              {index + 1}
-                            </div>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                {/* Spacer to maintain card height where checklist was */}
+                <div className="h-24"></div>
               </div>
               
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex justify-between">
+                <div className="flex justify-start">
                   <Button
                     variant="default"
                     onClick={() => setShowInspectionChecklist(true)}
                   >
                     Start Inspection
                   </Button>
-                  {selectedAssignment.type === "letterOfComfort" && (
-                    <Button variant="outline">
-                      Download Letter of Comfort
-                    </Button>
-                  )}
                 </div>
               </div>
             </div>
@@ -348,6 +327,7 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
         onOpenChange={setShowInspectionChecklist}
         assignment={selectedAssignment}
         onSubmitReport={handleInspectionReportSubmit}
+        onBackToDetails={() => setShowInspectionChecklist(false)}
       />
     </Dialog>
   )

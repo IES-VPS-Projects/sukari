@@ -109,28 +109,6 @@ export default function MillerProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Production Card */}
-          <Card 
-            className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
-            onClick={() => setProductionModalOpen(true)}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <PiFactory className="h-5 w-5" />
-                Production
-              </CardTitle>
-              <CardDescription>Daily production metrics & efficiency</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {/* Empty content to match CEO operations card height + 80px */}
-                <div className="h-32"></div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Second Row */}
-
           {/* Profile Card */}
           <Card 
             className="rounded-[20px] shadow-lg border-0 bg-white hover:shadow-xl transition-shadow cursor-pointer"
@@ -151,25 +129,27 @@ export default function MillerProfilePage() {
             </CardContent>
           </Card>
 
+          {/* Second Row */}
+
           {/* Empty cards to maintain layout */}
           <div className="h-32"></div>
           <div className="h-32"></div>
         </div>
 
-      {/* Modals */}
-      <MillerApplicationsModal 
-        open={applicationsModalOpen} 
-        onOpenChange={setApplicationsModalOpen}
-      />
-      <MillerReturnsModal 
-        open={returnsModalOpen} 
-        onOpenChange={setReturnsModalOpen}
-      />
-      <MillerProfileModal 
-        open={profileModalOpen} 
-        onOpenChange={setProfileModalOpen}
-        profileData={profileData}
-      />
+        {/* Modals */}
+        <MillerApplicationsModal 
+          open={applicationsModalOpen} 
+          onOpenChange={setApplicationsModalOpen}
+        />
+        <MillerReturnsModal 
+          open={returnsModalOpen} 
+          onOpenChange={setReturnsModalOpen}
+        />
+        <MillerProfileModal 
+          open={profileModalOpen} 
+          onOpenChange={setProfileModalOpen}
+          profileData={profileData}
+        />
         <MillerProductionModal 
           open={productionModalOpen} 
           onOpenChange={setProductionModalOpen}

@@ -92,7 +92,8 @@ export function MillRegistrationForm({
   const fieldCoordinators = [
     { id: "fc-001", name: "Sarah Wanjiku", region: "Western Region", county: "Kakamega" },
     { id: "fc-002", name: "James Ochieng", region: "Nyanza Region", county: "Kisumu" },
-    { id: "fc-003", name: "Mary Chebet", region: "Rift Valley Region", county: "Nakuru" }
+    { id: "fc-003", name: "Mary Chebet", region: "Rift Valley Region", county: "Nakuru" },
+    { id: "fc-004", name: "Bernice Kasavuli", region: "Coast Region", county: "Kwale" }
   ]
 
   useEffect(() => {
@@ -358,9 +359,9 @@ export function MillRegistrationForm({
           </div>
         </CollapsibleSection>
 
-        {/* CEO Actions Section - Always Visible */}
+        {/* Actions Section - Always Visible */}
         <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">CEO Actions</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Select Field Coordinator</label>

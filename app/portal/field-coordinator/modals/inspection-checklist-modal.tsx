@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Upload, X, CheckCircle, AlertTriangle, Camera } from "lucide-react"
+import { Upload, X, CheckCircle, AlertTriangle, Camera, ArrowLeft, FileText } from "lucide-react"
 import { InspectionAssignment } from "../data/inspections-data"
 
 interface InspectionChecklistModalProps {
@@ -16,6 +16,7 @@ interface InspectionChecklistModalProps {
   onOpenChange: (open: boolean) => void
   assignment: InspectionAssignment | null
   onSubmitReport: (report: InspectionReport) => void
+  onBackToDetails?: () => void
 }
 
 interface ChecklistItem {
@@ -39,15 +40,17 @@ export function InspectionChecklistModal({
   open,
   onOpenChange,
   assignment,
-  onSubmitReport
+  onSubmitReport,
+  onBackToDetails
 }: InspectionChecklistModalProps) {
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([])
   const [overallRecommendation, setOverallRecommendation] = useState("")
   const [additionalNotes, setAdditionalNotes] = useState("")
-  const [inspectorName, setInspectorName] = useState("Sarah Wanjiku") // Default field coordinator name
+  const [inspectorName, setInspectorName] = useState("Bernice Kasavuli") // Default field coordinator name
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set())
 
   // Initialize checklist items when assignment changes
-  useState(() => {
+  useEffect(() => {
     if (assignment?.checklist) {
       const items: ChecklistItem[] = assignment.checklist.map((item, index) => ({
         id: `item-${index}`,
@@ -109,34 +112,74 @@ export function InspectionChecklistModal({
     onOpenChange(false)
   }
 
+  const toggleNotesExpansion = (itemId: string) => {
+    setExpandedNotes(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      return newSet
+    })
+  }
+
   const completedItems = checklistItems.filter(item => item.completed).length
   const totalItems = checklistItems.length
   const allItemsCompleted = completedItems === totalItems && totalItems > 0
-
   if (!assignment) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Mill Inspection Checklist</DialogTitle>
-          <div className="flex items-center gap-2">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
+        {/* Gray Header */}
+        <div className="bg-gray-50 px-6 py-4">
+          <div className="flex items-center gap-4 mb-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onBackToDetails ? onBackToDetails : () => onOpenChange(false)}
+              className="p-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <DialogTitle>Mill Inspection Checklist</DialogTitle>
+          </div>
+          <div className="flex items-center gap-2 ml-12 mb-6">
             <span className="text-sm text-gray-600">{assignment.businessName}</span>
             <Badge variant="outline">{assignment.businessId}</Badge>
           </div>
-        </DialogHeader>
 
-        <div className="space-y-6 mt-6">
           {/* Progress Indicator */}
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="p-4 bg-white rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Inspection Progress</span>
               <span className="text-sm text-gray-600">{completedItems} of {totalItems} items completed</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-green-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${totalItems > 0 ? (completedItems / totalItems) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Horizontal Separator */}
+        <div className="border-b border-gray-200"></div>
+
+        <div className="space-y-6 mt-6 px-6 pb-5">
+
+          {/* Inspector Name Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Inspector Details</h3>
+            <div className="space-y-2">
+              <Label>Inspector Name</Label>
+              <Input
+                value={inspectorName}
+                readOnly
+                className="bg-gray-50 cursor-not-allowed"
+                placeholder="Enter inspector name"
               />
             </div>
           </div>
@@ -156,49 +199,60 @@ export function InspectionChecklistModal({
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`font-medium ${item.completed ? 'text-green-700 line-through' : 'text-gray-900'}`}>
+                      <span className={`font-medium ${item.completed ? 'text-black line-through' : 'text-gray-900'}`}>
                         {item.item}
                       </span>
-                      {item.completed && <CheckCircle className="h-4 w-4 text-green-600" />}
+                      {item.completed && <CheckCircle className="h-4 w-4 text-black" />}
                     </div>
 
-                    {/* Notes */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Inspection Notes</Label>
-                      <Textarea
-                        placeholder="Add notes about this inspection item..."
-                        value={item.notes}
-                        onChange={(e) =>
-                          handleChecklistItemChange(item.id, 'notes', e.target.value)
-                        }
-                        className="min-h-20"
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(item.id, e.target.files)}
+                        className="hidden"
+                        id={`file-upload-${item.id}`}
                       />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById(`file-upload-${item.id}`)?.click()}
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Add Photos
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleNotesExpansion(item.id)}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Add Inspection Notes
+                      </Button>
                     </div>
 
-                    {/* Image Upload */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Evidence Photos</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(item.id, e.target.files)}
-                          className="hidden"
-                          id={`file-upload-${item.id}`}
+                    {/* Conditional Notes Section */}
+                    {expandedNotes.has(item.id) && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Inspection Notes</Label>
+                        <Textarea
+                          placeholder="Add notes about this inspection item..."
+                          value={item.notes}
+                          onChange={(e) =>
+                            handleChecklistItemChange(item.id, 'notes', e.target.value)
+                          }
+                          className="min-h-20"
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => document.getElementById(`file-upload-${item.id}`)?.click()}
-                        >
-                          <Camera className="h-4 w-4 mr-2" />
-                          Add Photos
-                        </Button>
                       </div>
+                    )}
 
-                      {item.images.length > 0 && (
+                    {/* Evidence Photos Section */}
+                    {item.images.length > 0 && (
+                      <div className="space-y-2">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {item.images.map((image, index) => (
                             <div key={index} className="relative group">
@@ -219,8 +273,8 @@ export function InspectionChecklistModal({
                             </div>
                           ))}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -229,17 +283,7 @@ export function InspectionChecklistModal({
 
           {/* Overall Recommendation */}
           <div className="space-y-4 border-t pt-6">
-            <h3 className="text-lg font-semibold">Inspector Details</h3>
-
-            <div className="space-y-2">
-              <Label>Inspector Name</Label>
-              <Input
-                value={inspectorName}
-                onChange={(e) => setInspectorName(e.target.value)}
-                placeholder="Enter inspector name"
-              />
-            </div>
-
+            <h3 className="text-lg font-semibold">Overall Recommendation</h3>
             <div className="space-y-2">
               <Label>Overall Recommendation</Label>
               <Textarea
