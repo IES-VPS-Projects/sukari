@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Users, AlertTriangle, FileText } from "lucide-react"
 import { HiEllipsisHorizontal } from 'react-icons/hi2'
@@ -9,16 +9,31 @@ import { ActionsModal } from "../modals/actions-modal"
 import React from "react"
 
 interface ActionsCardProps {
-  selectedItemId: string | null
-  setSelectedItemId: (id: string | null) => void
+  // Remove shared state props - component will manage its own dropdown state
 }
 
-const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) => {
+const ActionsCard = () => {
   const [viewAllActionsOpen, setViewAllActionsOpen] = useState(false)
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(null)
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null) // Local state for dropdown menus
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Use all actions from mock data
   const allActionsForCard = actionsData
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setSelectedItemId(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const handleItemAction = (action: string, itemId: string) => {
     console.log(`${action} action for item ${itemId}`)
@@ -32,11 +47,12 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
 
   return (
     <>
-      <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+      <Card ref={cardRef} className="rounded-[20px] shadow-lg border-0 bg-white">
         <CardHeader className="pb-1">
           <CardTitle 
             className="text-[#202020] cursor-pointer" 
             onClick={() => {
+              console.log('Header clicked - opening list view')
               setSelectedActionForDetails(null)
               setViewAllActionsOpen(true)
             }}
@@ -57,6 +73,7 @@ const ActionsCard = ({ selectedItemId, setSelectedItemId }: ActionsCardProps) =>
                 onClick={(e: React.MouseEvent) => {
                   // Only trigger if not clicking on the ellipsis button
                   if (!(e.target as HTMLElement).closest('.ellipsis-menu')) {
+                    console.log(`Option clicked - opening details view for ${item.id}`)
                     setSelectedActionForDetails(item.id)
                     setViewAllActionsOpen(true)
                   }

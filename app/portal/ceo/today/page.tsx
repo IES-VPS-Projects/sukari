@@ -312,10 +312,7 @@ export default function TodayPage() {
             />
 
             {/* Actions Card */}
-            <ActionsCard 
-              selectedItemId={selectedItemId}
-              setSelectedItemId={setSelectedItemId}
-            />
+            <ActionsCard />
         </div>        </div>
 
       <ScheduleVisitModal
