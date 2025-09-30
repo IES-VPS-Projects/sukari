@@ -11,7 +11,7 @@ interface CollapsibleSectionProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function CollapsibleSection({
   title,
-  defaultOpen = true,
+  defaultOpen = false,
   children,
   className,
   ...props
@@ -22,7 +22,7 @@ export function CollapsibleSection({
     <div className={cn("w-full space-y-2", className)} {...props}>
       <button
         type="button"
-        className="flex w-full items-center justify-between rounded-md bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+        className="flex w-full items-center justify-between rounded-md bg-white border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{title}</span>

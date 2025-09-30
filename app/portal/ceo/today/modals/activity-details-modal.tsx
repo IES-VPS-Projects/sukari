@@ -4,426 +4,548 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import { useState } from "react"
-import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  MapPin, 
-  Users, 
-  AlertTriangle, 
-  FileText, 
-  Video, 
-  MessageCircle,
-  ChevronDown,
-  Download,
-  Forward,
-  Edit,
-  Trash2,
-  ArrowRight,
-  CheckCircle,
-  Share,
-  MessageSquare,
-  Check,
-  X,
-  UserPlus,
-  Phone
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Flag,
+  Paperclip,
+  Plus,
+  Send,
+  Search,
+  ArrowLeft
 } from "lucide-react"
-import { FaRegCopy } from 'react-icons/fa'
-import { BiCommentDetail } from 'react-icons/bi'
-import { GoNote } from 'react-icons/go'
+import { BiCategory } from "react-icons/bi"
+import { useState } from "react"
+import { activitiesData, ActivityItem } from "../data/activities-data"
 
-// Activity detail types
 interface ActivityDetailProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  activity: any | null
+  activityId: string | null
+  onBackToList?: () => void
 }
 
-interface Activity {
-  id: string
-  title: string
-  description: string
-  date: string
-  time: string
-  location: string
-  type: string
-  status: string
-}
+export function ActivityDetailsModal({ open, onOpenChange, activityId, onBackToList }: ActivityDetailProps) {
+  const activity = activitiesData.find(a => a.id === activityId)
 
-export function ActivityDetailsModal({ open, onOpenChange, activity }: ActivityDetailProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'updates' | 'documents'>('overview')
-  
   if (!activity) return null
-  
-  // Get formatted date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState("")
+  const [description, setDescription] = useState(activity.details || activity.description)
+  const [comment, setComment] = useState("")
+  const [searchCategory, setSearchCategory] = useState("")
+  const [showSubtaskInput, setShowSubtaskInput] = useState(false)
+  const [newSubtaskText, setNewSubtaskText] = useState("")
+  const [showAddAssignee, setShowAddAssignee] = useState(false)
+  const [newAssigneeName, setNewAssigneeName] = useState("")
+  const [editingStartDate, setEditingStartDate] = useState(false)
+  const [editingDueDate, setEditingDueDate] = useState(false)
+  const [editingLocation, setEditingLocation] = useState(false)
+  const [location, setLocation] = useState(activity.location)
+
+  // Initialize assignees from activity data
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase()
   }
-  
-  // Helper functions to get colors based on activity type
-  const getHeaderBg = (type: string) => {
-    switch (type) {
-      case 'visit': return 'bg-blue-50'
-      case 'meeting': return 'bg-green-50'
-      case 'task': return 'bg-amber-50'
-      case 'event': return 'bg-purple-50'
-      default: return 'bg-gray-50'
+
+  const [assignees, setAssignees] = useState([
+    { id: 1, name: activity.assignee, initials: getInitials(activity.assignee) }
+  ])
+
+  // Generate dynamic dates based on timestamp
+  const getActivityDates = (timeString: string) => {
+    const today = new Date()
+    if (timeString === "Tomorrow") {
+      const tomorrow = new Date(today)
+      tomorrow.setDate(today.getDate() + 1)
+      return {
+        start: `${tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 08:00AM`,
+        due: `${tomorrow.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 17:00PM`
+      }
+    } else if (timeString === "Friday") {
+      const friday = new Date(today)
+      const daysUntilFriday = (5 - today.getDay() + 7) % 7
+      friday.setDate(today.getDate() + daysUntilFriday)
+      return {
+        start: `${friday.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 09:00AM`,
+        due: `${friday.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 16:00PM`
+      }
+    } else if (timeString === "Next Week") {
+      const nextWeek = new Date(today)
+      nextWeek.setDate(today.getDate() + 7)
+      return {
+        start: `${nextWeek.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 07:00AM`,
+        due: `${nextWeek.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} - 18:00PM`
+      }
+    }
+    return {
+      start: "17 Mar - 09:00AM",
+      due: "20 Mar - 09:00AM"
     }
   }
-  
-  const getIconBg = (type: string) => {
-    switch (type) {
-      case 'visit': return 'bg-blue-100'
-      case 'meeting': return 'bg-green-100'
-      case 'task': return 'bg-amber-100'
-      case 'event': return 'bg-purple-100'
-      default: return 'bg-gray-100'
+
+  const activityDates = getActivityDates(activity.timestamp)
+  const [startDate, setStartDate] = useState(activityDates.start)
+  const [dueDate, setDueDate] = useState(activityDates.due)
+  const [comments, setComments] = useState<Array<{id: number, text: string, user: string, initials: string}>>([])
+  const [commentIdCounter, setCommentIdCounter] = useState(1)
+
+  // Generate dynamic subtasks
+  const getActivitySubtasks = () => {
+    if (activity.type === "compliance") {
+      return [
+        { id: 1, text: "Review documentation completeness", completed: false },
+        { id: 2, text: "Conduct on-site inspection", completed: false }
+      ]
+    } else if (activity.type === "visit") {
+      return [
+        { id: 1, text: "Prepare site visit checklist", completed: false },
+        { id: 2, text: "Coordinate with mill management", completed: false }
+      ]
+    } else if (activity.type === "renewal") {
+      return [
+        { id: 1, text: "Compile renewal documentation", completed: false },
+        { id: 2, text: "Submit application to authorities", completed: false }
+      ]
+    } else if (activity.type === "maintenance") {
+      return [
+        { id: 1, text: "Equipment inspection", completed: false },
+        { id: 2, text: "Parts replacement and calibration", completed: false }
+      ]
+    }
+    return [
+      { id: 1, text: "Prepare meeting materials", completed: false },
+      { id: 2, text: "Send invitations to participants", completed: false }
+    ]
+  }
+
+  const categories = ["Operations", "Compliance", "Maintenance", "Management", "Field Visit"]
+  const filteredCategories = categories.filter(cat =>
+    cat.toLowerCase().includes(searchCategory.toLowerCase())
+  )
+
+  const [subtasks, setSubtasks] = useState(getActivitySubtasks())
+
+  const handleSubtaskToggle = (id: number) => {
+    setSubtasks(prev => prev.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ))
+  }
+
+  const handleAddSubtask = () => {
+    if (newSubtaskText.trim()) {
+      const newSubtask = {
+        id: Math.max(...subtasks.map(s => s.id), 0) + 1,
+        text: newSubtaskText.trim(),
+        completed: false
+      }
+      setSubtasks(prev => [...prev, newSubtask])
+      setNewSubtaskText("")
+      setShowSubtaskInput(false)
     }
   }
-  
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'visit': return 'text-blue-600'
-      case 'meeting': return 'text-green-600'
-      case 'task': return 'text-amber-600'
-      case 'event': return 'text-purple-600'
-      default: return 'text-gray-600'
+
+  const handleSubtaskKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddSubtask()
+    }
+    if (e.key === 'Escape') {
+      setShowSubtaskInput(false)
+      setNewSubtaskText("")
     }
   }
-  
-  const getStatusBadgeStyle = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return "bg-green-100 text-green-800 hover:bg-green-200";
-      case 'in-progress':
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200";
-      case 'scheduled':
-        return "bg-purple-100 text-purple-800 hover:bg-purple-200";
-      case 'pending':
-        return "bg-amber-100 text-amber-800 hover:bg-amber-200";
-      case 'cancelled':
-        return "bg-red-100 text-red-800 hover:bg-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+
+  const handleSendComment = () => {
+    if (comment.trim()) {
+      const newComment = {
+        id: commentIdCounter,
+        text: comment.trim(),
+        user: "Current User",
+        initials: "CU"
+      }
+      setComments(prev => [...prev, newComment])
+      setComment("")
+      setCommentIdCounter(prev => prev + 1)
     }
   }
-  
-  // Get icon based on activity type
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'visit':
-        return <MapPin className={`h-5 w-5 ${getIconColor(type)}`} />;
-      case 'meeting':
-        return <Users className={`h-5 w-5 ${getIconColor(type)}`} />;
-      case 'task':
-        return <Check className={`h-5 w-5 ${getIconColor(type)}`} />;
-      case 'event':
-        return <CalendarIcon className={`h-5 w-5 ${getIconColor(type)}`} />;
-      default:
-        return <Clock className={`h-5 w-5 ${getIconColor(type)}`} />;
+
+  const handleCommentKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSendComment()
     }
   }
-  
-  // Mock data for participants
-  const participants = [
-    { name: "John Doe", role: "CEO, KSB", status: "Confirmed" },
-    { name: "Jane Smith", role: "Operations Manager", status: "Tentative" },
-    { name: "Michael Brown", role: "Field Coordinator", status: "Declined" },
-    { name: "Sarah Wilson", role: "Compliance Officer", status: "Confirmed" }
-  ]
-  
-  // Mock data for updates
-  const updates = [
-    { id: 1, time: "10:30 AM", date: "August 15, 2025", message: "Document 'Field Visit Report' uploaded", author: "Sarah Wilson", type: "document" },
-    { id: 2, time: "9:45 AM", date: "August 15, 2025", message: "Location changed to Mumias Sugar Factory", author: "John Doe", type: "update" },
-    { id: 3, time: "Yesterday", date: "August 14, 2025", message: "2 new participants added", author: "John Doe", type: "participant" },
-    { id: 4, time: "2 days ago", date: "August 13, 2025", message: "Activity created", author: "John Doe", type: "creation" }
-  ]
-  
-  // Mock data for documents
-  const documents = [
-    { id: 1, title: "Field Visit Agenda.pdf", type: "PDF", size: "245 KB", uploadedBy: "John Doe", uploadDate: "August 13, 2025" },
-    { id: 2, title: "Mumias Factory Layout.png", type: "Image", size: "1.2 MB", uploadedBy: "Sarah Wilson", uploadDate: "August 14, 2025" },
-    { id: 3, title: "Previous Visit Notes.docx", type: "Document", size: "78 KB", uploadedBy: "Michael Brown", uploadDate: "August 14, 2025" },
-    { id: 4, title: "KSB Field Protocol.pdf", type: "PDF", size: "450 KB", uploadedBy: "System", uploadDate: "August 10, 2025" }
-  ]
+
+  const handleAddAssignee = () => {
+    if (newAssigneeName.trim()) {
+      const initials = newAssigneeName.trim().split(' ').map(n => n[0]).join('').toUpperCase()
+      const newAssignee = {
+        id: Math.max(...assignees.map(a => a.id), 0) + 1,
+        name: newAssigneeName.trim(),
+        initials: initials
+      }
+      setAssignees(prev => [...prev, newAssignee])
+      setNewAssigneeName("")
+      setShowAddAssignee(false)
+    }
+  }
+
+  const handleAssigneeKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddAssignee()
+    }
+    if (e.key === 'Escape') {
+      setShowAddAssignee(false)
+      setNewAssigneeName("")
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className={`space-y-4 p-6 -mx-6 -mt-6 mb-6 ${getHeaderBg(activity.type)}`}>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getIconBg(activity.type)}`}>
-                  {getActivityIcon(activity.type)}
+      <DialogContent className="w-[95vw] max-w-2xl h-[95vh] max-h-[90vh] overflow-hidden flex flex-col p-0">
+        {/* Header with colored background based on activity type */}
+        <div className={`p-6 pb-2 border-b border-gray-200 shadow-sm ${
+          activity.type === 'compliance' ? 'bg-orange-50' :
+          activity.type === 'visit' ? 'bg-blue-50' :
+          activity.type === 'renewal' ? 'bg-purple-50' :
+          activity.type === 'maintenance' ? 'bg-green-50' :
+          activity.type === 'meeting' ? 'bg-blue-50' :
+          'bg-gray-50'
+        }`}>
+          <DialogHeader className="pb-2">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (onBackToList) {
+                      onBackToList()
+                    } else {
+                      onOpenChange(false)
+                    }
+                  }}
+                  className="shrink-0"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <DialogTitle className="text-xl font-semibold text-gray-900">
+                  Activity Details
+                </DialogTitle>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium text-gray-900">
+                {activity.title}
+              </h2>
+              <div className="flex items-center gap-3">
+                <div className={`px-2 py-0 ${activity.priorityColor} border ${activity.priority === 'high' ? 'border-red-200' : 'border-yellow-200'} rounded-full shadow-sm flex items-center h-6`}>
+                  <span className="text-xs font-medium">{activity.priority.charAt(0).toUpperCase() + activity.priority.slice(1)}</span>
                 </div>
-                <div>
-                  <Badge className={getStatusBadgeStyle(activity.status)}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 ${activity.status === 'pending' ? 'bg-amber-500' : activity.status === 'scheduled' ? 'bg-blue-500' : 'bg-green-500'} rounded-full`}></div>
+                  <span className={`text-sm ${activity.status === 'pending' ? 'text-amber-600' : activity.status === 'scheduled' ? 'text-blue-600' : 'text-green-600'}`}>
                     {activity.status.charAt(0).toUpperCase() + activity.status.slice(1).replace('-', ' ')}
-                  </Badge>
-                  <Badge variant="outline" className="ml-2 border-gray-300">
-                    {activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
-                  </Badge>
+                  </span>
                 </div>
               </div>
-              
-              <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
-                {activity.title}
-              </DialogTitle>
-              <p className="text-sm text-gray-600">{activity.description}</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-              <Button variant="outline" size="sm">
-                <Forward className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-6 pt-2">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{formatDate(activity.date)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{activity.time}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{activity.location}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{participants.length} participants</span>
-            </div>
-          </div>
-        </DialogHeader>
-
-        {/* Tabs */}
-        <div className="flex border-b mb-6">
-          <button
-            className={`px-4 py-2 font-medium text-sm ${
-              activeTab === 'overview' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('overview')}
-          >
-            Overview
-          </button>
-          <button
-            className={`px-4 py-2 font-medium text-sm ${
-              activeTab === 'updates' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('updates')}
-          >
-            Updates ({updates.length})
-          </button>
-          <button
-            className={`px-4 py-2 font-medium text-sm ${
-              activeTab === 'documents' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('documents')}
-          >
-            Documents ({documents.length})
-          </button>
+          </DialogHeader>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'overview' && (
+        <div className="p-6 overflow-y-auto">
           <div className="space-y-6">
-            {/* Description */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <GoNote className="h-5 w-5" />
-                Description
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {activity.description}
-                {activity.type === 'visit' && (
-                  <>
-                    <br/><br/>
-                    This visit aims to assess current operations, meet with local management, and identify opportunities for improvement. The team will conduct a thorough evaluation of production processes, quality control measures, and compliance with regulatory standards.
-                    <br/><br/>
-                    Key objectives include reviewing recent performance metrics, discussing challenges with staff, and formulating recommendations for operational enhancements.
-                  </>
-                )}
-                {activity.type === 'meeting' && (
-                  <>
-                    <br/><br/>
-                    This meeting will bring together key stakeholders to discuss quarterly performance, review strategic initiatives, and align on upcoming priorities. Participants should come prepared with their department updates and be ready to engage in collaborative planning.
-                    <br/><br/>
-                    The agenda includes performance review, strategic initiative updates, and action planning for the next quarter.
-                  </>
-                )}
-              </p>
-            </div>
-
-            <Separator />
-
-            {/* Participants */}
+            {/* Task Information */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Participants ({participants.length})
-                </h3>
-                <Button variant="outline" size="sm">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {participants.map((person, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-gray-100 text-gray-800 text-sm">
-                          {person.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{person.name}</p>
-                        <p className="text-xs text-gray-600">{person.role}</p>
+              {/* Assignee */}
+              <div>
+                <div className="flex items-center gap-3 pb-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <Label className="text-sm text-gray-600">Assignee</Label>
+                  <div className="flex items-center gap-2 ml-[78px]">
+                    {assignees.map((assignee) => (
+                      <div
+                        key={assignee.id}
+                        className="flex items-center gap-2 px-3 py-1 border border-gray-300 rounded-full hover:bg-gray-50 group"
+                      >
+                        <Avatar className="h-5 w-5">
+                          <AvatarFallback className="bg-blue-500 text-white text-xs">
+                            {assignee.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{assignee.name}</span>
                       </div>
-                    </div>
-                    <Badge 
-                      variant={person.status === "Confirmed" ? "default" : person.status === "Tentative" ? "secondary" : "outline"}
-                      className={
-                        person.status === "Confirmed" ? "bg-green-100 text-green-800" :
-                        person.status === "Tentative" ? "bg-amber-100 text-amber-800" :
-                        "bg-red-100 text-red-800"
-                      }
+                    ))}
+                    {showAddAssignee ? (
+                      <Input
+                        placeholder="Enter assignee name..."
+                        value={newAssigneeName}
+                        onChange={(e) => setNewAssigneeName(e.target.value)}
+                        onKeyDown={handleAssigneeKeyPress}
+                        onBlur={() => setShowAddAssignee(false)}
+                        className="text-sm h-8 w-40"
+                        autoFocus
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setShowAddAssignee(true)}
+                        className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="border-b border-gray-200"></div>
+              </div>
+
+              {/* Start Date */}
+              <div>
+                <div className="flex items-center gap-3 pb-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <Label className="text-sm text-gray-600">Start Date</Label>
+                  {editingStartDate ? (
+                    <Input
+                      type="text"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      onBlur={() => setEditingStartDate(false)}
+                      onKeyDown={(e) => e.key === 'Enter' && setEditingStartDate(false)}
+                      className="text-sm h-8 w-48 ml-[78px]"
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      className="text-sm cursor-pointer hover:bg-gray-50 px-2 py-1 rounded ml-[78px]"
+                      onClick={() => setEditingStartDate(true)}
                     >
-                      {person.status}
-                    </Badge>
+                      {startDate}
+                    </span>
+                  )}
+                </div>
+                <div className="border-b border-gray-200"></div>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <div className="flex items-center gap-3 pb-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <Label className="text-sm text-gray-600">Due Date</Label>
+                  {editingDueDate ? (
+                    <Input
+                      type="text"
+                      value={dueDate}
+                      onChange={(e) => setDueDate(e.target.value)}
+                      onBlur={() => setEditingDueDate(false)}
+                      onKeyDown={(e) => e.key === 'Enter' && setEditingDueDate(false)}
+                      className="text-sm h-8 w-48 ml-[82px]"
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      className="text-sm cursor-pointer hover:bg-gray-50 px-2 py-1 rounded ml-[82px]"
+                      onClick={() => setEditingDueDate(true)}
+                    >
+                      {dueDate}
+                    </span>
+                  )}
+                </div>
+                <div className="border-b border-gray-200"></div>
+              </div>
+
+              {/* Category */}
+              <div>
+                <div className="flex items-center gap-3 pb-2">
+                  <BiCategory className="h-4 w-4 text-gray-500" />
+                  <Label className="text-sm text-gray-600">Category</Label>
+                  <div className="ml-[84px] relative">
+                    <Button
+                      variant="ghost"
+                      className="text-blue-600 text-sm p-0 h-auto"
+                      onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add Category
+                    </Button>
+                    {showCategoryDropdown && (
+                      <div className="absolute right-0 top-6 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-48 z-10">
+                        <div className="mb-2">
+                          <p className="text-sm font-medium mb-2">Select Category</p>
+                          <div className="relative">
+                            <Search className="h-3 w-3 absolute left-2 top-2.5 text-gray-400" />
+                            <Input
+                              placeholder="Search"
+                              className="pl-7 h-8 text-xs"
+                              value={searchCategory}
+                              onChange={(e) => setSearchCategory(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          {filteredCategories.map((category) => (
+                            <button
+                              key={category}
+                              className="w-full text-left px-2 py-1 text-sm hover:bg-gray-100 rounded"
+                              onClick={() => {
+                                setSelectedCategory(category)
+                                setShowCategoryDropdown(false)
+                              }}
+                            >
+                              {category}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="border-b border-gray-200"></div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center gap-3">
+                <MapPin className="h-4 w-4 text-gray-500" />
+                <Label className="text-sm text-gray-600">Location</Label>
+                {editingLocation ? (
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    onBlur={() => setEditingLocation(false)}
+                    onKeyDown={(e) => e.key === 'Enter' && setEditingLocation(false)}
+                    className="text-sm h-8 w-48 ml-[84px]"
+                    autoFocus
+                  />
+                ) : (
+                  <span
+                    className="text-sm cursor-pointer hover:bg-gray-50 px-2 py-1 rounded ml-[84px]"
+                    onClick={() => setEditingLocation(true)}
+                  >
+                    {location}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="border-b border-gray-200"></div>
+
+            {/* Description and Attachments */}
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Description</Label>
+                <Input
+                  placeholder="Add a description..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <Button
+                variant="outline"
+                className="border border-blue-300 text-blue-600 hover:bg-blue-50/70 hover:backdrop-blur-sm hover:border-blue-400 rounded-lg px-4 py-2 text-sm transition-all"
+              >
+                <Paperclip className="h-4 w-4 mr-2 text-blue-600" />
+                Attach
+              </Button>
+            </div>
+            <div className="border-b border-gray-200"></div>
+
+            {/* Subtasks */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Subtask</h3>
+              <div className="space-y-2">
+                {subtasks.map((subtask) => (
+                  <div key={subtask.id} className="flex items-center gap-3">
+                    <Checkbox
+                      checked={subtask.completed}
+                      onCheckedChange={() => handleSubtaskToggle(subtask.id)}
+                    />
+                    <span className={`text-sm ${subtask.completed ? 'line-through text-gray-500' : ''}`}>
+                      {subtask.text}
+                    </span>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <Separator />
-
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-3">
-              <Button className="bg-black hover:bg-gray-800">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                {activity.status === 'completed' ? 'Completed' : 'Mark as Complete'}
-              </Button>
-              <Button variant="outline">
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Send Message
-              </Button>
-              <Button variant="outline">
-                <Phone className="mr-2 h-4 w-4" />
-                Call
-              </Button>
-              <Button variant="outline">
-                <FaRegCopy className="mr-2 h-4 w-4" />
-                Duplicate
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'updates' && (
-          <div className="space-y-4">
-            <div className="space-y-4 max-w-2xl">
-              {updates.map((update) => (
-                <div key={update.id} className="border-l-2 border-gray-200 pl-4 py-1 relative">
-                  <div className="absolute w-2 h-2 bg-gray-300 rounded-full -left-[5px] top-2"></div>
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback className="bg-gray-100 text-gray-800 text-xs">
-                        {update.author.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="text-sm">
-                        <span className="font-medium">{update.author}</span>
-                        <span className="text-gray-600"> {update.message}</span>
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">{update.time} • {update.date}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="pt-4">
-              <div className="flex gap-2 mt-4">
-                <Input 
-                  placeholder="Add a comment or update..."
-                  className="flex-1"
+              {showSubtaskInput ? (
+                <Input
+                  placeholder="Enter new subtask..."
+                  value={newSubtaskText}
+                  onChange={(e) => setNewSubtaskText(e.target.value)}
+                  onKeyDown={handleSubtaskKeyPress}
+                  autoFocus
+                  className="text-sm"
                 />
-                <Button>
-                  <BiCommentDetail className="mr-2 h-4 w-4" />
-                  Post
+              ) : (
+                <Button
+                  variant="ghost"
+                  className="text-blue-600 p-0 h-auto"
+                  onClick={() => setShowSubtaskInput(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Subtask
+                </Button>
+              )}
+            </div>
+            <div className="border-b border-gray-200"></div>
+
+            {/* Comments */}
+            <div className="space-y-4">
+              {/* Display existing comments */}
+              {comments.length > 0 && (
+                <div className="space-y-3">
+                  {comments.map((commentItem) => (
+                    <div key={commentItem.id} className="flex justify-end">
+                      <div className="flex items-start gap-2 max-w-xs">
+                        <div className="bg-blue-500 text-white p-2 rounded-lg rounded-tr-none">
+                          <p className="text-sm">{commentItem.text}</p>
+                        </div>
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="bg-gray-500 text-white text-xs">
+                            {commentItem.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Comment input */}
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute left-2 top-1 h-8 w-8 p-0 text-blue-600 hover:text-blue-700 z-10"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Input
+                  placeholder="Add Comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  onKeyDown={handleCommentKeyPress}
+                  className="pl-10 pr-10"
+                />
+                <Button
+                  size="sm"
+                  className="absolute right-1 top-1 h-8 w-8 p-0 bg-blue-600 hover:bg-blue-700"
+                  onClick={handleSendComment}
+                >
+                  <Send className="h-3 w-3" />
                 </Button>
               </div>
             </div>
-          </div>
-        )}
 
-        {activeTab === 'documents' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Attached Documents</h3>
-              <Button>
-                <FileText className="mr-2 h-4 w-4" />
-                Upload
+            {/* Mark As Completed Button */}
+            <div className="flex justify-end pt-4">
+              <Button className="bg-black hover:bg-gray-800 text-white">
+                Mark As Completed
               </Button>
             </div>
-
-            <div className="space-y-2">
-              {documents.map((doc) => (
-                <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{doc.title}</p>
-                      <p className="text-xs text-gray-600">
-                        {doc.size} • Uploaded by {doc.uploadedBy} on {doc.uploadDate}
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   )

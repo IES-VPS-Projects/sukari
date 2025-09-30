@@ -17,9 +17,10 @@ import {
 import { BsBuildings } from "react-icons/bs"
 import { GoInfo } from "react-icons/go"
 import { X } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { allActionsData } from "@/lib/mockdata"
+import { actionsData } from "../data/actions-data"
+import { MillRegistrationForm } from "../components/MillRegistrationForm"
 
 interface Action {
   id: string
@@ -45,6 +46,17 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   const [actionActiveTab, setActionActiveTab] = useState("overview")
   const [comment, setComment] = useState("")
   const isMobile = useIsMobile()
+
+  // Update selectedActionForDetails when selectedActionId prop changes
+  useEffect(() => {
+    console.log('ActionsModal: selectedActionId changed to:', selectedActionId)
+    setSelectedActionForDetails(selectedActionId || null)
+  }, [selectedActionId])
+
+  // Debug modal state
+  useEffect(() => {
+    console.log('ActionsModal: open =', open, 'selectedActionForDetails =', selectedActionForDetails)
+  }, [open, selectedActionForDetails])
   
   const handleActionDecision = (decision: string, actionId: string) => {
     console.log(`${decision} action ${actionId} with comment: ${comment}`)
@@ -53,17 +65,16 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   }
   
   if (!selectedActionForDetails) {
-    // List view
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} p-0 [&>button]:hidden`}>
           <DialogTitle className="sr-only">Actions</DialogTitle>
           <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
-            <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} bg-gray-50`}>
+            <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} bg-gray-50 relative`}>
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}>Actions</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+                  <p className="text-sm text-gray-500 mt-1">{actionsData.length} actions requiring attention</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="group relative">
@@ -82,14 +93,21 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                   </Button>
                 </div>
               </div>
+              {/* Horizontal divider line at bottom edge of header */}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-300"></div>
             </div>
             
             <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
               <div className="space-y-3">
-                {allActionsData.map((action) => (
+                {actionsData.map((action) => (
                   <div 
                     key={action.id}
-                    className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      action.id === 'action-1' ? 'hover:bg-orange-50' :
+                      action.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
+                      action.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
+                      'hover:bg-gray-50'
+                    }`}
                     onClick={() => setSelectedActionForDetails(action.id)}
                   >
                     {/* Icon */}
@@ -108,10 +126,11 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-sm font-medium text-[#202020] truncate">{action.title}</h4>
                             <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                              action.id === 'action-1' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
                               action.type === 'approval' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
                               'bg-green-50/80 text-green-700 border-gray-300'
                             }`}>
-                              {action.type === 'approval' ? 'Approval' : 'Vote'}
+                              {action.id === 'action-1' ? 'Review' : action.type === 'approval' ? 'Approval' : 'Vote'}
                             </div>
                           </div>
                           <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
@@ -130,114 +149,165 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   }
 
   // Details view - Get action details
-  const action = allActionsData.find(a => a.id === selectedActionForDetails)
+  const action = actionsData.find(a => a.id === selectedActionForDetails)
   
   if (!action) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none overflow-hidden' : 'max-w-4xl max-h-[90vh]'} p-0 [&>button]:hidden`}>
+      <DialogContent className={`${isMobile ? 'max-w-full h-screen max-h-screen m-0 rounded-none' : 'max-w-4xl max-h-[90vh]'} flex flex-col p-0 [&>button]:hidden`}>
         <DialogTitle className="sr-only">Action Details</DialogTitle>
-        <div className={`flex flex-col h-full ${isMobile ? 'overflow-hidden' : ''}`}>
+        <div className={`flex flex-col h-full min-h-0`}> 
           {/* Header */}
-          <div className={`${isMobile ? 'p-4 flex-shrink-0' : 'p-6'} bg-gray-50`}>
-            <div className="flex items-center gap-3 mb-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedActionForDetails(null)}
-                className="shrink-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} ${action.iconBg} rounded-lg flex items-center justify-center`}>
-                  {action.type === 'approval' ? (
-                    <CheckCircle className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
-                  ) : (
-                    <Users className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
+          <div className="flex-shrink-0">
+            {/* Header content with colored background */}
+            <div className={`${isMobile ? 'p-4' : 'p-6'} ${
+              action.id === 'action-1' ? 'bg-orange-50' :
+              action.iconColor === 'text-green-600' ? 'bg-green-50' :
+              action.iconColor === 'text-blue-600' ? 'bg-blue-50' :
+              'bg-gray-50'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedActionForDetails(null)}
+                  className="shrink-0"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} ${action.iconBg} rounded-lg flex items-center justify-center`}>
+                    {action.type === 'approval' ? (
+                      <CheckCircle className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
+                    ) : (
+                      <Users className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} ${action.iconColor}`} />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 truncate`}>{action.title}</h1>
+                      <Badge className={`${action.id === 'action-1' ? 'bg-orange-500/10 text-orange-700 border border-orange-200/30' : 'bg-red-500/10 text-red-700 border border-red-200/30'} backdrop-blur-sm shrink-0`} style={action.id === 'action-1' ? { backgroundColor: '#f97316', color: 'white' } : {}}>
+                        {action.id === 'action-1' ? 'Review' : 'High'}
+                      </Badge>
+                    </div>
+                    {action.id === 'action-1' ? (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <BsBuildings className="h-4 w-4 shrink-0" />
+                        <span className="truncate">Mumias Sugar Mills Ltd</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <BsBuildings className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{action.type === 'vote' ? 'Kenya Sugar Board - Policy Committee' : 'Sugar Industry Regulatory Division'}</span>
+                      </div>
+                    )}
+                  </div>
+                  {!isMobile && (
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon">
+                        <Star className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Share className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 truncate`}>{action.title}</h1>
-                    <Badge className="bg-red-500/10 text-red-700 border border-red-200/30 backdrop-blur-sm shrink-0">
-                      High
-                    </Badge>
-                  </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <BsBuildings className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{action.type === 'vote' ? 'Kenya Sugar Board - Policy Committee' : 'Sugar Industry Regulatory Division'}</span>
-                  </div>
-                </div>
-                {!isMobile && (
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Star className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Share className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className={`${isMobile ? 'mt-4' : 'mt-6'}`}>
-              <div className="flex border-b border-gray-200 overflow-x-auto">
-                <button
-                  onClick={() => setActionActiveTab("overview")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "overview"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => setActionActiveTab("documents")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "documents"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  Documents
-                </button>
-                <button
-                  onClick={() => setActionActiveTab("activities")}
-                  className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    actionActiveTab === "activities"
-                      ? "text-blue-600 border-blue-600"
-                      : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  History
-                </button>
+            {/* Tabs with colored background - Only show for non-mill registration actions */}
+            {action.id !== 'action-1' && (
+              <div className={`${
+                action.iconColor === 'text-green-600' ? 'bg-green-50' :
+                action.iconColor === 'text-blue-600' ? 'bg-blue-50' :
+                'bg-gray-50'
+              } ${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+                <div className="flex border-b border-gray-200 overflow-x-auto">
+                  <button
+                    onClick={() => setActionActiveTab("overview")}
+                    className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      actionActiveTab === "overview"
+                        ? "text-blue-600 border-blue-600"
+                        : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    Overview
+                  </button>
+                  <button
+                    onClick={() => setActionActiveTab("documents")}
+                    className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      actionActiveTab === "documents"
+                        ? "text-blue-600 border-blue-600"
+                        : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    Documents
+                  </button>
+                  <button
+                    onClick={() => setActionActiveTab("activities")}
+                    className={`${isMobile ? 'px-3 py-2' : 'px-4 py-2'} text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      actionActiveTab === "activities"
+                        ? "text-blue-600 border-blue-600"
+                        : "text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    History
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {/* Horizontal divider line between header and body for non-mill registration actions */}
+            {action.id !== 'action-1' && (
+              <div className="h-px bg-gray-300"></div>
+            )}
           </div>
 
+            {/* Horizontal line for mill registration */}
+            {action.id === 'action-1' && (
+              <div className="h-px bg-gray-300" />
+            )}
+
           {/* Content */}
-          <div className={`flex-1 ${isMobile ? 'overflow-hidden flex flex-col min-h-0' : 'overflow-hidden flex flex-col'}`}>
-            {actionActiveTab === "overview" && (
-              <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
-                <div className="space-y-6">
-                  {/* Summary */}
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">Summary</h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      {action.description} {action.type === 'vote' 
-                        ? 'This board committee vote requires your participation to establish the new sugar industry framework. Your vote will contribute to determining the policy structure for the upcoming implementation period.'
-                        : 'This proposal requires your review and approval to proceed with the sugar industry regulation. The approval will enhance sector oversight and ensure adequate regulatory coverage for the region during the upcoming operational period.'
-                      }
-                    </p>
-                  </div>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {/* Mill Registration Form or Tab Content */}
+            {action.id === 'action-1' ? (
+              // Mill Registration Application Form - Always shown, no tabs
+              <div className={`${isMobile ? 'px-4 py-4' : 'p-6'}`}>
+                <MillRegistrationForm
+                  onAssignFieldCoordinator={(coordinatorId, notes) => {
+                    console.log(`Assigning coordinator ${coordinatorId} with notes: ${notes}`)
+                    // Handle field coordinator assignment
+                    onOpenChange(false)
+                  }}
+                  onDeny={(reason) => {
+                    console.log(`Denying mill registration: ${reason}`)
+                    // Handle denial
+                    onOpenChange(false)
+                  }}
+                />
+              </div>
+            ) : (
+              // Tab-based content for other actions
+              <>
+                {actionActiveTab === "overview" && (
+                  <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
+                    <div className="space-y-6">
+                    {/* Summary */}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900 mb-3">Summary</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        {action.description} {action.type === 'vote'
+                          ? 'This board committee vote requires your participation to establish the new sugar industry framework. Your vote will contribute to determining the policy structure for the upcoming implementation period.'
+                          : 'This proposal requires your review and approval to proceed with the sugar industry regulation. The approval will enhance sector oversight and ensure adequate regulatory coverage for the region during the upcoming operational period.'
+                        }
+                      </p>
+                    </div>
 
                   {/* Key Details - Different for votes vs approvals */}
                   <div>
@@ -330,11 +400,11 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                    </div>
+                  </div>
+                )}
 
-            {actionActiveTab === "documents" && (
+                {actionActiveTab === "documents" && (
               <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-gray-900">Resources</h3>
@@ -501,7 +571,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
               </div>
             )}
 
-            {actionActiveTab === "activities" && (
+                {actionActiveTab === "activities" && (
               <div className={`${isMobile ? 'flex-1 overflow-y-auto overflow-x-hidden px-4 py-4' : 'h-[350px] overflow-y-auto scrollbar-hide p-6'}`}>
                 <div className="space-y-8">
                   {action.type === 'vote' ? (
@@ -720,68 +790,72 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
               </div>
             )}
 
-            {/* Comments Section & Action Buttons */}
-            <div className={`border-t bg-gray-50 flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-900 mb-2 block">
-                    Leave a Comment
-                  </label>
-                  <Textarea
-                    placeholder="Enter your decision rationale..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={3}
-                    className={`w-full ${isMobile ? 'text-sm' : ''}`}
-                  />
-                </div>
-                
-                <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-end'} gap-3`}>
-                  {action.type === 'vote' ? (
-                    // Board vote buttons
-                    <>
-                      <Button 
-                        variant="outline"
-                        className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('reject', action.id)}
-                      >
-                        Vote No
-                      </Button>
-                      <Button 
-                        className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('approve', action.id)}
-                      >
-                        Vote Yes
-                      </Button>
-                    </>
-                  ) : (
-                    // Approval buttons
-                    <>
-                      <Button 
-                        variant="outline"
-                        className={`text-yellow-600 border-yellow-200 hover:bg-yellow-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('defer', action.id)}
-                      >
-                        Defer
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('reject', action.id)}
-                      >
-                        Reject
-                      </Button>
-                      <Button 
-                        className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
-                        onClick={() => handleActionDecision('approve', action.id)}
-                      >
-                        Approve
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+                {/* Comments Section & Action Buttons - Only for non-mill registration actions */}
+                {action.id !== 'action-1' && (
+                  <div className={`border-t bg-gray-50 flex-shrink-0 ${isMobile ? 'p-4' : 'p-6'}`}>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-900 mb-2 block">
+                          Leave a Comment
+                        </label>
+                        <Textarea
+                          placeholder="Enter your decision rationale..."
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          rows={3}
+                          className={`w-full ${isMobile ? 'text-sm' : ''}`}
+                        />
+                      </div>
+
+                      <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-end'} gap-3`}>
+                        {action.type === 'vote' ? (
+                          // Board vote buttons
+                          <>
+                            <Button
+                              variant="outline"
+                              className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
+                              onClick={() => handleActionDecision('reject', action.id)}
+                            >
+                              Vote No
+                            </Button>
+                            <Button
+                              className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
+                              onClick={() => handleActionDecision('approve', action.id)}
+                            >
+                              Vote Yes
+                            </Button>
+                          </>
+                        ) : (
+                          // Approval buttons
+                          <>
+                            <Button
+                              variant="outline"
+                              className={`text-yellow-600 border-yellow-200 hover:bg-yellow-50 ${isMobile ? 'w-full' : ''}`}
+                              onClick={() => handleActionDecision('defer', action.id)}
+                            >
+                              Defer
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className={`text-red-600 border-red-200 hover:bg-red-50 ${isMobile ? 'w-full' : ''}`}
+                              onClick={() => handleActionDecision('reject', action.id)}
+                            >
+                              Reject
+                            </Button>
+                            <Button
+                              className={`bg-green-600 hover:bg-green-700 text-white ${isMobile ? 'w-full' : ''}`}
+                              onClick={() => handleActionDecision('approve', action.id)}
+                            >
+                              Approve
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </DialogContent>

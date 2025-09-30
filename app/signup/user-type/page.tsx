@@ -4,8 +4,8 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { User, Building2 } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import SignupHeader from "@/app/signup/components/SignupHeader"
+import ProgressBar from "@/app/signup/components/ProgressBar"
 
 const userTypes = [
   {
@@ -58,7 +58,7 @@ export default function SelectUserType() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SignupHeader />
-      <ProgressBar currentStep={1} totalSteps={6} />
+      <ProgressBar currentStep={1} />
 
       <div className="flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl w-full space-y-6">

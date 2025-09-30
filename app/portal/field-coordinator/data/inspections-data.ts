@@ -12,9 +12,54 @@ export interface InspectionAssignment {
   assignedDate: string
   description: string
   checklist?: string[]
+  companyInfo?: {
+    registrationNo?: string
+    pinNumber?: string
+    postalAddress?: string
+    county?: string
+    subcounty?: string
+    email?: string
+    establishmentDate?: string
+    productionCapacity?: string
+    facilitySize?: string
+    employeeCount?: string
+  }
 }
 
 export const inspectionAssignments: InspectionAssignment[] = [
+  {
+    id: "insp-mill-reg-001",
+    type: "letterOfComfort",
+    title: "Mill Registration Physical Inspection",
+    businessName: "Mumias Sugar Mills Ltd",
+    businessId: "KSB/REG/2025/001",
+    location: "Mumias-Kakamega Road, Mumias, Kakamega County",
+    contactPerson: "James Mwangi",
+    contactPhone: "+254-722-123456",
+    status: "pending",
+    dueDate: "2025-10-15",
+    assignedDate: "2025-09-29",
+    description: "Physical inspection of mill facilities for new registration application. Verify compliance with registration requirements and environmental standards.",
+    checklist: [
+      "Check on discharge of substances",
+      "Air pollution assessment",
+      "Hazardous Waste Management compliance",
+      "Labelling of Sugar and Jaggery standards verification",
+      "Verify no aid or abet illegal trafficking of sugar or related substances"
+    ],
+    companyInfo: {
+      registrationNo: "CPR/2018/123456",
+      pinNumber: "P051234567A",
+      postalAddress: "P.O. Box 234, Mumias",
+      county: "Kakamega",
+      subcounty: "Mumias East",
+      email: "info@mumiassugar.co.ke",
+      establishmentDate: "2018-03-15",
+      productionCapacity: "3,500 TCD (Tonnes Cane per Day)",
+      facilitySize: "45 acres",
+      employeeCount: "1,200"
+    }
+  },
   {
     id: "insp-001",
     type: "letterOfComfort",

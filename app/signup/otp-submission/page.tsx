@@ -5,8 +5,8 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle } from "lucide-react"
-import SignupHeader from "@/components/signup/SignupHeader"
-import ProgressBar from "@/components/signup/ProgressBar"
+import SignupHeader from "@/app/signup/components/SignupHeader"
+import ProgressBar from "@/app/signup/components/ProgressBar"
 
 export default function OTPSubmission() {
   const [otp, setOtp] = useState(["", "", "", ""])
@@ -158,7 +158,7 @@ export default function OTPSubmission() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SignupHeader />
-      <ProgressBar currentStep={currentStep} totalSteps={5} />
+      <ProgressBar currentStep={currentStep} />
 
       {/* Success Message */}
       {showSuccessMessage && (

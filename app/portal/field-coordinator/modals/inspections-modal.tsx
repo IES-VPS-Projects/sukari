@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InspectionAssignment, inspectionAssignments } from "../data/inspections-data"
 import { MapPin, Calendar, User, Phone, ClipboardCheck, ArrowRight } from "lucide-react"
+import { InspectionChecklistModal } from "./inspection-checklist-modal"
 
 interface InspectionsModalProps {
   open: boolean
@@ -24,6 +25,7 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
   const [selectedAssignment, setSelectedAssignment] = useState<InspectionAssignment | null>(null)
   const [activeTab, setActiveTab] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [showInspectionChecklist, setShowInspectionChecklist] = useState(false)
   
   const baseAssignments = activeTab === "all" 
     ? inspectionAssignments 
@@ -97,6 +99,17 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
     }
   }
 
+
+  const handleInspectionReportSubmit = (report: any) => {
+    console.log('Inspection Report Submitted:', report)
+    // Here you would normally send the report to the backend
+    // For now, we'll just log it and close the modals
+    setShowInspectionChecklist(false)
+    setSelectedAssignment(null)
+    // Show success message or update the assignment status
+    alert('Inspection report submitted successfully!')
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
@@ -161,6 +174,68 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
                   </div>
                 </div>
 
+                {selectedAssignment.companyInfo && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-3">Company Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {selectedAssignment.companyInfo.registrationNo && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Registration No:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.registrationNo}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.pinNumber && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">PIN Number:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.pinNumber}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.postalAddress && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Postal Address:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.postalAddress}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.county && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">County:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.county}, {selectedAssignment.companyInfo.subcounty}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.email && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Email:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.email}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.establishmentDate && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Established:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.establishmentDate}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.productionCapacity && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Production Capacity:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.productionCapacity}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.facilitySize && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Facility Size:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.facilitySize}</p>
+                        </div>
+                      )}
+                      {selectedAssignment.companyInfo.employeeCount && (
+                        <div>
+                          <span className="text-sm font-medium text-blue-800">Employee Count:</span>
+                          <p className="text-sm text-blue-700">{selectedAssignment.companyInfo.employeeCount}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {selectedAssignment.checklist && selectedAssignment.checklist.length > 0 && (
                   <div className="flex items-start gap-3">
                     <ClipboardCheck className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
@@ -183,7 +258,10 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
               
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <div className="flex justify-between">
-                  <Button variant="default">
+                  <Button
+                    variant="default"
+                    onClick={() => setShowInspectionChecklist(true)}
+                  >
                     Start Inspection
                   </Button>
                   {selectedAssignment.type === "letterOfComfort" && (
@@ -263,6 +341,14 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
           </div>
         )}
       </DialogContent>
+
+      {/* Inspection Checklist Modal */}
+      <InspectionChecklistModal
+        open={showInspectionChecklist}
+        onOpenChange={setShowInspectionChecklist}
+        assignment={selectedAssignment}
+        onSubmitReport={handleInspectionReportSubmit}
+      />
     </Dialog>
   )
 }

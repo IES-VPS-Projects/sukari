@@ -26,7 +26,8 @@ import {
   Download,
   Forward,
   Edit,
-  Trash2
+  Trash2,
+  ArrowLeft
 } from "lucide-react"
 
 interface Meeting {
@@ -141,13 +142,31 @@ export function MeetingDetailsModal({ open, onOpenChange, meeting }: MeetingDeta
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
+        <div className={`p-6 ${
+          meeting.title.includes("Board Meeting") ? 'bg-yellow-50' :
+          meeting.title.includes("Farmer") ? 'bg-blue-50' :
+          meeting.title.includes("Mill Operators") ? 'bg-green-50' :
+          meeting.title.includes("Quality") ? 'bg-blue-50' :
+          meeting.title.includes("Executive") ? 'bg-purple-50' :
+          'bg-gray-50'
+        }`}>
         <DialogHeader className="space-y-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
-                {meeting.title}
-              </DialogTitle>
+              <div className="flex items-center gap-3 mb-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onOpenChange(false)}
+                  className="shrink-0"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <DialogTitle className="text-2xl font-bold text-gray-900">
+                  {meeting.title}
+                </DialogTitle>
+              </div>
               <div className="flex gap-2">
                 <Badge className={getPriorityColor(meeting.priority)}>
                   {meeting.priority}
@@ -164,8 +183,10 @@ export function MeetingDetailsModal({ open, onOpenChange, meeting }: MeetingDeta
               <Button variant="outline" size="sm">
                 <Forward className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm">
-                <Trash2 className="h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </Button>
             </div>
           </div>
@@ -183,10 +204,12 @@ export function MeetingDetailsModal({ open, onOpenChange, meeting }: MeetingDeta
             </Button>
           </div>
         </DialogHeader>
-
+        </div>
+        
         {/* Horizontal Separator */}
         <div className="border-b border-gray-200"></div>
 
+        <div className="p-6">
         <div className="space-y-6">
           {/* Meeting Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,6 +347,7 @@ export function MeetingDetailsModal({ open, onOpenChange, meeting }: MeetingDeta
               ))}
             </div>
           </div>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

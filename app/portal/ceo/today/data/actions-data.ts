@@ -22,21 +22,21 @@ export interface ActionItem {
 export const actionsData: ActionItem[] = [
   {
     id: 'action-1',
-    title: 'Sugar Import Allocation Approval',
-    description: 'Approve allocation of 50,000 MT sugar imports to Mumias Sugar Company',
+    title: 'Application For Registration of a Mill',
+    description: 'Review mill registration application from Mumias Sugar Mills Ltd and assign field coordinator for inspection',
     type: 'approval',
-    timestamp: '2 hours ago',
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-100',
-    hoverBg: 'hover:bg-blue-50',
+    timestamp: '3 hours ago',
+    iconColor: 'text-orange-600',
+    iconBg: 'bg-orange-100',
+    hoverBg: 'hover:bg-orange-50',
     priority: 'high',
     status: 'pending',
-    deadline: 'Tomorrow, 5:00 PM',
-    requestedBy: 'Operations Department',
-    details: 'Request to approve the allocation of 50,000 MT sugar imports to Mumias Sugar Company to meet local demand gap for Q3 2025. The request follows the board resolution of July 15, 2025, and aligns with the import substitution policy framework.',
-    requiredAction: 'Review attached documentation and approve or deny the request',
-    relatedDocuments: ['Import Request Form #IMR-2025-089', 'Market Demand Analysis Q3 2025', 'Board Resolution #BR-2025-107'],
-    stakeholders: ['Mumias Sugar Company', 'Kenya Revenue Authority', 'Ministry of Agriculture']
+    deadline: '57 days remaining',
+    requestedBy: 'Mumias Sugar Mills Ltd',
+    details: 'New mill registration application requiring compliance review and site inspection. Application includes complete company documentation, facility specifications, and environmental compliance certificates. Requires field coordinator assignment for physical inspection.',
+    requiredAction: 'Review mill registration application and assign field coordinator for site inspection',
+    relatedDocuments: ['Application Form KSB/01', 'Company Registration Certificate', 'Environmental Impact Assessment', 'Facility Layout Plans', 'Technical Specifications'],
+    stakeholders: ['Mumias Sugar Mills Ltd', 'Field Coordinators', 'Environmental Department']
   },
   {
     id: 'action-2', 

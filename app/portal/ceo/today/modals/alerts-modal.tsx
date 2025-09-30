@@ -120,29 +120,44 @@ export function AlertsModal({
             if (alert) {
               return (
                 <div className="flex flex-col h-full">
-                  <div className="p-4 sm:p-6 flex-shrink-0 bg-gray-50">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(null)}
-                        className="shrink-0 h-8 w-8 sm:h-10 sm:w-10"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                      </Button>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 ${alert.iconBg} rounded-lg flex items-center justify-center`}>
-                          <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-semibold text-gray-900">{alert.title}</h2>
-                          <p className="text-sm text-gray-500">{formatTimestamp(alert.timestamp)}</p>
+                  {/* Header with background matching icon color */}
+                  <div className={`flex-shrink-0 ${alert.iconBg} border-b border-gray-200`}>
+                    <div className="p-4 sm:p-6">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedAlertForDetails && setSelectedAlertForDetails(null)}
+                          className="shrink-0 h-8 w-8 sm:h-10 sm:w-10 hover:bg-white/50"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm`}>
+                            <FiAlertTriangle className={`h-5 w-5 ${alert.iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h2 className="text-xl font-semibold text-gray-900 truncate">{alert.title}</h2>
+                              <div className={`px-2 py-0.5 rounded-full text-xs font-medium border shrink-0 ${
+                                alert.label === 'HIGH' ? 'bg-red-600 text-white border-red-700' :
+                                alert.label === 'MEDIUM' ? 'bg-orange-600 text-white border-orange-700' :
+                                alert.label === 'LOW' ? 'bg-green-600 text-white border-green-700' :
+                                alert.label === 'INFO' ? 'bg-blue-600 text-white border-blue-700' :
+                                'bg-gray-600 text-white border-gray-700'
+                              }`}>
+                                {alert.label}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600">{formatTimestamp(alert.timestamp)}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex-1 overflow-y-auto p-6">
+
+                  {/* White body content starts here */}
+                  <div className="flex-1 overflow-y-auto p-6 bg-white">
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 mb-2">Alert Details</h3>
@@ -235,7 +250,7 @@ export function AlertsModal({
           // List view
           return (
             <div className="flex flex-col h-full">
-              <div className="p-4 sm:p-6 pb-0 bg-gray-50">
+              <div className="p-4 sm:p-6 pb-0 bg-gray-50 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">Alerts</h2>
@@ -258,9 +273,9 @@ export function AlertsModal({
                     </Button>
                   </div>
                 </div>
-                
+
                 {/* Tabs with underline style and left alignment */}
-                <div className="mt-2">
+                <div className="mt-2 -mb-[1px]">
                   <div className="flex overflow-x-auto border-b border-gray-200">
                     <button
                       onClick={() => setActiveTab("all")}
@@ -305,8 +320,8 @@ export function AlertsModal({
                   </div>
                 </div>
               </div>
-              
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-4">
+
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-4 bg-white">
                 {activeTab === "all" && (
                   <div className="space-y-3">
                     <div className="space-y-3">

@@ -6,85 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertTriangle, ChevronDown } from "lucide-react"
-import { allAlertsData } from "@/lib/mockdata"
+import { alertsData as importedAlertsData } from "../data/alerts-data"
 
 // KSB Alerts data customized for sugar industry operations
 const alertsData = {
   alerts: [
-    {
-      id: '1',
-      title: 'Mill Performance Alert',
-      label: 'HIGH',
-      description: 'Mill #3 efficiency dropped by 12% - immediate maintenance required',
-      timestamp: '2 hours ago • Chemelil Factory',
-      category: 'Production',
-      priority: 'high',
-      labelColor: 'bg-red-500',
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600'
-    },
-    {
-      id: '2',
-      title: 'Environmental Compliance Warning',
-      label: 'MEDIUM',
-      description: 'West Zone operations require environmental standards review',
-      timestamp: '4 hours ago • Environmental Dept',
-      category: 'Compliance',
-      priority: 'medium',
-      labelColor: 'bg-orange-500',
-      iconBg: 'bg-orange-100',
-      iconColor: 'text-orange-600'
-    },
-    {
-      id: '3',
-      title: 'Weather Advisory',
-      label: 'HIGH',
-      description: 'Heavy rainfall expected - potential impact on cane transportation',
-      timestamp: '6 hours ago • Meteorological Dept',
-      category: 'Production',
-      priority: 'high',
-      labelColor: 'bg-red-500',
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600'
-    },
-    {
-      id: '4',
-      title: 'Quality Control Notice',
-      label: 'MEDIUM',
-      description: 'Sugar purity levels in Batch #247 below standard requirements',
-      timestamp: '6 hours ago • Quality Lab',
-      category: 'Production',
-      priority: 'medium',
-      labelColor: 'bg-yellow-500',
-      iconBg: 'bg-yellow-100',
-      iconColor: 'text-yellow-600'
-    },
-    {
-      id: '5',
-      title: 'Farmer Payment Update',
-      label: 'LOW',
-      description: 'Monthly payments processed for Western region farmers',
-      timestamp: 'Yesterday • Finance Dept',
-      category: 'Revenue',
-      priority: 'low',
-      labelColor: 'bg-green-500',
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600'
-    },
-    {
-      id: '6',
-      title: 'Safety Inspection Reminder',
-      label: 'MEDIUM',
-      description: 'Quarterly safety inspection due for factory equipment in 3 days',
-      timestamp: 'Today • Safety Dept',
-      category: 'Compliance',
-      priority: 'medium',
-      labelColor: 'bg-blue-500',
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600'
-    },
-    ...allAlertsData.map((alert, index) => ({
-      id: `alert-${index + 7}`,
+    ...importedAlertsData.map((alert, index) => ({
+      id: alert.id || `alert-${index + 1}`,
       title: alert.title,
       label: alert.label,
       description: alert.description,
@@ -93,18 +21,23 @@ const alertsData = {
                 alert.title === 'Weather Alert' ? 'Production' :
                 alert.title === 'Weather' ? 'Production' :
                 alert.title === 'Disbursement Approval' ? 'Revenue' :
+                alert.title === 'Equipment Maintenance Required' ? 'Production' :
                 alert.title === 'Equipment Maintenance' ? 'Stakeholders' :
                 alert.title === 'Quality Control Notice' ? 'Stakeholders' :
                 alert.title === 'System Performance Alert' ? 'Stakeholders' :
+                alert.title === 'Production Below Threshold' ? 'Production' :
+                alert.title === 'Compliance Issue Detected' ? 'Compliance' :
                 alert.area === 'Equipment' ? 'Production' :
                 alert.area === 'Quality' ? 'Production' :
                 alert.area === 'Operations' ? 'Production' :
                 alert.area === 'Safety' ? 'Compliance' :
                 alert.area === 'Payments' ? 'Revenue' :
-                alert.area === 'Performance' ? 'Reports' :
+                alert.area === 'Performance' ? 'Production' :
                 alert.area === 'Weather' ? 'Production' :
-                alert.area === 'Disaster' ? 'Compliance' :
-                alert.area === 'General' ? 'Reports' : 'Reports',
+                alert.area === 'Disaster' ? 'Production' :
+                alert.area === 'Compliance' ? 'Compliance' :
+                alert.area === 'General' ? 'Reports' :
+                alert.category || 'Reports',
       priority: alert.label === 'HIGH' || alert.label === 'Critical' ? 'high' : alert.label === 'MEDIUM' || alert.label === 'Warning' || alert.label === 'Medium' ? 'medium' : 'low',
       labelColor: alert.labelColor,
       iconBg: alert.iconBg,

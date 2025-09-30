@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ActivitiesModal } from "./modals/activities-modal"
+import { ActivitiesModal } from "../modals/activities-modal"
 import {
   AlertTriangle,
   Calendar,
@@ -23,8 +23,8 @@ import {
   Award
 } from "lucide-react"
 import { LuSquarePen } from 'react-icons/lu'
-import { allActivitiesData } from "@/lib/mockdata"
-import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
+import { activitiesData } from "../data/activities-data"
+import { ActivityDetailsModal } from "../modals/activity-details-modal"
 
 interface ActivitiesCardProps {
   className?: string
@@ -37,14 +37,11 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [newActivityOpen, setNewActivityOpen] = useState(false)
   const [viewAllActivitiesOpen, setViewAllActivitiesOpen] = useState(false)
   const [activityDetailsOpen, setActivityDetailsOpen] = useState(false)
-  const [selectedActivity, setSelectedActivity] = useState<any>(null)
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null)
 
   const handleActivityClick = (activityId: string) => {
-    const activity = allActivitiesData.find(a => a.id === activityId)
-    if (activity) {
-      setSelectedActivity(activity)
-      setActivityDetailsOpen(true)
-    }
+    setSelectedActivityId(activityId)
+    setActivityDetailsOpen(true)
   }
 
   // Form state
@@ -103,7 +100,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardContent className="px-3 py-2">
           {/* Scrollable activities list - showing 3 activities */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allActivitiesData.map((activity) => {
+            {activitiesData.map((activity) => {
               // Get icon component and styling based on activity type
               const getActivityIconAndStyle = (type: string) => {
                 switch (type) {
@@ -319,16 +316,21 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
       </Dialog>
 
       {/* Activities Modal */}
-      <ActivitiesModal 
+      <ActivitiesModal
         open={viewAllActivitiesOpen}
         onOpenChange={setViewAllActivitiesOpen}
+        onActivityClick={handleActivityClick}
       />
 
       {/* Activity Details Modal */}
-      <ActivityDetailsModal 
-        open={activityDetailsOpen} 
-        onOpenChange={setActivityDetailsOpen} 
-        activity={selectedActivity} 
+      <ActivityDetailsModal
+        open={activityDetailsOpen}
+        onOpenChange={setActivityDetailsOpen}
+        activityId={selectedActivityId}
+        onBackToList={() => {
+          setActivityDetailsOpen(false)
+          setViewAllActivitiesOpen(true)
+        }}
       />
     </>
   )
