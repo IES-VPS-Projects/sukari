@@ -21,6 +21,7 @@ import { useState, useEffect } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { actionsData } from "../data/actions-data"
 import { MillRegistrationForm } from "../components/MillRegistrationForm"
+import { ReviewApplicationModal } from "./review-application-modal"
 
 interface Action {
   id: string
@@ -45,12 +46,17 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   const [selectedActionForDetails, setSelectedActionForDetails] = useState<string | null>(selectedActionId || null)
   const [actionActiveTab, setActionActiveTab] = useState("overview")
   const [comment, setComment] = useState("")
+  const [showReviewModal, setShowReviewModal] = useState(false)
   const isMobile = useIsMobile()
 
   // Update selectedActionForDetails when selectedActionId prop changes
   useEffect(() => {
     console.log('ActionsModal: selectedActionId changed to:', selectedActionId)
     setSelectedActionForDetails(selectedActionId || null)
+    // If action-0 is selected, open the review modal
+    if (selectedActionId === 'action-0') {
+      setShowReviewModal(true)
+    }
   }, [selectedActionId])
 
   // Debug modal state
@@ -100,15 +106,23 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
             <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
               <div className="space-y-3">
                 {actionsData.map((action) => (
-                  <div 
+                  <div
                     key={action.id}
                     className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                      action.id === 'action-0' ? 'hover:bg-purple-50' :
                       action.id === 'action-1' ? 'hover:bg-orange-50' :
                       action.iconColor === 'text-green-600' ? 'hover:bg-green-50' :
                       action.iconColor === 'text-blue-600' ? 'hover:bg-blue-50' :
                       'hover:bg-gray-50'
                     }`}
-                    onClick={() => setSelectedActionForDetails(action.id)}
+                    onClick={() => {
+                      if (action.id === 'action-0') {
+                        // Open review modal directly for Review Registration
+                        setShowReviewModal(true)
+                      } else {
+                        setSelectedActionForDetails(action.id)
+                      }
+                    }}
                   >
                     {/* Icon */}
                     <div className={`w-8 h-8 ${action.iconBg} rounded-lg flex items-center justify-center flex-shrink-0`}>
@@ -126,11 +140,12 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="text-sm font-medium text-[#202020] truncate">{action.title}</h4>
                             <div className={`px-2 py-0.5 rounded-full text-xs font-medium border backdrop-blur-sm ${
+                              action.id === 'action-0' ? 'bg-purple-50/80 text-purple-700 border-gray-300' :
                               action.id === 'action-1' ? 'bg-orange-50/80 text-orange-700 border-gray-300' :
                               action.type === 'approval' ? 'bg-blue-50/80 text-blue-700 border-gray-300' :
                               'bg-green-50/80 text-green-700 border-gray-300'
                             }`}>
-                              {action.id === 'action-1' ? 'Review' : action.type === 'approval' ? 'Approval' : 'Vote'}
+                              {action.id === 'action-0' ? 'Compliance Review' : action.id === 'action-1' ? 'Review' : action.type === 'approval' ? 'Approval' : 'Vote'}
                             </div>
                           </div>
                           <p className="text-xs text-[#6B6B6B] mb-1">{action.description}</p>
@@ -162,6 +177,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
           <div className="flex-shrink-0">
             {/* Header content with colored background */}
             <div className={`${isMobile ? 'p-4' : 'p-6'} ${
+              action.id === 'action-0' ? 'bg-purple-50' :
               action.id === 'action-1' ? 'bg-orange-50' :
               action.iconColor === 'text-green-600' ? 'bg-green-50' :
               action.iconColor === 'text-blue-600' ? 'bg-blue-50' :
@@ -187,11 +203,18 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h1 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900 truncate`}>{action.title}</h1>
-                      <Badge className={`${action.id === 'action-1' ? 'bg-orange-500/10 text-orange-700 border border-orange-200/30' : 'bg-red-500/10 text-red-700 border border-red-200/30'} backdrop-blur-sm shrink-0`} style={action.id === 'action-1' ? { backgroundColor: '#f97316', color: 'white' } : {}}>
-                        {action.id === 'action-1' ? 'Review' : 'High'}
+                      <Badge className={`${
+                        action.id === 'action-0' ? 'bg-purple-500/10 text-purple-700 border border-purple-200/30' :
+                        action.id === 'action-1' ? 'bg-orange-500/10 text-orange-700 border border-orange-200/30' :
+                        'bg-red-500/10 text-red-700 border border-red-200/30'
+                      } backdrop-blur-sm shrink-0`} style={
+                        action.id === 'action-0' ? { backgroundColor: '#9333ea', color: 'white' } :
+                        action.id === 'action-1' ? { backgroundColor: '#f97316', color: 'white' } : {}
+                      }>
+                        {action.id === 'action-0' ? 'Compliance Review' : action.id === 'action-1' ? 'Review' : 'High'}
                       </Badge>
                     </div>
-                    {action.id === 'action-1' ? (
+                    {action.id === 'action-0' || action.id === 'action-1' ? (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <BsBuildings className="h-4 w-4 shrink-0" />
                         <span className="truncate">Mumias Sugar Mills Ltd</span>
@@ -221,7 +244,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
             </div>
 
             {/* Tabs with colored background - Only show for non-mill registration actions */}
-            {action.id !== 'action-1' && (
+            {action.id !== 'action-0' && action.id !== 'action-1' && (
               <div className={`${
                 action.iconColor === 'text-green-600' ? 'bg-green-50' :
                 action.iconColor === 'text-blue-600' ? 'bg-blue-50' :
@@ -261,22 +284,28 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
                 </div>
               </div>
             )}
-            
+
             {/* Horizontal divider line between header and body for non-mill registration actions */}
-            {action.id !== 'action-1' && (
+            {action.id !== 'action-0' && action.id !== 'action-1' && (
               <div className="h-px bg-gray-300"></div>
             )}
           </div>
 
-            {/* Horizontal line for mill registration */}
-            {action.id === 'action-1' && (
+            {/* Horizontal line for mill registration and review modal */}
+            {(action.id === 'action-0' || action.id === 'action-1') && (
               <div className="h-px bg-gray-300" />
             )}
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto min-h-0">
-            {/* Mill Registration Form or Tab Content */}
-            {action.id === 'action-1' ? (
+            {/* Action-0 opens separate review modal - show loading/info message */}
+            {action.id === 'action-0' ? (
+              <div className={`${isMobile ? 'px-4 py-4' : 'p-6'} flex items-center justify-center h-full`}>
+                <div className="text-center">
+                  <p className="text-gray-600">Opening comprehensive review modal...</p>
+                </div>
+              </div>
+            ) : action.id === 'action-1' ? (
               // Mill Registration Application Form - Always shown, no tabs
               <div className={`${isMobile ? 'px-4 py-4' : 'p-6'}`}>
                 <MillRegistrationForm
@@ -859,6 +888,23 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
           </div>
         </div>
       </DialogContent>
+
+      {/* Review Application Modal - Opens when action-0 is selected */}
+      <ReviewApplicationModal
+        open={showReviewModal}
+        onOpenChange={(open) => {
+          setShowReviewModal(open)
+          if (!open) {
+            // Close the parent modal too when review modal closes
+            onOpenChange(false)
+          }
+        }}
+        onBackToList={() => {
+          // Navigate back to actions list view
+          setShowReviewModal(false)
+          setSelectedActionForDetails(null)
+        }}
+      />
     </Dialog>
   )
 }

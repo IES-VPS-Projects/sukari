@@ -21,6 +21,24 @@ export interface ActionItem {
 // Actions data for card and modal
 export const actionsData: ActionItem[] = [
   {
+    id: 'action-0',
+    title: 'Review of Application For Registration',
+    description: 'Review completed inspection report and application data for Mumias Sugar Mills Ltd registration',
+    type: 'approval',
+    timestamp: '1 hour ago',
+    iconColor: 'text-purple-600',
+    iconBg: 'bg-purple-100',
+    hoverBg: 'hover:bg-purple-50',
+    priority: 'high',
+    status: 'pending',
+    deadline: '45 days remaining',
+    requestedBy: 'Compliance Department',
+    details: 'Compliance Head review of mill registration application with completed field inspection report. Compare application data with inspection findings, review supporting documents, and make final decision on registration approval.',
+    requiredAction: 'Review application vs inspection discrepancies and approve, reject, or defer registration',
+    relatedDocuments: ['Application Form KSB/01', 'Field Inspection Report', 'Company Documents', 'Environmental Compliance', 'Technical Specifications'],
+    stakeholders: ['Mumias Sugar Mills Ltd', 'Field Coordinator Bernice Kasavuli', 'Compliance Department']
+  },
+  {
     id: 'action-1',
     title: 'Application For Registration of a Mill',
     description: 'Review mill registration application from Mumias Sugar Mills Ltd and assign field coordinator for inspection',

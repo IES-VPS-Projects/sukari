@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Upload, X, CheckCircle, AlertTriangle, Camera, ArrowLeft, FileText } from "lucide-react"
+import { Upload, X, CheckCircle, AlertTriangle, Camera, ArrowLeft, FileText, Star } from "lucide-react"
 import { InspectionAssignment } from "../data/inspections-data"
 
 interface InspectionChecklistModalProps {
@@ -25,6 +25,7 @@ interface ChecklistItem {
   completed: boolean
   notes: string
   images: File[]
+  rating: number
 }
 
 interface InspectionReport {
@@ -57,7 +58,8 @@ export function InspectionChecklistModal({
         item,
         completed: false,
         notes: "",
-        images: []
+        images: [],
+        rating: 0
       }))
       setChecklistItems(items)
     }
@@ -127,6 +129,74 @@ export function InspectionChecklistModal({
   const completedItems = checklistItems.filter(item => item.completed).length
   const totalItems = checklistItems.length
   const allItemsCompleted = completedItems === totalItems && totalItems > 0
+  
+  // Calculate overall rating
+  const calculateOverallRating = () => {
+    const ratedItems = checklistItems.filter(item => item.rating > 0)
+    if (ratedItems.length === 0) return 0
+    const totalRating = ratedItems.reduce((sum, item) => sum + item.rating, 0)
+    return (totalRating / (ratedItems.length * 5)) * 100
+  }
+  
+  const overallRating = calculateOverallRating()
+  
+  // Get color for rating percentage
+  const getRatingColor = (rating: number) => {
+    if (rating <= 50) return "text-red-600"
+    if (rating <= 70) return "text-orange-600"
+    if (rating <= 79) return "text-yellow-600"
+    if (rating <= 90) return "text-green-600"
+    return "text-amber-600" // Gold color for 91-100%
+  }
+  
+  // Star rating component
+  const StarRating = ({ rating, onRatingChange, itemId }: { rating: number, onRatingChange: (rating: number) => void, itemId: string }) => {
+    const handleInputChange = (value: string) => {
+      const numValue = parseInt(value)
+      if (!isNaN(numValue) && numValue >= 0 && numValue <= 5) {
+        onRatingChange(numValue)
+      } else if (value === '') {
+        onRatingChange(0)
+      }
+    }
+    
+    return (
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            max="5"
+            step="1"
+            value={rating || ''}
+            onChange={(e) => handleInputChange(e.target.value)}
+            className="w-12 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="0"
+          />
+          <span className="text-sm text-gray-600">/ 5</span>
+        </div>
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => onRatingChange(star)}
+              className="focus:outline-none transition-colors"
+            >
+              <Star
+                className={`h-5 w-5 ${
+                  star <= rating
+                    ? 'fill-yellow-400 text-yellow-400'
+                    : 'text-gray-300 hover:text-yellow-400'
+                } transition-colors cursor-pointer`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  
   if (!assignment) return null
 
   return (
@@ -163,6 +233,16 @@ export function InspectionChecklistModal({
                 className="bg-green-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${totalItems > 0 ? (completedItems / totalItems) * 100 : 0}%` }}
               />
+            </div>
+          </div>
+          
+          {/* Overall Rating Display */}
+          <div className="flex justify-end mt-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm font-medium text-gray-600">Overall Rating:</span>
+              <span className={`text-3xl font-bold ${getRatingColor(overallRating)}`}>
+                {overallRating > 0 ? `${Math.round(overallRating)}%` : "Not Rated"}
+              </span>
             </div>
           </div>
         </div>
@@ -202,6 +282,15 @@ export function InspectionChecklistModal({
                         {item.item}
                       </span>
                       {item.completed && <CheckCircle className="h-4 w-4 text-black" />}
+                    </div>
+                    
+                    {/* Star Rating */}
+                    <div className="mb-3">
+                      <StarRating 
+                        rating={item.rating} 
+                        onRatingChange={(rating) => handleChecklistItemChange(item.id, 'rating', rating)}
+                        itemId={item.id}
+                      />
                     </div>
 
                     {/* Action Buttons */}
