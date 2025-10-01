@@ -17,18 +17,18 @@ export default function ProfilePage() {
   const [profileData] = useState({
     firstName: "Jude",
     lastName: "Chesire",
-    email: "jude.chesire@ksb.go.ke",
+    email: "jude.chesire@judiciary.go.ke",
     phone: "+254 712 345 678",
     location: "Nairobi, Kenya",
-    department: "Executive Management",
-    role: "Chief Executive Officer",
-    rank: "Executive",
-    employeeId: "KSB-2020-001",
-    organization: "Kenya Sugar Board",
-    bio: "Experienced executive leader with over 15 years in agricultural management and sugar industry development. Specialized in strategic leadership, policy development, and stakeholder relationship management across the sugar value chain.",
+    department: "High Court",
+    role: "High Court Judge",
+    rank: "Judge",
+    employeeId: "JUD-2020-001",
+    organization: "Judiciary of Kenya",
+    bio: "Experienced judicial officer with over 15 years in legal practice and case management. Specialized in civil law, constitutional matters, and judicial leadership. Committed to delivering timely and fair justice.",
     joinDate: "January 2020",
     deployments: 18,
-    clearanceLevel: "Executive Level"
+    clearanceLevel: "Judicial Officer"
   })
 
   // Modal states
@@ -66,7 +66,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="text-left sm:text-right w-full sm:w-auto">
-              <p className="text-xs sm:text-sm text-gray-600">Employee ID</p>
+              <p className="text-xs sm:text-sm text-gray-600">Judicial ID</p>
               <p className="font-semibold text-sm sm:text-base">{profileData.employeeId}</p>
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function ProfilePage() {
                 <span className="font-semibold">{profileData.department}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Projects</span>
+                <span className="text-sm text-muted-foreground">Cases Completed</span>
                 <span className="font-semibold">{profileData.deployments}</span>
               </div>
               <div className="flex justify-between">
@@ -118,25 +118,25 @@ export default function ProfilePage() {
               <Activity className="h-5 w-5" />
               Activities
             </CardTitle>
-            <CardDescription>Recent operational activities</CardDescription>
+            <CardDescription>Recent judicial activities</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Operations</span>
-                <span className="font-semibold text-black">47</span>
+                <span className="text-sm text-muted-foreground">Cases Handled</span>
+                <span className="font-semibold text-black">247</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Successful Projects</span>
-                <span className="font-semibold text-black">45</span>
+                <span className="text-sm text-muted-foreground">Judgments Delivered</span>
+                <span className="font-semibold text-black">215</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Active Operations</span>
-                <span className="font-semibold text-black">3</span>
+                <span className="text-sm text-muted-foreground">Active Cases</span>
+                <span className="font-semibold text-black">32</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Personnel Involved</span>
-                <span className="font-semibold text-black">1,234</span>
+                <span className="text-sm text-muted-foreground">Hearings Conducted</span>
+                <span className="font-semibold text-black">412</span>
               </div>
             </div>
           </CardContent>
@@ -152,25 +152,25 @@ export default function ProfilePage() {
               <Target className="h-5 w-5" />
               Performance
             </CardTitle>
-            <CardDescription>Service performance metrics</CardDescription>
+            <CardDescription>Judicial performance metrics</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Project Success Rate</span>
-                <span className="font-semibold text-black">98%</span>
+                <span className="text-sm text-muted-foreground">Case Clearance Rate</span>
+                <span className="font-semibold text-black">87%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Leadership Rating</span>
-                <span className="font-semibold text-black">4.9</span>
+                <span className="text-sm text-muted-foreground">Avg. Resolution Time</span>
+                <span className="font-semibold text-black">78 days</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Personnel Trained</span>
-                <span className="font-semibold text-black">234</span>
+                <span className="text-sm text-muted-foreground">Appeal Rate</span>
+                <span className="font-semibold text-black">12%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Training Sessions</span>
-                <span className="font-semibold text-black">89</span>
+                <span className="text-sm text-muted-foreground">Judgment Quality</span>
+                <span className="font-semibold text-black">4.8/5</span>
               </div>
             </div>
           </CardContent>

@@ -69,7 +69,7 @@ export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInf
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            {/* Profile Picture and KSB Info */}
+            {/* Profile Picture and Judiciary Info */}
             <div className="md:col-span-1">
               <div className="space-y-6">
                 <div className="flex flex-col items-center space-y-4">
@@ -128,11 +128,11 @@ export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInf
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Shield className="h-4 w-4 text-muted-foreground" />
-                    <span>Employee ID: {formData.employeeId}</span>
+                    <span>Judicial ID: {formData.employeeId}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Target className="h-4 w-4 text-muted-foreground" />
-                    <span>Projects: {formData.deployments}</span>
+                    <span>Cases Completed: {formData.deployments}</span>
                   </div>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInf
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="employeeId">Employee ID</Label>
+                    <Label htmlFor="employeeId">Judicial ID</Label>
                     <Input
                       id="employeeId"
                       value={formData.employeeId}
@@ -244,7 +244,7 @@ export function ProfileInfoModal({ open, onOpenChange, profileData }: ProfileInf
                     onChange={(e) => handleInputChange("bio", e.target.value)}
                     disabled={!isEditing}
                     rows={4}
-                    placeholder="Brief overview of your professional experience and specializations in the sugar industry..."
+                    placeholder="Brief overview of your professional experience and specializations in judicial service..."
                   />
                 </div>
               </div>
