@@ -19,20 +19,7 @@ import { GoInfo } from "react-icons/go"
 import { X } from "lucide-react"
 import { useState } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { allActionsData } from "@/lib/mockdata"
-
-interface Action {
-  id: string
-  title: string
-  description: string
-  type: 'approval' | 'vote'
-  timestamp: string
-  iconColor: string
-  iconBg: string
-  hoverBg: string
-  priority?: string
-  status?: string
-}
+import { actionsData, ActionItem } from "@/app/portal/ceo/today/data/actions-data"
 
 interface ActionsModalProps {
   open: boolean
@@ -63,7 +50,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold text-gray-900`}>Actions</h2>
-                  <p className="text-sm text-gray-500 mt-1">{allActionsData.length} actions requiring attention</p>
+                  <p className="text-sm text-gray-500 mt-1">{actionsData.length} actions requiring attention</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="group relative">
@@ -86,7 +73,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
             
             <div className={`flex-1 ${isMobile ? 'overflow-y-auto overflow-x-hidden px-4 py-4' : 'overflow-y-auto p-6'}`}>
               <div className="space-y-3">
-                {allActionsData.map((action) => (
+                {actionsData.map((action) => (
                   <div 
                     key={action.id}
                     className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"
@@ -130,7 +117,7 @@ export function ActionsModal({ open, onOpenChange, selectedActionId }: ActionsMo
   }
 
   // Details view - Get action details
-  const action = allActionsData.find(a => a.id === selectedActionForDetails)
+  const action = actionsData.find(a => a.id === selectedActionForDetails)
   
   if (!action) return null
 

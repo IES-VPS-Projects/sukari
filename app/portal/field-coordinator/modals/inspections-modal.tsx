@@ -257,11 +257,12 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
           <div className="mt-4">
             <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
               <div className="flex items-center justify-between mb-4 gap-2">
-                <TabsList className="w-auto justify-start border-b border-gray-200">
-                  <TabsTrigger value="all" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>All</TabsTrigger>
-                  <TabsTrigger value="letterOfComfort" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Letter of Comfort</TabsTrigger>
-                  <TabsTrigger value="mill" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Mill</TabsTrigger>
-                  <TabsTrigger value="import" className={`rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 ${getUnderlineClass(statusFilter)}`}>Import</TabsTrigger>
+                <TabsList className="w-auto justify-start bg-transparent border-b border-gray-200">
+                  <TabsTrigger value="all" className="rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 data-[state=active]:border-gray-900">All</TabsTrigger>
+                  <TabsTrigger value="registration" className="rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 data-[state=active]:border-gray-900">Registration</TabsTrigger>
+                  <TabsTrigger value="compliance" className="rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 data-[state=active]:border-gray-900">Compliance</TabsTrigger>
+                  <TabsTrigger value="operations" className="rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 data-[state=active]:border-gray-900">Operations</TabsTrigger>
+                  <TabsTrigger value="verification" className="rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 text-gray-600 data-[state=active]:border-gray-900">Verification</TabsTrigger>
                 </TabsList>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">Status:</span>
@@ -279,11 +280,16 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
                 </div>
               </div>
               
-              <TabsContent value={activeTab} className="mt-0 space-y-4 min-h-[420px]">
+              <TabsContent value={activeTab} className="mt-0 space-y-4 h-[500px] overflow-y-auto">
                 {filteredAssignments.map((assignment) => (
                   <div 
                     key={assignment.id} 
-                    className={`rounded-xl p-4 bg-white cursor-pointer transition-all hover:shadow-sm hover:-translate-y-0.5 ${getStatusHoverBg(assignment.status)}`}
+                    className={`rounded-xl p-4 bg-white cursor-pointer transition-all hover:shadow-sm hover:-translate-y-0.5 group ${
+                      assignment.status === 'pending' ? 'hover:bg-yellow-50' :
+                      assignment.status === 'in-progress' ? 'hover:bg-blue-50' :
+                      assignment.status === 'completed' ? 'hover:bg-green-50' :
+                      'hover:bg-gray-50'
+                    }`}
                     onClick={() => handleAssignmentClick(assignment)}
                   >
                     <div className="flex justify-between items-start">
@@ -293,7 +299,7 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
                       </div>
                       <div className="flex items-center gap-2">
                         {renderStatusBadge(assignment.status)}
-                        <ArrowRight className="h-4 w-4 text-gray-400" />
+                        <ArrowRight className="h-4 w-4 text-gray-400 transition-transform duration-200 group-hover:translate-x-1" />
                       </div>
                     </div>
                     
@@ -311,8 +317,10 @@ export function InspectionsModal({ open, onOpenChange }: InspectionsModalProps) 
                 ))}
                 
                 {filteredAssignments.length === 0 && (
-                  <div className="py-8 text-center text-gray-500">
-                    No inspection assignments found for this category.
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center text-gray-500">
+                      No inspection assignments found for this category.
+                    </div>
                   </div>
                 )}
               </TabsContent>

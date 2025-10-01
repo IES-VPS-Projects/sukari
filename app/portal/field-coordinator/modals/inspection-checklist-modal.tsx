@@ -132,8 +132,8 @@ export function InspectionChecklistModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
-        {/* Gray Header */}
-        <div className="bg-gray-50 px-6 py-4">
+        {/* Gray Header with integrated border */}
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-4 mb-2">
             <Button 
               variant="ghost" 
@@ -145,13 +145,15 @@ export function InspectionChecklistModal({
             </Button>
             <DialogTitle>Mill Inspection Checklist</DialogTitle>
           </div>
-          <div className="flex items-center gap-2 ml-12 mb-6">
+          <div className="flex items-center gap-2 ml-12">
             <span className="text-sm text-gray-600">{assignment.businessName}</span>
             <Badge variant="outline">{assignment.businessId}</Badge>
           </div>
+        </div>
 
-          {/* Progress Indicator */}
-          <div className="p-4 bg-white rounded-lg">
+        {/* Progress Indicator - Now outside the gray header */}
+        <div className="px-6 py-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Inspection Progress</span>
               <span className="text-sm text-gray-600">{completedItems} of {totalItems} items completed</span>
@@ -164,11 +166,8 @@ export function InspectionChecklistModal({
             </div>
           </div>
         </div>
-        
-        {/* Horizontal Separator */}
-        <div className="border-b border-gray-200"></div>
 
-        <div className="space-y-6 mt-6 px-6 pb-5">
+        <div className="space-y-6 px-6 pb-5">
 
           {/* Inspector Name Section */}
           <div className="space-y-4">
