@@ -53,8 +53,8 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
             <div className="flex items-center">
               <div className="flex items-center space-x-3">
                 <img 
-                  src="/images/ISE_Agri_Logo.png" 
-                  alt="ISE Agriculture Logo" 
+                  src="/images/judiciary-emblem.png" 
+                  alt="Judiciary Emblem" 
                   className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
                 />
                 <img 
@@ -62,17 +62,17 @@ export function PortalLayout({ children, pageTitle }: { children: React.ReactNod
                   alt="Vertical Separator" 
                   className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
                 />
-                <img 
-                  src="/images/ksb2.png" 
-                  alt="KSB Logo" 
-                  className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
+               // <img 
+               //   src="/images/judiciary-logo.png" 
+               //   alt="Judiciary Logo" 
+               //   className={`${isMobile ? 'h-8' : 'h-12'} w-auto`}
                 />
                 <div className="flex flex-col ml-2">
                   <h1 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900 leading-tight`}>
-                    KENYA SUGAR BOARD
+                    JUDICIARY OF KENYA
                   </h1>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600 leading-tight`}>
-                    Information Management System
+                    Case Management System
                   </p>
                 </div>
               </div>

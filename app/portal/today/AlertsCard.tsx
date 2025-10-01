@@ -5,16 +5,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle } from "lucide-react"
 
-// KSB Alerts data customized for sugar industry operations
+// Judiciary Alerts data for judges
 const alertsData = {
   alerts: [
     {
       id: '1',
-      title: 'Mill Performance Alert',
+      title: 'Urgent Case Scheduling',
       label: 'HIGH',
-      description: 'Mill #3 efficiency dropped by 12% - immediate maintenance required',
-      timestamp: '2 hours ago • Chemelil Factory',
-      category: 'Equipment',
+      description: 'Constitutional Case #245 requires immediate scheduling - Presidential petition',
+      timestamp: '2 hours ago • Chief Justice Office',
+      category: 'Scheduling',
       priority: 'high',
       labelColor: 'bg-red-500',
       iconBg: 'bg-red-100',
@@ -22,11 +22,11 @@ const alertsData = {
     },
     {
       id: '2',
-      title: 'Environmental Compliance Warning',
+      title: 'Case Law Update',
       label: 'MEDIUM',
-      description: 'West Zone operations require environmental standards review',
-      timestamp: '4 hours ago • Environmental Dept',
-      category: 'Compliance',
+      description: 'Supreme Court overturned precedent relevant to 3 cases on your docket',
+      timestamp: '4 hours ago • Legal Research',
+      category: 'Legal',
       priority: 'medium',
       labelColor: 'bg-orange-500',
       iconBg: 'bg-orange-100',
@@ -34,11 +34,11 @@ const alertsData = {
     },
     {
       id: '3',
-      title: 'Weather Advisory',
+      title: 'Courtroom Availability',
       label: 'HIGH',
-      description: 'Heavy rainfall expected - potential impact on cane transportation',
-      timestamp: '6 hours ago • Meteorological Dept',
-      category: 'Weather',
+      description: 'Courtroom 3A unavailable tomorrow - all cases reassigned to 4B',
+      timestamp: '6 hours ago • Court Administration',
+      category: 'Facilities',
       priority: 'high',
       labelColor: 'bg-red-500',
       iconBg: 'bg-red-100',
@@ -46,11 +46,11 @@ const alertsData = {
     },
     {
       id: '4',
-      title: 'Quality Control Notice',
+      title: 'Pending Decision Reminder',
       label: 'MEDIUM',
-      description: 'Sugar purity levels in Batch #247 below standard requirements',
-      timestamp: '6 hours ago • Quality Lab',
-      category: 'Quality',
+      description: 'Civil Case #782 judgment deadline approaching - due in 3 days',
+      timestamp: '6 hours ago • Case Management',
+      category: 'Deadlines',
       priority: 'medium',
       labelColor: 'bg-yellow-500',
       iconBg: 'bg-yellow-100',
@@ -58,11 +58,11 @@ const alertsData = {
     },
     {
       id: '5',
-      title: 'Farmer Payment Update',
+      title: 'Case File Update',
       label: 'LOW',
-      description: 'Monthly payments processed for Western region farmers',
-      timestamp: 'Yesterday • Finance Dept',
-      category: 'Operations',
+      description: 'New evidence submitted in Criminal Case #493 - witness statement',
+      timestamp: 'Yesterday • Court Registry',
+      category: 'Documents',
       priority: 'low',
       labelColor: 'bg-green-500',
       iconBg: 'bg-green-100',
@@ -70,11 +70,11 @@ const alertsData = {
     },
     {
       id: '6',
-      title: 'Safety Inspection Reminder',
+      title: 'Ethics Training Reminder',
       label: 'MEDIUM',
-      description: 'Quarterly safety inspection due for factory equipment in 3 days',
-      timestamp: 'Today • Safety Dept',
-      category: 'Safety',
+      description: 'Mandatory judicial ethics training scheduled for next Tuesday',
+      timestamp: 'Today • Judicial Training Institute',
+      category: 'Training',
       priority: 'medium',
       labelColor: 'bg-blue-500',
       iconBg: 'bg-blue-100',
@@ -95,17 +95,15 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
   setViewAllAlertsOpen,
   setSelectedAlertForDetails
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Equipment' | 'Compliance' | 'Weather' | 'Performance' | 'Payments' | 'Quality' | 'Operations' | 'Safety'>('All')
+  const [selectedCategory, setSelectedCategory] = useState<'All' | 'Scheduling' | 'Legal' | 'Facilities' | 'Deadlines' | 'Documents' | 'Training'>('All')
   
   const categoryCounts = {
-    Equipment: alertsData.alerts.filter(a => a.category === 'Equipment').length,
-    Compliance: alertsData.alerts.filter(a => a.category === 'Compliance').length,
-    Weather: alertsData.alerts.filter(a => a.category === 'Weather').length,
-    Performance: alertsData.alerts.filter(a => a.category === 'Equipment' || a.category === 'Quality').length,
-    Quality: alertsData.alerts.filter(a => a.category === 'Quality').length,
-    Operations: alertsData.alerts.filter(a => a.category === 'Operations').length,
-    Safety: alertsData.alerts.filter(a => a.category === 'Safety').length,
-    Payments: alertsData.alerts.filter(a => a.category === 'Operations' && a.title.toLowerCase().includes('payment')).length,
+    Scheduling: alertsData.alerts.filter(a => a.category === 'Scheduling').length,
+    Legal: alertsData.alerts.filter(a => a.category === 'Legal').length,
+    Facilities: alertsData.alerts.filter(a => a.category === 'Facilities').length,
+    Deadlines: alertsData.alerts.filter(a => a.category === 'Deadlines').length,
+    Documents: alertsData.alerts.filter(a => a.category === 'Documents').length,
+    Training: alertsData.alerts.filter(a => a.category === 'Training').length
   }
 
   return (
@@ -125,7 +123,7 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
         
         <div className="flex items-center gap-2 mb-3 border-b overflow-hidden">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-            {(['All','Compliance','Weather','Performance','Payments'] as const).map((category) => (
+            {(['All','Scheduling','Legal','Deadlines','Documents'] as const).map((category) => (
               <button
                 key={category}
                 className={`text-xs pb-2 -mb-px border-b-2 whitespace-nowrap flex-shrink-0 ${selectedCategory === category ? 'border-green-600 text-green-600' : 'border-transparent text-muted-foreground'} flex items-center gap-1`}
@@ -134,10 +132,10 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
                 {category}
                 {category !== 'All' && (
                   <Badge className="bg-gray-100 text-gray-700 text-[10px] px-1">
-                    {category === 'Compliance' ? categoryCounts.Compliance : 
-                     category === 'Weather' ? categoryCounts.Weather : 
-                     category === 'Performance' ? categoryCounts.Performance :
-                     category === 'Payments' ? categoryCounts.Payments : 0}
+                    {category === 'Scheduling' ? categoryCounts.Scheduling : 
+                     category === 'Legal' ? categoryCounts.Legal : 
+                     category === 'Deadlines' ? categoryCounts.Deadlines :
+                     category === 'Documents' ? categoryCounts.Documents : 0}
                   </Badge>
                 )}
               </button>
@@ -155,8 +153,6 @@ const AlertsCard: React.FC<AlertsCardProps> = ({
           {alertsData.alerts
             .filter((item) => {
               if (selectedCategory === 'All') return true
-              if (selectedCategory === 'Performance') return item.category === 'Equipment' || item.category === 'Quality'
-              if (selectedCategory === 'Payments') return item.category === 'Operations' && item.title.toLowerCase().includes('payment')
               return item.category === selectedCategory
             })
             .slice(0, 3) // Limit to maximum 3 options in viewport

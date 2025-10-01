@@ -1,5 +1,5 @@
 import { config } from './config';
-import { processedCropsData } from '@/app/portal/ai/mockdata';
+import { processedCasesData } from '@/app/portal/ai/mockdata';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -8,191 +8,165 @@ export interface ChatMessage {
 
 type DataInjectionResult = { context: string; matched: boolean };
 
-function getLatestYear() {
-  return Math.max(...processedCropsData.map(d => d.year));
+function getCaseTypes() {
+  return Array.from(new Set(processedCasesData.map(d => d.caseType)));
 }
-function getAllYears() {
-  return Array.from(new Set(processedCropsData.map(d => d.year))).sort();
+function getCourts() {
+  return Array.from(new Set(processedCasesData.map(d => d.court)));
 }
 function extractYearFromText(text: string): number | undefined {
   const match = text.match(/\b(20\d{2})\b/);
   return match ? parseInt(match[1], 10) : undefined;
 }
 function extractNFromText(text: string): number | undefined {
-  const match = text.match(/\b(last|past)?\s*(\d+)\s*(years?|months?|quarters?)\b/);
+  const match = text.match(/\b(last|past)?\s*(\d+)\s*(years?|months?|days?|weeks?)\b/);
   return match ? parseInt(match[2], 10) : undefined;
 }
-function extractMonthFromText(text: string): string | undefined {
-  const months = [
-    'january','february','march','april','may','june','july','august','september','october','november','december'
-  ];
-  return months.find(m => text.toLowerCase().includes(m));
+function extractCaseTypeFromText(text: string): string | undefined {
+  const caseTypes = getCaseTypes();
+  return caseTypes.find(t => text.toLowerCase().includes(t.toLowerCase()));
 }
-function extractRegionFromText(text: string): string | undefined {
-  const regions = Array.from(new Set(processedCropsData.map(d => d.region)));
-  return regions.find(r => text.toLowerCase().includes(r.toLowerCase()));
-}
-function extractFactoryFromText(text: string): string | undefined {
-  const factories = Array.from(new Set(processedCropsData.map(d => d.sourceFactory)));
-  return factories.find(f => text.toLowerCase().includes(f.toLowerCase()));
-}
-function extractVarietyFromText(text: string): string | undefined {
-  const varieties = Array.from(new Set(processedCropsData.map(d => d.variety)));
-  return varieties.find(v => text.toLowerCase().includes(v.toLowerCase()));
+function extractCourtFromText(text: string): string | undefined {
+  const courts = getCourts();
+  return courts.find(c => text.toLowerCase().includes(c.toLowerCase()));
 }
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // --- Table Generators (Handlers) ---
-function getRegionalProductionTable(year: number) {
-  const regions = Array.from(new Set(processedCropsData.map(d => d.region))).filter(r => r !== 'National');
-  let table = 'Region | Production (tonnes)\n--- | ---\n';
-  regions.forEach(region => {
-    const total = processedCropsData
-      .filter(d => d.region === region && d.year === year && d.element === 'Production Quantity')
-      .reduce((sum, d) => sum + d.value, 0);
-    table += `${region} | ${Math.round(total).toLocaleString()}\n`;
+function getCasesByCourt() {
+  const courts = getCourts();
+  let table = 'Court | Total Cases | Resolved Cases | Pending Cases\n--- | --- | --- | ---\n';
+  courts.forEach(court => {
+    const courtData = processedCasesData.filter(d => d.court === court);
+    const totalCases = courtData.reduce((sum, d) => sum + d.totalCases, 0);
+    const resolvedCases = courtData.reduce((sum, d) => sum + d.resolvedCases, 0);
+    const pendingCases = courtData.reduce((sum, d) => sum + d.pendingCases, 0);
+    table += `${court} | ${totalCases.toLocaleString()} | ${resolvedCases.toLocaleString()} | ${pendingCases.toLocaleString()}\n`;
   });
   return table;
 }
-function getFactoryProductionTable(year: number, month?: string) {
-  const factories = Array.from(new Set(processedCropsData.map(d => d.sourceFactory)));
-  let table = 'Factory | Production (tonnes)\n--- | ---\n';
-  factories.forEach(factory => {
-    const total = processedCropsData
-      .filter(d => d.sourceFactory === factory && d.year === year && (!month || d.month.toLowerCase() === month.toLowerCase()) && d.element === 'Production Quantity')
-      .reduce((sum, d) => sum + d.value, 0);
-    table += `${factory} | ${Math.round(total).toLocaleString()}\n`;
+
+function getCasesByCaseType() {
+  const caseTypes = getCaseTypes();
+  let table = 'Case Type | Total Cases | Resolved Cases | Pending Cases\n--- | --- | --- | ---\n';
+  caseTypes.forEach(caseType => {
+    const caseData = processedCasesData.filter(d => d.caseType === caseType);
+    const totalCases = caseData.reduce((sum, d) => sum + d.totalCases, 0);
+    const resolvedCases = caseData.reduce((sum, d) => sum + d.resolvedCases, 0);
+    const pendingCases = caseData.reduce((sum, d) => sum + d.pendingCases, 0);
+    table += `${caseType} | ${totalCases.toLocaleString()} | ${resolvedCases.toLocaleString()} | ${pendingCases.toLocaleString()}\n`;
   });
   return table;
 }
-function getNationalProductionTrends(n: number) {
-  const years = getAllYears().slice(-n);
-  let table = 'Year | Production (tonnes)\n--- | ---\n';
-  years.forEach(year => {
-    const total = processedCropsData
-      .filter(d => d.region === 'National' && d.year === year && d.element === 'Production Quantity')
-      .reduce((sum, d) => sum + d.value, 0);
-    table += `${year} | ${Math.round(total).toLocaleString()}\n`;
+
+function getResolutionTimesByCaseType() {
+  const caseTypes = getCaseTypes();
+  let table = 'Case Type | Average Resolution Time (days)\n--- | ---\n';
+  caseTypes.forEach(caseType => {
+    const caseData = processedCasesData.filter(d => d.caseType === caseType);
+    const avgTime = caseData.reduce((sum, d) => sum + d.averageResolutionTime, 0) / caseData.length;
+    table += `${caseType} | ${avgTime.toFixed(0)}\n`;
   });
   return table;
 }
-function getAverageCropYieldByRegion(year: number) {
-  const regions = Array.from(new Set(processedCropsData.map(d => d.region))).filter(r => r !== 'National');
-  let table = 'Region | Avg Crop Yield (tonnes/ha)\n--- | ---\n';
-  regions.forEach(region => {
-    const yields = processedCropsData
-      .filter(d => d.region === region && d.year === year && d.element === 'Crop Yield')
-      .map(d => d.value);
-    const avg = yields.length ? (yields.reduce((a, b) => a + b, 0) / yields.length) : 0;
-    table += `${region} | ${avg.toFixed(2)}\n`;
+
+function getPriorityCasesByCourt() {
+  const courts = getCourts();
+  let table = 'Court | Priority Cases | Total Pending Cases | Priority %\n--- | --- | --- | ---\n';
+  courts.forEach(court => {
+    const courtData = processedCasesData.filter(d => d.court === court);
+    const priorityCases = courtData.reduce((sum, d) => sum + d.priorityCases, 0);
+    const pendingCases = courtData.reduce((sum, d) => sum + d.pendingCases, 0);
+    const priorityPercent = pendingCases > 0 ? (priorityCases / pendingCases * 100).toFixed(1) : '0.0';
+    table += `${court} | ${priorityCases.toLocaleString()} | ${pendingCases.toLocaleString()} | ${priorityPercent}%\n`;
   });
   return table;
 }
-function getCaneDeliveries(region: string, year: number, month: string) {
-  const total = processedCropsData
-    .filter(d => d.region === region && d.year === year && d.month.toLowerCase() === month.toLowerCase() && d.element === 'Cane Deliveries')
-    .reduce((sum, d) => sum + d.value, 0);
-  return `Cane deliveries in ${region} for ${capitalize(month)} ${year}: ${Math.round(total).toLocaleString()} tonnes.`;
-}
-function getProductionValueByVariety(year: number) {
-  const varieties = Array.from(new Set(processedCropsData.map(d => d.variety)));
-  let table = 'Variety | Production Value (KSh million)\n--- | ---\n';
-  varieties.forEach(variety => {
-    const total = processedCropsData
-      .filter(d => d.variety === variety && d.year === year && d.element === 'Production Value')
-      .reduce((sum, d) => sum + d.value, 0);
-    table += `${variety} | ${total.toFixed(2)}\n`;
+
+function getCaseStatusTrends() {
+  const caseTypes = getCaseTypes();
+  let table = 'Case Type | Trend | Change %\n--- | --- | ---\n';
+  caseTypes.forEach(caseType => {
+    const caseData = processedCasesData.filter(d => d.caseType === caseType);
+    const trend = caseData[0]?.caseStatus.trend || 'stable';
+    const changePercent = caseData[0]?.caseStatus.changePercent || 0;
+    table += `${caseType} | ${capitalize(trend)} | ${changePercent}%\n`;
   });
   return table;
 }
-function getSugarPricesOverYears() {
-  // If you have sugarPrices in your mockdata, import and use it here
-  try {
-    const { sugarPrices } = require('@/app/portal/ai/mockdata');
-    let table = 'Year | Sugar Price (KSh/tonne)\n--- | ---\n';
-    Object.entries(sugarPrices).forEach(([year, price]) => {
-      table += `${year} | ${price}\n`;
-    });
-    return table;
-  } catch {
-    return 'Sugar price data not available.';
-  }
+
+function getCaseSpecificDetails(caseType: string) {
+  const caseData = processedCasesData.find(d => d.caseType.toLowerCase() === caseType.toLowerCase());
+  if (!caseData) return `No data available for ${caseType} cases.`;
+  
+  return `
+### ${caseData.caseType} Case Details (${caseData.court})
+
+- Total Cases: ${caseData.totalCases.toLocaleString()}
+- Resolved Cases: ${caseData.resolvedCases.toLocaleString()} (${(caseData.resolvedCases/caseData.totalCases*100).toFixed(1)}%)
+- Pending Cases: ${caseData.pendingCases.toLocaleString()}
+- Priority Cases: ${caseData.priorityCases.toLocaleString()}
+- Average Resolution Time: ${caseData.averageResolutionTime} days
+- Trend: ${capitalize(caseData.caseStatus.trend)} (${caseData.caseStatus.changePercent}%)
+
+**Key Challenges:**
+${caseData.challenges.map(c => `- ${c}`).join('\n')}
+
+**Recommendations:**
+${caseData.recommendations.map(r => `- ${r}`).join('\n')}
+`;
 }
 // ... Add more handler functions for the rest of your queries ...
 
 function getDataInjectionForQuery(userMsg: string): DataInjectionResult {
   userMsg = userMsg.toLowerCase();
 
-  // 1. Compare sugar production by region for [year]
-  if (userMsg.includes("compare sugar production by region")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
+  // 1. Compare cases by court
+  if (userMsg.includes("compare cases by court") || userMsg.includes("case distribution by court")) {
     return {
-      context: `\n\n### Regional Sugar Production Data for ${year}\n${getRegionalProductionTable(year)}`,
+      context: `\n\n### Cases by Court\n${getCasesByCourt()}`,
       matched: true
     };
   }
-  // 2. Which factory had the highest production in [month] [year]?
-  if (userMsg.includes("factory had the highest production")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
-    const month = extractMonthFromText(userMsg) || "January";
+  // 2. Show cases by type
+  if (userMsg.includes("cases by type") || userMsg.includes("case types") || userMsg.includes("types of cases")) {
     return {
-      context: `\n\n### Factory Production for ${capitalize(month)} ${year}\n${getFactoryProductionTable(year, month)}`,
+      context: `\n\n### Cases by Type\n${getCasesByCaseType()}`,
       matched: true
     };
   }
-  // 3. Show sugar production trends for the last [N] years
-  if (userMsg.includes("production trends for the last")) {
-    const n = extractNFromText(userMsg) || 5;
+  // 3. What are the average resolution times?
+  if (userMsg.includes("resolution time") || userMsg.includes("case duration") || userMsg.includes("how long")) {
     return {
-      context: `\n\n### National Sugar Production Trends for the Last ${n} Years\n${getNationalProductionTrends(n)}`,
+      context: `\n\n### Average Resolution Times by Case Type\n${getResolutionTimesByCaseType()}`,
       matched: true
     };
   }
-  // 4. What is the average crop yield by region for [year]?
-  if (userMsg.includes("average crop yield by region")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
+  // 4. What are the priority cases?
+  if (userMsg.includes("priority cases") || userMsg.includes("urgent cases") || userMsg.includes("high priority")) {
     return {
-      context: `\n\n### Average Crop Yield by Region for ${year}\n${getAverageCropYieldByRegion(year)}`,
+      context: `\n\n### Priority Cases by Court\n${getPriorityCasesByCourt()}`,
       matched: true
     };
   }
-  // 5. List all factories and their production for [month] [year]
-  if (userMsg.includes("factories and their production")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
-    const month = extractMonthFromText(userMsg) || "January";
+  // 5. Show case trends
+  if (userMsg.includes("case trends") || userMsg.includes("caseload trends") || userMsg.includes("trend")) {
     return {
-      context: `\n\n### Factory Production for ${capitalize(month)} ${year}\n${getFactoryProductionTable(year, month)}`,
+      context: `\n\n### Case Status Trends\n${getCaseStatusTrends()}`,
       matched: true
     };
   }
-  // 6. What was the total cane deliveries in [region] in [month] [year]?
-  if (userMsg.includes("total cane deliveries")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
-    const month = extractMonthFromText(userMsg) || "January";
-    const region = extractRegionFromText(userMsg) || "National";
+  // 6. Get specific case type details
+  const caseType = extractCaseTypeFromText(userMsg);
+  if (caseType && (userMsg.includes("details") || userMsg.includes("information") || userMsg.includes("about"))) {
     return {
-      context: `\n\n### Cane Deliveries\n${getCaneDeliveries(region, year, month)}`,
+      context: `\n\n${getCaseSpecificDetails(caseType)}`,
       matched: true
     };
   }
-  // 7. Show production value by variety for [year]
-  if (userMsg.includes("production value by variety")) {
-    const year = extractYearFromText(userMsg) || getLatestYear();
-    return {
-      context: `\n\n### Production Value by Variety for ${year}\n${getProductionValueByVariety(year)}`,
-      matched: true
-    };
-  }
-  // 8. Give me a summary of sugar prices over the years
-  if (userMsg.includes("sugar prices over the years")) {
-    return {
-      context: `\n\n### Sugar Prices Over the Years\n${getSugarPricesOverYears()}`,
-      matched: true
-    };
-  }
-  // ... Add more patterns for the rest of your queries ...
+  
   return { context: "", matched: false };
 }
 
@@ -208,8 +182,8 @@ export class GeminiService {
   async generateResponse(messages: ChatMessage[]): Promise<string> {
     const lastUserMsg = messages.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
     const { context: dataContext } = getDataInjectionForQuery(lastUserMsg);
-    const ksbDataContext = 'You have access to the Kenya Sugar Board database.';
-    const systemPrompt = `You are KSB-AI, an advanced AI assistant for the Kenya Sugar Board.\n${ksbDataContext}\n${dataContext}\n...rest of your prompt...`;
+    const judicialDataContext = 'You have access to the Judiciary Case Management database.';
+    const systemPrompt = `You are Judicial-AI, an advanced AI assistant for the Judiciary of Kenya.\n${judicialDataContext}\n${dataContext}\nYou help judges with legal research, case analysis, and procedural guidance. Always provide balanced, impartial information based on legal precedents and statutes.`;
     try {
       const url = `${this.apiUrl}?key=${this.apiKey}`;
       const response = await fetch(url, {

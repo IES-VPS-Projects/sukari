@@ -47,63 +47,53 @@ import MeetingsCard from "./MeetingsCard"
 import ActivitiesCard from "./ActivitiesCard"
 import AIInsightsCard from "./AIInsightsCard"
 
-// Market Insights data schema
-interface ProductInsight {
-  productName: string
-  price: number
-  currency: string
-  priceUnit: string
-  weeklyChangePercent: number
-  weeklyChangeDirection: 'up' | 'down'
-  importVolume: number
-  exportVolume: number
-  volumeUnit: string
+// Case Performance Metrics schema
+interface CasePerformanceMetric {
+  metricName: string
+  count: number
+  changePercent: number
+  changeDirection: 'up' | 'down'
+  resolutionRate?: number
+  averageTime?: number
+  timeUnit?: string
 }
 
-const marketData: ProductInsight[] = [
+const performanceMetrics: CasePerformanceMetric[] = [
   {
-    productName: "Sugarcane",
-    price: 4500,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    weeklyChangePercent: 5,
-    weeklyChangeDirection: 'up',
-    importVolume: 1000,
-    exportVolume: 200,
-    volumeUnit: "tonnes"
+    metricName: "Pending Cases",
+    count: 42,
+    changePercent: 8,
+    changeDirection: 'down',
+    resolutionRate: 65,
+    averageTime: 78,
+    timeUnit: "days"
   },
   {
-    productName: "Sugar",
-    price: 85,
-    currency: "KSh",
-    priceUnit: "per kg",
-    weeklyChangePercent: 2,
-    weeklyChangeDirection: 'down',
-    importVolume: 2450,
-    exportVolume: 890,
-    volumeUnit: "tonnes"
+    metricName: "Resolved Cases",
+    count: 87,
+    changePercent: 12,
+    changeDirection: 'up',
+    resolutionRate: 92,
+    averageTime: 65,
+    timeUnit: "days"
   },
   {
-    productName: "Molasses",
-    price: 15000,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    weeklyChangePercent: 3,
-    weeklyChangeDirection: 'up',
-    importVolume: 500,
-    exportVolume: 300,
-    volumeUnit: "tonnes"
+    metricName: "Appeals Filed",
+    count: 15,
+    changePercent: 5,
+    changeDirection: 'down',
+    resolutionRate: 80,
+    averageTime: 45,
+    timeUnit: "days"
   },
   {
-    productName: "Fertilizer",
-    price: 2500,
-    currency: "KSh",
-    priceUnit: "per 50 kg bag",
-    weeklyChangePercent: 1,
-    weeklyChangeDirection: 'down',
-    importVolume: 1200,
-    exportVolume: 100,
-    volumeUnit: "tonnes"
+    metricName: "Judgment Delivery",
+    count: 24,
+    changePercent: 10,
+    changeDirection: 'up',
+    resolutionRate: 87,
+    averageTime: 30,
+    timeUnit: "days"
   }
 ]
 
@@ -197,15 +187,27 @@ const schedulerSuggestions = [
   'Reminder to read Farmer Daily Article'
 ];
 
-// Market Insights Component
-const MarketInsightsCard = () => {
+// Case Performance Metrics Component
+const CasePerformanceCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const handleNext = () => {
-    setCurrentIndex((prev: number) => (prev + 1) % marketData.length)
+    setCurrentIndex((prev: number) => (prev + 1) % performanceMetrics.length)
   }
 
-  const currentProduct = marketData[currentIndex]
+  const currentMetric = performanceMetrics[currentIndex]
+
+  // Determine color based on metric type and change direction
+  const getChangeColor = (metric: CasePerformanceMetric) => {
+    // For pending cases and appeals, down is good (green)
+    if (metric.metricName.includes("Pending") || metric.metricName.includes("Appeals")) {
+      return metric.changeDirection === 'down' ? 'text-green-600' : 'text-red-600'
+    }
+    // For resolved cases and judgments, up is good (green)
+    return metric.changeDirection === 'up' ? 'text-green-600' : 'text-red-600'
+  }
+
+  const changeColor = getChangeColor(currentMetric)
 
   return (
     <Card 
@@ -213,31 +215,32 @@ const MarketInsightsCard = () => {
       onClick={handleNext}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-[#202020]">Market Insights</CardTitle>
-        <Badge className="bg-gray-100 text-green-600 flex items-center gap-1">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          Live
+        <CardTitle className="text-[#202020]">Case Performance</CardTitle>
+        <Badge className="bg-gray-100 text-blue-600 flex items-center gap-1">
+          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+          Updated
         </Badge>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-[#6B6B6B]">{currentProduct.productName}</h3>
-          {currentProduct.weeklyChangeDirection === 'up' ? (
-            <TrendingUp className="h-4 w-4 text-green-500" />
+          <h3 className="text-sm font-medium text-[#6B6B6B]">{currentMetric.metricName}</h3>
+          {currentMetric.changeDirection === 'up' ? (
+            <TrendingUp className={`h-4 w-4 ${currentMetric.metricName.includes("Pending") || currentMetric.metricName.includes("Appeals") ? 'text-red-500' : 'text-green-500'}`} />
           ) : (
-            <TrendingDown className="h-4 w-4 text-red-500" />
+            <TrendingDown className={`h-4 w-4 ${currentMetric.metricName.includes("Pending") || currentMetric.metricName.includes("Appeals") ? 'text-green-500' : 'text-red-500'}`} />
           )}
         </div>
-        <div className="text-2xl font-bold text-[#202020] mb-1">{currentProduct.currency} {currentProduct.price}</div>
-        <p className="text-xs text-[#6B6B6B] mb-3">{currentProduct.priceUnit}</p>
-        <p className="text-xs text-green-600 mb-2">{currentProduct.weeklyChangeDirection === 'up' ? '+' : '-'}{currentProduct.weeklyChangePercent}% from last week</p>
+        <div className="text-2xl font-bold text-[#202020] mb-1">{currentMetric.count}</div>
+        <p className="text-xs text-[#6B6B6B] mb-3">total cases</p>
+        <p className={`text-xs ${changeColor} mb-2`}>{currentMetric.changeDirection === 'down' ? '-' : '+'}{currentMetric.changePercent}% from last month</p>
+        <Progress value={currentMetric.resolutionRate} className="h-2 mb-1" />
         <div className="flex justify-between text-xs mb-1">
-          <span className="text-[#6B6B6B]">Import Volume</span>
-          <span className="font-medium">{currentProduct.importVolume} {currentProduct.volumeUnit}</span>
+          <span className="text-[#6B6B6B]">Resolution Rate</span>
+          <span className="font-medium">{currentMetric.resolutionRate}%</span>
         </div>
         <div className="flex justify-between text-xs">
-          <span className="text-[#6B6B6B]">Export Volume</span>
-          <span className="font-medium">{currentProduct.exportVolume} {currentProduct.volumeUnit}</span>
+          <span className="text-[#6B6B6B]">Average Time</span>
+          <span className="font-medium">{currentMetric.averageTime} {currentMetric.timeUnit}</span>
         </div>
       </CardContent>
     </Card>
@@ -342,24 +345,30 @@ export default function TodayPage() {
           {/* AI Morning Briefing */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style={{ height: "50%" }}>
             <BriefingCard />
-            <MarketInsightsCard />
+            <CasePerformanceCard />
             
-            {/* Industry News Card */}
+            {/* Legal News Card */}
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader className="pb-1">
-                <CardTitle className="text-[#202020]">Industry News</CardTitle>
+                <CardTitle className="text-[#202020]">Legal News</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <Carousel className="w-full" opts={{ loop: true }} plugins={[AutoPlay({ delay: 4000 })]}>
                   <CarouselContent>
-                    <CarouselItem className="bg-[url('/images/sugar_surge.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      Sugar Prices Surge
+                    <CarouselItem className="bg-[url('/images/courthouse.jpg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-lg">
+                      <div className="w-full h-full flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
+                        <span className="text-center px-4">Supreme Court Issues Landmark Ruling</span>
+                      </div>
                     </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/cane_tech.jpeg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      New Tech Boosts Yields
+                    <CarouselItem className="bg-[url('/images/legal_tech.jpg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-lg">
+                      <div className="w-full h-full flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
+                        <span className="text-center px-4">AI Legal Tools Transform Case Research</span>
+                      </div>
                     </CarouselItem>
-                    <CarouselItem className="bg-[url('/images/govt_subsidies.png')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-l-lg">
-                      Government Subsidies
+                    <CarouselItem className="bg-[url('/images/judicial_reform.jpg')] bg-cover bg-center h-48 flex items-center justify-center text-white font-bold text-lg rounded-lg">
+                      <div className="w-full h-full flex items-center justify-center bg-black bg-opacity-40 rounded-lg">
+                        <span className="text-center px-4">Judicial Reforms Aim to Reduce Backlog</span>
+                      </div>
                     </CarouselItem>
                   </CarouselContent>
                 </Carousel>

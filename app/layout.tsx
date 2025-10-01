@@ -8,13 +8,13 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "KSB Executive Portal",
-  description: "Kenya Sugar Board Executive Management Platform",
+  title: "Judiciary Portal",
+  description: "Judiciary Case Management Dashboard for Judges",
   generator: 'v0.dev',
   icons: {
     icon: [
       { url: '/icon.png' },
-      { url: '/images/ksb2.png' },
+      { url: '/images/judiciary-logo.png' },
     ],
     shortcut: '/icon.png',
     apple: '/icon.png',

@@ -25,7 +25,7 @@ import {
 } from "lucide-react"
 import { LuSquarePen, LuTriangleAlert, LuCalendar } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
-import { allActivitiesData } from "@/lib/mockdata"
+import { judicialActivities } from "@/lib/judicial-mockdata"
 import { ActivityDetailsModal } from "@/components/modals/activity-details-modal"
 
 interface ActivitiesCardProps {
@@ -43,7 +43,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
 
   const handleActivityClick = (activityId: string) => {
-    const activity = allActivitiesData.find(a => a.id === activityId)
+    const activity = judicialActivities.find(a => a.id === activityId)
     if (activity) {
       setSelectedActivity(activity)
       setActivityDetailsOpen(true)
@@ -107,27 +107,27 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
         <CardContent className="px-3 py-2">
           {/* Scrollable activities list - showing 3 activities */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allActivitiesData.slice(0, 3).map((activity) => {
+            {judicialActivities.slice(0, 3).map((activity) => {
               // Get icon component and styling based on activity type
               const getActivityIconAndStyle = (type: string) => {
                 switch (type) {
-                  case 'compliance': 
+                  case 'judgment': 
                     return { 
-                      icon: Shield, 
+                      icon: FileText, 
                       iconColor: 'text-orange-600', 
                       iconBg: 'bg-orange-100',
                       hoverBg: 'hover:bg-orange-50'
                     }
-                  case 'visit': 
+                  case 'research': 
                     return { 
-                      icon: MapPin, 
+                      icon: TrendingUp, 
                       iconColor: 'text-blue-600', 
                       iconBg: 'bg-blue-100',
                       hoverBg: 'hover:bg-blue-50'
                     }
-                  case 'renewal': 
+                  case 'review': 
                     return { 
-                      icon: Award, 
+                      icon: CheckCircle, 
                       iconColor: 'text-purple-600', 
                       iconBg: 'bg-purple-100',
                       hoverBg: 'hover:bg-purple-50'
@@ -139,16 +139,16 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                       iconBg: 'bg-green-100',
                       hoverBg: 'hover:bg-green-50'
                     }
-                  case 'quality': 
+                  case 'hearing': 
                     return { 
-                      icon: FileText, 
+                      icon: Calendar, 
                       iconColor: 'text-indigo-600', 
                       iconBg: 'bg-indigo-100',
                       hoverBg: 'hover:bg-indigo-50'
                     }
-                  case 'monitoring': 
+                  case 'legal': 
                     return { 
-                      icon: TrendingUp, 
+                      icon: Shield, 
                       iconColor: 'text-teal-600', 
                       iconBg: 'bg-teal-100',
                       hoverBg: 'hover:bg-teal-50'
@@ -211,11 +211,11 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                   onValueChange={(value) => {
                     // Auto-populate title when a template type is selected
                     let title = activityForm.title;
-                    if (value === 'inspection') title = 'Field Inspection';
-                    else if (value === 'compliance') title = 'Compliance Review';
-                    else if (value === 'training') title = 'Training Session';
-                    else if (value === 'audit') title = 'Quality Audit';
-                    else if (value === 'maintenance') title = 'Equipment Maintenance';
+                    if (value === 'judgment') title = 'Draft Judgment';
+                    else if (value === 'research') title = 'Legal Research';
+                    else if (value === 'review') title = 'Case File Review';
+                    else if (value === 'hearing') title = 'Hearing Preparation';
+                    else if (value === 'training') title = 'Judicial Ethics Training';
                     
                     setActivityForm({...activityForm, type: value, title});
                   }}
@@ -224,11 +224,11 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                     <SelectValue placeholder="Select activity type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="inspection">Field Inspection</SelectItem>
-                    <SelectItem value="compliance">Compliance Review</SelectItem>
-                    <SelectItem value="training">Training Session</SelectItem>
-                    <SelectItem value="audit">Quality Audit</SelectItem>
-                    <SelectItem value="maintenance">Equipment Maintenance</SelectItem>
+                    <SelectItem value="judgment">Draft Judgment</SelectItem>
+                    <SelectItem value="research">Legal Research</SelectItem>
+                    <SelectItem value="review">Case File Review</SelectItem>
+                    <SelectItem value="hearing">Hearing Preparation</SelectItem>
+                    <SelectItem value="training">Judicial Ethics Training</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -323,7 +323,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
           </DialogTitle>
           {(() => {
             if (selectedActivityForDetails) {
-              const activity = allActivitiesData.find(a => a.id === selectedActivityForDetails)
+              const activity = judicialActivities.find(a => a.id === selectedActivityForDetails)
               
               if (activity) {
                 return (
@@ -388,19 +388,19 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-sm line-through text-gray-500">Prepare inspection documentation</span>
+                              <span className="text-sm line-through text-gray-500">Review case documents</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <CheckCircle className="w-4 h-4 text-green-500" />
-                              <span className="text-sm line-through text-gray-500">Schedule site visit</span>
+                              <span className="text-sm line-through text-gray-500">Research relevant precedents</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                              <span className="text-sm">Conduct compliance assessment</span>
+                              <span className="text-sm">Prepare draft judgment</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                              <span className="text-sm">Submit compliance report</span>
+                              <span className="text-sm">Review and finalize judgment</span>
                             </div>
                           </div>
                         </div>
@@ -418,7 +418,7 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900">Activities</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allActivitiesData.length} activities requiring attention</p>
+                      <p className="text-sm text-gray-500 mt-1">{judicialActivities.length} activities requiring attention</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="group relative">
@@ -444,27 +444,27 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                 
                 <div className="flex-1 overflow-y-auto p-6">
                   <div className="space-y-3">
-                    {allActivitiesData.map((activity) => {
+                    {judicialActivities.map((activity) => {
                       // Get icon component and styling based on activity type (same as main card)
                       const getActivityIconAndStyle = (type: string) => {
                         switch (type) {
-                          case 'compliance': 
+                          case 'judgment': 
                             return { 
-                              icon: Shield, 
+                              icon: FileText, 
                               iconColor: 'text-orange-600', 
                               iconBg: 'bg-orange-100',
                               hoverBg: 'hover:bg-orange-50'
                             }
-                          case 'visit': 
+                          case 'research': 
                             return { 
-                              icon: MapPin, 
+                              icon: TrendingUp, 
                               iconColor: 'text-blue-600', 
                               iconBg: 'bg-blue-100',
                               hoverBg: 'hover:bg-blue-50'
                             }
-                          case 'renewal': 
+                          case 'review': 
                             return { 
-                              icon: Award, 
+                              icon: CheckCircle, 
                               iconColor: 'text-purple-600', 
                               iconBg: 'bg-purple-100',
                               hoverBg: 'hover:bg-purple-50'
@@ -476,16 +476,16 @@ const ActivitiesCard = ({ className, triggerNewActivity, setTriggerNewActivity }
                               iconBg: 'bg-green-100',
                               hoverBg: 'hover:bg-green-50'
                             }
-                          case 'quality': 
+                          case 'hearing': 
                             return { 
-                              icon: FileText, 
+                              icon: Calendar, 
                               iconColor: 'text-indigo-600', 
                               iconBg: 'bg-indigo-100',
                               hoverBg: 'hover:bg-indigo-50'
                             }
-                          case 'monitoring': 
+                          case 'legal': 
                             return { 
-                              icon: TrendingUp, 
+                              icon: Shield, 
                               iconColor: 'text-teal-600', 
                               iconBg: 'bg-teal-100',
                               hoverBg: 'hover:bg-teal-50'

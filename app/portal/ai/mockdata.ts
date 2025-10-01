@@ -1,194 +1,157 @@
-// AI portal mockdata - processed crops data for AI chat functionality
+// AI portal mockdata - processed case data for AI chat functionality
 
-export interface ProcessedCropData {
+export interface JudicialCaseData {
   id: string;
-  cropName: string;
-  region: string;
-  totalArea: number; // in hectares
-  productivity: number; // tonnes per hectare
-  currentPrice: number;
-  currency: string;
-  priceUnit: string;
-  harvestSeason: string;
-  marketTrends: {
-    demand: 'high' | 'medium' | 'low';
-    priceDirection: 'up' | 'down' | 'stable';
+  caseType: string;
+  court: string;
+  totalCases: number;
+  resolvedCases: number;
+  averageResolutionTime: number; // in days
+  pendingCases: number;
+  priorityCases: number;
+  timeUnit: string;
+  caseStatus: {
+    trend: 'increasing' | 'decreasing' | 'stable';
     changePercent: number;
   };
   challenges: string[];
-  opportunities: string[];
   recommendations: string[];
 }
 
-export const processedCropsData: ProcessedCropData[] = [
+export const processedCasesData: JudicialCaseData[] = [
   {
-    id: "sugarcane-001",
-    cropName: "Sugarcane",
-    region: "Nyanza Province",
-    totalArea: 45000,
-    productivity: 75,
-    currentPrice: 4500,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    harvestSeason: "July - September",
-    marketTrends: {
-      demand: 'high',
-      priceDirection: 'up',
-      changePercent: 5
-    },
-    challenges: [
-      "Mill efficiency concerns",
-      "Farmer payment delays in some regions",
-      "Weather dependency",
-      "Transportation costs"
-    ],
-    opportunities: [
-      "66% production increase in reformed mills",
-      "New leasing agreements improving operations",
-      "Government support through Sugar Act 2024",
-      "Export potential to EU markets"
-    ],
-    recommendations: [
-      "Continue mill modernization programs",
-      "Implement digital reporting systems",
-      "Focus on timely farmer payments",
-      "Explore value-added products like ethanol"
-    ]
-  },
-  {
-    id: "sugar-002",
-    cropName: "Sugar (Refined)",
-    region: "Western Kenya",
-    totalArea: 0, // Processed product
-    productivity: 0.12, // conversion ratio from sugarcane
-    currentPrice: 85,
-    currency: "KSh",
-    priceUnit: "per kg",
-    harvestSeason: "Year-round production",
-    marketTrends: {
-      demand: 'high',
-      priceDirection: 'down',
-      changePercent: 2
-    },
-    challenges: [
-      "Import competition",
-      "Quality standardization",
-      "Storage and distribution",
-      "Market price volatility"
-    ],
-    opportunities: [
-      "Reduced import dependency target",
-      "Regional export potential",
-      "Value chain integration",
-      "Quality premium markets"
-    ],
-    recommendations: [
-      "Strengthen quality control systems",
-      "Develop strategic reserves",
-      "Improve packaging and branding",
-      "Target premium market segments"
-    ]
-  },
-  {
-    id: "molasses-003",
-    cropName: "Molasses",
-    region: "Central Kenya",
-    totalArea: 0, // By-product
-    productivity: 0.04, // from sugar production
-    currentPrice: 15000,
-    currency: "KSh",
-    priceUnit: "per tonne",
-    harvestSeason: "Continuous with sugar production",
-    marketTrends: {
-      demand: 'medium',
-      priceDirection: 'up',
-      changePercent: 3
-    },
-    challenges: [
-      "Limited local demand",
-      "Storage infrastructure",
-      "Quality consistency",
-      "Transport logistics"
-    ],
-    opportunities: [
-      "Ethanol production potential",
-      "Animal feed industry growth",
-      "Export markets in East Africa",
-      "Industrial applications"
-    ],
-    recommendations: [
-      "Develop ethanol production facilities",
-      "Establish quality standards",
-      "Create regional distribution network",
-      "Research industrial applications"
-    ]
-  },
-  {
-    id: "maize-004",
-    cropName: "Maize",
-    region: "Rift Valley",
-    totalArea: 120000,
-    productivity: 28,
-    currentPrice: 3500,
-    currency: "KSh",
-    priceUnit: "per 90kg bag",
-    harvestSeason: "March - August",
-    marketTrends: {
-      demand: 'high',
-      priceDirection: 'stable',
-      changePercent: 0
-    },
-    challenges: [
-      "Climate variability",
-      "Post-harvest losses",
-      "Market access for smallholders",
-      "Pest and disease management"
-    ],
-    opportunities: [
-      "Food security importance",
-      "Value addition potential",
-      "Regional export markets",
-      "Technology adoption"
-    ],
-    recommendations: [
-      "Promote drought-resistant varieties",
-      "Improve storage facilities",
-      "Strengthen farmer cooperatives",
-      "Enhance extension services"
-    ]
-  },
-  {
-    id: "cotton-005",
-    cropName: "Cotton",
-    region: "Coast Province",
-    totalArea: 15000,
-    productivity: 12,
-    currentPrice: 45,
-    currency: "KSh",
-    priceUnit: "per kg",
-    harvestSeason: "December - March",
-    marketTrends: {
-      demand: 'medium',
-      priceDirection: 'up',
+    id: "civil-001",
+    caseType: "Civil",
+    court: "High Court",
+    totalCases: 1250,
+    resolvedCases: 875,
+    averageResolutionTime: 95,
+    pendingCases: 375,
+    priorityCases: 42,
+    timeUnit: "days",
+    caseStatus: {
+      trend: 'decreasing',
       changePercent: 8
     },
     challenges: [
-      "Limited ginning capacity",
-      "Quality requirements",
-      "Pest management costs",
-      "Market access"
-    ],
-    opportunities: [
-      "Textile industry revival",
-      "Export potential",
-      "Value chain development",
-      "Government support programs"
+      "Complex documentary evidence",
+      "Multiple parties involved",
+      "Expert witness scheduling",
+      "Procedural delays"
     ],
     recommendations: [
-      "Invest in ginning infrastructure",
-      "Improve seed quality",
-      "Develop farmer training programs",
-      "Create textile industry linkages"
+      "Implement case management conferences",
+      "Utilize digital evidence management",
+      "Set firm timelines for submissions",
+      "Consider alternative dispute resolution"
+    ]
+  },
+  {
+    id: "criminal-002",
+    caseType: "Criminal",
+    court: "Magistrate Court",
+    totalCases: 2100,
+    resolvedCases: 1680,
+    averageResolutionTime: 65,
+    pendingCases: 420,
+    priorityCases: 85,
+    timeUnit: "days",
+    caseStatus: {
+      trend: 'decreasing',
+      changePercent: 12
+    },
+    challenges: [
+      "Witness availability",
+      "Evidence processing backlogs",
+      "Remand population concerns",
+      "Investigation delays"
+    ],
+    recommendations: [
+      "Implement witness protection measures",
+      "Expedite bail hearings",
+      "Coordinate with prosecution services",
+      "Utilize plea bargaining where appropriate"
+    ]
+  },
+  {
+    id: "constitutional-003",
+    caseType: "Constitutional",
+    court: "Supreme Court",
+    totalCases: 85,
+    resolvedCases: 62,
+    averageResolutionTime: 120,
+    pendingCases: 23,
+    priorityCases: 15,
+    timeUnit: "days",
+    caseStatus: {
+      trend: 'stable',
+      changePercent: 2
+    },
+    challenges: [
+      "Complex legal interpretations",
+      "Public interest considerations",
+      "Amicus curiae management",
+      "Precedent implications"
+    ],
+    recommendations: [
+      "Establish research assistance teams",
+      "Schedule regular bench conferences",
+      "Implement structured deliberation processes",
+      "Develop comprehensive judgment templates"
+    ]
+  },
+  {
+    id: "family-004",
+    caseType: "Family",
+    court: "Family Court",
+    totalCases: 950,
+    resolvedCases: 760,
+    averageResolutionTime: 45,
+    pendingCases: 190,
+    priorityCases: 68,
+    timeUnit: "days",
+    caseStatus: {
+      trend: 'decreasing',
+      changePercent: 15
+    },
+    challenges: [
+      "Child welfare considerations",
+      "Emotional parties",
+      "Property division complexities",
+      "Enforcement of orders"
+    ],
+    recommendations: [
+      "Utilize family counselors",
+      "Implement child-friendly court procedures",
+      "Expedite cases involving minors",
+      "Consider mediation for appropriate cases"
+    ]
+  },
+  {
+    id: "commercial-005",
+    caseType: "Commercial",
+    court: "Commercial Court",
+    totalCases: 520,
+    resolvedCases: 338,
+    averageResolutionTime: 110,
+    pendingCases: 182,
+    priorityCases: 25,
+    timeUnit: "days",
+    caseStatus: {
+      trend: 'increasing',
+      changePercent: 5
+    },
+    challenges: [
+      "Complex financial evidence",
+      "International jurisdiction issues",
+      "Corporate disclosure compliance",
+      "Technical expert testimony"
+    ],
+    recommendations: [
+      "Implement specialized case tracks",
+      "Utilize financial forensic experts",
+      "Develop standardized disclosure protocols",
+      "Consider court-appointed neutral experts"
     ]
   }
 ];
@@ -196,27 +159,28 @@ export const processedCropsData: ProcessedCropData[] = [
 // Additional AI context data
 export const aiChatContext = {
   knowledgeBase: {
-    cropProduction: processedCropsData,
-    marketInsights: {
+    caseManagement: processedCasesData,
+    legalInsights: {
       lastUpdated: new Date().toISOString(),
-      dataSource: "Kenya Sugar Board & Ministry of Agriculture",
-      confidence: 0.85
+      dataSource: "Judiciary of Kenya Case Management System",
+      confidence: 0.90
     },
     regulations: [
-      "Sugar Act 2024",
-      "Crop Development Act",
-      "Agricultural Finance Corporation Guidelines",
-      "Export/Import Regulations"
+      "Constitution of Kenya 2010",
+      "Civil Procedure Act",
+      "Criminal Procedure Code",
+      "Evidence Act",
+      "Judicial Service Act"
     ]
   },
   systemPrompts: {
-    agricultural: "You are an AI assistant specialized in Kenyan agriculture, particularly sugar production and crop management. Provide evidence-based advice using current market data and regulatory guidelines.",
-    market: "Analyze market trends and provide recommendations based on current crop prices, demand patterns, and regional production data.",
-    planning: "Help with agricultural planning decisions using productivity data, seasonal patterns, and market opportunities."
+    legal: "You are an AI assistant specialized in Kenyan legal system, particularly case management and judicial procedures. Provide evidence-based advice using current case law and statutory guidelines.",
+    procedural: "Analyze procedural requirements and provide recommendations based on current case status, court rules, and legal precedents.",
+    research: "Help with legal research using case law, statutes, and judicial interpretations to support decision-making."
   }
 };
 
 export default {
-  processedCropsData,
+  processedCasesData,
   aiChatContext
 };

@@ -17,21 +17,21 @@ import {
 } from "lucide-react"
 import { LuSquarePen } from 'react-icons/lu'
 import { GoInfo } from 'react-icons/go'
-import { allMeetingsData } from "@/lib/mockdata"
+import { judicialMeetings } from "@/lib/judicial-mockdata"
 import { ScheduleMeetingModal, MeetingDetailsModal } from "@/components/modals/schedule-meeting-modal"
 
 interface MeetingsCardProps {
   className?: string
 }
 
-// Function to convert allMeetingsData format to Meeting format
+// Function to convert judicialMeetings format to Meeting format
 const convertToMeeting = (meetingData: any) => {
   const typeMapping: Record<string, "tactical-briefing" | "strategic-planning" | "mission-debrief" | "training-exercise" | "intelligence-briefing"> = {
-    "Board Meeting": "strategic-planning",
-    "Stakeholder Meeting": "tactical-briefing", 
-    "Operations Review": "mission-debrief",
-    "Training Session": "training-exercise",
-    "Intelligence Briefing": "intelligence-briefing"
+    "Judicial Conference": "strategic-planning",
+    "Administrative": "tactical-briefing", 
+    "Case Conference": "mission-debrief",
+    "Training": "training-exercise",
+    "Legal Briefing": "intelligence-briefing"
   }
 
   return {
@@ -55,7 +55,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null)
 
   const handleMeetingClick = (meetingId: string) => {
-    const meeting = allMeetingsData.find(m => m.id === meetingId)
+    const meeting = judicialMeetings.find(m => m.id === meetingId)
     if (meeting) {
       setSelectedMeeting(convertToMeeting(meeting))
       setMeetingDetailsOpen(true)
@@ -84,26 +84,26 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
         <CardContent className="px-3 py-2">
           {/* Scrollable meetings list - showing 3 meetings */}
           <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-hover">
-            {allMeetingsData.slice(0, 3).map((meeting) => {
+            {judicialMeetings.slice(0, 3).map((meeting) => {
               // Get color based on meeting type or status
               const getIndicatorColor = (type: string) => {
                 switch (type) {
-                  case 'Board Meeting': return 'bg-yellow-500'
-                  case 'Stakeholder Meeting': return 'bg-blue-500'
-                  case 'Operations Review': return 'bg-green-500'
-                  case 'Training Session': return 'bg-purple-500'
-                  case 'Intelligence Briefing': return 'bg-red-500'
+                  case 'Judicial Conference': return 'bg-blue-500'
+                  case 'Administrative': return 'bg-green-500'
+                  case 'Case Conference': return 'bg-yellow-500'
+                  case 'Training': return 'bg-purple-500'
+                  case 'Legal Briefing': return 'bg-red-500'
                   default: return 'bg-gray-500'
                 }
               }
 
               const getHoverBg = (type: string) => {
                 switch (type) {
-                  case 'Board Meeting': return 'hover:bg-yellow-50'
-                  case 'Stakeholder Meeting': return 'hover:bg-blue-50'
-                  case 'Operations Review': return 'hover:bg-green-50'
-                  case 'Training Session': return 'hover:bg-purple-50'
-                  case 'Intelligence Briefing': return 'hover:bg-red-50'
+                  case 'Judicial Conference': return 'hover:bg-blue-50'
+                  case 'Administrative': return 'hover:bg-green-50'
+                  case 'Case Conference': return 'hover:bg-yellow-50'
+                  case 'Training': return 'hover:bg-purple-50'
+                  case 'Legal Briefing': return 'hover:bg-red-50'
                   default: return 'hover:bg-gray-50'
                 }
               }
@@ -148,7 +148,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
           </DialogTitle>
           {(() => {
             if (selectedMeetingForDetails) {
-              const meeting = allMeetingsData.find(m => m.id === selectedMeetingForDetails)
+              const meeting = judicialMeetings.find(m => m.id === selectedMeetingForDetails)
               
               if (meeting) {
                 return (
@@ -239,7 +239,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900">Meetings</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allMeetingsData.length} upcoming meetings</p>
+                      <p className="text-sm text-gray-500 mt-1">{judicialMeetings.length} upcoming meetings</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="group relative">
@@ -265,7 +265,7 @@ const MeetingsCard = ({ className }: MeetingsCardProps) => {
                 
                 <div className="flex-1 overflow-y-auto p-6">
                   <div className="space-y-3">
-                    {allMeetingsData.map((meeting) => (
+                    {judicialMeetings.map((meeting) => (
                       <div 
                         key={meeting.id}
                         className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-md"

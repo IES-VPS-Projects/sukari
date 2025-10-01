@@ -10,7 +10,7 @@ import { resourceCenterData, getResourceCounts, getPopularResources, type Resour
 interface Resource {
   id: string
   title: string
-  type: 'article' | 'doc' | 'publication' | 'report' | 'case-study'
+  type: 'case-law' | 'legislation' | 'judgment' | 'report' | 'legal-research'
   author?: string
   readTime?: string
   savedDate: string
@@ -61,16 +61,19 @@ const ResourceCenterCard = () => {
 
   const getResourceIcon = (type: string) => {
     switch (type) {
-      case 'article': return <FileText className="h-4 w-4" />
+      case 'case-law': return <FileText className="h-4 w-4" />
       case 'report': return <TrendingUp className="h-4 w-4" />
-      case 'case-study': return <Users className="h-4 w-4" />
+      case 'judgment': return <Users className="h-4 w-4" />
+      case 'legislation': return <FileText className="h-4 w-4" />
+      case 'legal-research': return <BookOpen className="h-4 w-4" />
       default: return <BookOpen className="h-4 w-4" />
     }
   }
 
   const getResourceTypeLabel = (type: string) => {
     switch (type) {
-      case 'case-study': return 'Case Study'
+      case 'case-law': return 'Case Law'
+      case 'legal-research': return 'Legal Research'
       default: return type.charAt(0).toUpperCase() + type.slice(1)
     }
   }

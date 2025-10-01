@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { PortalLayout } from "@/components/portal-layout"
 import { useAuth } from "@/components/auth-provider"
-import { customAIService, ChatMessage, ChatSession } from "@/lib/custom-ai-service"
+import { judicialAIService, ChatMessage, ChatSession } from "@/lib/judicial-ai-service"
 import ReactMarkdown from 'react-markdown'
 import { 
   PlusIcon, 
@@ -69,10 +69,10 @@ export default function AIInterfacePage() {
         const userId = getUserId();
         if (!userId) return;
         
-        const newSession = customAIService.createNewSession(userId);
+        const newSession = judicialAIService.createNewSession(userId);
         setCurrentSession(newSession);
-        customAIService.saveSession(newSession);
-        setSessions(customAIService.getSessions(userId));
+        judicialAIService.saveSession(newSession);
+        setSessions(judicialAIService.getSessions(userId));
       }
 
       const userMessage: ChatMessage = {
@@ -87,7 +87,7 @@ export default function AIInterfacePage() {
       setIsTyping(true)
 
       try {
-        const aiReply = await customAIService.generateResponse(updatedMessages, currentSession?.id)
+        const aiReply = await judicialAIService.generateResponse(updatedMessages, currentSession?.id)
         setIsTyping(false)
         
         const aiMessage: ChatMessage = {
@@ -109,14 +109,14 @@ export default function AIInterfacePage() {
           
           // Update session title based on first message
           if (finalMessages.length === 2) {
-            customAIService.updateSessionTitle(updatedSession, userMessage.content);
+            judicialAIService.updateSessionTitle(updatedSession, userMessage.content);
           }
           
           setCurrentSession(updatedSession);
-          customAIService.saveSession(updatedSession);
+          judicialAIService.saveSession(updatedSession);
           const userId = getUserId();
           if (userId) {
-            setSessions(customAIService.getSessions(userId));
+            setSessions(judicialAIService.getSessions(userId));
           }
         }
       } catch (err) {
@@ -151,7 +151,7 @@ export default function AIInterfacePage() {
   useEffect(() => {
     const userId = getUserId();
     if (userId) {
-      const savedSessions = customAIService.getSessions(userId);
+      const savedSessions = judicialAIService.getSessions(userId);
       setSessions(savedSessions);
       setCurrentSession(null); // Reset current session when user changes
       setMessages([]);
@@ -166,22 +166,22 @@ export default function AIInterfacePage() {
     const userId = getUserId();
     if (!userId) return;
     
-    const newSession = customAIService.createNewSession(userId);
+    const newSession = judicialAIService.createNewSession(userId);
     setCurrentSession(newSession);
     setMessages([]);
     setMessage("");
     setIsTyping(false);
     
     // Save the new session
-    customAIService.saveSession(newSession);
-    setSessions(customAIService.getSessions(userId));
+    judicialAIService.saveSession(newSession);
+    setSessions(judicialAIService.getSessions(userId));
   }
 
   const handleLoadSession = (sessionId: string) => {
     const userId = getUserId();
     if (!userId) return;
     
-    const session = customAIService.getSession(sessionId, userId);
+    const session = judicialAIService.getSession(sessionId, userId);
     if (session) {
       setCurrentSession(session);
       setMessages(session.messages);
@@ -195,8 +195,8 @@ export default function AIInterfacePage() {
     const userId = getUserId();
     if (!userId) return;
     
-    customAIService.deleteSession(sessionId, userId);
-    setSessions(customAIService.getSessions(userId));
+    judicialAIService.deleteSession(sessionId, userId);
+    setSessions(judicialAIService.getSessions(userId));
     
     // If we're deleting the current session, start a new one
     if (currentSession?.id === sessionId) {
@@ -227,7 +227,7 @@ export default function AIInterfacePage() {
   )
 
   return (
-    <PortalLayout pageTitle="AI">
+    <PortalLayout pageTitle="Judicial AI Assistant">
       <div className="flex h-[calc(100vh-8rem)] bg-white text-gray-800">
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'w-64' : 'w-12'} transition-all duration-300 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden`}>
@@ -318,7 +318,7 @@ export default function AIInterfacePage() {
                         value={message}
                         onChange={handleTextareaChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask anything about sugar production, mills, or agriculture..."
+                        placeholder="Ask anything about case law, legal precedents, or judicial procedures..."
                         className="flex-1 resize-none border-0 bg-transparent focus:outline-none min-h-[24px] max-h-32 py-1 text-gray-900 placeholder-gray-500"
                         rows={1}
                       />
@@ -427,7 +427,7 @@ export default function AIInterfacePage() {
                       value={message}
                       onChange={handleTextareaChange}
                       onKeyDown={handleKeyDown}
-                      placeholder="Ask anything about sugar production, mills, or agriculture..."
+                      placeholder="Ask anything about case law, legal precedents, or judicial procedures..."
                       className="flex-1 resize-none border-0 bg-transparent focus:outline-none min-h-[24px] max-h-32 py-1 text-gray-900 placeholder-gray-500"
                       rows={1}
                     />

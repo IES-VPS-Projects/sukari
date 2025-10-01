@@ -25,7 +25,7 @@ const transcriptData = [
 export default function BriefingCard() {
   // Audio state and logic
   const [isPlaying, setIsPlaying] = useState(false)
-  const [audio] = useState(typeof window !== 'undefined' ? new Audio('/sukari2.mp3') : null)
+  const [audio] = useState(typeof window !== 'undefined' ? new Audio('/court.mp3') : null)
   const [currentTranscriptIndex, setCurrentTranscriptIndex] = useState(0)
   const [audioTime, setAudioTime] = useState(0)
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { CheckCircle, ArrowLeft, X } from "lucide-react"
 import { GoInfo } from 'react-icons/go'
-import { allAIInsightsData } from "@/lib/mockdata"
+import { judicialAIInsights } from "@/lib/judicial-mockdata"
 
 interface AIInsightsCardProps {
   triggerNewActivity?: boolean
@@ -22,31 +22,31 @@ export default function AIInsightsCard({
 
   // Helper function to get indicator color based on insight
   const getInsightColor = (id: string, title: string) => {
-    if (id === 'insight-1' || title === 'Productivity') return 'bg-blue-500'
-    if (id === 'insight-2' || title === 'Compliance') return 'bg-yellow-500'
-    if (id === 'insight-3' || title === 'Weather') return 'bg-green-400'
-    if (title === 'Predictive Risk Forecast') return 'bg-purple-500'
-    if (title === 'Opportunity Alert') return 'bg-blue-800'
-    if (title === 'Financial Insight') return 'bg-orange-500'
-    if (title === 'Traceability Gap Detection') return 'bg-red-500'
-    if (title === 'Stakeholder Engagement Update') return 'bg-teal-500'
-    if (title === 'Sustainability Metric') return 'bg-green-800'
-    if (title === 'Market Trend Analysis') return 'bg-indigo-500'
+    if (id === 'insight-1' || title === 'Case Backlog Alert') return 'bg-blue-500'
+    if (id === 'insight-2' || title === 'Judgment Patterns') return 'bg-yellow-500'
+    if (id === 'insight-3' || title === 'Legal Research') return 'bg-green-400'
+    if (title === 'Case Timeline Analysis') return 'bg-purple-500'
+    if (title === 'Procedural Recommendation') return 'bg-blue-800'
+    if (title === 'Sentencing Analysis') return 'bg-orange-500'
+    if (title === 'Citation Opportunity') return 'bg-red-500'
+    if (title === 'Witness Pattern Detection') return 'bg-teal-500'
+    if (title === 'Electronic Filing Alert') return 'bg-green-800'
+    if (title === 'Legal Trend Analysis') return 'bg-indigo-500'
     return 'bg-gray-500'
   }
 
   // Helper function to get hover background color
   const getHoverBg = (id: string, title: string) => {
-    if (id === 'insight-1' || title === 'Productivity') return 'hover:bg-blue-50'
-    if (id === 'insight-2' || title === 'Compliance') return 'hover:bg-yellow-50'
-    if (id === 'insight-3' || title === 'Weather') return 'hover:bg-green-50'
-    if (title === 'Predictive Risk Forecast') return 'hover:bg-purple-50'
-    if (title === 'Opportunity Alert') return 'hover:bg-blue-100'
-    if (title === 'Financial Insight') return 'hover:bg-orange-50'
-    if (title === 'Traceability Gap Detection') return 'hover:bg-red-50'
-    if (title === 'Stakeholder Engagement Update') return 'hover:bg-teal-50'
-    if (title === 'Sustainability Metric') return 'hover:bg-green-100'
-    if (title === 'Market Trend Analysis') return 'hover:bg-indigo-50'
+    if (id === 'insight-1' || title === 'Case Backlog Alert') return 'hover:bg-blue-50'
+    if (id === 'insight-2' || title === 'Judgment Patterns') return 'hover:bg-yellow-50'
+    if (id === 'insight-3' || title === 'Legal Research') return 'hover:bg-green-50'
+    if (title === 'Case Timeline Analysis') return 'hover:bg-purple-50'
+    if (title === 'Procedural Recommendation') return 'hover:bg-blue-100'
+    if (title === 'Sentencing Analysis') return 'hover:bg-orange-50'
+    if (title === 'Citation Opportunity') return 'hover:bg-red-50'
+    if (title === 'Witness Pattern Detection') return 'hover:bg-teal-50'
+    if (title === 'Electronic Filing Alert') return 'hover:bg-green-100'
+    if (title === 'Legal Trend Analysis') return 'hover:bg-indigo-50'
     return 'hover:bg-gray-50'
   }
 
@@ -64,7 +64,7 @@ export default function AIInsightsCard({
         <CardContent className="px-4 py-4 overflow-hidden">
           {/* Scrollable insights list - showing all insights */}
           <div className="space-y-3 max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hover pr-1">
-            {allAIInsightsData.map((insight) => (
+            {judicialAIInsights.map((insight) => (
               <div 
                 key={insight.id}
                 className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer hover:shadow-md transform-gpu ${getHoverBg(insight.id, insight.title)}`}
@@ -109,7 +109,7 @@ export default function AIInsightsCard({
           </DialogTitle>
           {(() => {
             if (selectedAIInsightForDetails) {
-              const insight = allAIInsightsData.find(i => i.id === selectedAIInsightForDetails)
+              const insight = judicialAIInsights.find(i => i.id === selectedAIInsightForDetails)
               if (insight) {
                 return (
                   <div className="flex flex-col h-full">
@@ -128,11 +128,9 @@ export default function AIInsightsCard({
                             <CheckCircle className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
-                            <h2 className="text-xl font-semibold text-gray-900">
-                              {insight.id === 'insight-1' ? 'Productivity' : 
-                               insight.id === 'insight-2' ? 'Compliance' : 
-                               insight.id === 'insight-3' ? 'Weather' : insight.title}
-                            </h2>
+                              <h2 className="text-xl font-semibold text-gray-900">
+                                {insight.title}
+                              </h2>
                             <p className="text-sm text-gray-500">{insight.timestamp}</p>
                           </div>
                         </div>
@@ -149,9 +147,7 @@ export default function AIInsightsCard({
                         <div>
                           <h3 className="text-sm font-medium text-gray-900 mb-2">Category</h3>
                           <div className="capitalize text-gray-700">
-                            {insight.id === 'insight-1' ? 'Travel' : 
-                             insight.id === 'insight-2' ? 'Governance' : 
-                             insight.id === 'insight-3' ? 'Environment' : insight.category}
+                            {insight.category}
                           </div>
                         </div>
 
@@ -194,10 +190,10 @@ export default function AIInsightsCard({
                         <div>
                           <h3 className="text-sm font-medium text-gray-900 mb-2">Data Sources</h3>
                           <div className="flex flex-wrap gap-2">
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Production Data</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Environmental Sensors</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Case Management System</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Court Records</span>
                             <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Historical Patterns</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Market Analysis</span>
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">Legal Precedents</span>
                           </div>
                         </div>
                       </div>
@@ -240,7 +236,7 @@ export default function AIInsightsCard({
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900">AI Insights</h2>
-                      <p className="text-sm text-gray-500 mt-1">{allAIInsightsData.length} insights available</p>
+                      <p className="text-sm text-gray-500 mt-1">{judicialAIInsights.length} insights available</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="group relative">
@@ -266,35 +262,35 @@ export default function AIInsightsCard({
                 
                 <div className="flex-1 overflow-y-auto p-6 bg-gray-50 min-h-0">
                   <div className="space-y-3">
-                    {allAIInsightsData.map((insight) => {
+                    {judicialAIInsights.map((insight) => {
                       // Define color mapping based on insight type
                       const getInsightColor = (id: string, title: string) => {
-                        if (id === 'insight-1' || title === 'Productivity') return 'bg-blue-500' // Blue for action-oriented travel
-                        if (id === 'insight-2' || title === 'Compliance') return 'bg-yellow-500' // Yellow for governance urgency
-                        if (id === 'insight-3' || title === 'Weather') return 'bg-green-400' // Light Green for environmental readiness
-                        if (title === 'Predictive Risk Forecast') return 'bg-purple-500' // Purple for cautionary projections
-                        if (title === 'Opportunity Alert') return 'bg-blue-800' // Dark Blue for growth potentials
-                        if (title === 'Financial Insight') return 'bg-orange-500' // Orange for fiscal optimization
-                        if (title === 'Traceability Gap Detection') return 'bg-red-500' // Red for supply chain vulnerabilities
-                        if (title === 'Stakeholder Engagement Update') return 'bg-teal-500' // Teal for inclusivity metrics
-                        if (title === 'Sustainability Metric') return 'bg-green-800' // Dark Green for long-term resilience
-                        if (title === 'Market Trend Analysis') return 'bg-indigo-500' // Indigo for external intelligence
-                        return 'bg-gray-500' // Default
+                        if (id === 'insight-1' || title === 'Case Backlog Alert') return 'bg-blue-500'
+                        if (id === 'insight-2' || title === 'Judgment Patterns') return 'bg-yellow-500'
+                        if (id === 'insight-3' || title === 'Legal Research') return 'bg-green-400'
+                        if (title === 'Case Timeline Analysis') return 'bg-purple-500'
+                        if (title === 'Procedural Recommendation') return 'bg-blue-800'
+                        if (title === 'Sentencing Analysis') return 'bg-orange-500'
+                        if (title === 'Citation Opportunity') return 'bg-red-500'
+                        if (title === 'Witness Pattern Detection') return 'bg-teal-500'
+                        if (title === 'Electronic Filing Alert') return 'bg-green-800'
+                        if (title === 'Legal Trend Analysis') return 'bg-indigo-500'
+                        return 'bg-gray-500'
                       }
 
                       // Define hover background colors that match the indicator colors
                       const getHoverBg = (id: string, title: string) => {
-                        if (id === 'insight-1' || title === 'Productivity') return 'hover:bg-blue-50' // Blue hover
-                        if (id === 'insight-2' || title === 'Compliance') return 'hover:bg-yellow-50' // Yellow hover
-                        if (id === 'insight-3' || title === 'Weather') return 'hover:bg-green-50' // Light Green hover
-                        if (title === 'Predictive Risk Forecast') return 'hover:bg-purple-50' // Purple hover
-                        if (title === 'Opportunity Alert') return 'hover:bg-blue-100' // Dark Blue hover
-                        if (title === 'Financial Insight') return 'hover:bg-orange-50' // Orange hover
-                        if (title === 'Traceability Gap Detection') return 'hover:bg-red-50' // Red hover
-                        if (title === 'Stakeholder Engagement Update') return 'hover:bg-teal-50' // Teal hover
-                        if (title === 'Sustainability Metric') return 'hover:bg-green-100' // Dark Green hover
-                        if (title === 'Market Trend Analysis') return 'hover:bg-indigo-50' // Indigo hover
-                        return 'hover:bg-gray-50' // Default
+                        if (id === 'insight-1' || title === 'Case Backlog Alert') return 'hover:bg-blue-50'
+                        if (id === 'insight-2' || title === 'Judgment Patterns') return 'hover:bg-yellow-50'
+                        if (id === 'insight-3' || title === 'Legal Research') return 'hover:bg-green-50'
+                        if (title === 'Case Timeline Analysis') return 'hover:bg-purple-50'
+                        if (title === 'Procedural Recommendation') return 'hover:bg-blue-100'
+                        if (title === 'Sentencing Analysis') return 'hover:bg-orange-50'
+                        if (title === 'Citation Opportunity') return 'hover:bg-red-50'
+                        if (title === 'Witness Pattern Detection') return 'hover:bg-teal-50'
+                        if (title === 'Electronic Filing Alert') return 'hover:bg-green-100'
+                        if (title === 'Legal Trend Analysis') return 'hover:bg-indigo-50'
+                        return 'hover:bg-gray-50'
                       }
 
                       return (

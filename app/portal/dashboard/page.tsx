@@ -22,7 +22,7 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Award, Filter, FileText, Search, Plus, Download, Eye } from "lucide-react"
+import { TrendingUp, TrendingDown, Factory, Users, DollarSign, AlertTriangle, Award, Filter, FileText, Search, Plus, Download, Eye, Calendar, BookOpen } from "lucide-react"
 import ViewPlanCard from "./ViewPlanCard"
 import ResourceCenterCard from "./ResourceCenterCard"
 import SucroseContentCard from "./SucroseContentCard"
@@ -309,13 +309,13 @@ export default function DashboardPage() {
   // Tab definitions
   const tabs = [
     { id: "overview", label: "Overview" },
-    { id: "permits", label: "Permits" },
-    { id: "revenue", label: "Revenue" },
-    { id: "stakeholders", label: "Stakeholders" },
-    { id: "compliance", label: "Compliance" },
+    { id: "cases", label: "Case Management" },
+    { id: "hearings", label: "Hearings" },
+    { id: "judgments", label: "Judgments" },
+    { id: "performance", label: "Performance" },
     { id: "strategic-plan", label: "Strategic Plan" },
     { id: "reports", label: "Reports" },
-    { id: "production", label: "Production" },
+    { id: "statistics", label: "Case Statistics" },
     { id: "resource-center", label: "Resource Center" }
   ]
 
@@ -323,8 +323,8 @@ export default function DashboardPage() {
   const reportsData = [
     {
       id: 1,
-      title: "Compliance Audit Report",
-      category: "Compliance",
+      title: "Case Management Performance Report",
+      category: "Performance",
       date: "28/07/2025",
       size: "3.2 MB",
       status: "Draft",
@@ -332,8 +332,8 @@ export default function DashboardPage() {
     },
     {
       id: 2,
-      title: "Monthly Production Summary - November 2024",
-      category: "Operational",
+      title: "Monthly Judgments Summary - August 2025",
+      category: "Judicial",
       date: "26/07/2025",
       size: "2.4 MB",
       status: "Published",
@@ -341,8 +341,8 @@ export default function DashboardPage() {
     },
     {
       id: 3,
-      title: "Financial Performance Q3 2024",
-      category: "Financial",
+      title: "Court Performance Statistics Q3 2025",
+      category: "Statistical",
       date: "21/07/2025",
       size: "1.8 MB",
       status: "Published",
@@ -352,9 +352,9 @@ export default function DashboardPage() {
 
   const categories = [
     { id: "all", label: "All Reports" },
-    { id: "operational", label: "Operational" },
-    { id: "financial", label: "Financial" },
-    { id: "compliance", label: "Compliance" }
+    { id: "judicial", label: "Judicial" },
+    { id: "performance", label: "Performance" },
+    { id: "statistical", label: "Statistical" }
   ]
 
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -368,41 +368,55 @@ export default function DashboardPage() {
           <>
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <PermitsCard />
               <Card className="rounded-[20px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Pending Cases</h3>
+                    <FileText className="h-4 w-4 text-blue-500" />
                   </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
-                  <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
-                  <Progress value={92} className="h-2 mb-2" />
-                  <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
+                  <div className="text-2xl font-bold text-[#202020] mb-1">42</div>
+                  <p className="text-xs text-[#6B6B6B] mb-3">cases awaiting hearing</p>
+                  <p className="text-xs text-green-600 mb-2">-8% from last month</p>
+                  <Progress value={65} className="h-2 mb-2" />
+                  <div className="text-xs text-[#6B6B6B]">Case clearance rate: 65%</div>
                 </CardContent>
               </Card>
               <Card className="rounded-[20px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Stakeholders</h3>
-                    <Users className="h-4 w-4 text-green-500" />
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Upcoming Hearings</h3>
+                    <Calendar className="h-4 w-4 text-green-500" />
                   </div>
-                  <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
-                  <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
-                  <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
-                  <Progress value={78} className="h-2 mb-2" />
-                  <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
+                  <div className="text-2xl font-bold text-[#202020] mb-1">12</div>
+                  <p className="text-xs text-[#6B6B6B] mb-3">hearings this week</p>
+                  <p className="text-xs text-orange-600 mb-2">3 priority cases</p>
+                  <Progress value={83} className="h-2 mb-2" />
+                  <div className="text-xs text-[#6B6B6B]">Scheduling efficiency: 83%</div>
                 </CardContent>
               </Card>
               <Card className="rounded-[20px] shadow-lg border-0 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-medium text-[#6B6B6B]">Compliance Radar</h3>
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Case Resolution</h3>
+                    <Award className="h-4 w-4 text-green-500" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#202020] mb-1">87%</div>
+                  <p className="text-xs text-[#6B6B6B] mb-3">judgment delivery rate</p>
+                  <p className="text-xs text-green-600 mb-2">+5.2% from last quarter</p>
+                  <Progress value={87} className="h-2 mb-2" />
+                  <p className="text-xs text-[#6B6B6B]">Target: 90%</p>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-[#6B6B6B]">Case Timeline</h3>
                     <AlertTriangle className="h-4 w-4 text-yellow-500" />
                   </div>
                   <div className="flex justify-center">
-                    <GaugeMeter value={94} />
+                    <GaugeMeter value={78} />
                   </div>
+                  <p className="text-xs text-center text-[#6B6B6B] mt-1">Average resolution: 78 days</p>
                 </CardContent>
               </Card>
             </div>
@@ -413,44 +427,90 @@ export default function DashboardPage() {
               <div></div>
               <Card className="rounded-[20px] shadow-lg border-0 bg-white">
                 <CardHeader>
-                  <CardTitle className="text-[#202020]">Top Performing Mills</CardTitle>
+                  <CardTitle className="text-[#202020]">Case Type Distribution</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">Mumias Sugar Mill</span>
-                      <span className="text-sm font-medium text-green-600">85%</span>
+                      <span className="text-sm text-[#202020]">Civil Cases</span>
+                      <span className="text-sm font-medium text-blue-600">48%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '85%'}}></div>
+                      <div className="bg-blue-500 h-2 rounded-full" style={{width: '48%'}}></div>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">Nzoia Sugar Mill</span>
-                      <span className="text-sm font-medium text-green-600">80%</span>
+                      <span className="text-sm text-[#202020]">Criminal Cases</span>
+                      <span className="text-sm font-medium text-purple-600">35%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '80%'}}></div>
+                      <div className="bg-purple-500 h-2 rounded-full" style={{width: '35%'}}></div>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#202020]">West Kenya Sugar</span>
-                      <span className="text-sm font-medium text-green-600">75%</span>
+                      <span className="text-sm text-[#202020]">Constitutional Cases</span>
+                      <span className="text-sm font-medium text-green-600">17%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{width: '75%'}}></div>
+                      <div className="bg-green-500 h-2 rounded-full" style={{width: '17%'}}></div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* CTU Sucrose Content and Production Row */}
+            {/* Case Resolution Time and Caseload Trends Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SucroseContentCard sucroseData={sucroseContentData} />
-              <ProductionPulseCard productionData={mockProductionData} />
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Case Resolution Time</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 mb-4">Average time to resolve cases by type (days)</p>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={[
+                      { name: "Civil", time: 82 },
+                      { name: "Criminal", time: 94 },
+                      { name: "Constitutional", time: 105 },
+                      { name: "Family", time: 65 },
+                      { name: "Land", time: 110 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="time" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+              <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+                <CardHeader>
+                  <CardTitle className="text-[#202020]">Caseload Trends</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 mb-4">Monthly caseload vs resolved cases</p>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={[
+                      { month: "Jan", filed: 42, resolved: 38 },
+                      { month: "Feb", filed: 48, resolved: 40 },
+                      { month: "Mar", filed: 53, resolved: 45 },
+                      { month: "Apr", filed: 49, resolved: 50 },
+                      { month: "May", filed: 52, resolved: 53 },
+                      { month: "Jun", filed: 47, resolved: 49 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="filed" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} name="Filed Cases" />
+                      <Line type="monotone" dataKey="resolved" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Resolved Cases" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Fourth Row - Resource Center */}
@@ -460,54 +520,95 @@ export default function DashboardPage() {
           </>
         )
 
-      case "permits":
+      case "cases":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <PermitsCard />
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="text-[#202020]">Permit Applications by Type</CardTitle>
+                <CardTitle className="text-[#202020]">Case Status Overview</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Mill Registration</span>
-                    <span className="font-semibold">45</span>
+                    <span className="text-sm">Pending Hearing</span>
+                    <span className="font-semibold text-blue-600">42</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Quality Certification</span>
-                    <span className="font-semibold">32</span>
+                    <span className="text-sm">In Progress</span>
+                    <span className="font-semibold text-amber-600">28</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Export License</span>
-                    <span className="font-semibold">28</span>
+                    <span className="text-sm">Judgment Pending</span>
+                    <span className="font-semibold text-purple-600">15</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Operation License</span>
-                    <span className="font-semibold">51</span>
+                    <span className="text-sm">Resolved</span>
+                    <span className="font-semibold text-green-600">67</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="text-[#202020]">Processing Timeline</CardTitle>
+                <CardTitle className="text-[#202020]">Case Types Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: "Civil", value: 48 },
+                        { name: "Criminal", value: 35 },
+                        { name: "Constitutional", value: 17 }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      <Cell fill="#3b82f6" />
+                      <Cell fill="#8b5cf6" />
+                      <Cell fill="#10b981" />
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex justify-between text-xs text-gray-600 mt-2">
+                  <div className="flex items-center"><div className="w-3 h-3 bg-blue-500 rounded-full mr-1"></div> Civil</div>
+                  <div className="flex items-center"><div className="w-3 h-3 bg-purple-500 rounded-full mr-1"></div> Criminal</div>
+                  <div className="flex items-center"><div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div> Constitutional</div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Case Processing Timeline</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm">Average Processing Time</span>
-                      <span className="text-sm font-semibold">14 days</span>
+                      <span className="text-sm">Average Resolution Time</span>
+                      <span className="text-sm font-semibold">78 days</span>
                     </div>
                     <Progress value={70} className="h-2" />
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm">Fast Track Applications</span>
-                      <span className="text-sm font-semibold">7 days</span>
+                      <span className="text-sm">Priority Cases</span>
+                      <span className="text-sm font-semibold">42 days</span>
                     </div>
                     <Progress value={35} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Target Resolution Time</span>
+                      <span className="text-sm font-semibold">60 days</span>
+                    </div>
+                    <Progress value={100} className="h-2 bg-gray-200" />
                   </div>
                 </div>
               </CardContent>
@@ -515,96 +616,196 @@ export default function DashboardPage() {
           </div>
         )
 
-      case "revenue":
+      case "hearings":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-[#6B6B6B]">Revenue</h3>
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Upcoming Hearings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="border-l-4 border-blue-500 pl-3 py-1">
+                  <p className="font-semibold text-[#202020]">Civil Case #2458</p>
+                  <p className="text-sm text-gray-500">Today, 10:30 AM</p>
+                  <p className="text-xs text-blue-600 mt-1">Court Room 3A</p>
                 </div>
-                <div className="text-2xl font-bold text-[#202020] mb-1">KSh 2.4B</div>
-                <p className="text-xs text-[#6B6B6B] mb-3">revenue this quarter</p>
-                <p className="text-xs text-green-600 mb-2">+18% from last quarter</p>
-                <Progress value={92} className="h-2 mb-2" />
-                <div className="text-xs text-[#6B6B6B]">Levy Collection: 92%</div>
+                <div className="border-l-4 border-blue-500 pl-3 py-1">
+                  <p className="font-semibold text-[#202020]">Criminal Case #1872</p>
+                  <p className="text-sm text-gray-500">Today, 2:15 PM</p>
+                  <p className="text-xs text-blue-600 mt-1">Court Room 5B</p>
+                </div>
+                <div className="border-l-4 border-amber-500 pl-3 py-1">
+                  <p className="font-semibold text-[#202020]">Civil Case #2461</p>
+                  <p className="text-sm text-gray-500">Tomorrow, 9:00 AM</p>
+                  <p className="text-xs text-blue-600 mt-1">Court Room 3A</p>
+                </div>
+                <Button className="w-full mt-2" variant="outline">View Full Schedule</Button>
               </CardContent>
             </Card>
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="text-[#202020]">Revenue Breakdown</CardTitle>
+                <CardTitle className="text-[#202020]">Hearing Statistics</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Sugar Levy</span>
-                    <span className="font-semibold">KSh 1.8B</span>
+                    <span className="text-sm">Scheduled This Week</span>
+                    <span className="font-semibold">28</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">License Fees</span>
-                    <span className="font-semibold">KSh 350M</span>
+                    <span className="text-sm">Completed</span>
+                    <span className="font-semibold">15</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Penalties</span>
-                    <span className="font-semibold">KSh 125M</span>
+                    <span className="text-sm">Rescheduled</span>
+                    <span className="font-semibold">3</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm">Other Income</span>
-                    <span className="font-semibold">KSh 125M</span>
+                    <span className="text-sm">Pending</span>
+                    <span className="font-semibold">10</span>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Completion Rate</span>
+                      <span className="text-sm font-semibold">83%</span>
+                    </div>
+                    <Progress value={83} className="h-2" />
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card className="rounded-[20px] shadow-lg border-0 bg-white">
               <CardHeader>
-                <CardTitle className="text-[#202020]">Collection Efficiency</CardTitle>
+                <CardTitle className="text-[#202020]">Average Hearing Duration</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex justify-center">
-                  <GaugeMeter value={92} />
+                <div className="flex justify-center mb-4">
+                  <GaugeMeter value={65} />
                 </div>
-                <p className="text-center text-sm text-gray-600 mt-2">Target: 95%</p>
+                <div className="space-y-2 text-center">
+                  <p className="text-center text-sm text-gray-600">65 minutes per hearing</p>
+                  <p className="text-xs text-gray-500">Target: 45-75 minutes</p>
+                </div>
               </CardContent>
             </Card>
           </div>
         )
 
-      case "stakeholders":
+      case "judgments":
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-medium text-[#6B6B6B]">Stakeholders</h3>
-                  <Users className="h-4 w-4 text-green-500" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Recent Judgments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    {
+                      id: "J-2458",
+                      title: "Smith vs. State of Kenya",
+                      date: "September 15, 2025",
+                      type: "Criminal",
+                      status: "Delivered"
+                    },
+                    {
+                      id: "J-2457",
+                      title: "ABC Holdings vs. XYZ Corporation",
+                      date: "September 12, 2025",
+                      type: "Civil",
+                      status: "Delivered"
+                    },
+                    {
+                      id: "J-2456",
+                      title: "Nairobi County vs. Resident Association",
+                      date: "September 10, 2025",
+                      type: "Constitutional",
+                      status: "Pending"
+                    },
+                    {
+                      id: "J-2455",
+                      title: "Family Estate Matter",
+                      date: "September 8, 2025",
+                      type: "Family",
+                      status: "Delivered"
+                    }
+                  ].map((judgment) => (
+                    <div key={judgment.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-between">
+                        <h3 className="font-semibold text-[#202020]">{judgment.title}</h3>
+                        <Badge className={judgment.status === "Delivered" ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}>
+                          {judgment.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center text-gray-500 text-sm mt-2">
+                        <span className="mr-3">Case ID: {judgment.id}</span>
+                        <span className="mr-3">•</span>
+                        <span className="mr-3">{judgment.type}</span>
+                        <span className="mr-3">•</span>
+                        <span>{judgment.date}</span>
+                      </div>
+                      <div className="flex mt-3">
+                        <Button variant="outline" size="sm" className="mr-2">
+                          <FileText className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
+                        <Button size="sm">
+                          <BookOpen className="h-4 w-4 mr-1" />
+                          Read Judgment
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-2xl font-bold text-[#202020] mb-1">3,038</div>
-                <p className="text-xs text-[#6B6B6B] mb-3">total registered entities</p>
-                <p className="text-xs text-green-600 mb-2">+5.2% new registrations</p>
-                <Progress value={78} className="h-2 mb-2" />
-                <p className="text-xs text-[#6B6B6B]">78% engagement rate</p>
               </CardContent>
             </Card>
-            {stakeholders.map((stakeholder, index) => (
-              <Card key={index} className="rounded-[20px] shadow-lg border-0 bg-white">
-                <CardHeader>
-                  <CardTitle className="text-[#202020] text-base">{stakeholder.type}</CardTitle>
-                </CardHeader>
-                <CardContent>
+            <Card className="rounded-[20px] shadow-lg border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-[#202020]">Judgment Statistics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">Judgments by Type - This Month</p>
                   <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-2xl font-bold">{stakeholder.count}</span>
-                      <span className="text-sm text-gray-600">of {stakeholder.total}</span>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Civil</span>
+                        <span>8</span>
+                      </div>
+                      <Progress value={42} className="h-2" />
                     </div>
-                    <Progress value={(stakeholder.count / stakeholder.total) * 100} className="h-2" />
-                    <div className="text-xs text-gray-600">
-                      <p>Location: {stakeholder.location}</p>
-                      <p>Status: {stakeholder.status}</p>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Criminal</span>
+                        <span>6</span>
+                      </div>
+                      <Progress value={32} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Constitutional</span>
+                        <span>3</span>
+                      </div>
+                      <Progress value={16} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Family</span>
+                        <span>2</span>
+                      </div>
+                      <Progress value={10} className="h-2" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </div>
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-600 mb-2">Judgment Delivery Performance</p>
+                  <div className="flex justify-center">
+                    <GaugeMeter value={87} />
+                  </div>
+                  <p className="text-center text-sm text-gray-600 mt-2">87% on-time delivery</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )
 

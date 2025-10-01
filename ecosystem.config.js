@@ -1,19 +1,19 @@
 module.exports = {
   apps: [
     {
-      name: 'sukari-app',
+      name: 'judiciary-portal',
       script: 'npm',
       args: 'start',
-      cwd: '/home/quinto/sukari',
+      cwd: '/home/quinto/judiciaryportal',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3047
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3047
       },
       // Logging configuration
       log_file: './logs/combined.log',
@@ -61,8 +61,8 @@ module.exports = {
       user: 'quinto',
       host: 'localhost',
       ref: 'origin/main',
-      repo: 'git@github.com:yourusername/sukari.git', // Update with your actual repo
-      path: '/home/quinto/sukari',
+      repo: 'git@github.com:yourusername/judiciaryportal.git', // Update with your actual repo
+      path: '/home/quinto/judiciaryportal',
       'pre-deploy-local': '',
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production',
       'pre-setup': ''
