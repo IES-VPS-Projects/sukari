@@ -1,6 +1,6 @@
 export interface InspectionAssignment {
   id: string
-  type: 'mill' | 'import' | 'letterOfComfort' | 'other'
+  type: 'registration' | 'compliance' | 'operations' | 'verification' | 'other'
   title: string
   businessName: string
   businessId: string
@@ -29,13 +29,13 @@ export interface InspectionAssignment {
 export const inspectionAssignments: InspectionAssignment[] = [
   {
     id: "insp-mill-reg-001",
-    type: "letterOfComfort",
+    type: "registration",
     title: "Mill Registration Physical Inspection",
     businessName: "Mumias Sugar Mills Ltd",
     businessId: "KSB/REG/2025/001",
-    location: "Mumias-Kakamega Road, Mumias, Kakamega County",
+    location: "Mumias-Kakamega road, Mumias, Kakamega County",
     contactPerson: "James Mwangi",
-    contactPhone: "+254-722-123456",
+    contactPhone: "+254 712 345 678",
     status: "pending",
     dueDate: "2025-10-15",
     assignedDate: "2025-09-29",
@@ -62,8 +62,8 @@ export const inspectionAssignments: InspectionAssignment[] = [
   },
   {
     id: "insp-001",
-    type: "letterOfComfort",
-    title: "Letter of Comfort Initial Inspection",
+    type: "registration",
+    title: "Registration Initial Inspection",
     businessName: "Mumias Sugar Company",
     businessId: "M-10045",
     location: "Kakamega County, Mumias East",
@@ -72,7 +72,7 @@ export const inspectionAssignments: InspectionAssignment[] = [
     status: "pending",
     dueDate: "2025-10-01",
     assignedDate: "2025-09-22",
-    description: "Conduct initial inspection for Letter of Comfort application. The mill is seeking approval to begin operations.",
+    description: "Conduct initial inspection for registration application. The mill is seeking approval to begin operations.",
     checklist: [
       "Verify mill facility meets structural requirements",
       "Inspect processing equipment and capacity",
@@ -85,7 +85,7 @@ export const inspectionAssignments: InspectionAssignment[] = [
   },
   {
     id: "insp-002",
-    type: "mill",
+    type: "compliance",
     title: "Quarterly Compliance Inspection",
     businessName: "Butali Sugar Mills",
     businessId: "M-10023",
@@ -99,7 +99,7 @@ export const inspectionAssignments: InspectionAssignment[] = [
   },
   {
     id: "insp-003",
-    type: "import",
+    type: "verification",
     title: "Import Verification Inspection",
     businessName: "East Africa Sugar Importers Ltd",
     businessId: "I-20089",
@@ -113,8 +113,8 @@ export const inspectionAssignments: InspectionAssignment[] = [
   },
   {
     id: "insp-004",
-    type: "letterOfComfort",
-    title: "Letter of Comfort Initial Inspection",
+    type: "registration",
+    title: "Registration Initial Inspection",
     businessName: "Busia Sugar Industries",
     businessId: "M-10067",
     location: "Busia County, Teso North",
@@ -123,7 +123,7 @@ export const inspectionAssignments: InspectionAssignment[] = [
     status: "pending",
     dueDate: "2025-10-08",
     assignedDate: "2025-09-24",
-    description: "Conduct initial inspection for Letter of Comfort application for a new sugar processing facility.",
+    description: "Conduct initial inspection for registration application for a new sugar processing facility.",
     checklist: [
       "Verify mill facility meets structural requirements",
       "Inspect processing equipment and capacity",
@@ -136,7 +136,7 @@ export const inspectionAssignments: InspectionAssignment[] = [
   },
   {
     id: "insp-005",
-    type: "mill",
+    type: "operations",
     title: "Annual Operational Inspection",
     businessName: "West Kenya Sugar Company",
     businessId: "M-10012",
